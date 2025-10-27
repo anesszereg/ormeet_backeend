@@ -140,7 +140,9 @@ Media (Polymorphic) ─── Events/Venues/Organizations/Users
 - **Orders Module** - Payment & order processing
 - **Reviews Module** - Ratings & feedback
 - **Promotions Module** - Discount campaigns
-- **Common Module** - Shared utilities
+- **Attendance Module** - Event check-in & tracking
+- **Common Module** - Shared utilities, filters & interceptors
+- **Database Module** - Migration management
 
 ---
 
@@ -375,6 +377,24 @@ http://localhost:3000/api/docs
 
 ---
 
+#### 📋 Attendance Module
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /attendance` - Check-in attendee
+  - Body: `{ ticketId, eventId, checkedInBy?, method, metadata? }`
+- `GET /attendance` - List all attendance records
+  - Query params: `eventId`, `ticketId`
+- `GET /attendance/event/:eventId` - Get attendance for specific event
+- `GET /attendance/event/:eventId/count` - Get attendance count
+- `GET /attendance/event/:eventId/stats` - Get attendance statistics
+- `GET /attendance/:id` - Get attendance record details
+- `PATCH /attendance/:id` - Update attendance record
+- `DELETE /attendance/:id` - Delete attendance record (Admin only)
+
+**Protected Endpoints (🔒 Authenticated Users):**
+- `GET /attendance/ticket/:ticketId` - Get attendance records for a ticket
+
+---
+
 ### Response Codes
 
 | Code | Description |
@@ -422,8 +442,10 @@ Ormeet/
 │   │   ├── orders/            # Order processing
 │   │   ├── reviews/           # Reviews & ratings
 │   │   ├── promotions/        # Discount codes
+│   │   ├── attendance/        # Attendance tracking
 │   │   ├── entities/          # TypeORM entities
-│   │   ├── common/            # Shared utilities
+│   │   ├── common/            # Shared utilities & filters
+│   │   ├── database/          # Database migrations
 │   │   ├── app.module.ts      # Root module
 │   │   └── main.ts            # Application entry
 │   │

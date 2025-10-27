@@ -12,6 +12,7 @@ import { TicketTypesModule } from './ticket-types/ticket-types.module';
 import { OrdersModule } from './orders/orders.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { PromotionsModule } from './promotions/promotions.module';
+import { AttendanceModule } from './attendance/attendance.module';
 import {
   User,
   Organization,
@@ -68,6 +69,7 @@ import {
     OrdersModule,
     TicketsModule,
     PromotionsModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
