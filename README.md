@@ -221,31 +221,189 @@ Access the full interactive API documentation at:
 http://localhost:3000/api/docs
 ```
 
-### Key Endpoints
+### Complete API Endpoints
 
-#### Authentication
+#### 🔐 Authentication
 - `POST /auth/register` - Register new user
 - `POST /auth/login` - User login
+- `POST /auth/refresh` - Refresh JWT token
+- `GET /auth/profile` - Get current user profile (🔒 Auth required)
 
-#### Events
-- `GET /events` - List all events (with filters)
-- `POST /events` - Create event (Organizer/Admin)
-- `GET /events/:id` - Get event details
-- `PATCH /events/:id` - Update event
-- `POST /events/:id/publish` - Publish event
+---
+
+#### 🎉 Events Module
+**Public Endpoints:**
+- `GET /events` - List all events with optional filters
+  - Query params: `status`, `category`, `organizerId`
+- `GET /events/:id` - Get event details by ID
+- `POST /events/:id/view` - Increment event view count
+
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /events` - Create a new event
+- `PATCH /events/:id` - Update event details
+- `DELETE /events/:id` - Delete event
+- `POST /events/:id/publish` - Publish event (change status to published)
 - `POST /events/:id/cancel` - Cancel event
 
-#### Organizations
-- `GET /organizations` - List organizations
-- `POST /organizations` - Create organization
+**Protected Endpoints (🔒 Authenticated Users):**
+- `POST /events/:id/favorite` - Add event to favorites
+
+---
+
+#### 🏢 Organizations Module
+**Public Endpoints:**
+- `GET /organizations` - List all organizations
 - `GET /organizations/:id` - Get organization details
+- `GET /organizations/owner/:ownerId` - Get organizations by owner
 
-#### Tickets & Orders
-- `POST /orders` - Create order
-- `GET /tickets/user/:userId` - Get user tickets
-- `POST /tickets/:id/use` - Mark ticket as used
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /organizations` - Create new organization
 
-For complete API documentation, see [API_DOCUMENTATION.md](backend/API_DOCUMENTATION.md)
+**Protected Endpoints (🔒 Authenticated Users):**
+- `PATCH /organizations/:id` - Update organization (owner only)
+- `DELETE /organizations/:id` - Delete organization (owner only)
+- `POST /organizations/:id/members/:userId` - Add member to organization
+- `DELETE /organizations/:id/members/:userId` - Remove member from organization
+
+---
+
+#### 📍 Venues Module
+**Public Endpoints:**
+- `GET /venues` - List all venues
+  - Query params: `city`, `country`, `minCapacity`
+- `GET /venues/nearby` - Find venues near a location
+  - Query params: `latitude`, `longitude`, `radius` (default: 50km)
+- `GET /venues/:id` - Get venue details
+
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /venues` - Create new venue
+- `PATCH /venues/:id` - Update venue
+
+**Protected Endpoints (🔒 Admin only):**
+- `DELETE /venues/:id` - Delete venue
+
+---
+
+#### 🎟️ Ticket Types Module
+**Public Endpoints:**
+- `GET /ticket-types` - List all ticket types
+  - Query params: `eventId`
+- `GET /ticket-types/event/:eventId` - Get ticket types for specific event
+- `GET /ticket-types/:id` - Get ticket type details
+- `GET /ticket-types/:id/available` - Get available quantity
+- `GET /ticket-types/:id/is-available` - Check availability status
+
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /ticket-types` - Create new ticket type
+- `PATCH /ticket-types/:id` - Update ticket type
+- `DELETE /ticket-types/:id` - Delete ticket type
+
+---
+
+#### 🎫 Tickets Module
+**Public Endpoints:**
+- `GET /tickets/qr/:qrCode` - Get ticket by QR code
+
+**Protected Endpoints (🔒 Authenticated Users):**
+- `POST /tickets` - Create new ticket
+- `GET /tickets` - List all tickets
+  - Query params: `userId`, `orderId`, `status`
+- `GET /tickets/user/:userId` - Get tickets for specific user
+- `GET /tickets/:id` - Get ticket details
+- `PATCH /tickets/:id` - Update ticket
+- `POST /tickets/:id/cancel` - Cancel ticket
+- `POST /tickets/:id/transfer` - Transfer ticket to another user
+  - Body: `{ newUserId: string }`
+- `DELETE /tickets/:id` - Delete ticket
+
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /tickets/:id/use` - Mark ticket as used (check-in)
+
+---
+
+#### 💳 Orders Module
+**Protected Endpoints (🔒 Authenticated Users):**
+- `POST /orders` - Create new order
+- `GET /orders` - List all orders
+  - Query params: `userId`, `eventId`, `status`
+- `GET /orders/user/:userId` - Get orders for specific user
+- `GET /orders/:id` - Get order details
+- `PATCH /orders/:id` - Update order (owner only)
+- `POST /orders/:id/payment` - Process payment for order
+  - Body: `{ provider: string, paymentId: string }`
+- `DELETE /orders/:id` - Delete order (pending orders only)
+
+**Protected Endpoints (🔒 Admin/Organizer):**
+- `POST /orders/:id/refund` - Refund an order
+
+---
+
+#### 🎁 Promotions Module
+**Public Endpoints:**
+- `GET /promotions` - List all promotions
+  - Query params: `eventId`, `isActive`
+- `GET /promotions/code/:code` - Get promotion by code
+- `GET /promotions/:id` - Get promotion details
+- `POST /promotions/validate/:code` - Validate promotion code
+
+**Protected Endpoints (🔒 Organizer/Admin):**
+- `POST /promotions` - Create new promotion
+- `PATCH /promotions/:id` - Update promotion
+- `POST /promotions/:id/deactivate` - Deactivate promotion
+
+**Protected Endpoints (🔒 Admin only):**
+- `DELETE /promotions/:id` - Delete promotion
+
+---
+
+#### ⭐ Reviews Module
+**Public Endpoints:**
+- `GET /reviews` - List all reviews
+  - Query params: `eventId`, `userId`, `approved`
+- `GET /reviews/event/:eventId` - Get reviews for specific event
+- `GET /reviews/event/:eventId/average` - Get average rating for event
+- `GET /reviews/:id` - Get review details
+
+**Protected Endpoints (🔒 Authenticated Users):**
+- `POST /reviews` - Create new review
+- `PATCH /reviews/:id` - Update review (author only)
+- `DELETE /reviews/:id` - Delete review (author or admin)
+
+**Protected Endpoints (🔒 Admin/Organizer):**
+- `POST /reviews/:id/approve` - Approve review
+- `POST /reviews/:id/reject` - Reject review
+
+---
+
+### Response Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 201 | Created successfully |
+| 400 | Bad request / Validation error |
+| 401 | Unauthorized - Authentication required |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Resource not found |
+| 500 | Internal server error |
+
+### Authentication
+
+Most endpoints require JWT authentication. Include the token in the Authorization header:
+
+```bash
+Authorization: Bearer <your-jwt-token>
+```
+
+### Role-Based Access Control
+
+The API implements three user roles:
+
+- **👤 USER** - Regular users (can purchase tickets, write reviews)
+- **🎭 ORGANIZER** - Event organizers (can create events, manage organizations)
+- **👑 ADMIN** - Administrators (full access to all resources)
+
+For complete API documentation with request/response examples, see [API_DOCUMENTATION.md](backend/API_DOCUMENTATION.md)
 
 ---
 
@@ -483,7 +641,7 @@ npm run test:e2e
 - [ ] Organization member management (95% complete)
 
 #### 📋 Planned Features
-- [ ] Payment gateway integration (Stripe, PayPal)
+- [ ] Payment gateway integration (shargili)
 - [ ] Email notifications (SendGrid, AWS SES)
 - [ ] QR code generation for tickets
 - [ ] File upload & media management
@@ -519,15 +677,9 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
+##  Authors
 
-This project is licensed under the UNLICENSED License - see the LICENSE file for details.
-
----
-
-## 👥 Authors
-
-- **Your Name** - Initial work
+- **Your Name** - ANESS ZEREG 
 
 ---
 
@@ -544,7 +696,7 @@ This project is licensed under the UNLICENSED License - see the LICENSE file for
 
 For issues, questions, or suggestions:
 
-- 📧 Email: support@ormeet.com
+- 📧 Email: Anesszereg1@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/yourusername/ormeet/issues)
 - 📖 Documentation: [Wiki](https://github.com/yourusername/ormeet/wiki)
 
