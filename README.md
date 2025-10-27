@@ -229,8 +229,12 @@ http://localhost:3000/api/docs
 ### Complete API Endpoints
 
 #### 🔐 Authentication
-- `POST /auth/register` - Register new user
+- `POST /auth/register` - Register new user (sends welcome email)
 - `POST /auth/login` - User login
+- `POST /auth/verify-email` - Verify email with token
+- `POST /auth/resend-verification` - Resend verification email
+- `POST /auth/forgot-password` - Request password reset link
+- `POST /auth/reset-password` - Reset password with token
 - `POST /auth/refresh` - Refresh JWT token
 - `GET /auth/profile` - Get current user profile (🔒 Auth required)
 
@@ -673,7 +677,12 @@ npm run test:e2e
 
 #### 📋 Planned Features (Phase 2)
 - [ ] Payment gateway integration (Stripe, PayPal, Chargily)
-- [ ] Email notifications (SendGrid, AWS SES)
+- [x] **Email notifications (Gmail SMTP)** ✨ COMPLETED
+  - Welcome emails on registration
+  - Email verification
+  - Password reset emails
+  - Password changed notifications
+  - Login notifications (optional)
 - [ ] SMS notifications (Twilio)
 - [ ] QR code generation library integration
 - [ ] File upload & media management (AWS S3, Cloudinary)
