@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme{
+
+    /*  font family */
+    
+  --font-poppins: 'Poppins', sans-serif;
+  
+  /* Font Import */
+  --font-family-base: 'Poppins', sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semi-bold: 600;
+  --font-weight-bold: 700;
+
+  --font-size-heading-l: 41px;
+  --font-size-heading-m: 20px;
+  --font-size-heading-s: 16px;
+  --font-size-body-large: 16px;
+  --font-size-small-titles: 14px;
+  --font-size-body-medium: 14px;
+  --font-size-body-base: 14px;
+  --font-size-caption: 12px;
+  --font-size-button-large: 16px;
+  --font-size-button-small: 14px;
+
+
+
+    /* colors */
+
+  --color-primary: #FF4000;
+  --color-primary-dark: #F0450B;
+  --color-primary-extra-dark: #E33900;
+  --color-primary-light: #FFF4F3;
+  
+  --color-secondary: #000000;
+  --color-secondary-light: #F8F8F8;
+
+  --color-black: #000000;
+  --color-dark-gray: #434343;
+  --color-gray: #4F4F4F;
+  --color-light-gray: #EEEEEE;
+  --color-extra-light-green: #F9F9F9;
+  --color-light-green: #E6F4F4;
+
+  --color-success: #34A853;
+  --color-error: #FF3425;
+  --color-info-icon-blue: #2DA8E0;
+  --color-info-light-blue: #EAF6FC;
+  --color-input-gray: #BCBCBC;
+  --color-light-orange: #FFF9F8;
+  --color-notification-blue: #0991FF;
+
+  --color-status-green: #0F9335;
+  --color-status-light-green: #EBF6EE;
+  --color-status-red: #FF3425;
+  --color-status-light-red: #FEEEE;
+  --color-status-gray: #676767;
+  --color-status-light-gray: #F0F0F0;
+  --color-status-brown: #D8BC00;
+  --color-status-light-brown: #FFFEEA;
+  --color-status-blue: #2466BF;
+  --color-status-light-blue: #EAF3FF;
+}
+
+  

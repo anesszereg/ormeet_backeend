@@ -1,8 +1,8 @@
 import React from 'react'
 
-function App() {
+const App = () => {
   return (
-    <div>hello this  is app</div>
+    <div>App</div>
   )
 }
 
