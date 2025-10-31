@@ -63,6 +63,23 @@ export class User {
   @JoinColumn({ name: 'organization_id' })
   organization: Organization;
 
+  // Email verification
+  @Column({ type: 'boolean', default: false, name: 'email_verified' })
+  emailVerified: boolean;
+
+  @Column({ name: 'email_verification_token', nullable: true })
+  emailVerificationToken: string;
+
+  @Column({ type: 'timestamp', name: 'email_verified_at', nullable: true })
+  emailVerifiedAt: Date;
+
+  // Password reset
+  @Column({ name: 'password_reset_token', nullable: true })
+  passwordResetToken: string;
+
+  @Column({ type: 'timestamp', name: 'password_reset_expires', nullable: true })
+  passwordResetExpires: Date;
+
   // Settings
   @Column({ type: 'boolean', default: true, name: 'email_opt_in' })
   emailOptIn: boolean;
