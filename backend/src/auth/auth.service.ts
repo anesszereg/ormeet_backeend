@@ -74,7 +74,7 @@ export class AuthService {
     };
   }
 
-  async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
     const { email, password } = loginDto;
 
     // Find user by email
@@ -91,6 +91,19 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Send login notification email
+    try {
+      await this.emailService.sendLoginNotification(
+        email, 
+        user.name, 
+        ipAddress || 'Unknown',
+        userAgent || 'Unknown'
+      );
+    } catch (error) {
+      console.error('⚠️ Failed to send login notification email:', error.message);
+      // Don't fail login if email fails
     }
 
     // Generate JWT token
@@ -132,9 +145,18 @@ export class AuthService {
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     const { token } = verifyEmailDto;
 
+    // Debug log
+    console.log('🔍 Received verification token:', token);
+
     const user = await this.userRepository.findOne({
       where: { emailVerificationToken: token },
     });
+
+    console.log('👤 User found:', user ? 'Yes' : 'No');
+    if (user) {
+      console.log('🔑 Stored token:', user.emailVerificationToken);
+      console.log('✅ Email verified:', user.emailVerified);
+    }
 
     if (!user) {
       throw new BadRequestException('Invalid or expired verification token');
@@ -205,6 +227,10 @@ export class AuthService {
     user.passwordResetExpires = passwordResetExpires;
     await this.userRepository.save(user);
 
+    // Debug log
+    console.log('🔑 Generated password reset token:', passwordResetToken);
+    console.log('⏰ Token expires at:', passwordResetExpires);
+
     // Send password reset email
     try {
       await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
@@ -220,12 +246,22 @@ export class AuthService {
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
     const { token, newPassword } = resetPasswordDto;
 
+    // Debug log
+    console.log('🔍 Received reset token:', token);
+    console.log('🕐 Current time:', new Date());
+
     const user = await this.userRepository.findOne({
       where: {
         passwordResetToken: token,
         passwordResetExpires: MoreThan(new Date()),
       },
     });
+
+    console.log('👤 User found:', user ? 'Yes' : 'No');
+    if (user) {
+      console.log('🔑 Stored token:', user.passwordResetToken);
+      console.log('⏰ Token expires:', user.passwordResetExpires);
+    }
 
     if (!user) {
       throw new BadRequestException('Invalid or expired reset token');

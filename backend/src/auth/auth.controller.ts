@@ -1,5 +1,6 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import type { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto } from './dto';
 
@@ -54,8 +55,12 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Req() req: Request) {
+    // Extract IP address from request
+    const ipAddress = req.ip || req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'Unknown';
+    // Extract user agent from request headers
+    const userAgent = req.headers['user-agent'] || 'Unknown';
+    return this.authService.login(loginDto, ipAddress, userAgent);
   }
 
   @Post('verify-email')
