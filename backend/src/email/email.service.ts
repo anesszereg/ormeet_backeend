@@ -20,7 +20,7 @@ export class EmailService {
       await this.mailerService.sendMail({
         to: email,
         subject: 'Welcome to Ormeet - Verify Your Email',
-        template: './welcome',
+        template: 'welcome',
         context: {
           name,
           verificationUrl,
@@ -44,7 +44,7 @@ export class EmailService {
       await this.mailerService.sendMail({
         to: email,
         subject: 'Verify Your Email - Ormeet',
-        template: './verify-email',
+        template: 'verify-email',
         context: {
           name,
           verificationUrl,
@@ -68,7 +68,7 @@ export class EmailService {
       await this.mailerService.sendMail({
         to: email,
         subject: 'Reset Your Password - Ormeet',
-        template: './reset-password',
+        template: 'reset-password',
         context: {
           name,
           resetUrl,
@@ -91,7 +91,7 @@ export class EmailService {
       await this.mailerService.sendMail({
         to: email,
         subject: 'Password Changed Successfully - Ormeet',
-        template: './password-changed',
+        template: 'password-changed',
         context: {
           name,
           appName: 'Ormeet',
@@ -113,7 +113,7 @@ export class EmailService {
       await this.mailerService.sendMail({
         to: email,
         subject: 'New Login to Your Account - Ormeet',
-        template: './login-notification',
+        template: 'login-notification',
         context: {
           name,
           ipAddress,
@@ -127,6 +127,94 @@ export class EmailService {
     } catch (error) {
       this.logger.error(`❌ Failed to send login notification to: ${email}`, error.stack);
       throw error;
+    }
+  }
+
+  async sendVerificationCode(email: string, code: string, purpose: string) {
+    try {
+      this.logger.log(`📧 Sending verification code to: ${email} (Purpose: ${purpose})`);
+
+      const subjectMap = {
+        login: 'Your Login Code - Ormeet',
+        registration: 'Complete Your Registration - Ormeet',
+        email_verification: 'Verify Your Email - Ormeet',
+        phone_verification: 'Verify Your Phone - Ormeet',
+        password_reset: 'Reset Your Password - Ormeet',
+      };
+
+      const subject = subjectMap[purpose] || 'Your Verification Code - Ormeet';
+      
+      await this.mailerService.sendMail({
+        to: email,
+        subject,
+        template: 'verification-code',
+        context: {
+          code,
+          purpose,
+          expiresIn: '10 minutes',
+          appName: 'Ormeet',
+        },
+      });
+
+      this.logger.log(`✅ Verification code sent successfully to: ${email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send verification code to: ${email}`, error.stack);
+      throw error;
+    }
+  }
+
+  async sendOrderConfirmation(orderData: {
+    email: string;
+    customerName: string;
+    orderId: string;
+    eventTitle: string;
+    eventDate: string;
+    eventLocation: string;
+    tickets: Array<{
+      id: string;
+      code: string;
+      ticketType: string;
+      price: number;
+      qrCodeUrl: string;
+    }>;
+    subtotal: number;
+    discount: number;
+    serviceFee: number;
+    processingFee: number;
+    total: number;
+    currency: string;
+  }) {
+    try {
+      this.logger.log(`📧 Sending order confirmation to: ${orderData.email}`);
+
+      await this.mailerService.sendMail({
+        to: orderData.email,
+        subject: `Order Confirmation - ${orderData.eventTitle}`,
+        template: 'order-confirmation',
+        context: {
+          customerName: orderData.customerName,
+          orderId: orderData.orderId,
+          eventTitle: orderData.eventTitle,
+          eventDate: orderData.eventDate,
+          eventLocation: orderData.eventLocation,
+          tickets: orderData.tickets,
+          ticketCount: orderData.tickets.length,
+          subtotal: orderData.subtotal.toFixed(2),
+          discount: orderData.discount.toFixed(2),
+          serviceFee: orderData.serviceFee.toFixed(2),
+          processingFee: orderData.processingFee.toFixed(2),
+          total: orderData.total.toFixed(2),
+          currency: orderData.currency,
+          appName: 'Ormeet',
+          supportEmail: this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com',
+        },
+      });
+
+      this.logger.log(`✅ Order confirmation sent successfully to: ${orderData.email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send order confirmation to: ${orderData.email}`, error.stack);
+      // Don't throw - we don't want to fail the order if email fails
+      console.error('Email error:', error);
     }
   }
 }

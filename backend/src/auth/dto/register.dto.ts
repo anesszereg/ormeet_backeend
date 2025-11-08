@@ -1,6 +1,6 @@
 import { IsEmail, IsString, MinLength, IsEnum, IsOptional, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from '../../entities';
+import { UserRole, EventCategory } from '../../entities';
 
 export class RegisterDto {
   @ApiProperty({
@@ -52,4 +52,26 @@ export class RegisterDto {
   @IsOptional()
   @IsString()
   organizationId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Event categories the ATTENDEE is interested in',
+    enum: EventCategory,
+    isArray: true,
+    example: ['conference', 'workshop'],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(EventCategory, { each: true })
+  interestedEventCategories?: EventCategory[];
+
+  @ApiPropertyOptional({
+    description: 'Event types the ORGANIZER wants to host',
+    enum: EventCategory,
+    isArray: true,
+    example: ['conference', 'seminar'],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(EventCategory, { each: true })
+  hostingEventTypes?: EventCategory[];
 }

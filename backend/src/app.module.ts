@@ -16,6 +16,8 @@ import { AttendanceModule } from './attendance/attendance.module';
 import {
   User,
   Organization,
+  OrganizationInvitation,
+  VerificationCode,
   Venue,
   Event,
   TicketType,
@@ -45,6 +47,8 @@ import {
         entities: [
           User,
           Organization,
+          OrganizationInvitation,
+          VerificationCode,
           Venue,
           Event,
           TicketType,

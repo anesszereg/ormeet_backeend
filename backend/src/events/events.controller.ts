@@ -19,7 +19,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { EventsService } from './events.service';
-import { CreateEventDto, UpdateEventDto } from './dto';
+import { CreateEventDto, UpdateEventDto, CreateEventEnhancedDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -35,12 +35,132 @@ export class EventsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ORGANIZER, UserRole.ADMIN)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create a new event (Organizer/Admin only)' })
-  @ApiResponse({ status: 201, description: 'Event created successfully' })
+  @ApiOperation({ 
+    summary: 'Create a comprehensive event',
+    description: `Create an event with all features:
+
+**Features:**
+- ✅ Recurring events (daily, weekly, monthly)
+- ✅ Multiple location types (physical, online, TBA)
+- ✅ Rich media (images + videos)
+- ✅ Event guidelines (age, refund, accessibility, parking, etc.)
+- ✅ Participants (speakers, performers, sponsors)
+- ✅ Custom locations or venue selection
+- ✅ **Create tickets with the event** (NEW!)
+
+**Example for Physical One-Time Event:**
+\`\`\`json
+{
+  "title": "Tech Conference 2025",
+  "type": "conference",
+  "shortDescription": "Annual tech conference",
+  "organizerId": "org-uuid",
+  "dateType": "one_time",
+  "startAt": "2025-06-15T09:00:00Z",
+  "endAt": "2025-06-15T18:00:00Z",
+  "locationType": "physical",
+  "venueId": "venue-uuid",
+  "images": ["https://example.com/banner.jpg"],
+  "speakers": [
+    {
+      "name": "Dr. Jane Smith",
+      "role": "Keynote Speaker",
+      "bio": "AI Expert",
+      "image": "https://example.com/jane.jpg"
+    }
+  ],
+  "guidelines": {
+    "ageRequirement": "18+",
+    "refundPolicy": "Full refund 7 days before event",
+    "parkingInfo": "Free parking in Lot A"
+  },
+  "tickets": [
+    {
+      "name": "General Admission",
+      "type": "general",
+      "quantityTotal": 200,
+      "price": 79.99,
+      "maxPerOrder": 5,
+      "ticketBenefits": ["Entry to event", "Event swag bag", "Lunch included"]
+    },
+    {
+      "name": "VIP Pass",
+      "type": "vip",
+      "quantityTotal": 50,
+      "price": 299.99,
+      "maxPerOrder": 2,
+      "ticketBenefits": ["Priority entry", "VIP lounge access", "Meet & greet with speakers", "Premium seating"]
+    }
+  ]
+}
+\`\`\`
+
+**Example for Recurring Online Event:**
+\`\`\`json
+{
+  "title": "Weekly Webinar Series",
+  "type": "webinar",
+  "shortDescription": "Weekly tech talks",
+  "organizerId": "org-uuid",
+  "dateType": "multiple",
+  "recurringPattern": "weekly",
+  "recurringCount": 10,
+  "startAt": "2025-06-01T14:00:00Z",
+  "endAt": "2025-06-01T15:00:00Z",
+  "locationType": "online",
+  "onlineLink": "https://zoom.us/j/123456789",
+  "onlineInstructions": "Join 15 minutes early"
+}
+\`\`\`
+
+**Example with Custom Location:**
+\`\`\`json
+{
+  "title": "Community Meetup",
+  "type": "networking",
+  "shortDescription": "Monthly networking event",
+  "organizerId": "org-uuid",
+  "dateType": "one_time",
+  "startAt": "2025-06-20T18:00:00Z",
+  "endAt": "2025-06-20T21:00:00Z",
+  "locationType": "physical",
+  "customLocation": {
+    "address": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001",
+    "postalCode": "10001",
+    "country": "USA"
+  }
+}
+\`\`\`
+    `
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Event created successfully',
+    schema: {
+      example: {
+        id: 'uuid',
+        title: 'Tech Conference 2025',
+        type: 'conference',
+        dateType: 'one_time',
+        locationType: 'physical',
+        speakers: [{name: 'Dr. Jane Smith', role: 'Keynote Speaker'}],
+        guidelines: {ageRequirement: '18+', refundPolicy: 'Full refund 7 days before'},
+        status: 'draft',
+        createdAt: '2025-11-08T00:00:00Z'
+      }
+    }
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Bad Request - Validation failed. Common errors: Missing recurringPattern for MULTIPLE events, Missing location for PHYSICAL events, Missing onlineLink for ONLINE events' 
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
-  create(@Body() createEventDto: CreateEventDto, @CurrentUser() user: User) {
-    return this.eventsService.create(createEventDto);
+  create(@Body() createEventDto: CreateEventEnhancedDto, @CurrentUser() user: User) {
+    return this.eventsService.createEnhanced(createEventDto);
   }
 
   @Get()

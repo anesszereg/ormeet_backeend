@@ -20,6 +20,21 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
+export enum EventCategory {
+  CONFERENCE = 'conference',
+  WORKSHOP = 'workshop',
+  SEMINAR = 'seminar',
+  CONCERT = 'concert',
+  SPORTS = 'sports',
+  FESTIVAL = 'festival',
+  EXHIBITION = 'exhibition',
+  NETWORKING = 'networking',
+  WEBINAR = 'webinar',
+  PARTY = 'party',
+  CHARITY = 'charity',
+  OTHER = 'other',
+}
+
 @Entity('users')
 @Index(['email'], { unique: true })
 @Index(['organizationId'])
@@ -55,6 +70,13 @@ export class User {
   @Column({ type: 'jsonb', nullable: true, name: 'social_links' })
   socialLinks: Array<{ provider: string; url: string }>;
 
+  // User Preferences
+  @Column({ type: 'simple-array', nullable: true, name: 'interested_event_categories' })
+  interestedEventCategories: EventCategory[]; // For ATTENDEES
+
+  @Column({ type: 'simple-array', nullable: true, name: 'hosting_event_types' })
+  hostingEventTypes: EventCategory[]; // For ORGANIZERS
+
   // Organization relationship
   @Column({ name: 'organization_id', nullable: true })
   organizationId: string;
@@ -72,6 +94,13 @@ export class User {
 
   @Column({ type: 'timestamp', name: 'email_verified_at', nullable: true })
   emailVerifiedAt: Date;
+
+  // Phone verification
+  @Column({ type: 'boolean', default: false, name: 'phone_verified' })
+  phoneVerified: boolean;
+
+  @Column({ type: 'timestamp', name: 'phone_verified_at', nullable: true })
+  phoneVerifiedAt: Date;
 
   // Password reset
   @Column({ name: 'password_reset_token', nullable: true })

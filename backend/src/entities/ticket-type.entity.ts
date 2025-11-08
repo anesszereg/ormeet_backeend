@@ -50,11 +50,20 @@ export class TicketType {
   @Column({ type: 'int', default: 0, name: 'quantity_sold' })
   quantitySold: number;
 
+  @Column({ type: 'int', nullable: true, name: 'max_per_order' })
+  maxPerOrder: number; // Maximum tickets per order
+
   @Column({ type: 'timestamp', nullable: true, name: 'sales_start' })
   salesStart: Date;
 
   @Column({ type: 'timestamp', nullable: true, name: 'sales_end' })
   salesEnd: Date;
+
+  @Column({ type: 'simple-array', nullable: true, name: 'ticket_benefits' })
+  ticketBenefits: string[]; // List of benefits for this ticket type
+
+  @Column({ type: 'boolean', default: true, name: 'is_visible' })
+  isVisible: boolean; // Ticket visibility (hidden tickets for special access)
 
   @Column({ type: 'boolean', default: false, name: 'is_free' })
   isFree: boolean;
@@ -68,6 +77,11 @@ export class TicketType {
 
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
+
+  // Computed field for availability
+  get available(): number {
+    return this.quantityTotal - this.quantitySold;
+  }
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

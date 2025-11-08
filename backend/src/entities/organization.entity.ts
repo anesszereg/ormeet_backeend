@@ -12,6 +12,13 @@ import {
 import { User } from './user.entity';
 import { Event } from './event.entity';
 
+export enum OrganizationMemberRole {
+  OWNER = 'owner',
+  ADMIN = 'admin',
+  EDITOR = 'editor',
+  VIEWER = 'viewer',
+}
+
 @Entity('organizations')
 @Index(['name'])
 @Index(['ownerId'])
@@ -42,7 +49,12 @@ export class Organization {
   owner: User;
 
   @Column({ type: 'jsonb', nullable: true })
-  members: Array<{ userId: string; role: string }>;
+  members: Array<{ 
+    userId: string; 
+    role: OrganizationMemberRole;
+    addedAt: Date;
+    addedBy: string;
+  }>;
 
   @Column({ type: 'jsonb', nullable: true })
   settings: Record<string, any>;

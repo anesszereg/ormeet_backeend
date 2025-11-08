@@ -2,10 +2,11 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Organization } from '../entities';
+import { Organization, User, OrganizationMemberRole } from '../entities';
 import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
 
 @Injectable()
@@ -13,6 +14,8 @@ export class OrganizationsService {
   constructor(
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(
@@ -86,20 +89,49 @@ export class OrganizationsService {
   async addMember(
     organizationId: string,
     userId: string,
+    role: OrganizationMemberRole,
     requesterId: string,
   ): Promise<Organization> {
     const organization = await this.findOne(organizationId);
 
-    // Check if requester is the owner
-    if (organization.ownerId !== requesterId) {
+    // Check if requester has permission (owner or admin)
+    const hasPermission = this.checkMemberPermission(
+      organization,
+      requesterId,
+      [OrganizationMemberRole.OWNER, OrganizationMemberRole.ADMIN],
+    );
+
+    if (!hasPermission) {
       throw new ForbiddenException(
-        'Only the organization owner can add members',
+        'Only owners and admins can add members',
       );
     }
 
-    // Add member logic would go here
-    // This requires updating the User entity relationship
-    return organization;
+    // Check if user exists
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if user is already a member
+    const existingMember = organization.members?.find(
+      (m) => m.userId === userId,
+    );
+    if (existingMember) {
+      throw new BadRequestException('User is already a member');
+    }
+
+    // Add member
+    const members = organization.members || [];
+    members.push({
+      userId,
+      role,
+      addedAt: new Date(),
+      addedBy: requesterId,
+    });
+
+    organization.members = members;
+    return await this.organizationRepository.save(organization);
   }
 
   async removeMember(
@@ -109,14 +141,98 @@ export class OrganizationsService {
   ): Promise<Organization> {
     const organization = await this.findOne(organizationId);
 
-    // Check if requester is the owner
-    if (organization.ownerId !== requesterId) {
+    // Check if requester has permission (owner or admin)
+    const hasPermission = this.checkMemberPermission(
+      organization,
+      requesterId,
+      [OrganizationMemberRole.OWNER, OrganizationMemberRole.ADMIN],
+    );
+
+    if (!hasPermission) {
       throw new ForbiddenException(
-        'Only the organization owner can remove members',
+        'Only owners and admins can remove members',
       );
     }
 
-    // Remove member logic would go here
-    return organization;
+    // Cannot remove the owner
+    if (userId === organization.ownerId) {
+      throw new BadRequestException('Cannot remove the organization owner');
+    }
+
+    // Remove member
+    const members = organization.members || [];
+    const updatedMembers = members.filter((m) => m.userId !== userId);
+
+    if (members.length === updatedMembers.length) {
+      throw new NotFoundException('Member not found in organization');
+    }
+
+    organization.members = updatedMembers;
+    return await this.organizationRepository.save(organization);
+  }
+
+  async updateMemberRole(
+    organizationId: string,
+    userId: string,
+    newRole: OrganizationMemberRole,
+    requesterId: string,
+  ): Promise<Organization> {
+    const organization = await this.findOne(organizationId);
+
+    // Only owner can change roles
+    if (organization.ownerId !== requesterId) {
+      throw new ForbiddenException(
+        'Only the organization owner can update member roles',
+      );
+    }
+
+    // Cannot change owner's role
+    if (userId === organization.ownerId) {
+      throw new BadRequestException("Cannot change the owner's role");
+    }
+
+    // Find and update member
+    const members = organization.members || [];
+    const memberIndex = members.findIndex((m) => m.userId === userId);
+
+    if (memberIndex === -1) {
+      throw new NotFoundException('Member not found in organization');
+    }
+
+    members[memberIndex].role = newRole;
+    organization.members = members;
+
+    return await this.organizationRepository.save(organization);
+  }
+
+  private checkMemberPermission(
+    organization: Organization,
+    userId: string,
+    allowedRoles: OrganizationMemberRole[],
+  ): boolean {
+    // Owner always has permission
+    if (organization.ownerId === userId) {
+      return true;
+    }
+
+    // Check if user is a member with allowed role
+    const member = organization.members?.find((m) => m.userId === userId);
+    if (member && allowedRoles.includes(member.role)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  getMemberRole(
+    organization: Organization,
+    userId: string,
+  ): OrganizationMemberRole | null {
+    if (organization.ownerId === userId) {
+      return OrganizationMemberRole.OWNER;
+    }
+
+    const member = organization.members?.find((m) => m.userId === userId);
+    return member?.role || null;
   }
 }

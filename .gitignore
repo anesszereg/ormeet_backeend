@@ -12,6 +12,7 @@ build/
 *.tsbuildinfo
 .next/
 out/
+docs/
 
 # Environment variables
 .env

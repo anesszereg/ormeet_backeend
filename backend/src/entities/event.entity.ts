@@ -24,6 +24,24 @@ export enum EventStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum EventDateType {
+  ONE_TIME = 'one_time',
+  MULTIPLE = 'multiple',
+}
+
+export enum RecurringPattern {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+  CUSTOM = 'custom',
+}
+
+export enum LocationType {
+  PHYSICAL = 'physical',
+  ONLINE = 'online',
+  TO_BE_ANNOUNCED = 'to_be_announced',
+}
+
 @Entity('events')
 @Index(['title'])
 @Index(['organizerId', 'startAt'])
@@ -64,12 +82,51 @@ export class Event {
   @Column({ type: 'simple-array', nullable: true })
   images: string[];
 
+  @Column({ type: 'simple-array', nullable: true })
+  videos: string[];
+
+  // Location Configuration
+  @Column({
+    type: 'enum',
+    enum: LocationType,
+    default: LocationType.PHYSICAL,
+    name: 'location_type',
+  })
+  locationType: LocationType;
+
+  // Physical Location
   @Column({ name: 'venue_id', nullable: true })
   venueId: string;
 
   @ManyToOne(() => Venue, (venue) => venue.events, { nullable: true })
   @JoinColumn({ name: 'venue_id' })
   venue: Venue;
+
+  @Column({ type: 'jsonb', nullable: true, name: 'custom_location' })
+  customLocation: {
+    address: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    postalCode: string;
+    country: string;
+  };
+
+  // Online Location
+  @Column({ type: 'text', nullable: true, name: 'online_link' })
+  onlineLink: string;
+
+  @Column({ type: 'text', nullable: true, name: 'online_instructions' })
+  onlineInstructions: string; // How to join
+
+  // Date & Time Configuration
+  @Column({
+    type: 'enum',
+    enum: EventDateType,
+    default: EventDateType.ONE_TIME,
+    name: 'date_type',
+  })
+  dateType: EventDateType;
 
   @Column({ type: 'timestamp', name: 'start_at' })
   startAt: Date;
@@ -79,6 +136,21 @@ export class Event {
 
   @Column({ default: 'UTC' })
   timezone: string;
+
+  // Recurring Event Fields (for MULTIPLE date type)
+  @Column({
+    type: 'enum',
+    enum: RecurringPattern,
+    nullable: true,
+    name: 'recurring_pattern',
+  })
+  recurringPattern: RecurringPattern;
+
+  @Column({ type: 'int', nullable: true, name: 'recurring_count' })
+  recurringCount: number; // How many times it repeats
+
+  @Column({ type: 'timestamp', nullable: true, name: 'recurring_end_date' })
+  recurringEndDate: Date;
 
   @Column({ type: 'jsonb', nullable: true })
   sessions: Array<{
@@ -101,6 +173,18 @@ export class Event {
 
   @Column({ type: 'boolean', default: false, name: 'refunds_allowed' })
   refundsAllowed: boolean;
+
+  // Event Guidelines
+  @Column({ type: 'jsonb', nullable: true })
+  guidelines: {
+    ageRequirement: string; // e.g., "18+", "All ages", "21+"
+    refundPolicy: string;
+    accessibleInfo: string;
+    entryPolicy: string;
+    prohibitedItems: string[];
+    allowedItems: string[];
+    parkingInfo: string;
+  };
 
   @Column({ type: 'timestamp', nullable: true, name: 'published_at' })
   publishedAt: Date;
@@ -136,4 +220,29 @@ export class Event {
 
   @OneToMany(() => Promotion, (promotion) => promotion.event)
   promotions: Promotion[];
+
+  // Event Participants (stored as JSONB for flexibility)
+  @Column({ type: 'jsonb', nullable: true })
+  speakers: Array<{
+    name: string;
+    role: string;
+    bio: string;
+    image: string;
+  }>;
+
+  @Column({ type: 'jsonb', nullable: true })
+  performers: Array<{
+    company: string;
+    type: string;
+    description: string;
+    image: string;
+  }>;
+
+  @Column({ type: 'jsonb', nullable: true })
+  sponsors: Array<{
+    sponsorName: string;
+    sponsorshipTier: string; // e.g., "Gold", "Silver", "Bronze"
+    about: string;
+    logo: string;
+  }>;
 }
