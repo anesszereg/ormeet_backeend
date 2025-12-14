@@ -10,7 +10,7 @@ import CardIcon from '../assets/Svgs/card.svg';
 import GoBackIcon from '../assets/Svgs/goBack.svg';
 import UploadIcon from '../assets/Svgs/upload.svg';
 import AddIcon from '../assets/Svgs/add.svg';
-import CardImage from '../assets/imges/card.png';
+import CardFirstImage from '../assets/imges/cardFirst.png';
 
 interface PaymentCard {
   id: string;
@@ -30,12 +30,14 @@ const AccountSettings = () => {
   const [isPhoneModalOpen, setIsPhoneModalOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [showAddCardForm, setShowAddCardForm] = useState(false);
+  const [isEditPasswordOpen, setIsEditPasswordOpen] = useState(false);
   
   // Validation errors
   const [profileError, setProfileError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [locationError, setLocationError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   
   // Form states for Personal Info
   const [profileData, setProfileData] = useState({
@@ -71,7 +73,6 @@ const AccountSettings = () => {
   });
   
   // Email Preferences states
-  const [emailPrefsTab, setEmailPrefsTab] = useState<'attendees' | 'organizers'>('attendees');
   const [attendeePrefs, setAttendeePrefs] = useState({
     ticketConfirmations: true,
     eventReminders: true,
@@ -81,15 +82,14 @@ const AccountSettings = () => {
     newsletters: false,
     surveys: false
   });
-  const [organizerPrefs, setOrganizerPrefs] = useState({
-    eventCreation: true,
-    ticketSales: true,
-    attendeeQuestions: true,
-    platformFeatures: true,
-    sellingTips: false,
-    marketingOffers: false,
-    organizerNewsletters: false
+  
+  // Login & Security states
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   
   // Handlers for Personal Info
   const handleProfileSave = () => {
@@ -184,6 +184,30 @@ const AccountSettings = () => {
   const getMaskedCardNumber = (cardNumber: string) => {
     const lastFour = cardNumber.slice(-4);
     return `•••• •••• •••• ${lastFour}`;
+  };
+  
+  // Handlers for Login & Security
+  const handlePasswordSave = () => {
+    if (!passwordData.currentPassword.trim()) {
+      setPasswordError('Current password is required');
+      return;
+    }
+    if (!passwordData.newPassword.trim()) {
+      setPasswordError('New password is required');
+      return;
+    }
+    if (passwordData.newPassword.length < 8) {
+      setPasswordError('Password must be at least 8 characters');
+      return;
+    }
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('Passwords do not match');
+      return;
+    }
+    setPasswordError('');
+    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    setIsEditPasswordOpen(false);
+    // Here you would typically call an API to update the password
   };
 
   const menuItems = [
@@ -327,8 +351,8 @@ const AccountSettings = () => {
                   {savedCards.length === 0 ? (
                     /* Empty State */
                     <div className="bg-white rounded-xl border border-[#EEEEEE] p-12 flex flex-col items-center justify-center">
-                      <div className="w-48 h-32 mb-6 opacity-20">
-                        <img src={CardImage} alt="Card" className="w-full h-full object-contain" />
+                      <div className="w-64 h-40 mb-6">
+                        <img src={CardFirstImage} alt="Card" className="w-full h-full object-contain" />
                       </div>
                       <h2 className="text-xl font-bold text-black mb-2">Add your preferred payment method</h2>
                       <p className="text-sm text-[#4F4F4F] mb-6 text-center max-w-md">
@@ -348,10 +372,10 @@ const AccountSettings = () => {
                       <h2 className="text-lg font-bold text-black mb-6">Saved Cards</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {savedCards.map((card) => (
-                          <div key={card.id} className="relative">
-                            <img src={CardImage} alt="Card" className="w-full h-auto rounded-xl" />
-                            <div className="absolute inset-0 p-4 flex flex-col justify-between">
-                              <div className="flex justify-end">
+                          <div key={card.id} className="relative bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] rounded-xl p-6 shadow-lg">
+                            <div className="flex flex-col h-full justify-between">
+                              <div className="flex justify-between items-start">
+                                <img src={CardIcon} alt="Card" className="w-12 h-12" />
                                 <button
                                   onClick={() => handleDeleteCard(card.id)}
                                   className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
@@ -361,8 +385,8 @@ const AccountSettings = () => {
                                   </svg>
                                 </button>
                               </div>
-                              <div>
-                                <p className="text-white text-base font-medium mb-2">{getMaskedCardNumber(card.cardNumber)}</p>
+                              <div className="mt-8">
+                                <p className="text-white text-lg font-medium mb-4 tracking-wider">{getMaskedCardNumber(card.cardNumber)}</p>
                                 <div className="flex items-center justify-between">
                                   <p className="text-white text-sm font-medium">{card.cardHolder}</p>
                                   <p className="text-white text-sm">{card.expiryMonth}/{card.expiryYear.slice(-2)}</p>
@@ -474,44 +498,13 @@ const AccountSettings = () => {
           {/* Email Preferences Section */}
           {activeSection === 'email-preferences' && (
             <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
-              <div className="mb-6">
+              <div className="mb-8">
                 <h2 className="text-2xl font-bold text-black mb-2">Email preferences</h2>
                 <p className="text-sm text-[#4F4F4F]">Choose the emails you want to receive—stay informed, not overwhelmed.</p>
               </div>
               
-              {/* Tabs */}
-              <div className="flex gap-8 border-b border-[#EEEEEE] mb-8">
-                <button
-                  onClick={() => setEmailPrefsTab('attendees')}
-                  className={`pb-3 text-sm font-medium transition-colors relative ${
-                    emailPrefsTab === 'attendees'
-                      ? 'text-[#FF4000]'
-                      : 'text-black hover:text-[#FF4000]'
-                  }`}
-                >
-                  For Attendees
-                  {emailPrefsTab === 'attendees' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4000]"></div>
-                  )}
-                </button>
-                <button
-                  onClick={() => setEmailPrefsTab('organizers')}
-                  className={`pb-3 text-sm font-medium transition-colors relative ${
-                    emailPrefsTab === 'organizers'
-                      ? 'text-[#FF4000]'
-                      : 'text-black hover:text-[#FF4000]'
-                  }`}
-                >
-                  For Organizers
-                  {emailPrefsTab === 'organizers' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4000]"></div>
-                  )}
-                </button>
-              </div>
-              
               {/* Attendees Preferences */}
-              {emailPrefsTab === 'attendees' && (
-                <div className="space-y-6">
+              <div className="space-y-6">
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
                       <h3 className="text-base font-semibold text-black mb-1">Ticket Confirmations</h3>
@@ -624,132 +617,113 @@ const AccountSettings = () => {
                     </label>
                   </div>
                 </div>
-              )}
-              
-              {/* Organizers Preferences */}
-              {emailPrefsTab === 'organizers' && (
-                <div className="space-y-6">
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Event Creation Confirmations</h3>
-                      <p className="text-sm text-[#4F4F4F]">Get a confirmation each time you publish an event.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.eventCreation}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, eventCreation: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Ticket Sales Updates</h3>
-                      <p className="text-sm text-[#4F4F4F]">Receive daily or weekly ticket sales summary emails.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.ticketSales}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, ticketSales: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Attendee Questions & Messages</h3>
-                      <p className="text-sm text-[#4F4F4F]">Be notified when someone contacts you about your event.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.attendeeQuestions}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, attendeeQuestions: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Platform Feature Updates</h3>
-                      <p className="text-sm text-[#4F4F4F]">Get notified about new tools and improvements to boost your event.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.platformFeatures}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, platformFeatures: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Tips for Selling More Tickets</h3>
-                      <p className="text-sm text-[#4F4F4F]">Occasional tips and strategies to help increase your ticket sales.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.sellingTips}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, sellingTips: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Marketing Offers & Promotions</h3>
-                      <p className="text-sm text-[#4F4F4F]">Learn about promotions that can help promote your events.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.marketingOffers}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, marketingOffers: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                  
-                  <div className="flex items-start justify-between py-4">
-                    <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Organizer Newsletters</h3>
-                      <p className="text-sm text-[#4F4F4F]">Receive news, success stories, and expert advice from other organizers.</p>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
-                      <input
-                        type="checkbox"
-                        checked={organizerPrefs.organizerNewsletters}
-                        onChange={(e) => setOrganizerPrefs({ ...organizerPrefs, organizerNewsletters: e.target.checked })}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                    </label>
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
           {/* Login & Security Section */}
           {activeSection === 'login-security' && (
-            <div className="bg-white rounded-xl border border-[#EEEEEE] p-6">
-              <h2 className="text-lg font-bold text-black mb-4">Login & Security</h2>
-              <p className="text-sm text-[#4F4F4F]">Manage your login credentials and security settings.</p>
+            <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-black mb-2">Login & security</h2>
+                <p className="text-sm text-[#4F4F4F]">Set a unique password to protect your account</p>
+              </div>
+              
+              {!isEditPasswordOpen ? (
+                <>
+                  {/* Password Section */}
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-base font-semibold text-black">Password</h3>
+                      <button
+                        onClick={() => setIsEditPasswordOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-[#F8F8F8] rounded-lg transition-colors"
+                      >
+                        <img src={EditIcon} alt="Edit" className="w-4 h-4" />
+                        Change Password
+                      </button>
+                    </div>
+                    <p className="text-sm text-black">••••••••</p>
+                  </div>
+                  
+                  {/* Two-factor Authentication Section */}
+                  <div className="pt-6 border-t border-[#EEEEEE]">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-base font-semibold text-black mb-1">Two-factor authentication</h3>
+                        <p className="text-sm text-[#4F4F4F]">Two-factor authentication adds extra security by requiring a second step to verify your identity during login.</p>
+                      </div>
+                      <label className="relative inline-flex items-center cursor-pointer ml-6">
+                        <input
+                          type="checkbox"
+                          checked={twoFactorEnabled}
+                          onChange={(e) => setTwoFactorEnabled(e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                      </label>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* Edit Password Form */
+                <div>
+                  {passwordError && (
+                    <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
+                      {passwordError}
+                    </div>
+                  )}
+                  <div className="space-y-4 mb-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-black">Current Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.currentPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                        placeholder="Enter current password"
+                        className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-black">New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.newPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                        placeholder="Enter new password"
+                        className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-sm font-medium text-black">Confirm New Password</label>
+                      <input
+                        type="password"
+                        value={passwordData.confirmPassword}
+                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                        placeholder="Confirm new password"
+                        className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => {
+                        setPasswordError('');
+                        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                        setIsEditPasswordOpen(false);
+                      }}
+                      className="flex-1 px-6 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-base font-semibold text-black hover:bg-[#F8F8F8] transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handlePasswordSave}
+                      className="flex-1 px-6 py-3.5 bg-[#FF4000] text-white rounded-lg text-base font-semibold hover:bg-[#E63900] transition-colors"
+                    >
+                      Confirm
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
