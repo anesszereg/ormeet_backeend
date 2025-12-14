@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Login, Register, ForgotPassword, OnboardingChoice, OnboardingOrganizer, OnboardingSignup, EmailConfirmation, OnboardingBrandInfo, OnboardingInterests, DashboardAttendee } from '../pages';
+import { Login, Register, ForgotPassword, OnboardingChoice, OnboardingOrganizer, OnboardingSignup, EmailConfirmation, OnboardingBrandInfo, OnboardingInterests, DashboardAttendee, SearchResult, EventDetailsSearchResults } from '../pages';
 
 const App = () => {
   return (
@@ -21,6 +21,12 @@ const App = () => {
         
         {/* Dashboard Routes */}
         <Route path="/dashboard-attendee" element={<DashboardAttendee />} />
+        
+        {/* Search Results */}
+        <Route path="/search-results" element={<SearchResult />} />
+        
+        {/* Event Details */}
+        <Route path="/event/:eventId" element={<EventDetailsSearchResults />} />
         
         {/* TODO: Add other routes */}
         {/* <Route path="/events" element={<Events />} /> */}

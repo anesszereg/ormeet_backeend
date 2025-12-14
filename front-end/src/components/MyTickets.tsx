@@ -299,7 +299,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             {/* Dropdown menu */}
             {isSortOpen && (
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z', 'Z-A'].map((option) => (
+                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
                   <button
                     key={option}
                     onClick={() => {

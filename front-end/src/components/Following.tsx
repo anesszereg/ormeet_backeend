@@ -30,6 +30,7 @@ const Following = () => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [unfollowConfirmId, setUnfollowConfirmId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -59,18 +60,29 @@ const Following = () => {
     { id: '12', name: 'Velocity Productions', followers: '25K', logo: Logo12, isFollowing: true },
   ]);
 
-  const handleUnfollow = (id: string) => {
-    setOrganizers(organizers.map(org => 
-      org.id === id ? { ...org, isFollowing: false } : org
-    ));
+  const handleUnfollowClick = (id: string) => {
+    setUnfollowConfirmId(id);
     setOpenMenuId(null);
+  };
+
+  const confirmUnfollow = () => {
+    if (unfollowConfirmId) {
+      setOrganizers(organizers.map(org => 
+        org.id === unfollowConfirmId ? { ...org, isFollowing: false } : org
+      ));
+      setUnfollowConfirmId(null);
+    }
+  };
+
+  const cancelUnfollow = () => {
+    setUnfollowConfirmId(null);
   };
 
   const toggleMenu = (id: string) => {
     setOpenMenuId(openMenuId === id ? null : id);
   };
 
-  const sortOptions = ['Newest First', 'Oldest First', 'A-Z', 'Z-A'];
+  const sortOptions = ['Newest First', 'Oldest First', 'A-Z'];
 
   // Filter organizers based on search and following status
   const filteredOrganizers = organizers.filter(org => 
@@ -199,7 +211,7 @@ const Following = () => {
                 {openMenuId === organizer.id && (
                   <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
                     <button
-                      onClick={() => handleUnfollow(organizer.id)}
+                      onClick={() => handleUnfollowClick(organizer.id)}
                       className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors"
                     >
                       {/* Unfollow icon (user minus) */}
@@ -230,6 +242,32 @@ const Following = () => {
               ? "Try adjusting your search to find organisers you're following."
               : "You're not following any organisers yet. Start exploring events to find organisers to follow!"}
           </p>
+        </div>
+      )}
+
+      {/* Unfollow Confirmation Modal */}
+      {unfollowConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
+            <h3 className="text-xl font-bold text-black mb-3">Unfollow Organiser?</h3>
+            <p className="text-sm text-[#4F4F4F] mb-6">
+              Are you sure you want to unfollow {organizers.find(org => org.id === unfollowConfirmId)?.name}? You won't receive updates about their events anymore.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={cancelUnfollow}
+                className="flex-1 px-4 py-3 border border-[#EEEEEE] text-black rounded-lg text-sm font-medium hover:bg-[#F8F8F8] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmUnfollow}
+                className="flex-1 px-4 py-3 bg-[#FF4000] text-white rounded-lg text-sm font-medium hover:bg-[#E63900] transition-colors"
+              >
+                Unfollow
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
