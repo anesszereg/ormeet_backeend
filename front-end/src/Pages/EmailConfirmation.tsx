@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -8,6 +9,22 @@ const EmailConfirmation = () => {
   const navigate = useNavigate();
   const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [verificationType, setVerificationType] = useState<'email' | 'phone'>('email');
+
+  useEffect(() => {
+    const pendingVerification = localStorage.getItem('pendingVerification');
+    const type = localStorage.getItem('verificationType') as 'email' | 'phone' | null;
+    
+    if (pendingVerification) {
+      setIdentifier(pendingVerification);
+    }
+    if (type) {
+      setVerificationType(type);
+    }
+  }, []);
 
   const handleChange = (index: number, value: string) => {
     // Only allow digits
@@ -46,29 +63,60 @@ const EmailConfirmation = () => {
     inputRefs.current[nextEmptyIndex]?.focus();
   };
 
-  const handleResend = () => {
-    // TODO: Implement resend logic
-    console.log('Resend code clicked');
+  const handleResend = async () => {
+    setError('');
+    try {
+      await authService.sendVerificationCode({
+        email: verificationType === 'email' ? identifier : undefined,
+        phone: verificationType === 'phone' ? identifier : undefined,
+        type: verificationType,
+        purpose: 'email_verification',
+      });
+      alert('Verification code sent successfully!');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Failed to resend code. Please try again.';
+      setError(errorMessage);
+      console.error('Resend error:', err);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const verificationCode = code.join('');
     
-    if (verificationCode.length === 6) {
-      // TODO: Implement verification logic
-      console.log('Verification code:', verificationCode);
+    if (verificationCode.length !== 6) {
+      setError('Please enter a valid 6-digit code');
+      return;
+    }
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      await authService.verifyCode({
+        email: verificationType === 'email' ? identifier : undefined,
+        phone: verificationType === 'phone' ? identifier : undefined,
+        type: verificationType,
+        code: verificationCode,
+      });
+
+      localStorage.removeItem('pendingVerification');
+      localStorage.removeItem('verificationType');
       
-      // Navigate to different pages based on user type
       const userType = localStorage.getItem('userType');
       if (userType === 'organize') {
         navigate('/onboarding-brand-info');
       } else if (userType === 'attend') {
         navigate('/onboarding-interests');
       } else {
-        // Default fallback
-        navigate('/onboarding-brand-info');
+        navigate('/onboarding-interests');
       }
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Verification failed. Please check your code and try again.';
+      setError(errorMessage);
+      console.error('Verification error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -101,11 +149,11 @@ const EmailConfirmation = () => {
             </h2>
           </div>
 
-          {/* Email Display */}
+          {/* Email/Phone Display */}
           <div className="flex items-center gap-2 text-sm">
             <span className="text-[#4F4F4F]">
               We've sent a 6-digit code to{' '}
-              <span className="font-semibold text-black">abdeslam@ormeet.dz</span>
+              <span className="font-semibold text-black">{identifier || 'your email/phone'}</span>
             </span>
             <button
               type="button"
@@ -117,6 +165,13 @@ const EmailConfirmation = () => {
               </svg>
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* OTP Input */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -153,10 +208,10 @@ const EmailConfirmation = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={code.some((digit) => !digit)}
+              disabled={code.some((digit) => !digit) || isLoading}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
             >
-              Verify & Continue
+              {isLoading ? 'Verifying...' : 'Verify & Continue'}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

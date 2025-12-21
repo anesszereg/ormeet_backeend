@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -52,6 +53,8 @@ const OnboardingInterests = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('music');
   const [selectedSubtypes, setSelectedSubtypes] = useState<string[]>([]);
   const [categoryStartIndex, setCategoryStartIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   
   const visibleCategoriesCount = 5;
   const canScrollLeft = categoryStartIndex > 0;
@@ -81,22 +84,45 @@ const OnboardingInterests = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // At least one category must be selected
     if (!selectedCategory) {
+      setError('Please select at least one category');
       return;
     }
 
-    // TODO: Save user interests
-    console.log({
-      selectedCategory,
-      selectedSubtypes,
-    });
+    setError('');
+    setIsLoading(true);
 
-    // Navigate to dashboard or next step
-    navigate('/');
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        setError('Please complete registration first');
+        navigate('/onboarding-signup');
+        return;
+      }
+
+      const onboardingData = {
+        interestedEventCategories: [selectedCategory, ...selectedSubtypes],
+      };
+
+      localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
+      localStorage.removeItem('userType');
+
+      navigate('/login', { 
+        state: { 
+          message: 'Registration complete! Please log in to continue.',
+          onboardingComplete: true 
+        } 
+      });
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Failed to save data. Please try again.';
+      setError(errorMessage);
+      console.error('Save error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const currentCategory = eventCategories.find((cat) => cat.id === selectedCategory);
@@ -134,6 +160,13 @@ const OnboardingInterests = () => {
               What kind of events excite you?
             </p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -215,10 +248,10 @@ const OnboardingInterests = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={!selectedCategory}
+              disabled={!selectedCategory || isLoading}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
             >
-              Finish & Explore
+              {isLoading ? 'Saving...' : 'Finish & Login'}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

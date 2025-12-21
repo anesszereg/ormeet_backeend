@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -12,6 +13,8 @@ const OnboardingSignup = () => {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleEmailSignup = () => {
     setSignupMethod('email');
@@ -43,15 +46,38 @@ const OnboardingSignup = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement signup logic
-    const formData = signupMethod === 'email' 
-      ? { signupMethod, email, password }
-      : { signupMethod, phone, password };
-    console.log('Form submitted:', formData);
-    // Navigate to email confirmation
-    navigate('/email-confirmation');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const userType = localStorage.getItem('userType') || 'attend';
+      const roles: ('attendee' | 'organizer' | 'admin')[] = userType === 'organize' ? ['organizer'] : ['attendee'];
+      
+      const name = signupMethod === 'email' ? email.split('@')[0] : `User${phone.slice(-4)}`;
+      
+      const registerData = {
+        name,
+        email: signupMethod === 'email' ? email : `${phone}@temp.ormeet.com`,
+        password,
+        phone: signupMethod === 'phone' ? phone : undefined,
+        roles,
+      };
+
+      await authService.register(registerData);
+      
+      localStorage.setItem('pendingVerification', signupMethod === 'email' ? email : phone);
+      localStorage.setItem('verificationType', signupMethod);
+      
+      navigate('/email-confirmation');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
+      console.error('Registration error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -115,6 +141,13 @@ const OnboardingSignup = () => {
               Sign up with Phone
             </button>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -236,9 +269,10 @@ const OnboardingSignup = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md"
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
             >
-              Continue to sign up
+              {isLoading ? 'Creating account...' : 'Continue to sign up'}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
