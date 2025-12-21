@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -13,6 +13,7 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -26,6 +27,13 @@ const Login = () => {
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || '/';
 
+  useEffect(() => {
+    const message = (location.state as any)?.message;
+    if (message) {
+      setSuccessMessage(message);
+    }
+  }, [location]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -37,7 +45,17 @@ const Login = () => {
         : { phone, password };
       
       await login(credentials);
-      navigate(from, { replace: true });
+      
+      // Navigate to dashboard after successful login
+      // Avoid redirecting back to onboarding or login pages
+      const isOnboardingOrAuth = from === '/' || 
+                                  from === '/login' || 
+                                  from === '/register' ||
+                                  from.startsWith('/onboarding');
+      
+      const redirectTo = !isOnboardingOrAuth ? from : '/dashboard-attendee';
+      
+      navigate(redirectTo, { replace: true });
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please try again.';
       setError(errorMessage);
@@ -104,6 +122,13 @@ const Login = () => {
               Log in with Phone
             </button>
           </div>
+
+          {/* Success Message */}
+          {successMessage && (
+            <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+              {successMessage}
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -25,6 +26,8 @@ const OnboardingBrandInfo = () => {
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [eventsPerYear, setEventsPerYear] = useState('');
   const [averageAttendees, setAverageAttendees] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const toggleEventType = (eventType: string) => {
     setSelectedEventTypes((prev) =>
@@ -34,16 +37,42 @@ const OnboardingBrandInfo = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement submission logic
-    console.log({
-      organisationName,
-      selectedEventTypes,
-      eventsPerYear,
-      averageAttendees,
-    });
-    // Navigate to next step or dashboard
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const user = authService.getCurrentUser();
+      if (!user) {
+        setError('Please complete registration first');
+        navigate('/onboarding-signup');
+        return;
+      }
+
+      const onboardingData = {
+        organisationName,
+        hostingEventTypes: selectedEventTypes,
+        eventsPerYear,
+        averageAttendees,
+      };
+
+      localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
+      localStorage.removeItem('userType');
+
+      navigate('/login', { 
+        state: { 
+          message: 'Registration complete! Please log in to continue.',
+          onboardingComplete: true 
+        } 
+      });
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || 'Failed to save data. Please try again.';
+      setError(errorMessage);
+      console.error('Save error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -75,6 +104,13 @@ const OnboardingBrandInfo = () => {
               Tell us about your brand or yourself
             </h2>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -193,9 +229,10 @@ const OnboardingBrandInfo = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md mt-2"
+              disabled={isLoading}
+              className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
             >
-              Finish & Explore
+              {isLoading ? 'Saving...' : 'Finish & Login'}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

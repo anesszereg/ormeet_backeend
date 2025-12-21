@@ -21,7 +21,7 @@ const App = () => {
     <Router>
       <Routes>
         {/* Redirect root to onboarding choice */}
-        <Route path="/" element={<Navigate to="/dashboard-attendee" replace />} />
+        <Route path="/" element={<Navigate to="/onboarding-choice" replace />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
