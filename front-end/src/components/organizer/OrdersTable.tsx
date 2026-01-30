@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
-import CreateEventIcon from '../../assets/Svgs/organiser/dashboard/Events/createEvent.svg';
 import ExportIcon from '../../assets/Svgs/organiser/dashboard/Orders/export.svg';
+import ExportModal from './ExportModal';
 import PaidIcon from '../../assets/Svgs/organiser/dashboard/Orders/paid.svg';
 import PendingIcon from '../../assets/Svgs/organiser/dashboard/Orders/pending.svg';
 import FailedIcon from '../../assets/Svgs/organiser/dashboard/Orders/failed.svg';
@@ -35,7 +35,7 @@ interface Order {
 }
 
 interface OrdersTableProps {
-  onCreateOrder: () => void;
+  onCreateOrder?: () => void;
 }
 
 const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
@@ -52,6 +52,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const ordersPerPage = 6;
   
   const sortRef = useRef<HTMLDivElement>(null);
@@ -76,6 +77,13 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   useEffect(() => {
     setCurrentPage(1);
   }, [activeFilter]);
+
+  const mockEvents = [
+    { id: '1', name: 'Tech Summit 2025' },
+    { id: '2', name: 'Music Fest LA' },
+    { id: '3', name: 'AI Expo 2025' },
+    { id: '4', name: 'Business Conference' },
+  ];
 
   const mockOrders: Order[] = [
     {
@@ -261,6 +269,10 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
     return date.getTime() === selectedStartDate.getTime();
   };
 
+  const handleExport = (selectedEvent: string) => {
+    console.log('Exporting orders for event:', selectedEvent);
+  };
+
   const renderCalendar = () => {
     const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
     const days = [];
@@ -352,23 +364,13 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-black">Orders</h1>
         
-        <div className="flex items-center gap-3">
-          <button
-            className="relative flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
-          >
-            <img src={ExportIcon} alt="Export" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-            <span>Export</span>
-          </button>
-
-          <button
-            onClick={onCreateOrder}
-            className="relative flex items-center gap-2 pl-11 pr-5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
-            style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
-          >
-            <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
-            <span>Create Order</span>
-          </button>
-        </div>
+        <button
+          onClick={() => setIsExportModalOpen(true)}
+          className="relative flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+        >
+          <img src={ExportIcon} alt="Export" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+          <span>Export</span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -901,6 +903,14 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onConfirm={handleExport}
+        events={mockEvents}
+      />
     </div>
   );
 };

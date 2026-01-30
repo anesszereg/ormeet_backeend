@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
+import ExportIcon from '../../assets/Svgs/organiser/dashboard/Orders/export.svg';
+import ExportModal from './ExportModal';
 import FilterIcon from '../../assets/Svgs/organiser/dashboard/Attendee/filter.svg';
 import FilterOnClickIcon from '../../assets/Svgs/organiser/dashboard/Attendee/filterOnClick.svg';
 import CheckedInIcon from '../../assets/Svgs/organiser/dashboard/Attendee/checkedIn.svg';
@@ -57,6 +59,7 @@ const AttendeesTable = () => {
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [showResendSuccess, setShowResendSuccess] = useState(false);
   const [showResendError, setShowResendError] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const attendeesPerPage = 9;
   
   const sortRef = useRef<HTMLDivElement>(null);
@@ -380,6 +383,10 @@ const AttendeesTable = () => {
     );
   };
 
+  const handleExport = (selectedEvent: string) => {
+    console.log('Exporting attendees for event:', selectedEvent);
+  };
+
   const renderCalendar = () => {
     const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
     const days = [];
@@ -470,6 +477,14 @@ const AttendeesTable = () => {
     <div className="w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-black">Attendees</h1>
+        
+        <button
+          onClick={() => setIsExportModalOpen(true)}
+          className="relative flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+        >
+          <img src={ExportIcon} alt="Export" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+          <span>Export</span>
+        </button>
       </div>
 
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
@@ -1082,6 +1097,14 @@ const AttendeesTable = () => {
           </div>
         </div>
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onConfirm={handleExport}
+        events={mockEvents}
+      />
     </div>
   );
 };

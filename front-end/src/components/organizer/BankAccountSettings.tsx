@@ -18,7 +18,7 @@ const BankAccountSettings = () => {
   
   // Modal states
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<'add' | 'edit' | 'replace'>('add');
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
   
   // Success/Error states
   const [showSuccess, setShowSuccess] = useState(false);
@@ -94,7 +94,7 @@ const BankAccountSettings = () => {
   };
 
   // Handle opening modal
-  const handleOpenModal = (mode: 'add' | 'edit' | 'replace') => {
+  const handleOpenModal = (mode: 'add' | 'edit') => {
     setModalMode(mode);
     setFormError('');
     setIbanError('');
@@ -203,7 +203,6 @@ const BankAccountSettings = () => {
     setTimeout(() => {
       setShowDeleteSuccess(false);
       setIsDeleteConfirmOpen(false);
-      setIsAddEditModalOpen(false);
     }, 3000);
   };
 
@@ -294,19 +293,22 @@ const BankAccountSettings = () => {
               </div>
 
               {isAdmin && (
-                <div className="flex items-center gap-3 pt-3 border-t border-light-gray">
+                <div className="flex items-center justify-between pt-3 border-t border-light-gray">
                   <button
-                    onClick={() => handleOpenModal('edit')}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors"
+                    onClick={handleDeleteClick}
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#FF4000] hover:bg-[#FFF4F3] rounded-lg transition-all cursor-pointer group"
+                    title="Delete bank account"
                   >
-                    <img src={EditIcon} alt="Edit" className="w-4 h-4" />
-                    Edit
+                    <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    <span className="group-hover:underline">Delete</span>
                   </button>
                   <button
-                    onClick={() => handleOpenModal('replace')}
-                    className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition-colors"
+                    onClick={() => handleOpenModal('edit')}
+                    className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition-all cursor-pointer hover:shadow-sm"
                   >
-                    Replace bank account
+                    Edit bank account
                   </button>
                 </div>
               )}
@@ -319,17 +321,17 @@ const BankAccountSettings = () => {
       {isAddEditModalOpen && (
         <div 
           className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center p-4"
-          onClick={() => !showSuccess && !isDeleteConfirmOpen && handleCancel()}
+          onClick={() => !showSuccess && handleCancel()}
         >
           <div 
             className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 overflow-y-auto flex-1">
-              {!showSuccess && !showError && !isDeleteConfirmOpen ? (
+              {!showSuccess && !showError ? (
                 <>
                   <h2 className="text-xl font-bold text-black mb-4">
-                    {modalMode === 'add' ? 'Add Bank Account' : modalMode === 'edit' ? 'Edit Bank Account' : 'Replace Bank Account'}
+                    {modalMode === 'add' ? 'Add Bank Account' : 'Edit Bank Account'}
                   </h2>
 
                   <div className="space-y-4">
@@ -449,19 +451,49 @@ const BankAccountSettings = () => {
                     >
                       Save changes
                     </button>
-                    {(modalMode === 'edit' || modalMode === 'replace') && bankAccount && (
-                      <button
-                        onClick={handleDeleteClick}
-                        className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
-                        style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
-                      >
-                        Delete bank account
-                      </button>
-                    )}
                   </div>
                 </>
-              ) : isDeleteConfirmOpen && !showDeleteSuccess ? (
-                // Delete Confirmation Popup
+              ) : showSuccess ? (
+                // Success Popup
+                <div className="flex flex-col items-center justify-center py-8">
+                  <img 
+                    src={SuccessIcon} 
+                    alt="Success" 
+                    className="w-16 h-16 mb-4" 
+                    style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} 
+                  />
+                  <p className="text-lg font-semibold text-black">
+                    {successMessage}
+                  </p>
+                </div>
+              ) : (
+                // Error Popup
+                <div className="flex flex-col items-center justify-center py-8">
+                  <img 
+                    src={ErrorIcon} 
+                    alt="Error" 
+                    className="w-16 h-16 mb-4"
+                  />
+                  <p className="text-lg font-semibold text-black">Action failed. Please try again</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center p-4"
+          onClick={() => !showDeleteSuccess && handleCancelDelete()}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {!showDeleteSuccess ? (
                 <>
                   <h2 className="text-xl font-bold text-black mb-4">Confirm deletion</h2>
                   <p className="text-sm text-gray mb-6">
@@ -484,8 +516,7 @@ const BankAccountSettings = () => {
                     </button>
                   </div>
                 </>
-              ) : showSuccess || showDeleteSuccess ? (
-                // Success Popup
+              ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <img 
                     src={SuccessIcon} 
@@ -494,18 +525,8 @@ const BankAccountSettings = () => {
                     style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} 
                   />
                   <p className="text-lg font-semibold text-black">
-                    {showDeleteSuccess ? 'Bank account deleted successfully' : successMessage}
+                    Bank account deleted successfully
                   </p>
-                </div>
-              ) : (
-                // Error Popup
-                <div className="flex flex-col items-center justify-center py-8">
-                  <img 
-                    src={ErrorIcon} 
-                    alt="Error" 
-                    className="w-16 h-16 mb-4"
-                  />
-                  <p className="text-lg font-semibold text-black">Action failed. Please try again</p>
                 </div>
               )}
             </div>

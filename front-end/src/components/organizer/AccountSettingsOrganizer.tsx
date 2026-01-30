@@ -70,6 +70,14 @@ const AccountSettingsOrganizer = () => {
   const [showResendSuccess, setShowResendSuccess] = useState(false);
   const [showResendError, setShowResendError] = useState(false);
   
+  // Change role states
+  const [isChangeRoleOpen, setIsChangeRoleOpen] = useState(false);
+  const [changeRoleData, setChangeRoleData] = useState({ currentRole: '', newRole: '' });
+  const [showChangeRoleSuccess, setShowChangeRoleSuccess] = useState(false);
+  const [showChangeRoleError, setShowChangeRoleError] = useState(false);
+  const [isNewRoleDropdownOpen, setIsNewRoleDropdownOpen] = useState(false);
+  const newRoleDropdownRef = useRef<HTMLDivElement>(null);
+  
   // Validation errors
   const [profileError, setProfileError] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -351,6 +359,9 @@ const AccountSettingsOrganizer = () => {
       if (roleDropdownRef.current && !roleDropdownRef.current.contains(event.target as Node)) {
         setIsRoleDropdownOpen(false);
       }
+      if (newRoleDropdownRef.current && !newRoleDropdownRef.current.contains(event.target as Node)) {
+        setIsNewRoleDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
@@ -520,6 +531,61 @@ const AccountSettingsOrganizer = () => {
     setShowInviteConfirmation(false);
     setIsInviteTeamMemberPage(false);
     setInviteTeamMemberData({ email: '', invitationCode: '', assignedRole: '' });
+  };
+  
+  // Handlers for Change Role
+  const handleOpenChangeRole = () => {
+    if (selectedMember) {
+      setChangeRoleData({
+        currentRole: selectedMember.role,
+        newRole: ''
+      });
+      setIsChangeRoleOpen(true);
+      setSelectedMember(null);
+    }
+  };
+
+  const handleNewRoleSelect = (roleName: string) => {
+    setChangeRoleData(prev => ({
+      ...prev,
+      newRole: roleName
+    }));
+    setIsNewRoleDropdownOpen(false);
+  };
+
+  const handleCancelChangeRole = () => {
+    const memberToRestore = mockTeamMembers.find(m => m.role === changeRoleData.currentRole);
+    setIsChangeRoleOpen(false);
+    setChangeRoleData({ currentRole: '', newRole: '' });
+    if (memberToRestore) {
+      setSelectedMember(memberToRestore);
+    }
+  };
+
+  const handleConfirmChangeRole = () => {
+    if (!changeRoleData.newRole) {
+      return;
+    }
+
+    console.log('Changing role:', changeRoleData);
+
+    if (Math.random() > 0.5) {
+      setShowChangeRoleSuccess(true);
+      setTimeout(() => {
+        setShowChangeRoleSuccess(false);
+        setIsChangeRoleOpen(false);
+        setChangeRoleData({ currentRole: '', newRole: '' });
+        setActiveTeamTab('team');
+      }, 3000);
+    } else {
+      setShowChangeRoleError(true);
+      setTimeout(() => {
+        setShowChangeRoleError(false);
+        setIsChangeRoleOpen(false);
+        setChangeRoleData({ currentRole: '', newRole: '' });
+        setActiveTeamTab('team');
+      }, 3000);
+    }
   };
   
   // Handlers for Login & Security
@@ -2504,26 +2570,11 @@ const AccountSettingsOrganizer = () => {
                       Remove
                     </button>
                     <button
-                      onClick={() => {
-                        // Simuler un échec pour le premier membre (id: '1')
-                        if (selectedMember.id === '1') {
-                          setShowResendError(true);
-                          setTimeout(() => {
-                            setShowResendError(false);
-                            setSelectedMember(null);
-                          }, 3000);
-                        } else {
-                          setShowResendSuccess(true);
-                          setTimeout(() => {
-                            setShowResendSuccess(false);
-                            setSelectedMember(null);
-                          }, 3000);
-                        }
-                      }}
+                      onClick={handleOpenChangeRole}
                       className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Resend ticket
+                      Change role
                     </button>
                   </div>
                 </div>
@@ -2540,6 +2591,122 @@ const AccountSettingsOrganizer = () => {
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={ErrorIcon} alt="Error" className="w-16 h-16 mb-4" />
                   <p className="text-lg font-semibold text-black">Failed to resend ticket. Please try again.</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Change Role Modal */}
+      {isChangeRoleOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center p-4" 
+          onClick={() => !showChangeRoleSuccess && !showChangeRoleError && handleCancelChangeRole()}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-visible" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!showChangeRoleSuccess && !showChangeRoleError ? (
+              <div className="p-6">
+                <h2 className="text-xl font-bold text-black mb-6">Change Role</h2>
+
+                {/* Current Role - Read Only */}
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-black mb-2">
+                    Current role
+                  </label>
+                  <input
+                    type="text"
+                    value={changeRoleData.currentRole}
+                    readOnly
+                    className="w-full px-4 py-2 bg-[#F5F5F5] border border-light-gray rounded-lg text-sm text-gray cursor-not-allowed"
+                  />
+                </div>
+
+                {/* New Role - Dropdown */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-black mb-2">
+                    New role
+                  </label>
+                  <div className="relative" ref={newRoleDropdownRef}>
+                    <button
+                      onClick={() => setIsNewRoleDropdownOpen(!isNewRoleDropdownOpen)}
+                      className="w-full px-4 py-2 bg-white border border-light-gray rounded-lg text-sm text-left flex items-center justify-between hover:border-primary transition-all cursor-pointer"
+                    >
+                      <span className={changeRoleData.newRole ? 'text-black' : 'text-input-gray'}>
+                        {changeRoleData.newRole || 'Select a role'}
+                      </span>
+                      <svg 
+                        className={`w-4 h-4 text-gray transition-transform ${isNewRoleDropdownOpen ? 'rotate-180' : ''}`} 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {isNewRoleDropdownOpen && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                        {mockRoles.map((role) => (
+                          <button
+                            key={role.id}
+                            onClick={() => handleNewRoleSelect(role.name)}
+                            className="w-full px-4 py-2 text-sm text-left hover:bg-secondary-light transition-colors cursor-pointer text-black"
+                          >
+                            {role.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    onClick={handleCancelChangeRole}
+                    className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmChangeRole}
+                    disabled={!changeRoleData.newRole}
+                    className={`px-5 py-2 text-white font-medium text-sm rounded-full transition-all whitespace-nowrap ${
+                      changeRoleData.newRole
+                        ? 'bg-[#FF4000] hover:bg-[#E63900] cursor-pointer'
+                        : 'bg-gray/30 cursor-not-allowed'
+                    }`}
+                    style={changeRoleData.newRole ? { boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' } : {}}
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            ) : showChangeRoleSuccess ? (
+              <div className="p-6">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <img 
+                    src={SuccessIcon} 
+                    alt="Success" 
+                    className="w-16 h-16 mb-4" 
+                    style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} 
+                  />
+                  <p className="text-lg font-semibold text-black">Role changed successfully</p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-6">
+                <div className="flex flex-col items-center justify-center py-8">
+                  <img 
+                    src={ErrorIcon} 
+                    alt="Error" 
+                    className="w-16 h-16 mb-4"
+                  />
+                  <p className="text-lg font-semibold text-black">Failed to change role. Please try again</p>
                 </div>
               </div>
             )}

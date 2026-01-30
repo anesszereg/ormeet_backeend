@@ -196,7 +196,7 @@ const DashboardOrganizer = () => {
         return <AttendeesTable />;
 
       case 'orders':
-        return <OrdersTable onCreateOrder={() => console.log('Create order')} />;
+        return <OrdersTable />;
 
       case 'account-settings':
         return <AccountSettingsOrganizer />;
