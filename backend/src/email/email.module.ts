@@ -11,9 +11,9 @@ import { EmailService } from './email.service';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         transport: {
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false,
+          host: configService.get('SMTP_HOST') || 'smtp.hostinger.com',
+          port: Number(configService.get('SMTP_PORT')) || 465,
+          secure: true,
           auth: {
             user: configService.get('EMAIL_USER'),
             pass: configService.get('EMAIL_PASSWORD'),
