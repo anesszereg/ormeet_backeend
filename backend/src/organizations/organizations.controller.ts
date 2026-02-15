@@ -79,7 +79,7 @@ export class OrganizationsController {
     return this.organizationsService.update(
       id,
       updateOrganizationDto,
-      req.user.sub,
+      req.user.id,
     );
   }
 
@@ -92,7 +92,7 @@ export class OrganizationsController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Organization not found' })
   remove(@Param('id') id: string, @Request() req) {
-    return this.organizationsService.remove(id, req.user.sub);
+    return this.organizationsService.remove(id, req.user.id);
   }
 
   @Post(':id/members/:userId/:role')
@@ -109,7 +109,7 @@ export class OrganizationsController {
     @Param('role') role: OrganizationMemberRole,
     @Request() req,
   ) {
-    return this.organizationsService.addMember(id, userId, role, req.user.sub);
+    return this.organizationsService.addMember(id, userId, role, req.user.id);
   }
 
   @Delete(':id/members/:userId')
@@ -125,7 +125,7 @@ export class OrganizationsController {
     @Param('userId') userId: string,
     @Request() req,
   ) {
-    return this.organizationsService.removeMember(id, userId, req.user.sub);
+    return this.organizationsService.removeMember(id, userId, req.user.id);
   }
 
   @Patch(':id/members/:userId/role')
@@ -146,7 +146,7 @@ export class OrganizationsController {
       id,
       userId,
       updateMemberRoleDto.role,
-      req.user.sub,
+      req.user.id,
     );
   }
 }
