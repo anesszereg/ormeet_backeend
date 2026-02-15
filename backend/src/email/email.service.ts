@@ -1,15 +1,34 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
+  private readonly resend: Resend;
+  private readonly fromEmail: string;
 
   constructor(
-    private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
+    this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <hello@ormeet.com>';
+  }
+
+  private async sendEmail(to: string, subject: string, html: string) {
+    const { data, error } = await this.resend.emails.send({
+      from: this.fromEmail,
+      to: [to],
+      subject,
+      html,
+    });
+
+    if (error) {
+      throw new Error(`Resend error: ${JSON.stringify(error)}`);
+    }
+
+    return data;
+  }
 
   async sendWelcomeEmail(email: string, name: string, verificationToken: string) {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
@@ -17,17 +36,10 @@ export class EmailService {
 
     try {
       this.logger.log(`📧 Sending welcome email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Welcome to Ormeet - Verify Your Email',
-        template: 'welcome',
-        context: {
-          name,
-          verificationUrl,
-          appName: 'Ormeet',
-        },
-      });
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.button{display:inline-block;padding:12px 30px;background:#667eea;color:white;text-decoration:none;border-radius:5px;margin:20px 0}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>🎉 Welcome to Ormeet!</h1></div><div class="content"><p>Hi ${name},</p><p>Thank you for joining <strong>Ormeet</strong> - your ultimate event organization platform!</p><p>To get started, please verify your email address by clicking the button below:</p><center><a href="${verificationUrl}" class="button">Verify Email Address</a></center><p>Or copy and paste this link into your browser:</p><p style="word-break:break-all;color:#667eea;">${verificationUrl}</p><p><strong>What you can do with Ormeet:</strong></p><ul><li>🎫 Discover and book amazing events</li><li>🏢 Create and manage your own events</li><li>📍 Find venues near you</li><li>💳 Secure ticket purchasing</li><li>⭐ Share reviews and ratings</li></ul><p>If you didn't create this account, please ignore this email.</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(email, 'Welcome to Ormeet - Verify Your Email', html);
 
       this.logger.log(`✅ Welcome email sent successfully to: ${email}`);
     } catch (error) {
@@ -42,17 +54,10 @@ export class EmailService {
 
     try {
       this.logger.log(`📧 Sending verification email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Verify Your Email - Ormeet',
-        template: 'verify-email',
-        context: {
-          name,
-          verificationUrl,
-          appName: 'Ormeet',
-        },
-      });
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:#667eea;color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.button{display:inline-block;padding:12px 30px;background:#667eea;color:white;text-decoration:none;border-radius:5px;margin:20px 0}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>📧 Verify Your Email</h1></div><div class="content"><p>Hi ${name},</p><p>Please verify your email address to complete your registration on Ormeet.</p><center><a href="${verificationUrl}" class="button">Verify Email Address</a></center><p>Or copy and paste this link:</p><p style="word-break:break-all;color:#667eea;">${verificationUrl}</p><p>This link will expire in 24 hours.</p><p>If you didn't request this, please ignore this email.</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(email, 'Verify Your Email - Ormeet', html);
 
       this.logger.log(`✅ Verification email sent successfully to: ${email}`);
     } catch (error) {
@@ -67,18 +72,10 @@ export class EmailService {
 
     try {
       this.logger.log(`📧 Sending password reset email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Reset Your Password - Ormeet',
-        template: 'reset-password',
-        context: {
-          name,
-          resetUrl,
-          appName: 'Ormeet',
-          expirationTime: '1 hour',
-        },
-      });
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:#f59e0b;color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.button{display:inline-block;padding:12px 30px;background:#f59e0b;color:white;text-decoration:none;border-radius:5px;margin:20px 0}.warning{background:#fef3c7;border-left:4px solid #f59e0b;padding:15px;margin:20px 0}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>🔒 Reset Your Password</h1></div><div class="content"><p>Hi ${name},</p><p>We received a request to reset your password for your Ormeet account.</p><center><a href="${resetUrl}" class="button">Reset Password</a></center><p>Or copy and paste this link:</p><p style="word-break:break-all;color:#f59e0b;">${resetUrl}</p><div class="warning"><strong>⚠️ Important:</strong> This link will expire in 1 hour. If you didn't request a password reset, please ignore this email or contact support if you have concerns.</div><p>For security reasons, never share this link with anyone.</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(email, 'Reset Your Password - Ormeet', html);
 
       this.logger.log(`✅ Password reset email sent successfully to: ${email}`);
     } catch (error) {
@@ -90,17 +87,11 @@ export class EmailService {
   async sendPasswordChangedEmail(email: string, name: string) {
     try {
       this.logger.log(`📧 Sending password changed confirmation to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Password Changed Successfully - Ormeet',
-        template: 'password-changed',
-        context: {
-          name,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('EMAIL_USER'),
-        },
-      });
+
+      const supportEmail = this.configService.get('EMAIL_USER') || 'hello@ormeet.com';
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:#10b981;color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.alert{background:#fef2f2;border-left:4px solid #ef4444;padding:15px;margin:20px 0}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>✅ Password Changed Successfully</h1></div><div class="content"><p>Hi ${name},</p><p>Your password for Ormeet has been successfully changed.</p><div class="alert"><strong>🔐 Security Notice:</strong> If you didn't make this change, please contact our support team immediately at <a href="mailto:${supportEmail}">${supportEmail}</a></div><p><strong>Security Tips:</strong></p><ul><li>Never share your password with anyone</li><li>Use a unique password for each account</li><li>Enable two-factor authentication when available</li><li>Change your password regularly</li></ul><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(email, 'Password Changed Successfully - Ormeet', html);
 
       this.logger.log(`✅ Password changed email sent successfully to: ${email}`);
     } catch (error) {
@@ -112,19 +103,11 @@ export class EmailService {
   async sendLoginNotification(email: string, name: string, ipAddress: string, userAgent: string) {
     try {
       this.logger.log(`📧 Sending login notification to: ${email} (IP: ${ipAddress})`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'New Login to Your Account - Ormeet',
-        template: 'login-notification',
-        context: {
-          name,
-          ipAddress,
-          userAgent,
-          loginTime: new Date().toLocaleString(),
-          appName: 'Ormeet',
-        },
-      });
+
+      const loginTime = new Date().toLocaleString();
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:#3b82f6;color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.info-box{background:#dbeafe;border-left:4px solid #3b82f6;padding:15px;margin:20px 0}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>🔔 New Login Detected</h1></div><div class="content"><p>Hi ${name},</p><p>We detected a new login to your Ormeet account.</p><div class="info-box"><p><strong>Login Details:</strong></p><ul style="margin:10px 0;"><li><strong>Time:</strong> ${loginTime}</li><li><strong>IP Address:</strong> ${ipAddress}</li><li><strong>Device:</strong> ${userAgent}</li></ul></div><p>If this was you, you can safely ignore this email.</p><p><strong>If this wasn't you:</strong></p><ol><li>Change your password immediately</li><li>Review your recent account activity</li><li>Contact our support team</li></ol><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(email, 'New Login to Your Account - Ormeet', html);
 
       this.logger.log(`✅ Login notification sent successfully to: ${email}`);
     } catch (error) {
@@ -146,18 +129,10 @@ export class EmailService {
       };
 
       const subject = subjectMap[purpose] || 'Your Verification Code - Ormeet';
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject,
-        template: 'verification-code',
-        context: {
-          code,
-          purpose,
-          expiresIn: '10 minutes',
-          appName: 'Ormeet',
-        },
-      });
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.code-box{background:white;border:2px dashed #667eea;padding:20px;text-align:center;margin:20px 0;border-radius:8px}.code{font-size:36px;font-weight:bold;color:#667eea;letter-spacing:8px;font-family:'Courier New',monospace}.warning{background:#fff3cd;border-left:4px solid #ffc107;padding:12px;margin:20px 0;border-radius:4px}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>🔐 Your Verification Code</h1></div><div class="content"><p>Hello,</p><p>You requested a verification code for your Ormeet account.</p><div class="code-box"><p style="margin:0;color:#666;font-size:14px;">Your verification code is:</p><div class="code">${code}</div><p style="margin:10px 0 0 0;color:#999;font-size:12px;">This code expires in 10 minutes</p></div><p><strong>Purpose:</strong> ${purpose}</p><div class="warning"><strong>⚠️ Security Notice:</strong><ul style="margin:10px 0 0 0;padding-left:20px;"><li>Never share this code with anyone</li><li>Ormeet will never ask for your code via phone or email</li><li>This code is valid for 10 minutes only</li><li>You have 3 attempts to enter the correct code</li></ul></div><p>If you didn't request this code, please ignore this email.</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p><p>This is an automated message, please do not reply to this email.</p></div></body></html>`;
+
+      await this.sendEmail(email, subject, html);
 
       this.logger.log(`✅ Verification code sent successfully to: ${email}`);
     } catch (error) {
@@ -191,59 +166,25 @@ export class EmailService {
     try {
       this.logger.log(`📧 Sending order confirmation to: ${orderData.email}`);
 
-      // Prepare attachments for QR codes
-      const attachments = orderData.tickets.map((ticket, index) => ({
-        filename: `qr-${ticket.code}.png`,
-        content: ticket.qrCodeBuffer,
-        cid: `qr-${ticket.code}`, // Content ID for embedding in HTML
-      }));
+      const ticketsHtml = orderData.tickets.map(ticket => `
+        <div style="background:#fff;border:2px solid #e0e0e0;padding:25px;margin-bottom:20px;border-left:5px solid #FF4000;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:15px;padding-bottom:15px;border-bottom:1px solid #e0e0e0;">
+            <span style="font-size:18px;font-weight:600;">${ticket.ticketType}</span>
+            <span style="font-size:20px;font-weight:700;color:#FF4000;">${orderData.currency} ${ticket.price}</span>
+          </div>
+          <div style="background:#f8f9fa;border:1px dashed #bdc3c7;padding:12px;text-align:center;font-family:'Courier New',monospace;font-size:15px;letter-spacing:3px;font-weight:600;">Ticket Code: ${ticket.code}</div>
+        </div>
+      `).join('');
 
-      // Add PDF ticket as attachment if provided
-      if (orderData.pdfTicket) {
-        attachments.push({
-          filename: `Tickets-${orderData.orderId}.pdf`,
-          content: orderData.pdfTicket,
-          contentType: 'application/pdf',
-        } as any);
-      }
+      const supportEmail = this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com';
 
-      // Prepare tickets with CID references for template
-      const ticketsForTemplate = orderData.tickets.map((ticket) => ({
-        id: ticket.id,
-        code: ticket.code,
-        ticketType: ticket.ticketType,
-        price: ticket.price,
-        qrCodeCid: `qr-${ticket.code}`, // CID reference
-      }));
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Georgia,'Times New Roman',serif;line-height:1.8;color:#2c3e50;max-width:650px;margin:0 auto;padding:20px;background-color:#f8f9fa}</style></head><body><div style="background:#fff;border:1px solid #e0e0e0;box-shadow:0 4px 6px rgba(0,0,0,0.07);"><div style="background:linear-gradient(135deg,#2c3e50 0%,#34495e 100%);padding:40px 30px;text-align:center;border-bottom:3px solid #FF4000;"><h1 style="color:#fff;margin:0;font-size:28px;font-weight:400;letter-spacing:1px;">Order Confirmation</h1><div style="display:inline-block;background-color:#27ae60;color:white;padding:8px 20px;border-radius:20px;font-size:14px;margin-top:15px;font-family:Arial,sans-serif;">✓ Payment Successful</div></div><div style="padding:30px;"><p style="font-size:16px;">Dear <strong>${orderData.customerName}</strong>,</p><p style="font-size:15px;color:#7f8c8d;">Thank you for your purchase. Your order has been confirmed and your tickets are ready.</p><div style="background:#fafafa;border-left:4px solid #FF4000;padding:20px 25px;margin:25px 0;"><h2 style="margin-top:0;font-size:20px;font-weight:400;">Order Details</h2><p><strong>Order ID:</strong> ${orderData.orderId}</p><p><strong>Tickets:</strong> ${orderData.tickets.length}</p></div><div style="background:#fafafa;border:2px solid #ecf0f1;border-left:5px solid #FF4000;padding:25px;margin:25px 0;"><h3 style="margin-top:0;font-size:22px;">📅 ${orderData.eventTitle}</h3><p>🗓️ ${orderData.eventDate}</p><p>📍 ${orderData.eventLocation}</p></div><h2 style="font-size:22px;font-weight:400;border-bottom:2px solid #ecf0f1;padding-bottom:10px;">Your Event Tickets</h2>${ticketsHtml}<div style="background:#fafafa;border:1px solid #e0e0e0;padding:25px;margin:25px 0;"><h3 style="margin-top:0;font-size:20px;font-weight:400;">Payment Summary</h3><p>Subtotal: ${orderData.currency} ${orderData.subtotal.toFixed(2)}</p>${orderData.discount ? `<p style="color:#4CAF50;">Discount: -${orderData.currency} ${orderData.discount.toFixed(2)}</p>` : ''}<p>Service Fee: ${orderData.currency} ${orderData.serviceFee.toFixed(2)}</p><p>Processing Fee: ${orderData.currency} ${orderData.processingFee.toFixed(2)}</p><p style="font-size:19px;font-weight:700;color:#27ae60;border-top:2px solid #2c3e50;padding-top:15px;margin-top:15px;">Total Paid: ${orderData.currency} ${orderData.total.toFixed(2)}</p></div></div><div style="background:#f8f9fa;text-align:center;padding:30px;border-top:3px solid #FF4000;color:#7f8c8d;font-size:13px;"><p>For assistance, contact us at <a href="mailto:${supportEmail}">${supportEmail}</a></p><p style="font-size:11px;color:#bdc3c7;">© 2025 Ormeet. All rights reserved.</p></div></div></body></html>`;
 
-      await this.mailerService.sendMail({
-        to: orderData.email,
-        subject: `Order Confirmation - ${orderData.eventTitle}`,
-        template: 'order-confirmation',
-        context: {
-          customerName: orderData.customerName,
-          orderId: orderData.orderId,
-          eventTitle: orderData.eventTitle,
-          eventDate: orderData.eventDate,
-          eventLocation: orderData.eventLocation,
-          tickets: ticketsForTemplate,
-          ticketCount: orderData.tickets.length,
-          subtotal: orderData.subtotal.toFixed(2),
-          discount: orderData.discount.toFixed(2),
-          serviceFee: orderData.serviceFee.toFixed(2),
-          processingFee: orderData.processingFee.toFixed(2),
-          total: orderData.total.toFixed(2),
-          currency: orderData.currency,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com',
-        },
-        attachments,
-      });
+      await this.sendEmail(orderData.email, `Order Confirmation - ${orderData.eventTitle}`, html);
 
       this.logger.log(`✅ Order confirmation sent successfully to: ${orderData.email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send order confirmation to: ${orderData.email}`, error.stack);
-      // Don't throw - we don't want to fail the order if email fails
       console.error('Email error:', error);
     }
   }
@@ -263,29 +204,16 @@ export class EmailService {
     try {
       this.logger.log(`📧 Sending check-in confirmation to: ${checkInData.email}`);
 
-      await this.mailerService.sendMail({
-        to: checkInData.email,
-        subject: `✓ Check-In Confirmed - ${checkInData.eventTitle}`,
-        template: 'check-in-confirmation',
-        context: {
-          attendeeName: checkInData.attendeeName,
-          eventTitle: checkInData.eventTitle,
-          eventDate: checkInData.eventDate,
-          eventLocation: checkInData.eventLocation,
-          ticketCode: checkInData.ticketCode,
-          ticketType: checkInData.ticketType,
-          checkInTime: checkInData.checkInTime,
-          checkInMethod: checkInData.checkInMethod.toUpperCase(),
-          seatInfo: checkInData.seatInfo,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com',
-        },
-      });
+      const supportEmail = this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com';
+      const seatHtml = checkInData.seatInfo ? `<p><strong>Seat:</strong> ${checkInData.seatInfo}</p>` : '';
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Georgia,'Times New Roman',serif;line-height:1.8;color:#2c3e50;max-width:650px;margin:0 auto;padding:20px}</style></head><body><div style="background:#fff;border:2px solid #d4af37;border-radius:8px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.12);"><div style="background:linear-gradient(135deg,#1e8449 0%,#27ae60 100%);padding:45px 35px;text-align:center;border-bottom:4px solid #d4af37;"><h1 style="color:#fff;margin:0;font-size:32px;font-weight:300;letter-spacing:2px;">Check-In Confirmed!</h1><div style="display:inline-block;background:#fff;color:#1e8449;padding:10px 28px;border-radius:25px;font-size:15px;margin-top:18px;font-weight:700;">✓ You're All Set</div></div><div style="padding:40px 35px;"><div style="background:linear-gradient(135deg,#e8f5e9 0%,#c8e6c9 100%);border:3px solid #66bb6a;padding:35px 30px;text-align:center;border-radius:12px;margin-bottom:35px;"><h2 style="color:#1e8449;font-size:28px;margin:0 0 10px 0;">Welcome, ${checkInData.attendeeName}!</h2><p style="font-size:17px;font-weight:500;">You have successfully checked in</p><p><strong>Checked in at:</strong> ${checkInData.checkInTime}</p></div><div style="background:linear-gradient(135deg,#fff8f0 0%,#ffe8d6 100%);border:2px solid #d4af37;border-radius:10px;padding:30px;margin:30px 0;"><h3 style="margin-top:0;font-size:24px;border-bottom:2px solid #d4af37;padding-bottom:15px;">📅 ${checkInData.eventTitle}</h3><p>🗓️ ${checkInData.eventDate}</p><p>📍 ${checkInData.eventLocation}</p></div><div style="background:#fff;border:2px solid #e0e0e0;border-radius:10px;padding:30px;margin:30px 0;"><h2 style="margin-top:0;font-size:22px;border-bottom:2px solid #27ae60;padding-bottom:12px;">Check-In Details</h2><p><strong>Ticket Code:</strong> ${checkInData.ticketCode}</p><p><strong>Ticket Type:</strong> ${checkInData.ticketType}</p><p><strong>Method:</strong> ${checkInData.checkInMethod.toUpperCase()}</p>${seatHtml}</div></div><div style="background:linear-gradient(135deg,#2c3e50 0%,#34495e 100%);text-align:center;padding:35px 30px;border-top:4px solid #d4af37;color:#ecf0f1;font-size:13px;"><p>Questions? Contact us at <a href="mailto:${supportEmail}" style="color:#f39c12;">${supportEmail}</a></p><p style="font-size:11px;color:#bdc3c7;">© 2025 Ormeet. All rights reserved.</p></div></div></body></html>`;
+
+      await this.sendEmail(checkInData.email, `✓ Check-In Confirmed - ${checkInData.eventTitle}`, html);
 
       this.logger.log(`✅ Check-in confirmation sent successfully to: ${checkInData.email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send check-in confirmation to: ${checkInData.email}`, error.stack);
-      // Don't throw - we don't want to fail the check-in if email fails
       console.error('Email error:', error);
     }
   }
