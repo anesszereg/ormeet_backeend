@@ -50,10 +50,7 @@ export class AuthService {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Generate email verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-
-    // Create new user
+    // Create new user (skip email verification for now)
     const user = this.userRepository.create({
       name,
       email,
@@ -63,19 +60,10 @@ export class AuthService {
       organizationId,
       interestedEventCategories,
       hostingEventTypes,
-      emailVerificationToken,
-      emailVerified: false,
+      emailVerified: true,
     });
 
     await this.userRepository.save(user);
-
-    // Send welcome email with verification link
-    try {
-      await this.emailService.sendWelcomeEmail(email, name, emailVerificationToken);
-    } catch (error) {
-      console.error('⚠️ Failed to send welcome email, but user registration succeeded:', error.message);
-      // Don't fail registration if email fails
-    }
 
     // Generate JWT token
     const token = this.generateToken(user);
@@ -83,7 +71,7 @@ export class AuthService {
     return {
       user: this.sanitizeUser(user),
       token,
-      message: 'Registration successful! Please check your email to verify your account.',
+      message: 'Registration successful!',
     };
   }
 
@@ -108,11 +96,6 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Check if email is verified
-    if (!user.emailVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in. Check your inbox for the verification link.');
     }
 
     // Send login notification email (only if email exists)
