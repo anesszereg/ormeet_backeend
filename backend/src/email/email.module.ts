@@ -12,11 +12,14 @@ import { EmailService } from './email.service';
       useFactory: async (configService: ConfigService) => ({
         transport: {
           host: configService.get('SMTP_HOST') || 'smtp.hostinger.com',
-          port: Number(configService.get('SMTP_PORT')) || 465,
-          secure: true,
+          port: Number(configService.get('SMTP_PORT')) || 587,
+          secure: Number(configService.get('SMTP_PORT')) === 465,
           auth: {
             user: configService.get('EMAIL_USER'),
             pass: configService.get('EMAIL_PASSWORD'),
+          },
+          tls: {
+            rejectUnauthorized: false,
           },
         },
         defaults: {
