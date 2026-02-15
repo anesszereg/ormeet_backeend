@@ -95,6 +95,7 @@ const AccountSettingsOrganizer = () => {
     fullName: user?.name || '',
     profilePhoto: user?.avatarUrl || ProfilePhoto
   });
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   
   const [emailData, setEmailData] = useState({
     currentEmail: user?.email || '',
@@ -135,7 +136,7 @@ const AccountSettingsOrganizer = () => {
   
   // About Organization states
   const [organizationData, setOrganizationData] = useState({
-    name: 'Pulsewave Entertainment',
+    name: '',
     logo: null as File | null,
     logoPreview: '',
     organizationType: '',
@@ -144,13 +145,44 @@ const AccountSettingsOrganizer = () => {
     phone: '',
     description: '',
     socialMedia: {
-      facebook: 'facebook.com/yourpage',
-      instagram: '@yourusername',
-      linkedin: 'linkedin.com/company/yourname',
-      youtube: 'youtube.com/@yourchannel'
+      facebook: '',
+      instagram: '',
+      linkedin: '',
+      youtube: ''
     }
   });
+  const [orgSaveSuccess, setOrgSaveSuccess] = useState(false);
+  const [orgSaveError, setOrgSaveError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch organization data from API
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!user?.organizationId) return;
+      try {
+        const org = await organizerService.getOrganizationById(user.organizationId);
+        setOrganizationData(prev => ({
+          ...prev,
+          name: org.name || '',
+          email: org.contactEmail || '',
+          phone: org.contactPhone || '',
+          description: org.description || '',
+          address: org.settings?.address || '',
+          organizationType: org.settings?.organizationType || '',
+          logoPreview: org.settings?.logoUrl || '',
+          socialMedia: {
+            facebook: org.settings?.socialMedia?.facebook || '',
+            instagram: org.settings?.socialMedia?.instagram || '',
+            linkedin: org.settings?.socialMedia?.linkedin || '',
+            youtube: org.settings?.socialMedia?.youtube || '',
+          }
+        }));
+      } catch (err) {
+        console.error('Failed to fetch organization:', err);
+      }
+    };
+    fetchOrganization();
+  }, [user?.organizationId]);
   
   // Team & Roles states
   const [activeTeamTab, setActiveTeamTab] = useState<'team' | 'roles'>('team');
@@ -376,7 +408,19 @@ const AccountSettingsOrganizer = () => {
     setIsLoading(true);
     
     try {
-      await authService.updateProfile({ name: profileData.fullName });
+      let avatarUrl: string | undefined;
+      // Upload profile photo to Cloudinary if a new file was selected
+      if (profilePhotoFile) {
+        const urls = await organizerService.uploadImages([profilePhotoFile]);
+        if (urls.length > 0) {
+          avatarUrl = urls[0];
+        }
+      }
+      await authService.updateProfile({ name: profileData.fullName, ...(avatarUrl && { avatarUrl }) });
+      if (avatarUrl) {
+        setProfileData(prev => ({ ...prev, profilePhoto: avatarUrl! }));
+      }
+      setProfilePhotoFile(null);
       refreshUser();
       setShowProfileSuccess(true);
       setTimeout(() => {
@@ -528,8 +572,51 @@ const AccountSettingsOrganizer = () => {
     setIsOrgTypeDropdownOpen(false);
   };
 
-  const handleOrganizationSave = () => {
-    console.log('Saving organization data:', organizationData);
+  const handleOrganizationSave = async () => {
+    if (!user?.organizationId) {
+      setOrgSaveError('No organization found. Please re-login.');
+      return;
+    }
+    if (!organizationData.name.trim()) {
+      setOrgSaveError('Organization name is required');
+      return;
+    }
+    setOrgSaveError('');
+    setIsLoading(true);
+
+    try {
+      // Upload logo if a new file was selected
+      let logoUrl: string | undefined;
+      if (organizationData.logo) {
+        const urls = await organizerService.uploadImages([organizationData.logo]);
+        if (urls.length > 0) {
+          logoUrl = urls[0];
+        }
+      }
+
+      await organizerService.updateOrganization(user.organizationId, {
+        name: organizationData.name,
+        description: organizationData.description || undefined,
+        contactEmail: organizationData.email || undefined,
+        contactPhone: organizationData.phone || undefined,
+        settings: {
+          address: organizationData.address,
+          organizationType: organizationData.organizationType,
+          logoUrl: logoUrl || organizationData.logoPreview || undefined,
+          socialMedia: organizationData.socialMedia,
+        },
+      });
+
+      if (logoUrl) {
+        setOrganizationData(prev => ({ ...prev, logoPreview: logoUrl!, logo: null }));
+      }
+      setOrgSaveSuccess(true);
+      setTimeout(() => setOrgSaveSuccess(false), 3000);
+    } catch (err: any) {
+      setOrgSaveError(err.response?.data?.message || 'Failed to save organization');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const organizationTypes = ['Company', 'Association', 'Agency', 'Individual', 'Other'];
@@ -1035,14 +1122,28 @@ const AccountSettingsOrganizer = () => {
                 </div>
               </div>
 
+              {/* Error/Success Messages */}
+              {orgSaveError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {orgSaveError}
+                </div>
+              )}
+              {orgSaveSuccess && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                  <img src={SuccessIcon} alt="Success" className="w-5 h-5" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
+                  Organization saved successfully!
+                </div>
+              )}
+
               {/* Save Changes Button */}
               <div className="flex justify-end">
                 <button
                   onClick={handleOrganizationSave}
-                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                  disabled={isLoading}
+                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {isLoading ? 'Saving...' : 'Save changes'}
                 </button>
               </div>
             </div>
@@ -2016,6 +2117,7 @@ const AccountSettingsOrganizer = () => {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          setProfilePhotoFile(file);
                           const reader = new FileReader();
                           reader.onloadend = () => {
                             setProfileData({ ...profileData, profilePhoto: reader.result as string });

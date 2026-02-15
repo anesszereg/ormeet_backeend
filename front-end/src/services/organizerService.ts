@@ -196,11 +196,11 @@ export interface Organization {
   id: string;
   name: string;
   description?: string;
-  logo?: string;
   website?: string;
-  email?: string;
-  phone?: string;
+  contactEmail?: string;
+  contactPhone?: string;
   ownerId: string;
+  settings?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
@@ -208,14 +208,21 @@ export interface Organization {
 export interface CreateOrganizationDto {
   name: string;
   description?: string;
-  logo?: string;
   website?: string;
-  email?: string;
-  phone?: string;
+  contactEmail?: string;
+  contactPhone?: string;
   ownerId: string;
+  settings?: Record<string, any>;
 }
 
-export interface UpdateOrganizationDto extends Partial<CreateOrganizationDto> {}
+export interface UpdateOrganizationDto {
+  name?: string;
+  description?: string;
+  website?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  settings?: Record<string, any>;
+}
 
 // ========== Dashboard Stats Types ==========
 

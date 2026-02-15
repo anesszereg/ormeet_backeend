@@ -25,27 +25,17 @@ export class CreateOrganizationDto {
   @ApiPropertyOptional({ example: 'contact@techevents.com' })
   @IsEmail()
   @IsOptional()
-  email?: string;
+  contactEmail?: string;
 
   @ApiPropertyOptional({ example: '+1234567890' })
   @IsString()
   @IsOptional()
-  phone?: string;
+  contactPhone?: string;
 
   @ApiPropertyOptional({ example: 'https://techevents.com' })
   @IsUrl()
   @IsOptional()
   website?: string;
-
-  @ApiPropertyOptional({ example: '123 Event Street, City, Country' })
-  @IsString()
-  @IsOptional()
-  address?: string;
-
-  @ApiPropertyOptional({ example: 'https://logo.url/image.png' })
-  @IsUrl()
-  @IsOptional()
-  logoUrl?: string;
 
   @ApiProperty({ example: 'user-uuid' })
   @IsString()
