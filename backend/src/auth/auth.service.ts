@@ -10,7 +10,7 @@ import { Repository, MoreThan } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User, UserRole, VerificationCode, VerificationType, VerificationPurpose } from '../entities';
+import { User, UserRole, VerificationCode, VerificationType, VerificationPurpose, Organization } from '../entities';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, SendVerificationCodeDto, VerifyCodeDto, LoginWithCodeDto } from './dto';
 import { EmailService } from '../email/email.service';
 
@@ -21,6 +21,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(VerificationCode)
     private readonly verificationCodeRepository: Repository<VerificationCode>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
@@ -64,6 +66,19 @@ export class AuthService {
     });
 
     await this.userRepository.save(user);
+
+    // If registering as organizer and no organization provided, auto-create one
+    if (!organizationId && roles?.includes(UserRole.ORGANIZER)) {
+      const org = this.organizationRepository.create({
+        name: `${name}'s Organization`,
+        ownerId: user.id,
+      });
+      const savedOrg = await this.organizationRepository.save(org);
+
+      // Link the organization back to the user
+      user.organizationId = savedOrg.id;
+      await this.userRepository.update(user.id, { organizationId: savedOrg.id });
+    }
 
     // Generate JWT token
     const token = this.generateToken(user);
@@ -111,6 +126,17 @@ export class AuthService {
     //     console.error('⚠️ Failed to send login notification email:', error.message);
     //   }
     // }
+
+    // Auto-create organization for existing organizer users who don't have one
+    if (!user.organizationId && user.roles?.includes(UserRole.ORGANIZER)) {
+      const org = this.organizationRepository.create({
+        name: `${user.name}'s Organization`,
+        ownerId: user.id,
+      });
+      const savedOrg = await this.organizationRepository.save(org);
+      user.organizationId = savedOrg.id;
+      await this.userRepository.update(user.id, { organizationId: savedOrg.id });
+    }
 
     // Generate JWT token
     const token = this.generateToken(user);
