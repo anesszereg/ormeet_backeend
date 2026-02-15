@@ -37,7 +37,7 @@ export class OrganizationsService {
   async findOne(id: string): Promise<Organization> {
     const organization = await this.organizationRepository.findOne({
       where: { id },
-      relations: ['owner', 'events', 'members'],
+      relations: ['owner', 'events'],
     });
 
     if (!organization) {
