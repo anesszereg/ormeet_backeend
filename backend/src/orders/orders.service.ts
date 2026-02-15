@@ -396,23 +396,23 @@ export class OrdersService {
         currency: order.currency,
       });
 
-      // Send email with PDF and embedded QR codes
-      await this.emailService.sendOrderConfirmation({
-        email: order.billingEmail,
-        customerName: order.billingName,
-        orderId: order.id,
-        eventTitle: event.title,
-        eventDate,
-        eventLocation,
-        tickets: generatedTickets,
-        subtotal: Number(order.amountSubtotal),
-        discount: Number(order.discountAmount),
-        serviceFee: Number(order.serviceFee),
-        processingFee: Number(order.processingFee),
-        total: Number(order.amountTotal),
-        currency: order.currency,
-        pdfTicket: pdfBuffer,
-      });
+      // // Send email with PDF and embedded QR codes (disabled - email not working on Render)
+      // await this.emailService.sendOrderConfirmation({
+      //   email: order.billingEmail,
+      //   customerName: order.billingName,
+      //   orderId: order.id,
+      //   eventTitle: event.title,
+      //   eventDate,
+      //   eventLocation,
+      //   tickets: generatedTickets,
+      //   subtotal: Number(order.amountSubtotal),
+      //   discount: Number(order.discountAmount),
+      //   serviceFee: Number(order.serviceFee),
+      //   processingFee: Number(order.processingFee),
+      //   total: Number(order.amountTotal),
+      //   currency: order.currency,
+      //   pdfTicket: pdfBuffer,
+      // });
     }
 
     return savedOrder;

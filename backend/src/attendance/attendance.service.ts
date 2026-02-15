@@ -128,43 +128,43 @@ export class AttendanceService {
     ticket.status = TicketStatus.USED;
     await this.ticketRepository.save(ticket);
 
-    // Send check-in confirmation email
-    if (ticket.owner?.email) {
-      const eventLocation = event.venue 
-        ? `${event.venue.name}, ${event.venue.city}`
-        : event.customLocation?.city || event.customLocation?.address || 'TBA';
-
-      const seatInfo = ticket.seatSection
-        ? `${ticket.seatSection} - Row ${ticket.seatRow} - Seat ${ticket.seatNumber}`
-        : undefined;
-
-      await this.emailService.sendCheckInConfirmation({
-        email: ticket.owner.email,
-        attendeeName: ticket.owner.name || 'Guest',
-        eventTitle: event.title,
-        eventDate: event.startAt.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        eventLocation,
-        ticketCode: ticket.code,
-        ticketType: ticket.ticketType?.title || 'General Admission',
-        checkInTime: savedAttendance.checkedInAt.toLocaleString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-        checkInMethod: savedAttendance.method,
-        seatInfo,
-      });
-    }
+    // // Send check-in confirmation email (disabled - email not working on Render)
+    // if (ticket.owner?.email) {
+    //   const eventLocation = event.venue 
+    //     ? `${event.venue.name}, ${event.venue.city}`
+    //     : event.customLocation?.city || event.customLocation?.address || 'TBA';
+    //
+    //   const seatInfo = ticket.seatSection
+    //     ? `${ticket.seatSection} - Row ${ticket.seatRow} - Seat ${ticket.seatNumber}`
+    //     : undefined;
+    //
+    //   await this.emailService.sendCheckInConfirmation({
+    //     email: ticket.owner.email,
+    //     attendeeName: ticket.owner.name || 'Guest',
+    //     eventTitle: event.title,
+    //     eventDate: event.startAt.toLocaleDateString('en-US', {
+    //       weekday: 'long',
+    //       year: 'numeric',
+    //       month: 'long',
+    //       day: 'numeric',
+    //       hour: '2-digit',
+    //       minute: '2-digit',
+    //     }),
+    //     eventLocation,
+    //     ticketCode: ticket.code,
+    //     ticketType: ticket.ticketType?.title || 'General Admission',
+    //     checkInTime: savedAttendance.checkedInAt.toLocaleString('en-US', {
+    //       weekday: 'long',
+    //       year: 'numeric',
+    //       month: 'long',
+    //       day: 'numeric',
+    //       hour: '2-digit',
+    //       minute: '2-digit',
+    //     }),
+    //     checkInMethod: savedAttendance.method,
+    //     seatInfo,
+    //   });
+    // }
 
     return {
       success: true,

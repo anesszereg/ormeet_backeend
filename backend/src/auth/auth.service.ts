@@ -98,20 +98,19 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Send login notification email (only if email exists)
-    if (user.email) {
-      try {
-        await this.emailService.sendLoginNotification(
-          user.email, 
-          user.name, 
-          ipAddress || 'Unknown',
-          userAgent || 'Unknown'
-        );
-      } catch (error) {
-        console.error('⚠️ Failed to send login notification email:', error.message);
-        // Don't fail login if email fails
-      }
-    }
+    // // Send login notification email (disabled - email not working on Render)
+    // if (user.email) {
+    //   try {
+    //     // await this.emailService.sendLoginNotification(
+    //     //   user.email, 
+    //     //   user.name, 
+    //     //   ipAddress || 'Unknown',
+    //     //   userAgent || 'Unknown'
+    //     // );
+    //   } catch (error) {
+    //     console.error('⚠️ Failed to send login notification email:', error.message);
+    //   }
+    // }
 
     // Generate JWT token
     const token = this.generateToken(user);
@@ -203,8 +202,8 @@ export class AuthService {
     user.emailVerificationToken = emailVerificationToken;
     await this.userRepository.save(user);
 
-    // Send verification email
-    await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
+    // // Send verification email (disabled - email not working on Render)
+    // await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
 
     return {
       message: 'Verification email sent successfully!',
@@ -238,12 +237,12 @@ export class AuthService {
     console.log('🔑 Generated password reset token:', passwordResetToken);
     console.log('⏰ Token expires at:', passwordResetExpires);
 
-    // Send password reset email
-    try {
-      await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
-    } catch (error) {
-      console.error('⚠️ Failed to send password reset email:', error.message);
-    }
+    // // Send password reset email (disabled - email not working on Render)
+    // try {
+    //   await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
+    // } catch (error) {
+    //   console.error('⚠️ Failed to send password reset email:', error.message);
+    // }
 
     return {
       message: 'If the email exists, a password reset link has been sent.',
@@ -284,12 +283,12 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    // Send password changed confirmation email
-    try {
-      await this.emailService.sendPasswordChangedEmail(user.email, user.name);
-    } catch (error) {
-      console.error('⚠️ Failed to send password changed email:', error.message);
-    }
+    // // Send password changed confirmation email (disabled - email not working on Render)
+    // try {
+    //   await this.emailService.sendPasswordChangedEmail(user.email, user.name);
+    // } catch (error) {
+    //   console.error('⚠️ Failed to send password changed email:', error.message);
+    // }
 
     return {
       message: 'Password reset successfully!',
@@ -333,15 +332,9 @@ export class AuthService {
 
     await this.verificationCodeRepository.save(verificationCode);
 
-    // Send code via email or SMS
+    // Send code via email or SMS (email disabled - not working on Render)
     if (type === VerificationType.EMAIL && email) {
-      try {
-        await this.emailService.sendVerificationCode(email, code, purpose);
-      } catch (error) {
-        console.error('⚠️ Failed to send verification code email:', error.message);
-        // Still log to console as fallback for development
-        console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
-      }
+      console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
     } else if (type === VerificationType.PHONE && phone) {
       // TODO: Implement SMS sending (Twilio, etc.)
       console.log(`📱 SMS Code for ${phone}: ${code}`);
@@ -444,19 +437,19 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Send login notification email (only if email exists)
-    if (user.email) {
-      try {
-        await this.emailService.sendLoginNotification(
-          user.email,
-          user.name,
-          ipAddress || 'Unknown',
-          userAgent || 'Unknown',
-        );
-      } catch (error) {
-        console.error('⚠️ Failed to send login notification email:', error.message);
-      }
-    }
+    // // Send login notification email (disabled - email not working on Render)
+    // if (user.email) {
+    //   try {
+    //     await this.emailService.sendLoginNotification(
+    //       user.email,
+    //       user.name,
+    //       ipAddress || 'Unknown',
+    //       userAgent || 'Unknown',
+    //     );
+    //   } catch (error) {
+    //     console.error('⚠️ Failed to send login notification email:', error.message);
+    //   }
+    // }
 
     // Generate JWT token
     const token = this.generateToken(user);
