@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import LangueIcon from '../assets/Svgs/navbar/langue.svg';
-import ProfilePhoto from '../assets/imges/photoProfil.jpg';
+
 
 interface NavbarProps {
   onMenuToggle?: () => void;
@@ -122,9 +122,20 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
         <div className="relative" ref={profileMenuRef}>
           <button
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-            className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#FF4000] transition-all"
+            className="flex items-center gap-2 cursor-pointer"
           >
-            <img src={ProfilePhoto} alt="Profile" className="w-full h-full object-cover" />
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Profile" className="w-10 h-10 rounded-full object-cover hover:ring-2 hover:ring-[#FF4000] transition-all" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center hover:ring-2 hover:ring-[#FF4000] transition-all">
+                <span className="text-sm font-semibold text-primary">
+                  {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
+                </span>
+              </div>
+            )}
+            <span className="hidden sm:block text-sm font-medium text-black max-w-[120px] truncate">
+              {user?.name || 'User'}
+            </span>
           </button>
 
           {/* Profile Dropdown menu */}
