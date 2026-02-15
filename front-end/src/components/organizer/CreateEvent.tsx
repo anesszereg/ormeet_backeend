@@ -547,7 +547,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   };
 
   // Helper to convert form data to API format
-  const convertToApiFormat = (status: 'draft' | 'publish'): CreateEventDto => {
+  const convertToApiFormat = (status: 'draft' | 'publish', imageUrls: string[] = []): CreateEventDto => {
     // Parse start and end times
     const parseTime = (timeStr: string): { hours: number; minutes: number } => {
       const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
@@ -586,10 +586,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         price: t.priceType === 'free' ? 0 : parseFloat(t.price) || 0,
       }));
 
-    // Filter images to only include valid URLs (not base64 data)
-    const validImages = formData.eventImages
-      .map(img => img.preview)
-      .filter(url => url.startsWith('http://') || url.startsWith('https://'));
+    // Use uploaded image URLs
+    const validImages = imageUrls;
 
     // Validate onlineLink is a proper URL or set to undefined
     const onlineLink = locationType === 'online' && formData.onlineLink && 
@@ -630,7 +628,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setSubmitError(null);
     
     try {
-      const eventData = convertToApiFormat('draft');
+      // Upload images first
+      let imageUrls: string[] = [];
+      const filesToUpload = formData.eventImages.map(img => img.file);
+      if (filesToUpload.length > 0) {
+        imageUrls = await organizerService.uploadImages(filesToUpload);
+      }
+
+      const eventData = convertToApiFormat('draft', imageUrls);
       
       if (mode === 'edit' && initialData?.id) {
         await organizerService.updateEvent(initialData.id, eventData);
@@ -655,7 +660,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setSubmitError(null);
     
     try {
-      const eventData = convertToApiFormat('publish');
+      // Upload images first
+      let imageUrls: string[] = [];
+      const filesToUpload = formData.eventImages.map(img => img.file);
+      if (filesToUpload.length > 0) {
+        imageUrls = await organizerService.uploadImages(filesToUpload);
+      }
+
+      const eventData = convertToApiFormat('publish', imageUrls);
       
       let eventId: string;
       

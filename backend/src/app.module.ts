@@ -14,6 +14,7 @@ import { TicketsModule } from './tickets/tickets.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { UsersModule } from './users/users.module';
+import { UploadModule } from './upload/upload.module';
 import {
   User,
   Organization,
@@ -111,6 +112,7 @@ import {
     PromotionsModule,
     AttendanceModule,
     UsersModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

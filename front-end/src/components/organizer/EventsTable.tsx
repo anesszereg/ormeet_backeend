@@ -8,15 +8,6 @@ import OngoingIcon from '../../assets/Svgs/organiser/dashboard/Events/ongoing.sv
 import UpcomingIcon from '../../assets/Svgs/organiser/dashboard/Events/upcoming.svg';
 import CompletedIcon from '../../assets/Svgs/organiser/dashboard/Events/completed.svg';
 import CreateEventIcon from '../../assets/Svgs/organiser/dashboard/Events/createEvent.svg';
-import Event1 from '../../assets/imges/event myticket 1.jpg';
-import Event2 from '../../assets/imges/event myticket 2.jpg';
-import Event3 from '../../assets/imges/event myticket 3.jpg';
-import Event4 from '../../assets/imges/event myticket 4.png';
-import Event5 from '../../assets/imges/event myticket 5.jpg';
-import Event6 from '../../assets/imges/event myticket 6.jpg';
-import Event7 from '../../assets/imges/event myticket 7.png';
-import Event8 from '../../assets/imges/event myticket 8.png';
-import Event9 from '../../assets/imges/event myticket 9.jpg';
 
 interface TicketData {
   id: string;
@@ -133,8 +124,8 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           return {
             id: event.id,
             name: event.title,
-            image: event.images?.[0] || Event1,
-            images: event.images || [Event1],
+            image: event.images?.[0] || '',
+            images: event.images || [],
             date: new Date(event.startAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             dateRange: [new Date(event.startAt), new Date(event.endAt)] as [Date | null, Date | null],
             startTime: new Date(event.startAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
@@ -145,7 +136,12 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             mapAddress: '',
             onlineLink: '',
             status,
-            sold: '0/0',
+            sold: (() => {
+              const ticketTypes = (event as any).ticketTypes || [];
+              const totalSold = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantitySold || 0), 0);
+              const totalCapacity = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantityTotal || 0), 0);
+              return `${totalSold}/${totalCapacity}`;
+            })(),
             category: event.type || 'Other',
             eventType: event.locationType === 'online' ? 'online' : event.locationType === 'physical' ? 'in-person' : 'hybrid',
             description: event.description || event.shortDescription || '',
@@ -604,26 +600,27 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               <p className="text-sm text-gray">Loading events...</p>
             </div>
           ) : currentEvents.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 px-4">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">No events yet</h3>
-              <p className="text-sm text-gray-500 text-center max-w-sm mb-6">
-                Create your first event to start selling tickets and managing attendees.
-              </p>
-              <button
-                onClick={onCreateEvent}
-                className="flex items-center gap-2 px-6 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Create Your First Event
-              </button>
-            </div>
+            <div className="flex flex-col items-center justify-center py-16 bg-white border border-light-gray ">
+          <div className="w-24 h-24 bg-secondary-light rounded-full flex items-center justify-center mb-4">
+            <svg className="w-12 h-12 text-input-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-black mb-2">No events found</h3>
+          <p className="text-sm text-gray mb-4">
+            {searchQuery ? 'Try adjusting your search or filters' : 'Create your first event to get started'}
+          </p>
+          {!searchQuery && (
+            <button
+              onClick={onCreateEvent}
+              className="relative flex items-center gap-2 pl-9 pr-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
+              style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
+            >
+              <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
+              <span>Create Event</span>
+            </button>
+          )}
+        </div>
           ) : (
           currentEvents.map((event) => (
             <div
@@ -636,11 +633,19 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             >
               {/* Event Name with Image */}
               <div className="md:col-span-4 flex items-center gap-3">
-                <img
-                  src={event.image}
-                  alt={event.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
-                />
+                {event.image ? (
+                  <img
+                    src={event.image}
+                    alt={event.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-sm font-medium text-black">{event.name}</span>
               </div>
 
@@ -786,30 +791,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
         </div>
       )}
 
-      {/* Empty State */}
-      {filteredEvents.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 bg-white border border-light-gray rounded-xl">
-          <div className="w-24 h-24 bg-secondary-light rounded-full flex items-center justify-center mb-4">
-            <svg className="w-12 h-12 text-input-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-black mb-2">No events found</h3>
-          <p className="text-sm text-gray mb-4">
-            {searchQuery ? 'Try adjusting your search or filters' : 'Create your first event to get started'}
-          </p>
-          {!searchQuery && (
-            <button
-              onClick={onCreateEvent}
-              className="relative flex items-center gap-2 pl-9 pr-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
-              style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
-            >
-              <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
-              <span>Create Event</span>
-            </button>
-          )}
-        </div>
-      )}
+      
 
       {/* Event Details Popup */}
       {isEventDetailsOpen && selectedEvent && (
@@ -820,11 +802,19 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           >
             {/* Header with Image Gallery */}
             <div className="relative h-64 sm:h-80">
-              <img
-                src={selectedEvent.images[currentImageIndex]}
-                alt={selectedEvent.name}
-                className="w-full h-full object-cover rounded-t-2xl"
-              />
+              {selectedEvent.images.length > 0 ? (
+                <img
+                  src={selectedEvent.images[currentImageIndex]}
+                  alt={selectedEvent.name}
+                  className="w-full h-full object-cover rounded-t-2xl"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/30 rounded-t-2xl flex items-center justify-center">
+                  <svg className="w-16 h-16 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
               {/* Close Button */}
               <button
                 onClick={() => {
@@ -1010,24 +1000,32 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {/* Sold Info - Modern Design */}
               <div className="mb-8">
                 <div className="bg-gradient-to-br from-primary-light to-secondary-light rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-black">Tickets Sold</h3>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">{selectedEvent.sold.split('/')[0]}</p>
-                      <p className="text-sm text-gray">of {selectedEvent.sold.split('/')[1]}</p>
-                    </div>
-                  </div>
-                  <div className="relative h-2 bg-white rounded-full overflow-hidden">
-                    <div 
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${(parseInt(selectedEvent.sold.split('/')[0]) / parseInt(selectedEvent.sold.split('/')[1])) * 100}%` 
-                      }}
-                    />
-                  </div>
-                  <p className="text-xs text-gray mt-2">
-                    {Math.round((parseInt(selectedEvent.sold.split('/')[0]) / parseInt(selectedEvent.sold.split('/')[1])) * 100)}% capacity
-                  </p>
+                  {(() => {
+                    const soldParts = selectedEvent.sold.split('/');
+                    const soldCount = parseInt(soldParts[0]) || 0;
+                    const totalCapacity = parseInt(soldParts[1]) || 0;
+                    const percentage = totalCapacity > 0 ? Math.round((soldCount / totalCapacity) * 100) : 0;
+                    return (
+                      <>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-black">Tickets Sold</h3>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold text-primary">{soldCount}</p>
+                            <p className="text-sm text-gray">of {totalCapacity}</p>
+                          </div>
+                        </div>
+                        <div className="relative h-2 bg-white rounded-full overflow-hidden">
+                          <div 
+                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray mt-2">
+                          {percentage}% capacity
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

@@ -75,6 +75,15 @@ export interface CreateEventDto {
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {}
 
+export interface TicketTypeInfo {
+  id: string;
+  name: string;
+  type: string;
+  price: number;
+  quantityTotal: number;
+  quantitySold: number;
+}
+
 export interface Event {
   id: string;
   title: string;
@@ -92,6 +101,7 @@ export interface Event {
   favoriteCount: number;
   createdAt: string;
   updatedAt: string;
+  ticketTypes?: TicketTypeInfo[];
 }
 
 // ========== Order Types ==========
@@ -269,6 +279,17 @@ class OrganizerService {
   async cancelEvent(id: string): Promise<Event> {
     const response = await api.post<Event>(`/events/${id}/cancel`);
     return response.data;
+  }
+
+  // ========== Upload ==========
+
+  async uploadImages(files: File[]): Promise<string[]> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    const response = await api.post<{ urls: string[] }>('/upload/images', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.urls;
   }
 
   // ========== Orders ==========

@@ -53,6 +53,7 @@ export class EventsService {
     query
       .leftJoinAndSelect('event.organizer', 'organizer')
       .leftJoinAndSelect('event.venue', 'venue')
+      .leftJoinAndSelect('event.ticketTypes', 'ticketTypes')
       .orderBy('event.startAt', 'ASC');
 
     return await query.getMany();
