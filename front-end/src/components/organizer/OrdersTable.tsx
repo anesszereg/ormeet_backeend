@@ -433,15 +433,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Orders</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">463</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : apiOrders.length.toLocaleString()}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowUpIcon} alt="Up" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#10B981]">28.5%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>
@@ -450,15 +450,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Returns</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">287</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : apiOrders.filter(o => o.status === 'cancelled').length.toLocaleString()}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={DownIcon} alt="Down trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowDownIcon} alt="Down" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#EF4444]">47.3%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>
@@ -467,15 +467,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Revenue</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">$12,964</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : `$${apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowUpIcon} alt="Up" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#10B981]">39.8%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>

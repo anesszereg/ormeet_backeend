@@ -44,8 +44,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState('Weekly');
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
   const [isActivitiesModalOpen, setIsActivitiesModalOpen] = useState(false);
-  const [isAlertsModalOpen, setIsAlertsModalOpen] = useState(false);
-  const [isActionsModalOpen, setIsActionsModalOpen] = useState(false);
   const periodRef = useRef<HTMLDivElement>(null);
 
   // API Data States
@@ -99,11 +97,10 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         const refundedOrders = organizerOrders.filter(o => o.status === 'refunded');
         const totalRevenue = paidOrders.reduce((sum, o) => sum + (parseFloat(String(o.amountTotal)) || 0), 0);
 
-        // Calculate percentage changes (placeholder - would need historical data for real calculation)
-        // For now, show positive change if there's data, 0 if no data
-        const ordersChange = organizerOrders.length > 0 ? 12.5 : 0;
-        const returnsChange = refundedOrders.length > 0 ? -5.2 : 0;
-        const revenueChange = totalRevenue > 0 ? 18.3 : 0;
+        // No historical data available yet — show 0% change
+        const ordersChange = 0;
+        const returnsChange = 0;
+        const revenueChange = 0;
 
         const calculatedStats = {
           totalOrders: organizerOrders.length,
@@ -165,17 +162,18 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
     const totalSold = Array.from(ticketStats.values()).reduce((sum, t) => sum + t.sold, 0);
     
     // Convert to display format
-    const ticketTypes = ['VIP', 'Early Bird', 'General', 'Premium'];
-    return ticketTypes.slice(0, Math.max(ticketStats.size, 1)).map((type, index) => {
-      const stats = Array.from(ticketStats.values())[index] || { sold: 0, revenue: 0 };
-      const salesPercent = totalSold > 0 ? Math.round((stats.sold / totalSold) * 100) : 0;
+    const entries = Array.from(ticketStats.entries());
+    if (entries.length === 0) return [];
+    
+    return entries.map(([typeId, stat]) => {
+      const salesPercent = totalSold > 0 ? Math.round((stat.sold / totalSold) * 100) : 0;
       return {
-        type: type,
-        sold: stats.sold,
-        conversion: `${(Math.random() * 20 + 10).toFixed(1)}%`,
+        type: typeId,
+        sold: stat.sold,
+        conversion: '-',
         totalSales: `${salesPercent}%`,
-        trend: stats.sold > 0 ? 'up' : 'nochange',
-        change: stats.sold > 0 ? `${Math.floor(Math.random() * 15 + 5)}%` : '0%'
+        trend: stat.sold > 0 ? 'up' : 'nochange',
+        change: '0%'
       };
     });
   };
@@ -459,91 +457,33 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         <div className="flex flex-col justify-between gap-6">
           {/* Important Alerts Panel */}
           <div className="bg-white border border-light-gray rounded-xl p-4">
-            {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#FF4000] rounded-full"></div>
                 <h3 className="text-sm font-bold text-black">Important Alerts</h3>
-                <span className="px-2 py-0.5 bg-black text-white text-xs font-medium rounded-full">5 New</span>
               </div>
-              <button 
-                onClick={() => setIsAlertsModalOpen(true)}
-                className="text-[#FF4000] text-xs font-medium hover:text-[#E63900] transition-colors cursor-pointer"
-              >
-                See All
-              </button>
             </div>
-
-            {/* Alert Items */}
-            <div className="space-y-4">
-              {/* Vendor Coordination Meeting */}
-              <div className="pb-4 border-b border-light-gray last:border-0 last:pb-0">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-sm font-medium text-black">Vendor Coordination Meeting</h4>
-                  <span className="text-xs text-gray whitespace-nowrap ml-2">in 30 min</span>
-                </div>
-                <p className="text-xs text-gray mb-2">You have a meeting at 11:00 AM – Vendor Coordination Call</p>
-                <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                  Join Now
-                </button>
-              </div>
-
-              {/* Reminder: Ticket Launch */}
-              <div>
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-sm font-medium text-black">Reminder: Ticket Launch</h4>
-                  <span className="text-xs text-gray whitespace-nowrap ml-2">in 1 hr</span>
-                </div>
-                <p className="text-xs text-gray mb-2">Early Bird Phase begins at 12:00 PM*</p>
-                <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                  Retry Now
-                </button>
-              </div>
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <p className="text-xs text-gray">No alerts at the moment</p>
             </div>
           </div>
 
           {/* Action Required Panel */}
           <div className="bg-white border border-light-gray rounded-xl p-4">
-            {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#FBBC04] rounded-full"></div>
                 <h3 className="text-sm font-bold text-black">Action Required</h3>
-                <span className="px-2 py-0.5 bg-black text-white text-xs font-medium rounded-full">3 New</span>
               </div>
-              <button 
-                onClick={() => setIsActionsModalOpen(true)}
-                className="text-[#FF4000] text-xs font-medium hover:text-[#E63900] transition-colors cursor-pointer"
-              >
-                See All
-              </button>
             </div>
-
-            {/* Action Items */}
-            <div className="space-y-4">
-              {/* Access Request */}
-              <div className="pb-4 border-b border-light-gray last:border-0 last:pb-0">
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-sm font-medium text-black">Access Request</h4>
-                  <span className="text-xs text-gray whitespace-nowrap ml-2">10:12 AM</span>
-                </div>
-                <p className="text-xs text-gray mb-2">Jane Smith requested access to Event: Tech Expo</p>
-                <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                  Review Request
-                </button>
-              </div>
-
-              {/* New Task Assigned */}
-              <div>
-                <div className="flex items-start justify-between mb-2">
-                  <h4 className="text-sm font-medium text-black">New Task Assigned</h4>
-                  <span className="text-xs text-gray whitespace-nowrap ml-2">10:12 AM</span>
-                </div>
-                <p className="text-xs text-gray mb-2">Jessica Lee assigned a task to you: Update VIP Seating Chart</p>
-                <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                  View Task
-                </button>
-              </div>
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <p className="text-xs text-gray">No actions required</p>
             </div>
           </div>
         </div>
@@ -595,159 +535,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         </div>
       )}
 
-      {/* Important Alerts Modal */}
-      {isAlertsModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setIsAlertsModalOpen(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-[#FF4000] rounded-full"></div>
-                <h2 className="text-xl font-bold text-black">Important Alerts</h2>
-                <span className="px-2 py-0.5 bg-black text-white text-xs font-medium rounded-full">5 New</span>
-              </div>
-              <button 
-                onClick={() => setIsAlertsModalOpen(false)}
-                className="text-gray hover:text-black transition-colors cursor-pointer"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(80vh-88px)]">
-              <div className="space-y-4">
-                {/* Vendor Coordination Meeting */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Vendor Coordination Meeting</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">in 30 min</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">You have a meeting at 11:00 AM – Vendor Coordination Call</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Join Now
-                  </button>
-                </div>
-
-                {/* Reminder: Ticket Launch */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Reminder: Ticket Launch</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">in 1 hr</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Early Bird Phase begins at 12:00 PM*</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Retry Now
-                  </button>
-                </div>
-
-                {/* Payment Issue */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Payment Issue</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">2 hrs ago</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Payment gateway error detected for Event: Music Festival</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Resolve Issue
-                  </button>
-                </div>
-
-                {/* Capacity Warning */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Capacity Warning</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">3 hrs ago</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Tech Summit 2025 is at 95% capacity</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    View Details
-                  </button>
-                </div>
-
-                {/* System Maintenance */}
-                <div>
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">System Maintenance</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">Yesterday</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Scheduled maintenance on Jan 20, 2026 from 2:00 AM to 4:00 AM</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Learn More
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Action Required Modal */}
-      {isActionsModalOpen && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setIsActionsModalOpen(false)}>
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-[#FBBC04] rounded-full"></div>
-                <h2 className="text-xl font-bold text-black">Action Required</h2>
-                <span className="px-2 py-0.5 bg-black text-white text-xs font-medium rounded-full">3 New</span>
-              </div>
-              <button 
-                onClick={() => setIsActionsModalOpen(false)}
-                className="text-gray hover:text-black transition-colors cursor-pointer"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            {/* Modal Content */}
-            <div className="p-6 overflow-y-auto max-h-[calc(80vh-88px)]">
-              <div className="space-y-4">
-                {/* Access Request */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Access Request</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">10:12 AM</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Jane Smith requested access to Event: Tech Expo</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Review Request
-                  </button>
-                </div>
-
-                {/* New Task Assigned */}
-                <div className="pb-4 border-b border-light-gray">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">New Task Assigned</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">10:12 AM</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Jessica Lee assigned a task to you: Update VIP Seating Chart</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    View Task
-                  </button>
-                </div>
-
-                {/* Approval Needed */}
-                <div>
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="text-sm font-medium text-black">Approval Needed</h4>
-                    <span className="text-xs text-gray whitespace-nowrap ml-2">Yesterday</span>
-                  </div>
-                  <p className="text-xs text-gray mb-2">Marketing materials for Art Exhibition require your approval</p>
-                  <button className="px-3 py-1 border border-[#FF4000] text-[#FF4000] text-xs font-medium rounded-lg hover:bg-[#FF4000] hover:text-white transition-colors cursor-pointer">
-                    Review & Approve
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

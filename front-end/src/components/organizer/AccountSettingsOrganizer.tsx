@@ -320,12 +320,8 @@ const AccountSettingsOrganizer = () => {
     });
   };
   
-  // Mock team members data
-  const mockTeamMembers: TeamMember[] = [
-    { id: '1', name: 'Lina Bensalem', email: 'Lina@company.dz', role: 'Admin', status: 'active', lastActive: '', avatar: TeamPhoto1 },
-    { id: '2', name: 'Charlotte Anderson Charlotte Anderson', email: 'Charlotte@ormeet.dz', role: 'Finance Manager', status: 'active', lastActive: '', avatar: TeamPhoto2 },
-    { id: '3', name: 'John Lee', email: 'John@Company.Com', role: 'Ticketing Officer', status: 'pending', lastActive: '', avatar: TeamPhoto3 },
-  ];
+  // Team members data (empty - no mock data)
+  const mockTeamMembers: TeamMember[] = [];
   
   const filteredTeamMembers = mockTeamMembers.filter(member =>
     member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
@@ -333,12 +329,8 @@ const AccountSettingsOrganizer = () => {
     member.role.toLowerCase().includes(teamSearchQuery.toLowerCase())
   );
   
-  // Mock roles data
-  const mockRoles: Role[] = [
-    { id: '1', name: 'Admin', permissions: 'All Permissions' },
-    { id: '2', name: 'Finance Manager', permissions: '20 Permissions' },
-    { id: '3', name: 'Ticketing Officer', permissions: '10 Permissions' },
-  ];
+  // Roles data (empty - no mock data)
+  const mockRoles: Role[] = [];
   
   const filteredRoles = mockRoles.filter(role =>
     role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
