@@ -1,6 +1,5 @@
-import { IsEmail, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { OrganizationMemberRole } from '../../entities';
 
 export class InviteMemberDto {
   @ApiProperty({
@@ -11,12 +10,11 @@ export class InviteMemberDto {
   email: string;
 
   @ApiProperty({
-    description: 'Role to assign to the member',
-    enum: OrganizationMemberRole,
-    example: OrganizationMemberRole.EDITOR,
+    description: 'Role name to assign to the member',
+    example: 'Editor',
   })
-  @IsEnum(OrganizationMemberRole)
-  role: OrganizationMemberRole;
+  @IsString()
+  role: string;
 
   @ApiPropertyOptional({
     description: 'Optional message to include in the invitation',
@@ -25,4 +23,24 @@ export class InviteMemberDto {
   @IsOptional()
   @IsString()
   message?: string;
+}
+
+export class CreateCustomRoleDto {
+  @ApiProperty({ description: 'Role name', example: 'Event Manager' })
+  @IsString()
+  name: string;
+
+  @ApiProperty({ description: 'Permissions object' })
+  permissions: Record<string, Record<string, boolean>>;
+}
+
+export class UpdateCustomRoleDto {
+  @ApiPropertyOptional({ description: 'Role name', example: 'Event Manager' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ description: 'Permissions object' })
+  @IsOptional()
+  permissions?: Record<string, Record<string, boolean>>;
 }

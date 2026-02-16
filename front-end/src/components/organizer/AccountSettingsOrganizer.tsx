@@ -256,9 +256,12 @@ const AccountSettingsOrganizer = () => {
   }, [isCreatingRole, roleMode]);
 
   // Handle role form submission
-  const handleCreateRole = () => {
+  const handleCreateRole = async () => {
+    if (!user?.organizationId) return;
+    if (!roleFormData.roleName.trim()) return;
+
     // Check for duplicate role name (case-insensitive) - skip check if editing the same role
-    const isDuplicate = mockRoles.some(
+    const isDuplicate = roles.some(
       role => role.id !== editingRoleId && role.name.toLowerCase() === roleFormData.roleName.trim().toLowerCase()
     );
     
@@ -266,33 +269,61 @@ const AccountSettingsOrganizer = () => {
       setIsDuplicateRoleWarning(true);
       return;
     }
-    
-    if (roleMode === 'edit') {
-      console.log('Updating role:', editingRoleId, roleFormData);
-    } else {
-      console.log('Creating role:', roleFormData);
-    }
-    
-    setIsCreatingRole(false);
-    setRoleMode('create');
-    setEditingRoleId(null);
-    // Reset form
-    setRoleFormData({
-      roleName: '',
-      permissions: {
-        events: { deleteEvents: false, createAndEditEvents: false, viewEvents: false },
-        ticketsAndPricing: { viewTickets: false, editTicketTypesAndPricing: false, managePromoCodes: false },
-        ordersAndAttendees: { viewAttendees: false, exportAttendeeData: false, checkInAttendees: false, editAttendeeInfo: false },
-        reportsAndAnalytics: { viewAnalyticsDashboard: false, downloadReports: false },
-        emailAndNotifications: { viewScheduledMessages: false, editEmailTemplates: false, sendEventReminders: false },
-        settings: { viewSettings: false, manageTeamAccess: false }
+
+    setIsLoading(true);
+    try {
+      if (roleMode === 'edit' && editingRoleId) {
+        const updated = await organizerService.updateCustomRole(user.organizationId, editingRoleId, {
+          name: roleFormData.roleName,
+          permissions: roleFormData.permissions,
+        });
+        setRoles(prev => prev.map(r => r.id === editingRoleId ? {
+          id: updated.id,
+          name: updated.name,
+          permissions: Object.entries(updated.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        } : r));
+      } else {
+        const created = await organizerService.createCustomRole(user.organizationId, {
+          name: roleFormData.roleName,
+          permissions: roleFormData.permissions,
+        });
+        setRoles(prev => [...prev, {
+          id: created.id,
+          name: created.name,
+          permissions: Object.entries(created.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        }]);
       }
-    });
+
+      setIsCreatingRole(false);
+      setRoleMode('create');
+      setEditingRoleId(null);
+      // Reset form
+      setRoleFormData({
+        roleName: '',
+        permissions: {
+          events: { deleteEvents: false, createAndEditEvents: false, viewEvents: false },
+          ticketsAndPricing: { viewTickets: false, editTicketTypesAndPricing: false, managePromoCodes: false },
+          ordersAndAttendees: { viewAttendees: false, exportAttendeeData: false, checkInAttendees: false, editAttendeeInfo: false },
+          reportsAndAnalytics: { viewAnalyticsDashboard: false, downloadReports: false },
+          emailAndNotifications: { viewScheduledMessages: false, editEmailTemplates: false, sendEventReminders: false },
+          settings: { viewSettings: false, manageTeamAccess: false }
+        }
+      });
+    } catch (err: any) {
+      console.error('Failed to save role:', err);
+      setIsDuplicateRoleWarning(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle edit role action
   const handleEditRole = (roleId: string) => {
-    const role = mockRoles.find(r => r.id === roleId);
+    const role = roles.find(r => r.id === roleId);
     if (!role) return;
 
     setRoleMode('edit');
@@ -314,7 +345,7 @@ const AccountSettingsOrganizer = () => {
 
   // Handle duplicate role action
   const handleDuplicateRole = (roleId: string) => {
-    const role = mockRoles.find(r => r.id === roleId);
+    const role = roles.find(r => r.id === roleId);
     if (!role) return;
 
     setRoleMode('duplicate');
@@ -352,19 +383,50 @@ const AccountSettingsOrganizer = () => {
     });
   };
   
-  // Team members data (empty - no mock data)
-  const mockTeamMembers: TeamMember[] = [];
-  
-  const filteredTeamMembers = mockTeamMembers.filter(member =>
+  // Team members & roles state (loaded from API)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  // Fetch roles and pending invites from API
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (!user?.organizationId) return;
+      try {
+        const [customRoles, pendingInvites] = await Promise.all([
+          organizerService.getCustomRoles(user.organizationId),
+          organizerService.getPendingInvites(user.organizationId).catch(() => []),
+        ]);
+        setRoles(customRoles.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          permissions: Object.entries(r.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        })));
+        // Map pending invites as team members with 'pending' status
+        const pendingMembers: TeamMember[] = pendingInvites.map((inv: any) => ({
+          id: inv.id,
+          name: inv.email.split('@')[0],
+          email: inv.email,
+          role: inv.role,
+          status: 'pending' as const,
+          lastActive: `Invited ${new Date(inv.invitedAt).toLocaleDateString()}`,
+        }));
+        setTeamMembers(pendingMembers);
+      } catch (err) {
+        console.error('Failed to fetch team data:', err);
+      }
+    };
+    fetchTeamData();
+  }, [user?.organizationId]);
+
+  const filteredTeamMembers = teamMembers.filter(member =>
     member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
     member.email.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
     member.role.toLowerCase().includes(teamSearchQuery.toLowerCase())
   );
   
-  // Roles data (empty - no mock data)
-  const mockRoles: Role[] = [];
-  
-  const filteredRoles = mockRoles.filter(role =>
+  const filteredRoles = roles.filter(role =>
     role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
     role.permissions.toLowerCase().includes(rolesSearchQuery.toLowerCase())
   );
@@ -630,7 +692,8 @@ const AccountSettingsOrganizer = () => {
     setIsRoleDropdownOpen(false);
   };
 
-  const handleSendInvite = () => {
+  const handleSendInvite = async () => {
+    if (!user?.organizationId) return;
     if (!inviteTeamMemberData.email.trim()) {
       setInviteError('Email address is required');
       return;
@@ -645,8 +708,29 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setInviteError('');
-    console.log('Sending invite:', inviteTeamMemberData);
-    setShowInviteConfirmation(true);
+    setIsLoading(true);
+    try {
+      const result = await organizerService.inviteTeamMember(user.organizationId, {
+        email: inviteTeamMemberData.email,
+        role: inviteTeamMemberData.assignedRole,
+      });
+      // Update invitation code in the UI
+      setInviteTeamMemberData(prev => ({ ...prev, invitationCode: result.inviteCode }));
+      // Add to team members list as pending
+      setTeamMembers(prev => [...prev, {
+        id: result.inviteCode,
+        name: inviteTeamMemberData.email.split('@')[0],
+        email: inviteTeamMemberData.email,
+        role: inviteTeamMemberData.assignedRole,
+        status: 'pending',
+        lastActive: `Invited ${new Date().toLocaleDateString()}`,
+      }]);
+      setShowInviteConfirmation(true);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.message || 'Failed to send invitation');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelInvite = () => {
@@ -682,7 +766,7 @@ const AccountSettingsOrganizer = () => {
   };
 
   const handleCancelChangeRole = () => {
-    const memberToRestore = mockTeamMembers.find(m => m.role === changeRoleData.currentRole);
+    const memberToRestore = teamMembers.find(m => m.role === changeRoleData.currentRole);
     setIsChangeRoleOpen(false);
     setChangeRoleData({ currentRole: '', newRole: '' });
     if (memberToRestore) {
@@ -1361,7 +1445,7 @@ const AccountSettingsOrganizer = () => {
 
                             {isRoleDropdownOpen && (
                               <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                {mockRoles.map((role) => (
+                                {roles.map((role) => (
                                   <button
                                     key={role.id}
                                     type="button"
@@ -2508,14 +2592,22 @@ const AccountSettingsOrganizer = () => {
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        console.log('Deleting role:', roleToDelete.id);
-                        setShowDeleteRoleSuccess(true);
-                        setTimeout(() => {
-                          setShowDeleteRoleSuccess(false);
+                      onClick={async () => {
+                        if (!user?.organizationId) return;
+                        try {
+                          await organizerService.deleteCustomRole(user.organizationId, roleToDelete.id);
+                          setRoles(prev => prev.filter(r => r.id !== roleToDelete.id));
+                          setShowDeleteRoleSuccess(true);
+                          setTimeout(() => {
+                            setShowDeleteRoleSuccess(false);
+                            setIsDeleteRoleConfirmOpen(false);
+                            setRoleToDelete(null);
+                          }, 3000);
+                        } catch (err) {
+                          console.error('Failed to delete role:', err);
                           setIsDeleteRoleConfirmOpen(false);
                           setRoleToDelete(null);
-                        }, 3000);
+                        }
                       }}
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
@@ -2805,7 +2897,7 @@ const AccountSettingsOrganizer = () => {
 
                     {isNewRoleDropdownOpen && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        {mockRoles.map((role) => (
+                        {roles.map((role) => (
                           <button
                             key={role.id}
                             onClick={() => handleNewRoleSelect(role.name)}

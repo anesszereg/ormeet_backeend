@@ -412,6 +412,43 @@ class OrganizerService {
     await api.patch(`/organizations/${orgId}/members/${userId}/role`, { role });
   }
 
+  // ========== Team Invites ==========
+
+  async inviteTeamMember(orgId: string, data: { email: string; role: string; message?: string }): Promise<{ inviteCode: string; email: string }> {
+    const response = await api.post<{ inviteCode: string; email: string }>(`/organizations/${orgId}/invite`, data);
+    return response.data;
+  }
+
+  async getPendingInvites(orgId: string): Promise<any[]> {
+    const response = await api.get<any[]>(`/organizations/${orgId}/invites`);
+    return response.data;
+  }
+
+  async cancelInvite(orgId: string, inviteId: string): Promise<void> {
+    await api.delete(`/organizations/${orgId}/invites/${inviteId}`);
+  }
+
+  // ========== Custom Roles ==========
+
+  async getCustomRoles(orgId: string): Promise<any[]> {
+    const response = await api.get<any[]>(`/organizations/${orgId}/roles`);
+    return response.data;
+  }
+
+  async createCustomRole(orgId: string, data: { name: string; permissions: Record<string, Record<string, boolean>> }): Promise<any> {
+    const response = await api.post<any>(`/organizations/${orgId}/roles`, data);
+    return response.data;
+  }
+
+  async updateCustomRole(orgId: string, roleId: string, data: { name?: string; permissions?: Record<string, Record<string, boolean>> }): Promise<any> {
+    const response = await api.patch<any>(`/organizations/${orgId}/roles/${roleId}`, data);
+    return response.data;
+  }
+
+  async deleteCustomRole(orgId: string, roleId: string): Promise<void> {
+    await api.delete(`/organizations/${orgId}/roles/${roleId}`);
+  }
+
   // ========== Dashboard Stats (Computed from other endpoints) ==========
 
   async getDashboardStats(organizerId: string): Promise<DashboardStats> {

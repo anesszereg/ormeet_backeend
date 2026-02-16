@@ -189,6 +189,30 @@ export class EmailService {
     }
   }
 
+  async sendTeamInviteEmail(inviteData: {
+    email: string;
+    organizationName: string;
+    inviterName: string;
+    roleName: string;
+    inviteCode: string;
+  }) {
+    try {
+      this.logger.log(`📧 Sending team invite to: ${inviteData.email}`);
+
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+      const inviteUrl = `${frontendUrl}/join-team?code=${inviteData.inviteCode}`;
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:linear-gradient(135deg,#FF4000 0%,#E63900 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.button{display:inline-block;padding:12px 30px;background:#FF4000;color:white;text-decoration:none;border-radius:25px;margin:20px 0;font-weight:600}.info-box{background:#fff;border-left:4px solid #FF4000;padding:15px;margin:20px 0;border-radius:4px}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>🤝 You're Invited!</h1></div><div class="content"><p>Hi there,</p><p><strong>${inviteData.inviterName}</strong> has invited you to join <strong>${inviteData.organizationName}</strong> on Ormeet as a <strong>${inviteData.roleName}</strong>.</p><div class="info-box"><p><strong>Organization:</strong> ${inviteData.organizationName}</p><p><strong>Role:</strong> ${inviteData.roleName}</p><p><strong>Invite Code:</strong> ${inviteData.inviteCode}</p></div><center><a href="${inviteUrl}" class="button">Accept Invitation</a></center><p>Or use this invite code when signing up: <strong>${inviteData.inviteCode}</strong></p><p>This invitation will expire in 7 days.</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(inviteData.email, `You're invited to join ${inviteData.organizationName} on Ormeet`, html);
+
+      this.logger.log(`✅ Team invite email sent successfully to: ${inviteData.email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send team invite email to: ${inviteData.email}`, error.stack);
+      throw error;
+    }
+  }
+
   async sendCheckInConfirmation(checkInData: {
     email: string;
     attendeeName: string;
