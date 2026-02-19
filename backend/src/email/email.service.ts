@@ -1,33 +1,41 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private readonly resend: Resend;
+  private readonly transporter: nodemailer.Transporter;
   private readonly fromEmail: string;
 
   constructor(
     private readonly configService: ConfigService,
   ) {
-    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
     this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <hello@ormeet.com>';
+
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get('SMTP_HOST') || 'smtp.hostinger.com',
+      port: parseInt(this.configService.get('SMTP_PORT') || '465', 10),
+      secure: true, // SSL on port 465
+      auth: {
+        user: this.configService.get('SMTP_USER') || 'hello@ormeet.com',
+        pass: this.configService.get('SMTP_PASS'),
+      },
+    });
+
+    this.logger.log(`📧 Email service initialized with SMTP: ${this.configService.get('SMTP_HOST') || 'smtp.hostinger.com'}`);
   }
 
   private async sendEmail(to: string, subject: string, html: string) {
-    const { data, error } = await this.resend.emails.send({
+    const info = await this.transporter.sendMail({
       from: this.fromEmail,
-      to: [to],
+      to,
       subject,
       html,
     });
 
-    if (error) {
-      throw new Error(`Resend error: ${JSON.stringify(error)}`);
-    }
-
-    return data;
+    this.logger.log(`📧 Email sent: ${info.messageId}`);
+    return info;
   }
 
   async sendWelcomeEmail(email: string, name: string, verificationToken: string) {
