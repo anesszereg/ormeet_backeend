@@ -13,14 +13,17 @@ export class EmailService {
   ) {
     this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <hello@ormeet.com>';
 
+    const port = parseInt(this.configService.get('SMTP_PORT') || '587', 10);
+
     this.transporter = nodemailer.createTransport({
       host: this.configService.get('SMTP_HOST') || 'smtp.hostinger.com',
-      port: parseInt(this.configService.get('SMTP_PORT') || '465', 10),
-      secure: true, // SSL on port 465
+      port,
+      secure: port === 465, // true for 465 (SSL), false for 587 (STARTTLS)
       auth: {
         user: this.configService.get('SMTP_USER') || 'hello@ormeet.com',
         pass: this.configService.get('SMTP_PASS'),
       },
+      connectionTimeout: 10000,
     });
 
     this.logger.log(`📧 Email service initialized with SMTP: ${this.configService.get('SMTP_HOST') || 'smtp.hostinger.com'}`);
