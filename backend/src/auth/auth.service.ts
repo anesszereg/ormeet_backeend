@@ -52,7 +52,10 @@ export class AuthService {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Create new user (skip email verification for now)
+    // Generate email verification token
+    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
+
+    // Create new user
     const user = this.userRepository.create({
       name,
       email,
@@ -62,7 +65,8 @@ export class AuthService {
       organizationId,
       interestedEventCategories,
       hostingEventTypes,
-      emailVerified: true,
+      emailVerified: false,
+      emailVerificationToken,
     });
 
     await this.userRepository.save(user);
@@ -80,13 +84,20 @@ export class AuthService {
       await this.userRepository.update(user.id, { organizationId: savedOrg.id });
     }
 
+    // Send welcome email with verification link
+    try {
+      await this.emailService.sendWelcomeEmail(email, name, emailVerificationToken);
+    } catch (error) {
+      console.error('Failed to send welcome email:', error.message);
+    }
+
     // Generate JWT token
     const token = this.generateToken(user);
 
     return {
       user: this.sanitizeUser(user),
       token,
-      message: 'Registration successful!',
+      message: 'Registration successful! Please check your email to verify your account.',
     };
   }
 
@@ -228,8 +239,12 @@ export class AuthService {
     user.emailVerificationToken = emailVerificationToken;
     await this.userRepository.save(user);
 
-    // // Send verification email (disabled - email not working on Render)
-    // await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
+    // Send verification email
+    try {
+      await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
+    } catch (error) {
+      console.error('Failed to send verification email:', error.message);
+    }
 
     return {
       message: 'Verification email sent successfully!',
