@@ -1,44 +1,36 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private readonly transporter: nodemailer.Transporter;
+  private readonly resend: Resend;
   private readonly fromEmail: string;
 
   constructor(
     private readonly configService: ConfigService,
   ) {
-    this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <hello@ormeet.com>';
+    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
+    this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <onboarding@resend.dev>';
 
-    const port = parseInt(this.configService.get('SMTP_PORT') || '587', 10);
-
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get('SMTP_HOST') || 'smtp.hostinger.com',
-      port,
-      secure: port === 465, // true for 465 (SSL), false for 587 (STARTTLS)
-      auth: {
-        user: this.configService.get('SMTP_USER') || 'hello@ormeet.com',
-        pass: this.configService.get('SMTP_PASS'),
-      },
-      connectionTimeout: 10000,
-    });
-
-    this.logger.log(`📧 Email service initialized with SMTP: ${this.configService.get('SMTP_HOST') || 'smtp.hostinger.com'}`);
+    this.logger.log('📧 Email service initialized with Resend HTTP API');
   }
 
   private async sendEmail(to: string, subject: string, html: string) {
-    const info = await this.transporter.sendMail({
+    const { data, error } = await this.resend.emails.send({
       from: this.fromEmail,
-      to,
+      to: [to],
       subject,
       html,
     });
 
-    this.logger.log(`📧 Email sent: ${info.messageId}`);
-    return info;
+    if (error) {
+      throw new Error(`Resend error: ${JSON.stringify(error)}`);
+    }
+
+    this.logger.log(`📧 Email sent: ${data?.id}`);
+    return data;
   }
 
   async sendWelcomeEmail(email: string, name: string, verificationToken: string) {
