@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsObject, IsOptional, IsString } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class InviteMemberDto {
@@ -31,6 +31,7 @@ export class CreateCustomRoleDto {
   name: string;
 
   @ApiProperty({ description: 'Permissions object' })
+  @IsObject()
   permissions: Record<string, Record<string, boolean>>;
 }
 
@@ -42,5 +43,6 @@ export class UpdateCustomRoleDto {
 
   @ApiPropertyOptional({ description: 'Permissions object' })
   @IsOptional()
+  @IsObject()
   permissions?: Record<string, Record<string, boolean>>;
 }
