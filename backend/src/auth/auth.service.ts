@@ -124,6 +124,11 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Check if email is verified
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Please verify your email before logging in. Check your inbox for the verification link.');
+    }
+
     // // Send login notification email (disabled - email not working on Render)
     // if (user.email) {
     //   try {
