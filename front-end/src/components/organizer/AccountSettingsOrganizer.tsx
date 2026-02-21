@@ -257,7 +257,11 @@ const AccountSettingsOrganizer = () => {
 
   // Handle role form submission
   const handleCreateRole = async () => {
-    if (!user?.organizationId) return;
+    if (!user?.organizationId) {
+      console.error('No organizationId found on user:', user);
+      alert('Organization not found. Please log out and log back in.');
+      return;
+    }
     if (!roleFormData.roleName.trim()) return;
 
     // Check for duplicate role name (case-insensitive) - skip check if editing the same role
@@ -315,7 +319,11 @@ const AccountSettingsOrganizer = () => {
       });
     } catch (err: any) {
       console.error('Failed to save role:', err);
-      setIsDuplicateRoleWarning(true);
+      if (err.response?.status === 409) {
+        setIsDuplicateRoleWarning(true);
+      } else {
+        alert(err.response?.data?.message || 'Failed to save role. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
