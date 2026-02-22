@@ -216,6 +216,39 @@ export class EmailService {
     }
   }
 
+  async sendEventReminder(reminderData: {
+    email: string;
+    attendeeName: string;
+    eventTitle: string;
+    eventDate: string;
+    eventLocation: string;
+    ticketCode?: string;
+    ticketType?: string;
+    hoursUntilEvent: number;
+  }) {
+    try {
+      this.logger.log(`📧 Sending event reminder to: ${reminderData.email} (${reminderData.hoursUntilEvent}h before)`);
+
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+      const timeLabel = reminderData.hoursUntilEvent >= 24
+        ? `${Math.round(reminderData.hoursUntilEvent / 24)} day(s)`
+        : `${reminderData.hoursUntilEvent} hour(s)`;
+
+      const ticketHtml = reminderData.ticketCode
+        ? `<div style="background:#fff;border:2px dashed #FF4000;padding:15px;text-align:center;margin:20px 0;border-radius:8px;"><p style="margin:0 0 5px 0;color:#666;font-size:13px;">Your Ticket Code</p><p style="margin:0;font-size:24px;font-weight:bold;color:#FF4000;letter-spacing:4px;font-family:'Courier New',monospace;">${reminderData.ticketCode}</p>${reminderData.ticketType ? `<p style="margin:5px 0 0 0;color:#999;font-size:12px;">${reminderData.ticketType}</p>` : ''}</div>`
+        : '';
+
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px}.header{background:linear-gradient(135deg,#FF4000 0%,#ff6b35 100%);color:white;padding:30px;text-align:center;border-radius:10px 10px 0 0}.content{background:#f9f9f9;padding:30px;border-radius:0 0 10px 10px}.event-box{background:#fff;border-left:4px solid #FF4000;padding:20px;margin:20px 0;border-radius:4px}.countdown{background:#fff3e0;border:2px solid #FF4000;padding:20px;text-align:center;margin:20px 0;border-radius:8px}.footer{text-align:center;margin-top:30px;color:#666;font-size:12px}</style></head><body><div class="header"><h1>⏰ Event Reminder</h1><p style="margin:5px 0 0 0;font-size:16px;">Starting in ${timeLabel}!</p></div><div class="content"><p>Hi ${reminderData.attendeeName},</p><p>This is a friendly reminder that your event is coming up soon!</p><div class="event-box"><h2 style="margin-top:0;color:#FF4000;">📅 ${reminderData.eventTitle}</h2><p>🗓️ <strong>Date:</strong> ${reminderData.eventDate}</p><p>📍 <strong>Location:</strong> ${reminderData.eventLocation}</p></div><div class="countdown"><p style="margin:0;font-size:18px;font-weight:bold;color:#FF4000;">⏰ Starts in ${timeLabel}</p></div>${ticketHtml}<p><strong>Quick Checklist:</strong></p><ul><li>✅ Have your ticket ready (digital or printed)</li><li>✅ Check the event location and plan your route</li><li>✅ Arrive 15-30 minutes early for check-in</li><li>✅ Bring a valid ID if required</li></ul><center><a href="${frontendUrl}" style="display:inline-block;padding:12px 30px;background:#FF4000;color:white;text-decoration:none;border-radius:25px;margin:20px 0;font-weight:600;">View Event Details</a></center><p>We hope you have an amazing time!</p><p>Best regards,<br>The Ormeet Team</p></div><div class="footer"><p>&copy; 2025 Ormeet. All rights reserved.</p></div></body></html>`;
+
+      await this.sendEmail(reminderData.email, `⏰ Reminder: ${reminderData.eventTitle} starts in ${timeLabel}!`, html);
+
+      this.logger.log(`✅ Event reminder sent successfully to: ${reminderData.email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send event reminder to: ${reminderData.email}`, error.stack);
+      console.error('Email error:', error);
+    }
+  }
+
   async sendCheckInConfirmation(checkInData: {
     email: string;
     attendeeName: string;
