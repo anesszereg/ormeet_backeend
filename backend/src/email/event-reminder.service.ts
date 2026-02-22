@@ -57,7 +57,7 @@ export class EventReminderService {
     }
   }
 
-  private async sendRemindersForEvent(event: Event, hoursUntilEvent: number) {
+  async sendRemindersForEvent(event: Event, hoursUntilEvent: number) {
     // Find all active tickets for this event with their owners
     const tickets = await this.ticketRepository.find({
       where: {

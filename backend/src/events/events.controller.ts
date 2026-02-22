@@ -25,11 +25,15 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User, UserRole, EventStatus } from '../entities';
+import { EventReminderService } from '../email/event-reminder.service';
 
 @ApiTags('Events')
 @Controller('events')
 export class EventsController {
-  constructor(private readonly eventsService: EventsService) {}
+  constructor(
+    private readonly eventsService: EventsService,
+    private readonly eventReminderService: EventReminderService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -259,5 +263,24 @@ export class EventsController {
   async incrementFavorites(@Param('id', ParseUUIDPipe) id: string) {
     await this.eventsService.incrementFavorites(id);
     return { message: 'Favorite count incremented' };
+  }
+
+  @Post(':id/send-reminders')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ORGANIZER, UserRole.ADMIN)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Manually send event reminders (Organizer/Admin)',
+    description: 'Send reminder emails to all attendees with active tickets for this event. Useful for testing or sending ad-hoc reminders.',
+  })
+  @ApiParam({ name: 'id', description: 'Event UUID' })
+  @ApiResponse({ status: 200, description: 'Reminders sent successfully' })
+  @ApiResponse({ status: 404, description: 'Event not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async sendReminders(@Param('id', ParseUUIDPipe) id: string) {
+    const event = await this.eventsService.findOne(id);
+    await this.eventReminderService.sendRemindersForEvent(event, 0);
+    return { message: `Reminders sent for event: ${event.title}` };
   }
 }
