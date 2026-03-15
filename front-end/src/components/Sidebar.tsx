@@ -51,7 +51,7 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
           {/* Button: circular with hover effect */}
           <button
             onClick={handleToggleCollapse}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EEEEEE] transition-all"
+            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EEEEEE] transition-all cursor-pointer"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {isCollapsed ? (
@@ -72,7 +72,7 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
           /* Search icon button when collapsed - clicking expands sidebar */
           <button
             onClick={handleToggleCollapse}
-            className="w-full flex items-center justify-center hover:opacity-80 transition-opacity"
+            className="w-full flex items-center justify-center hover:opacity-80 transition-opacity cursor-pointer"
           >
             <img src={RechercheIcon} alt="Search" className="w-8 h-8" />
           </button>
@@ -103,9 +103,9 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
               {/* Height: 44px, rounded corners for modern look */}
               <button
                 onClick={() => onTabChange?.(item.id)}
-                className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg transition-all relative ${activeTab === item.id
+                className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg transition-all relative cursor-pointer ${activeTab === item.id
                     ? 'bg-[#FAFAFA] text-black'
-                    : 'text-[#434343] hover:bg-white/50'
+                    : 'text-[#434343] hover:bg-white/50 hover:text-[#FF4000]'
                   }`}
               >
                 {/* Active indicator: orange vertical bar on the left */}

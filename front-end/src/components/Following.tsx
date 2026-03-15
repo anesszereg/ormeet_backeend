@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import SearchIcon from '../assets/Svgs/recherche.svg';
 import NewestIcon from '../assets/Svgs/newest.svg';
 import FollowingIcon from '../assets/Svgs/following.svg';
+import SuccessIcon from '../assets/Svgs/success.svg';
 
 // Import organizer logos
 import Logo1 from '../assets/imges/logoFollowing/21162d651a00893986cd56b7be86b29b_fgraphic.png';
@@ -31,6 +32,7 @@ const Following = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [unfollowConfirmId, setUnfollowConfirmId] = useState<string | null>(null);
+  const [showUnfollowSuccess, setShowUnfollowSuccess] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside
@@ -70,7 +72,11 @@ const Following = () => {
       setOrganizers(organizers.map(org => 
         org.id === unfollowConfirmId ? { ...org, isFollowing: false } : org
       ));
-      setUnfollowConfirmId(null);
+      setShowUnfollowSuccess(true);
+      setTimeout(() => {
+        setShowUnfollowSuccess(false);
+        setUnfollowConfirmId(null);
+      }, 1500);
     }
   };
 
@@ -151,7 +157,7 @@ const Following = () => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
                         : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
@@ -172,7 +178,7 @@ const Following = () => {
           {filteredOrganizers.map((organizer) => (
             <div
               key={organizer.id}
-              className="flex items-center justify-between p-4 bg-white border border-[#EEEEEE] rounded-lg hover:border-[#FF4000] transition-colors"
+              className="flex items-center justify-between p-4 bg-white border border-[#EEEEEE] rounded-lg hover:border-[#FF4000] hover:shadow-md transition-all duration-200"
             >
               {/* Left section: Logo + Info */}
               <div className="flex items-center gap-4">
@@ -187,7 +193,7 @@ const Following = () => {
 
                 {/* Organizer Info */}
                 <div>
-                  <h3 className="text-base font-semibold text-black mb-1">
+                  <h3 className="text-base font-semibold text-black mb-1 hover:text-[#FF4000] transition-colors cursor-pointer">
                     {organizer.name}
                   </h3>
                   <p className="text-sm text-[#4F4F4F]">
@@ -200,7 +206,7 @@ const Following = () => {
               <div className="relative" ref={openMenuId === organizer.id ? menuRef : null}>
                 <button
                   onClick={() => toggleMenu(organizer.id)}
-                  className="flex items-center gap-2 px-4 py-2 bg-white border border-[#EEEEEE] rounded-full hover:border-[#FF4000] hover:bg-[#FFF4F3] transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-white border border-[#EEEEEE] rounded-full hover:border-[#FF4000] hover:bg-[#FFF4F3] transition-colors cursor-pointer"
                 >
                   {/* Following icon */}
                   <img src={FollowingIcon} alt="Following" className="w-5 h-5" />
@@ -212,7 +218,7 @@ const Following = () => {
                   <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
                     <button
                       onClick={() => handleUnfollowClick(organizer.id)}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors cursor-pointer"
                     >
                       {/* Unfollow icon (user minus) */}
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -248,25 +254,37 @@ const Following = () => {
       {/* Unfollow Confirmation Modal */}
       {unfollowConfirmId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-black mb-3">Unfollow Organiser?</h3>
-            <p className="text-sm text-[#4F4F4F] mb-6">
-              Are you sure you want to unfollow {organizers.find(org => org.id === unfollowConfirmId)?.name}? You won't receive updates about their events anymore.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={cancelUnfollow}
-                className="flex-1 px-4 py-3 border border-[#EEEEEE] text-black rounded-lg text-sm font-medium hover:bg-[#F8F8F8] transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmUnfollow}
-                className="flex-1 px-4 py-3 bg-[#FF4000] text-white rounded-lg text-sm font-medium hover:bg-[#E63900] transition-colors"
-              >
-                Unfollow
-              </button>
-            </div>
+          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showUnfollowSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+            {!showUnfollowSuccess && (
+              <>
+                <h2 className="text-2xl font-bold text-black mb-6">Unfollow Organiser?</h2>
+                <p className="text-sm text-[#4F4F4F] mb-2">
+                  Are you sure you want to unfollow {organizers.find(org => org.id === unfollowConfirmId)?.name}? You won't receive updates about their events anymore.
+                </p>
+              </>
+            )}
+            {!showUnfollowSuccess ? (
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={cancelUnfollow}
+                  className="px-5 py-2 border border-[#FF4000] text-[#FF4000] rounded-full text-sm font-medium hover:bg-[#FFF4F3] transition-all whitespace-nowrap cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmUnfollow}
+                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                  style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
+                >
+                  Unfollow
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
+                <p className="text-lg font-semibold text-black">Unfollowed successfully</p>
+              </div>
+            )}
           </div>
         </div>
       )}

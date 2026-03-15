@@ -8,6 +8,7 @@ import NewestIcon from '../assets/Svgs/newest.svg';
 import SearchIcon from '../assets/Svgs/recherche.svg';
 import OrganizerLogo from '../assets/imges/logoFollowing/images (1).png';
 import QRCode from '../assets/imges/14.jpg';
+import SuccessIcon from '../assets/Svgs/success.svg';
 
 // Type pour les événements favoris
 interface FavoriteEvent {
@@ -54,9 +55,11 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState('Newest First');
   const [searchQuery, setSearchQuery] = useState('');
+  const [unfavoriteConfirmId, setUnfavoriteConfirmId] = useState<string | null>(null);
+  const [showUnfavoriteSuccess, setShowUnfavoriteSuccess] = useState(false);
 
   // Données des événements favoris
-  const favoriteEvents: FavoriteEvent[] = [
+  const [favoriteEvents, setFavoriteEvents] = useState<FavoriteEvent[]>([
     {
       id: '1',
       image: Event1,
@@ -83,7 +86,27 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
       priceFrom: 55.99,
       badge: 'Almost full',
     },
-  ];
+  ]);
+
+  const handleHeartClick = (e: React.MouseEvent, eventId: string) => {
+    e.stopPropagation();
+    setUnfavoriteConfirmId(eventId);
+  };
+
+  const confirmUnfavorite = () => {
+    if (unfavoriteConfirmId) {
+      setFavoriteEvents(favoriteEvents.filter(ev => ev.id !== unfavoriteConfirmId));
+      setShowUnfavoriteSuccess(true);
+      setTimeout(() => {
+        setShowUnfavoriteSuccess(false);
+        setUnfavoriteConfirmId(null);
+      }, 1500);
+    }
+  };
+
+  const cancelUnfavorite = () => {
+    setUnfavoriteConfirmId(null);
+  };
 
   const sortOptions = ['Newest First', 'Oldest First', 'A-Z'];
 
@@ -188,7 +211,7 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
                         : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
@@ -212,11 +235,11 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
             <div
               key={event.id}
               onClick={() => handleEventClick(event)}
-              className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative"
+              className="bg-white rounded-xl overflow-hidden border border-[#EEEEEE] hover:shadow-lg hover:border-[#FF4000] hover:-translate-y-1 transition-all duration-300 cursor-pointer relative group"
             >
               {/* Event Image with action icons */}
               {/* Height: 200px for consistent card appearance */}
-              <div className="relative h-[200px] overflow-hidden group">
+              <div className="relative h-[200px] overflow-hidden">
                 <img
                   src={event.image}
                   alt={event.title}
@@ -227,11 +250,14 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
                 {/* Icons: 37x37px as per SVG specs */}
                 <div className="absolute top-3 right-3 flex gap-2">
                   {/* Heart/Favorite icon */}
-                  <button className="w-[37px] h-[37px] hover:scale-110 transition-transform">
+                  <button
+                    onClick={(e) => handleHeartClick(e, event.id)}
+                    className="w-[37px] h-[37px] hover:scale-110 transition-transform cursor-pointer"
+                  >
                     <img src={FavoriIcon} alt="Favorite" className="w-full h-full" />
                   </button>
                   {/* Upload/Share icon */}
-                  <button className="w-[37px] h-[37px] hover:scale-110 transition-transform">
+                  <button className="w-[37px] h-[37px] hover:scale-110 transition-transform cursor-pointer">
                     <img src={UploadIcon} alt="Share" className="w-full h-full" />
                   </button>
                 </div>
@@ -242,7 +268,7 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
               <div className="p-4">
                 {/* Event Title */}
                 {/* Font: 16px, semibold, black, 2 lines max with ellipsis */}
-                <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
+                <h3 className="text-base font-semibold text-black mb-2 line-clamp-2 group-hover:text-[#FF4000] transition-colors">
                   {event.title}
                 </h3>
 
@@ -291,6 +317,44 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
           <p className="text-sm text-[#4F4F4F]">
             You haven't added any events to your favorites yet.
           </p>
+        </div>
+      )}
+
+      {/* Unfavorite Confirmation Modal */}
+      {unfavoriteConfirmId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showUnfavoriteSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+            {!showUnfavoriteSuccess && (
+              <>
+                <h2 className="text-2xl font-bold text-black mb-6">Remove from Favourites?</h2>
+                <p className="text-sm text-[#4F4F4F] mb-2">
+                  Are you sure you want to remove "{favoriteEvents.find(ev => ev.id === unfavoriteConfirmId)?.title}" from your favourite events?
+                </p>
+              </>
+            )}
+            {!showUnfavoriteSuccess ? (
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={cancelUnfavorite}
+                  className="px-5 py-2 border border-[#FF4000] text-[#FF4000] rounded-full text-sm font-medium hover:bg-[#FFF4F3] transition-all whitespace-nowrap cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmUnfavorite}
+                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                  style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8">
+                <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
+                <p className="text-lg font-semibold text-black">Removed from favourites</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

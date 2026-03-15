@@ -219,7 +219,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       <div className="flex items-center gap-6 border-b border-[#EEEEEE] mb-6">
         <button
           onClick={() => setActiveTab('upcoming')}
-          className={`pb-3 text-sm font-medium transition-colors relative ${
+          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'upcoming' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -231,7 +231,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
         </button>
         <button
           onClick={() => setActiveTab('past')}
-          className={`pb-3 text-sm font-medium transition-colors relative ${
+          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'past' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -242,7 +242,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
         </button>
         <button
           onClick={() => setActiveTab('cancelled')}
-          className={`pb-3 text-sm font-medium transition-colors relative ${
+          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'cancelled' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -306,7 +306,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
                         : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
@@ -329,7 +329,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
           <div
             key={ticket.id}
             onClick={() => handleEventClick(ticket)}
-            className="bg-white rounded-xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+            className="bg-white rounded-xl overflow-hidden border border-[#EEEEEE] hover:shadow-lg hover:border-[#FF4000] hover:-translate-y-1 transition-all duration-300 cursor-pointer group"
           >
             {/* Event Image */}
             {/* Height: 200px for consistent card appearance */}
@@ -346,7 +346,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             <div className="p-4">
               {/* Event Title */}
               {/* Font: 16px, semibold, black, 2 lines max with ellipsis */}
-              <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
+              <h3 className="text-base font-semibold text-black mb-2 line-clamp-2 group-hover:text-[#FF4000] transition-colors">
                 {ticket.title}
               </h3>
 
