@@ -16,6 +16,7 @@ import DashboardOrganizer from './dashboard/DashboardOrganizer';
 import SearchResult from './SearchResult';
 import EventDetailsGlobal from './EventDetailsGlobal';
 import TicketList from './TicketList';
+import PurchaseConfirmation from './PurchaseConfirmation';
 
 const App = () => {
   return (
@@ -53,6 +54,7 @@ const App = () => {
         <Route path="/search-results" element={<SearchResult />} />
         <Route path="/event/:eventId" element={<EventDetailsGlobal />} />
         <Route path="/event/:eventId/tickets" element={<TicketList />} />
+        <Route path="/event/:eventId/tickets/confirmation" element={<PurchaseConfirmation />} />
         
         {/* TODO: Add other routes */}
         {/* <Route path="/events" element={<Events />} /> */}

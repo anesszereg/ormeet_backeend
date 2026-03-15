@@ -29,11 +29,11 @@ const OnboardingChoice = () => {
     if (selectedType === 'organize') {
       // Store user type in localStorage for later use
       localStorage.setItem('userType', 'organize');
-      navigate('/onboarding-organizer');
+      navigate('/login');
     } else if (selectedType === 'attend') {
       // Store user type in localStorage for later use
       localStorage.setItem('userType', 'attend');
-      navigate('/onboarding-organizer'); // Same flow for attendees
+      navigate('/login');
     }
   };
 
@@ -70,7 +70,7 @@ const OnboardingChoice = () => {
             {/* Attend Events Card */}
             <button
               onClick={() => handleSelection('attend')}
-              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left ${
+              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left cursor-pointer ${
                 selectedType === 'attend'
                   ? 'border-[#FF4000] bg-[#FFF4F3]'
                   : 'border-[#EEEEEE] bg-white hover:border-[#CCCCCC]'
@@ -121,7 +121,7 @@ const OnboardingChoice = () => {
             {/* Organize Events Card */}
             <button
               onClick={() => handleSelection('organize')}
-              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left ${
+              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left cursor-pointer ${
                 selectedType === 'organize'
                   ? 'border-[#FF4000] bg-[#FFF4F3]'
                   : 'border-[#EEEEEE] bg-white hover:border-[#CCCCCC]'
@@ -174,7 +174,7 @@ const OnboardingChoice = () => {
           <button
             onClick={handleContinue}
             disabled={!selectedType}
-            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2 cursor-pointer"
           >
             Let's get started
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">

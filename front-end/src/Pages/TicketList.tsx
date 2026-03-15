@@ -103,7 +103,7 @@ const TicketList: React.FC = () => {
         {/* Go Back Button */}
         <button 
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-black mb-6 hover:text-[#FF4000] transition-colors"
+          className="flex items-center gap-2 text-black mb-6 hover:text-[#FF4000] transition-colors cursor-pointer"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -179,7 +179,7 @@ const TicketList: React.FC = () => {
                       <span className="text-lg font-semibold text-black w-6 text-center">{ticket.quantity}</span>
                       <button
                         onClick={() => updateQuantity(ticket.id, 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:bg-[#333333] transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:bg-[#333333] transition-colors cursor-pointer"
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                           <path d="M8 4V12M4 8H12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -194,7 +194,7 @@ const TicketList: React.FC = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 sticky top-6">
+            <div className="bg-white rounded-2xl p-6 sticky top-6 min-h-[480px] flex flex-col">
               {/* Event Info */}
               <div className="flex gap-3 mb-6 pb-6 border-b border-[#EEEEEE]">
                 <img 
@@ -235,6 +235,9 @@ const TicketList: React.FC = () => {
                 </div>
               </div>
 
+              {/* Spacer to push total and button to bottom */}
+              <div className="flex-1"></div>
+
               <div className="pt-4 border-t border-[#EEEEEE] mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-base font-bold text-black">Total</span>
@@ -244,7 +247,8 @@ const TicketList: React.FC = () => {
 
               {/* Continue Button */}
               <button 
-                className="w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base"
+                onClick={() => navigate(`/event/1/tickets/confirmation`)}
+                className="w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
                 disabled={getOrderSummaryItems().length === 0}
               >
                 Continue

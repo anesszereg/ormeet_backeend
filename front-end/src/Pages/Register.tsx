@@ -101,7 +101,7 @@ const Register = () => {
               </p>
               <button
                 onClick={() => navigate('/login')}
-                className="w-full px-6 py-3.5 bg-[#FF4000] text-white text-base font-semibold rounded-lg hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md mt-2"
+                className="w-full px-6 py-3.5 bg-[#FF4000] text-white text-base font-semibold rounded-lg hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md mt-2 cursor-pointer"
               >
                 Go to Login
               </button>
@@ -135,7 +135,7 @@ const Register = () => {
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="firstName" className="text-sm font-medium text-black">First name</label>
+                <label htmlFor="firstName" className="text-sm font-medium text-black">First name <span className="text-[#FF4000]">*</span></label>
                 <input
                   type="text"
                   id="firstName"
@@ -148,7 +148,7 @@ const Register = () => {
                 />
               </div>
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="familyName" className="text-sm font-medium text-black">Family name</label>
+                <label htmlFor="familyName" className="text-sm font-medium text-black">Family name <span className="text-[#FF4000]">*</span></label>
                 <input
                   type="text"
                   id="familyName"
@@ -163,7 +163,7 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-sm font-medium text-black">Email</label>
+              <label htmlFor="email" className="text-sm font-medium text-black">Email <span className="text-[#FF4000]">*</span></label>
               <input
                 type="email"
                 id="email"
@@ -177,7 +177,7 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="phone" className="text-sm font-medium text-black">Phone number</label>
+              <label htmlFor="phone" className="text-sm font-medium text-black">Phone number <span className="text-[#FF4000]">*</span></label>
               <input
                 type="tel"
                 id="phone"
@@ -191,7 +191,7 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-sm font-medium text-black">Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-black">Password <span className="text-[#FF4000]">*</span></label>
               <input
                 type="password"
                 id="password"
@@ -206,7 +206,7 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">Confirm Password <span className="text-[#FF4000]">*</span></label>
               <input
                 type="password"
                 id="confirmPassword"
@@ -249,7 +249,7 @@ const Register = () => {
 
           {/* Social Signup */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <button type="button" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg bg-white text-sm font-medium text-[#4F4F4F] transition-all hover:border-[#434343] hover:bg-[#F8F8F8]" onClick={handleGoogleSignup}>
+            <button type="button" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg bg-white text-sm font-medium text-[#4F4F4F] transition-all hover:border-[#434343] hover:bg-[#F8F8F8] cursor-pointer" onClick={handleGoogleSignup}>
               <svg width="20" height="20" viewBox="0 0 20 20" className="w-5 h-5">
                 <path d="M19.6 10.23c0-.82-.1-1.42-.25-2.05H10v3.72h5.5c-.15.96-.74 2.31-2.04 3.22v2.45h3.16c1.89-1.73 2.98-4.3 2.98-7.34z" fill="#4285F4"/>
                 <path d="M13.46 15.13c-.83.59-1.96 1-3.46 1-2.64 0-4.88-1.74-5.68-4.15H1.07v2.52C2.72 17.75 6.09 20 10 20c2.7 0 4.96-.89 6.62-2.42l-3.16-2.45z" fill="#34A853"/>
@@ -258,7 +258,7 @@ const Register = () => {
               </svg>
               Google
             </button>
-            <button type="button" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg bg-white text-sm font-medium text-[#4F4F4F] transition-all hover:border-[#434343] hover:bg-[#F8F8F8]" onClick={handleFacebookSignup}>
+            <button type="button" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg bg-white text-sm font-medium text-[#4F4F4F] transition-all hover:border-[#434343] hover:bg-[#F8F8F8] cursor-pointer" onClick={handleFacebookSignup}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="#1877F2" className="w-5 h-5">
                 <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"/>
               </svg>

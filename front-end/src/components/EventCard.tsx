@@ -23,7 +23,7 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
   return (
     <div 
       onClick={handleClick}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-shadow w-full border border-[#EEEEEE] cursor-pointer"
+      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all w-full border border-[#EEEEEE] cursor-pointer hover:scale-[1.02]"
     >
       {/* Event image */}
       <div className="relative w-full h-48 md:h-56">

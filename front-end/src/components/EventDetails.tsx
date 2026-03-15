@@ -78,7 +78,7 @@ const EventDetails = ({
       {/* Go Back Button */}
       <button
         onClick={onGoBack}
-        className="flex items-center gap-2 mb-6 text-sm font-medium text-[#4F4F4F] hover:text-[#FF4000] transition-colors"
+        className="flex items-center gap-2 mb-6 text-sm font-medium text-[#4F4F4F] hover:text-[#FF4000] transition-colors cursor-pointer"
       >
         <img src={GoBackIcon} alt="Go Back" className="w-6 h-6" />
         <span>Go Back</span>
@@ -166,7 +166,7 @@ const EventDetails = ({
                     {/* Expand/Collapse Button */}
                     <button
                       onClick={() => toggleTicketExpansion(ticket.id)}
-                      className="hover:opacity-80 transition-opacity"
+                      className="hover:opacity-80 hover:bg-[#F8F8F8] rounded-lg p-1 transition-all cursor-pointer"
                     >
                       <img
                         src={expandedTickets.has(ticket.id) ? ShowLessIcon : ShowDetailsIcon}
@@ -240,7 +240,7 @@ const EventDetails = ({
                 {tickets.length > 1 && (
                   <button
                     onClick={handlePrevQR}
-                    className="shrink-0 hover:opacity-80 transition-opacity"
+                    className="shrink-0 hover:opacity-70 hover:scale-110 transition-all cursor-pointer"
                   >
                     <img src={GoBackIcon} alt="Previous" className="w-8 h-8" />
                   </button>
@@ -259,7 +259,7 @@ const EventDetails = ({
                 {tickets.length > 1 && (
                   <button
                     onClick={handleNextQR}
-                    className="shrink-0 hover:opacity-80 transition-opacity"
+                    className="shrink-0 hover:opacity-70 hover:scale-110 transition-all cursor-pointer"
                   >
                     <img src={NextStepIcon} alt="Next" className="w-8 h-8" />
                   </button>
@@ -273,10 +273,10 @@ const EventDetails = ({
 
               {/* Action Buttons */}
               <div className="w-full space-y-3">
-                <button className="w-full py-3.5 bg-black text-white text-sm font-semibold rounded-full hover:bg-[#333] transition-colors">
+                <button className="w-full py-3.5 bg-black text-white text-sm font-semibold rounded-full hover:bg-[#333] transition-colors cursor-pointer">
                   Download Ticket
                 </button>
-                <button className="w-full py-3.5 bg-white text-black text-sm font-semibold rounded-full border border-black hover:bg-[#F8F8F8] transition-colors">
+                <button className="w-full py-3.5 bg-white text-black text-sm font-semibold rounded-full border border-black hover:bg-[#F8F8F8] transition-colors cursor-pointer">
                   Cancel Order
                 </button>
               </div>
@@ -302,10 +302,10 @@ const EventDetails = ({
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <button className="px-6 py-2 text-sm font-semibold text-black bg-white rounded-full border border-black hover:bg-[#F8F8F8] transition-colors">
+              <button className="px-6 py-2 text-sm font-semibold text-black bg-white rounded-full border border-black hover:bg-[#F8F8F8] hover:border-[#FF4000] hover:text-[#FF4000] transition-colors cursor-pointer">
                 Contact Organizer
               </button>
-              <button className="flex items-center gap-1 text-sm font-semibold text-black hover:text-[#FF4000] transition-colors">
+              <button className="flex items-center gap-1 text-sm font-semibold text-black hover:text-[#FF4000] transition-colors cursor-pointer">
                 More
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
