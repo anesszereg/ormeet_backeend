@@ -4,12 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import LangueIcon from '../assets/Svgs/navbar/langue.svg';
 import ProfilePhoto from '../assets/imges/photoProfil.jpg';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   onMenuToggle?: () => void;
+  showNotifications?: boolean;
 }
 
-const Navbar = ({ onMenuToggle }: NavbarProps) => {
+const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -117,6 +119,9 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
             </div>
           )}
         </div>
+
+        {/* Notification bell - only shown for Attendee */}
+        {showNotifications && <NotificationBell />}
 
         {/* Profile photo with dropdown menu */}
         <div className="relative" ref={profileMenuRef}>
