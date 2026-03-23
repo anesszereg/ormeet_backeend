@@ -162,7 +162,7 @@ const EventDetailsGlobal = () => {
           key={i}
           onClick={() => isValidDay && handleDateSelect(dayNumber)}
           disabled={!isValidDay}
-          className={`h-10 flex items-center justify-center text-sm font-medium rounded-full transition-colors ${
+          className={`h-10 flex items-center justify-center text-sm font-medium rounded-full transition-colors cursor-pointer ${
             isSelected
               ? 'bg-[#FF4000] text-white'
               : isValidDay
@@ -200,7 +200,7 @@ const EventDetailsGlobal = () => {
             {/* Previous Image Button */}
             <button
               onClick={handlePrevImage}
-              className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
+              className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
               aria-label="Previous image"
             >
               <img src={PastImageIcon} alt="Previous" className="w-full h-full" />
@@ -209,7 +209,7 @@ const EventDetailsGlobal = () => {
             {/* Next Image Button */}
             <button
               onClick={handleNextImage}
-              className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
+              className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
               aria-label="Next image"
             >
               <img src={NextImageIcon} alt="Next" className="w-full h-full" />
@@ -221,7 +221,7 @@ const EventDetailsGlobal = () => {
                 <button
                   key={index}
                   onClick={() => goToImage(index)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
                     index === currentImageIndex
                       ? 'bg-white w-3 h-3'
                       : 'bg-white/60 hover:bg-white/80'
@@ -260,13 +260,13 @@ const EventDetailsGlobal = () => {
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button 
-                    className="hover:scale-105 transition-transform"
+                    className="hover:scale-105 transition-transform cursor-pointer"
                     aria-label="Add to favorites"
                   >
                     <img src={FavoriteIcon} alt="Favorite" className="w-[42px] h-[42px]" />
                   </button>
                   <button 
-                    className="hover:scale-105 transition-transform"
+                    className="hover:scale-105 transition-transform cursor-pointer"
                     aria-label="Share event"
                   >
                     <img src={UploadIcon} alt="Share" className="w-[42px] h-[42px]" />
@@ -282,7 +282,7 @@ const EventDetailsGlobal = () => {
                 </p>
                 <button 
                   onClick={() => setShowDateTimeSection(!showDateTimeSection)}
-                  className="text-sm font-medium text-[#FF4000] hover:underline mt-2"
+                  className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
                 >
                   {showDateTimeSection ? 'Close Calendar' : 'Change date'}
                 </button>
@@ -297,7 +297,7 @@ const EventDetailsGlobal = () => {
                         <div className="flex items-center justify-between mb-6">
                           <button
                             onClick={handlePrevMonth}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
                           >
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                               <path d="M12.5 15L7.5 10L12.5 5" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -305,7 +305,7 @@ const EventDetailsGlobal = () => {
                           </button>
                           <div className="flex items-center gap-2">
                             <span className="text-base font-semibold text-black">{monthNames[selectedMonth - 1]} {selectedYear}</span>
-                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white">
+                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white cursor-pointer">
                               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M8 4V12M4 8H12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                               </svg>
@@ -313,7 +313,7 @@ const EventDetailsGlobal = () => {
                           </div>
                           <button
                             onClick={handleNextMonth}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors"
+                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
                           >
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                               <path d="M7.5 15L12.5 10L7.5 5" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -381,7 +381,7 @@ const EventDetailsGlobal = () => {
                 </p>
                 <button 
                   onClick={() => setShowLocationSection(!showLocationSection)}
-                  className="text-sm font-medium text-[#FF4000] hover:underline mt-2"
+                  className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
                 >
                   {showLocationSection ? 'Close map' : 'See on map'}
                 </button>
@@ -582,7 +582,7 @@ const EventDetailsGlobal = () => {
 
                   {/* Description */}
                   <p className="text-sm text-[#4F4F4F] mb-4 leading-relaxed">
-                    Pulsewave Entertainment is a California-based event company known for creating high-energy music festivals and unforgettable live experiences. With a pa... <button className="text-[#4F4F4F] font-medium hover:underline">See more</button>
+                    Pulsewave Entertainment is a California-based event company known for creating high-energy music festivals and unforgettable live experiences. With a pa... <button className="text-[#4F4F4F] font-medium hover:underline cursor-pointer">See more</button>
                   </p>
 
                   {/* Social Links and More Details */}
@@ -616,7 +616,7 @@ const EventDetailsGlobal = () => {
                       </a>
                     </div>
 
-                    <button className="flex items-center gap-1.5 text-sm font-medium text-black hover:underline">
+                    <button className="flex items-center gap-1.5 text-sm font-medium text-black hover:underline cursor-pointer">
                       More details
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="translate-y-[1px]">
                         <path d="M6 3L11 8L6 13" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -808,7 +808,7 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 0 ? null : 0)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
                       <span className="text-sm font-semibold text-black">Can I get a refund if I can't attend?</span>
                       <svg 
@@ -832,7 +832,7 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 1 ? null : 1)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
                       <span className="text-sm font-semibold text-black">Will there be security at the event?</span>
                       <svg 
@@ -856,7 +856,7 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 2 ? null : 2)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
                       <span className="text-sm font-semibold text-black">Can I buy tickets at the door?</span>
                       <svg 
@@ -880,7 +880,7 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 3 ? null : 3)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
                       <span className="text-sm font-semibold text-black">Is there a lost and found service for lost items?</span>
                       <svg 
@@ -904,7 +904,7 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 4 ? null : 4)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left"
+                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
                       <span className="text-sm font-semibold text-black">Are bags or backpacks allowed inside the venue?</span>
                       <svg 
@@ -1023,7 +1023,7 @@ const EventDetailsGlobal = () => {
               {/* Get Tickets Button */}
               <button 
                 onClick={() => navigate(`/event/${eventId}/tickets`)}
-                className="w-full lg:w-auto px-10 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors text-base"
+                className="w-full lg:w-auto px-10 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
               >
                 Get Tickets Now!
               </button>

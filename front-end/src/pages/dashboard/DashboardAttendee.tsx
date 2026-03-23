@@ -56,7 +56,7 @@ const DashboardAttendee = () => {
     // Main container: full viewport height, flex column to stack all sections
     <div className="flex flex-col min-h-screen w-full bg-white">
       {/* Navbar: fixed at top, full width */}
-      <Navbar />
+      <Navbar showNotifications={true} />
 
       {/* Content area: flex row for sidebar + main content */}
       {/* flex-1 ensures this section takes available space, min-height for consistency */}

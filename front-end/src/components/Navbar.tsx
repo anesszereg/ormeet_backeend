@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import LangueIcon from '../assets/Svgs/navbar/langue.svg';
-
+import ProfilePhoto from '../assets/imges/photoProfil.jpg';
+import NotificationBell from './NotificationBell';
 
 interface NavbarProps {
   onMenuToggle?: () => void;
+  showNotifications?: boolean;
 }
 
-const Navbar = ({ onMenuToggle }: NavbarProps) => {
+const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -64,9 +66,9 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
           </button>
         )}
         {/* Logo: Slightly reduced size for Figma accuracy, vertically centered */}
-        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
+        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8 cursor-pointer" />
         {/* Brand text: 20px font size, bold weight, black color, vertically aligned with logo */}
-        <span className="text-xl font-bold text-black leading-none">Ormeet</span>
+        <span className="text-xl font-bold text-black leading-none cursor-pointer hover:text-[#FF4000] transition-colors">Ormeet</span>
       </div>
 
       {/* Center section: Navigation links - Hidden on mobile */}
@@ -90,7 +92,7 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
           {/* Language button: 36x36px circular background with icon */}
           <button
             onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer"
           >
             {/* Language icon: 36x36px */}
             <img src={LangueIcon} alt="Language" className="w-9 h-9" />
@@ -105,10 +107,10 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
                 <button
                   key={lang}
                   onClick={() => handleLanguageSelect(lang)}
-                  className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                  className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
                     selectedLanguage === lang
                       ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
-                      : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
+                      : 'text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000]'
                   }`}
                 >
                   {lang}
@@ -117,6 +119,9 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
             </div>
           )}
         </div>
+
+        {/* Notification bell - only shown for Attendee */}
+        {showNotifications && <NotificationBell />}
 
         {/* Profile photo with dropdown menu */}
         <div className="relative" ref={profileMenuRef}>
@@ -183,7 +188,7 @@ const Navbar = ({ onMenuToggle }: NavbarProps) => {
               <div className="border-t border-[#EEEEEE] my-1"></div>
               <button
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors font-medium"
+                className="w-full text-left px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors font-medium cursor-pointer"
               >
                 Log out
               </button>

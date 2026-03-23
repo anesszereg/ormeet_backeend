@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  --font-poppins: 'Poppins', sans-serif;
+
+  --color-primary: #FF4000;
+  --color-primary-dark: #E63900;
+  --color-primary-light: #FFF4F3;
+
+  --color-secondary-light: #F8F8F8;
+
+  --color-black: #000000;
+  --color-dark-gray: #434343;
+  --color-gray: #4F4F4F;
+  --color-light-gray: #EEEEEE;
+  --color-input-gray: #BCBCBC;
+  --color-medium-gray: #757575;
+}
+
+body {
+  background: #ffffff;
+  color: #000000;
+  font-family: 'Poppins', sans-serif;
+}

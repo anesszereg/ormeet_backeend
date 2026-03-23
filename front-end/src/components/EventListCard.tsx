@@ -34,7 +34,7 @@ const EventListCard = ({
   return (
     <div 
       onClick={handleClick}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-shadow cursor-pointer flex w-full border border-[#EEEEEE]"
+      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer flex w-full border border-[#EEEEEE] hover:scale-[1.01]"
     >
       {/* Event image - Left side */}
       <div className="relative w-[240px] xl:w-[280px] 2xl:w-[320px] h-[180px] shrink-0">

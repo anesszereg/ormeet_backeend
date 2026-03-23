@@ -121,7 +121,7 @@ const SearchResult = () => {
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-base font-semibold text-black">Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} className="hover:opacity-70 transition-opacity">
+                <button onClick={() => setIsFilterOpen(false)} className="hover:opacity-70 transition-opacity cursor-pointer">
                   <img src={CancelIcon} alt="Close" className="w-6 h-6" />
                 </button>
               </div>
@@ -175,7 +175,7 @@ const SearchResult = () => {
                 </div>
                 <button 
                   onClick={() => setShowAllCategories(!showAllCategories)}
-                  className="flex items-center gap-1 text-xs font-medium text-[#FF4000] hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-1 text-xs font-medium text-[#FF4000] hover:opacity-80 transition-opacity cursor-pointer"
                 >
                   <img src={showAllCategories ? ShowLessIcon : ShowMoreIcon} alt="Toggle" className="w-4 h-4" />
                   {showAllCategories ? 'Show Less' : 'Show More'}
@@ -332,7 +332,7 @@ const SearchResult = () => {
                 <div className="flex items-center border border-[#EEEEEE] bg-white" style={{ borderRadius: '85.41px', height: '38px', padding: '0 4px' }}>
                   <button
                     onClick={() => setViewMode('list')}
-                    className="w-[30px] h-[30px] flex items-center justify-center transition-opacity"
+                    className="w-[30px] h-[30px] flex items-center justify-center transition-opacity cursor-pointer"
                   >
                     <img 
                       src={ListIcon} 
@@ -343,7 +343,7 @@ const SearchResult = () => {
                   </button> 
                   <button
                     onClick={() => setViewMode('grid')}
-                    className="w-[30px] h-[30px] flex items-center justify-center transition-opacity"
+                    className="w-[30px] h-[30px] flex items-center justify-center transition-opacity cursor-pointer"
                   >
                     <img 
                       src={GridIcon} 
