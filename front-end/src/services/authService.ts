@@ -209,6 +209,13 @@ class AuthService {
     return response.data;
   }
 
+  async getMe(): Promise<User> {
+    const response = await api.get<User>('/users/me');
+    // Sync localStorage with fresh server data
+    localStorage.setItem('user', JSON.stringify(response.data));
+    return response.data;
+  }
+
   // ========== User Profile Updates ==========
 
   async updateProfile(data: { name?: string; phone?: string; bio?: string; avatarUrl?: string }): Promise<User> {

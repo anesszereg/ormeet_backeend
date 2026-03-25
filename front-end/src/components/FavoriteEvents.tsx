@@ -1,362 +1,51 @@
-import { useState } from 'react';
-import Event1 from '../assets/imges/event myticket 1.jpg';
-import Event2 from '../assets/imges/event myticket 2.jpg';
-import Event3 from '../assets/imges/event myticket 3.jpg';
-import FavoriIcon from '../assets/Svgs/favori.svg';
-import UploadIcon from '../assets/Svgs/upload.svg';
-import NewestIcon from '../assets/Svgs/newest.svg';
-import SearchIcon from '../assets/Svgs/recherche.svg';
-import OrganizerLogo from '../assets/imges/logoFollowing/images (1).png';
-import QRCode from '../assets/imges/14.jpg';
-import SuccessIcon from '../assets/Svgs/success.svg';
+import React from 'react';
 
-// Type pour les événements favoris
-interface FavoriteEvent {
-  id: string;
-  image: string;
-  title: string;
-  date: string;
-  venue: string;
-  priceFrom: number;
-  badge?: string; // "Trending" ou "Almost full"
-}
-
-// Type pour les événements sélectionnés
-interface SelectedEvent {
-  eventId: string;
-  eventImage: string;
-  eventTitle: string;
-  eventDate: string;
-  eventTime: string;
-  eventVenue: string;
-  eventLocation: string;
-  tickets: Array<{
-    id: string;
-    attendeeName: string;
-    ticketType: string;
-    ticketNumber: string;
-    ticketId: string;
-    status: string;
-    qrCode: string;
-  }>;
-  orderId: string;
-  purchaseDate: string;
-  refundPolicy: string;
-  refundDays: number;
-  organizerName: string;
-  organizerLogo: string;
-}
-
-interface FavoriteEventsProps {
-  onEventSelect?: (event: SelectedEvent) => void;
-}
-
-const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('Newest First');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [unfavoriteConfirmId, setUnfavoriteConfirmId] = useState<string | null>(null);
-  const [showUnfavoriteSuccess, setShowUnfavoriteSuccess] = useState(false);
-
-  // Données des événements favoris
-  const [favoriteEvents, setFavoriteEvents] = useState<FavoriteEvent[]>([
-    {
-      id: '1',
-      image: Event1,
-      title: 'Midnight Echo: Indie Rock Night',
-      date: 'Jul 20',
-      venue: 'Luna Hall',
-      priceFrom: 65.99,
-      badge: 'Trending',
-    },
-    {
-      id: '2',
-      image: Event2,
-      title: 'Voices of Summer: Acoustic Vibes',
-      date: 'Aug 26',
-      venue: 'Sunset Gardens',
-      priceFrom: 35.99,
-    },
-    {
-      id: '3',
-      image: Event3,
-      title: 'Jazz Over the Bay',
-      date: 'Sep 10',
-      venue: 'Bayview Pavilion',
-      priceFrom: 55.99,
-      badge: 'Almost full',
-    },
-  ]);
-
-  const handleHeartClick = (e: React.MouseEvent, eventId: string) => {
-    e.stopPropagation();
-    setUnfavoriteConfirmId(eventId);
-  };
-
-  const confirmUnfavorite = () => {
-    if (unfavoriteConfirmId) {
-      setFavoriteEvents(favoriteEvents.filter(ev => ev.id !== unfavoriteConfirmId));
-      setShowUnfavoriteSuccess(true);
-      setTimeout(() => {
-        setShowUnfavoriteSuccess(false);
-        setUnfavoriteConfirmId(null);
-      }, 1500);
-    }
-  };
-
-  const cancelUnfavorite = () => {
-    setUnfavoriteConfirmId(null);
-  };
-
-  const sortOptions = ['Newest First', 'Oldest First', 'A-Z'];
-
-  // Filter events based on search query
-  const filteredEvents = favoriteEvents.filter(event =>
-    event.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Fonction pour générer les détails complets d'un événement
-  const generateEventDetails = (event: FavoriteEvent): SelectedEvent => {
-    // Générer des tickets (pour les favoris, on simule 2 tickets)
-    const tickets = Array.from({ length: 2 }, (_, index) => ({
-      id: `${event.id}-ticket-${index + 1}`,
-      attendeeName: index === 0 ? 'Michael Thompson' : 'Jessica Monroe',
-      ticketType: 'General Admission',
-      ticketNumber: `Ticket ${index + 1}`,
-      ticketId: `TK1-98${2312 + index}`,
-      status: 'Not Scanned',
-      qrCode: QRCode,
-    }));
-
-    return {
-      eventId: event.id,
-      eventImage: event.image,
-      eventTitle: event.title,
-      eventDate: `Sat, Oct 6`,
-      eventTime: '3:00 PM - 11:00 PM',
-      eventVenue: event.venue,
-      eventLocation: 'San Mateo, CA, California',
-      tickets,
-      orderId: '45.32',
-      purchaseDate: 'Oct 1, 2025',
-      refundPolicy: 'Refund available',
-      refundDays: 7,
-      organizerName: 'Pulsewave Entertainment',
-      organizerLogo: OrganizerLogo,
-    };
-  };
-
-  const handleEventClick = (event: FavoriteEvent) => {
-    if (onEventSelect) {
-      const eventDetails = generateEventDetails(event);
-      onEventSelect(eventDetails);
-    }
-  };
-
+const FavoriteEvents = () => {
   return (
     <div className="w-full">
       {/* Page Title */}
       <h1 className="text-2xl font-bold text-black mb-6">Favourite Events</h1>
 
-      {/* Event Count and Filters */}
-      <div className="flex items-center justify-between mb-6">
-        {/* Events count */}
-        <div className="text-base font-semibold text-black mb-6">
-          {filteredEvents.length} Favourite Event{filteredEvents.length !== 1 ? 's' : ''}
+      {/* Coming Soon UI */}
+      <div className="flex flex-col items-center justify-center py-20">
+        {/* Icon Container */}
+        <div className="w-32 h-32 bg-gradient-to-br from-[#FF4000]/10 to-[#FF4000]/5 rounded-full flex items-center justify-center mb-6">
+          <svg className="w-16 h-16 text-[#FF4000]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
         </div>
 
-        {/* Search and Sort controls */}
-        <div className="flex items-center gap-3">
-          {/* Search input with icon on right */}
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search Events"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-4 pr-10 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-              style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
-            />
-            {/* Search icon positioned on the right */}
-            <img
-              src={SearchIcon}
-              alt="Search"
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none"
-            />
-          </div>
+        {/* Coming Soon Text */}
+        <h2 className="text-3xl font-bold text-black mb-3">Coming Soon</h2>
+        <p className="text-base text-[#4F4F4F] text-center max-w-md mb-8">
+          We're working on bringing you the ability to save and manage your favorite events. Stay tuned!
+        </p>
 
-          {/* Sort dropdown with newest icon - Fixed width 187px */}
-          <div className="relative">
-            <button
-              onClick={() => setIsSortOpen(!isSortOpen)}
-              className="flex items-center gap-2 pl-11 pr-3 border border-[#EEEEEE] bg-white cursor-pointer hover:border-[#FF4000] transition-colors"
-              style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
-            >
-              {/* Newest icon on the left */}
-              <img src={NewestIcon} alt="Sort" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-              <span className="text-sm font-medium text-[#4F4F4F] truncate flex-1">{sortOption}</span>
-              {/* Dropdown arrow */}
-              <svg className="w-4 h-4 text-[#4F4F4F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        {/* Feature List */}
+        <div className="bg-white rounded-xl border border-[#EEEEEE] p-6 max-w-md w-full">
+          <h3 className="text-sm font-semibold text-black mb-4">What's Coming:</h3>
+          <ul className="space-y-3">
+            <li className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-[#FF4000] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-            </button>
-
-            {/* Dropdown menu */}
-            {isSortOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => {
-                      setSortOption(option);
-                      setIsSortOpen(false);
-                    }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
-                      sortOption === option
-                        ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
-                        : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+              <span className="text-sm text-[#4F4F4F]">Save events you're interested in</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-[#FF4000] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm text-[#4F4F4F]">Quick access to your favorite events</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-[#FF4000] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <span className="text-sm text-[#4F4F4F]">Get notified about updates</span>
+            </li>
+          </ul>
         </div>
       </div>
-
-      {/* Events Grid */}
-      {/* Grid: 3 columns on desktop, responsive on smaller screens */}
-      {/* Gap: 24px between cards */}
-      {filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => (
-            <div
-              key={event.id}
-              onClick={() => handleEventClick(event)}
-              className="bg-white rounded-xl overflow-hidden border border-[#EEEEEE] hover:shadow-lg hover:border-[#FF4000] hover:-translate-y-1 transition-all duration-300 cursor-pointer relative group"
-            >
-              {/* Event Image with action icons */}
-              {/* Height: 200px for consistent card appearance */}
-              <div className="relative h-[200px] overflow-hidden">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-
-                {/* Action icons - top right corner */}
-                {/* Icons: 37x37px as per SVG specs */}
-                <div className="absolute top-3 right-3 flex gap-2">
-                  {/* Heart/Favorite icon */}
-                  <button
-                    onClick={(e) => handleHeartClick(e, event.id)}
-                    className="w-[37px] h-[37px] hover:scale-110 transition-transform cursor-pointer"
-                  >
-                    <img src={FavoriIcon} alt="Favorite" className="w-full h-full" />
-                  </button>
-                  {/* Upload/Share icon */}
-                  <button className="w-[37px] h-[37px] hover:scale-110 transition-transform cursor-pointer">
-                    <img src={UploadIcon} alt="Share" className="w-full h-full" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Card Content */}
-              {/* Padding: 16px for comfortable spacing */}
-              <div className="p-4">
-                {/* Event Title */}
-                {/* Font: 16px, semibold, black, 2 lines max with ellipsis */}
-                <h3 className="text-base font-semibold text-black mb-2 line-clamp-2 group-hover:text-[#FF4000] transition-colors">
-                  {event.title}
-                </h3>
-
-                {/* Event Details: Date and Venue */}
-                {/* Font: 14px, medium, gray color */}
-                <div className="flex items-center gap-2 text-sm text-[#4F4F4F] mb-2">
-                  <span>{event.date}</span>
-                  <span>•</span>
-                  <span>{event.venue}</span>
-                </div>
-
-                {/* Price and Badge */}
-                <div className="flex items-center justify-between">
-                  {/* Price */}
-                  <p className="text-sm text-black">
-                    <span className="font-normal">from</span>{' '}
-                    <span className="font-semibold">${event.priceFrom}</span>
-                  </p>
-
-                  {/* Badge (Trending or Almost full) */}
-                  {event.badge && (
-                    <span
-                      className={`px-2 py-1 text-xs font-medium rounded ${
-                        event.badge === 'Trending'
-                          ? 'bg-[#E8F5E9] text-[#2E7D32]'
-                          : 'bg-[#E3F2FD] text-[#1976D2]'
-                      }`}
-                    >
-                      {event.badge}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        // Empty state when no events match search
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-24 h-24 mb-6 rounded-full bg-[#F8F8F8] flex items-center justify-center">
-            <svg className="w-12 h-12 text-[#BCBCBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-black mb-2">No favorite events</h3>
-          <p className="text-sm text-[#4F4F4F]">
-            You haven't added any events to your favorites yet.
-          </p>
-        </div>
-      )}
-
-      {/* Unfavorite Confirmation Modal */}
-      {unfavoriteConfirmId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showUnfavoriteSuccess ? 'max-w-md' : 'max-w-lg'}`}>
-            {!showUnfavoriteSuccess && (
-              <>
-                <h2 className="text-2xl font-bold text-black mb-6">Remove from Favourites?</h2>
-                <p className="text-sm text-[#4F4F4F] mb-2">
-                  Are you sure you want to remove "{favoriteEvents.find(ev => ev.id === unfavoriteConfirmId)?.title}" from your favourite events?
-                </p>
-              </>
-            )}
-            {!showUnfavoriteSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={cancelUnfavorite}
-                  className="px-5 py-2 border border-[#FF4000] text-[#FF4000] rounded-full text-sm font-medium hover:bg-[#FFF4F3] transition-all whitespace-nowrap cursor-pointer"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={confirmUnfavorite}
-                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
-                  style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-8">
-                <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Removed from favourites</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

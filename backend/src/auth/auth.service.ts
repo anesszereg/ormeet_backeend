@@ -283,12 +283,12 @@ export class AuthService {
     console.log('🔑 Generated password reset token:', passwordResetToken);
     console.log('⏰ Token expires at:', passwordResetExpires);
 
-    // // Send password reset email (disabled - email not working on Render)
-    // try {
-    //   await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
-    // } catch (error) {
-    //   console.error('⚠️ Failed to send password reset email:', error.message);
-    // }
+    // Send password reset email
+    try {
+      await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
+    } catch (error) {
+      console.error('⚠️ Failed to send password reset email:', error.message);
+    }
 
     return {
       message: 'If the email exists, a password reset link has been sent.',
@@ -329,12 +329,12 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    // // Send password changed confirmation email (disabled - email not working on Render)
-    // try {
-    //   await this.emailService.sendPasswordChangedEmail(user.email, user.name);
-    // } catch (error) {
-    //   console.error('⚠️ Failed to send password changed email:', error.message);
-    // }
+    // Send password changed confirmation email
+    try {
+      await this.emailService.sendPasswordChangedEmail(user.email, user.name);
+    } catch (error) {
+      console.error('⚠️ Failed to send password changed email:', error.message);
+    }
 
     return {
       message: 'Password reset successfully!',
@@ -378,9 +378,15 @@ export class AuthService {
 
     await this.verificationCodeRepository.save(verificationCode);
 
-    // Send code via email or SMS (email disabled - not working on Render)
+    // Send code via email or SMS
     if (type === VerificationType.EMAIL && email) {
-      console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
+      try {
+        await this.emailService.sendVerificationCode(email, code, purpose);
+        console.log(`📧 Verification code sent to ${email}`);
+      } catch (error) {
+        console.error(`⚠️ Failed to send verification code email:`, error.message);
+        console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
+      }
     } else if (type === VerificationType.PHONE && phone) {
       // TODO: Implement SMS sending (Twilio, etc.)
       console.log(`📱 SMS Code for ${phone}: ${code}`);

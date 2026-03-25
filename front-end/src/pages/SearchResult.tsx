@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import SearchResultNavbar from '../components/SearchResultNavbar';
 import EventCard from '../components/EventCard';
 import EventListCard from '../components/EventListCard';
@@ -12,79 +12,21 @@ import LocationIcon from '../assets/Svgs/filtresSearchResult/location.svg';
 import DateIcon from '../assets/Svgs/filtresSearchResult/date.svg';
 import ShowMoreIcon from '../assets/Svgs/filtresSearchResult/showMore.svg';
 import ShowLessIcon from '../assets/Svgs/filtresSearchResult/showLess.svg';
+import eventService, { Event as ApiEvent } from '../services/eventService';
 
-// Mock events data
-import Event1 from '../assets/imges/event myticket 1.jpg';
-import Event2 from '../assets/imges/event myticket 2.jpg';
-import Event3 from '../assets/imges/event myticket 3.jpg';
-import Event4 from '../assets/imges/event myticket 5.jpg';
-import Event5 from '../assets/imges/event myticket 6.jpg';
-import Event6 from '../assets/imges/event myticket 9.jpg';
+import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
-const mockEvents = [
-  {
-    id: '1',
-    image: Event1,
-    title: 'Midnight Echo: Indie Rock Night',
-    date: 'Jul 20',
-    venue: 'Luna Hall',
-    price: '$65.99',
-    badge: 'Trending',
-    badgeColor: '#4CAF50',
-    description: 'Experience an unforgettable night of indie rock with emerging artists.',
-  },
-  {
-    id: '2',
-    image: Event2,
-    title: 'Voices of Summer: Acoustic Vibes',
-    date: 'Aug 25',
-    venue: 'Sunset Gardens',
-    price: '$35.99',
-    description: 'Relax to soothing acoustic melodies in a beautiful outdoor setting.',
-  },
-  {
-    id: '3',
-    image: Event3,
-    title: 'Jazz Over the Bay',
-    date: 'Sep 10',
-    venue: 'Bayview Pavilion',
-    price: '$65.99',
-    badge: 'Almost full',
-    badgeColor: '#FF9800',
-    description: 'Enjoy smooth jazz performances with stunning waterfront views.',
-  },
-  {
-    id: '4',
-    image: Event4,
-    title: 'Strings in the Wild: Outdoor Classical Evening',
-    date: 'Sep 20',
-    venue: 'Redwood Hills Amphitheatre',
-    price: '$65.99',
-    badge: 'Only few left',
-    badgeColor: '#FF9800',
-    description: 'Classical music under the stars in a breathtaking natural amphitheatre.',
-  },
-  {
-    id: '5',
-    image: Event5,
-    title: 'Soul City Nights: Live Performances',
-    date: 'Oct 6',
-    venue: 'Vibe Lounge',
-    price: '$50.99',
-    badge: 'Only few left',
-    badgeColor: '#FF9800',
-    description: 'Groove to soulful beats with talented local and international artists.',
-  },
-  {
-    id: '6',
-    image: Event6,
-    title: 'Electric Dreams: EDM Festival',
-    date: 'Oct 15',
-    venue: 'Neon Arena',
-    price: '$85.99',
-    description: 'Dance all night to the hottest EDM tracks from world-class DJs.',
-  },
-];
+interface MappedEvent {
+  id: string;
+  image: string;
+  title: string;
+  date: string;
+  venue: string;
+  price: string;
+  badge?: string;
+  badgeColor?: string;
+  description: string;
+}
 
 const SearchResult = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -96,7 +38,37 @@ const SearchResult = () => {
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('Today');
   const [selectedOrganizer, setSelectedOrganizer] = useState('Events by Organizers You Follow');
   const [showAllCategories, setShowAllCategories] = useState(false);
-  const [selectedMapEvent, setSelectedMapEvent] = useState<typeof mockEvents[0] | null>(null);
+  const [selectedMapEvent, setSelectedMapEvent] = useState<MappedEvent | null>(null);
+  const [events, setEvents] = useState<MappedEvent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setIsLoading(true);
+      try {
+        const apiEvents = await eventService.getAllEvents({ status: 'published' });
+        const mapped: MappedEvent[] = apiEvents.map((e: ApiEvent) => {
+          const startDate = new Date(e.startAt);
+          const lowestPrice = e.ticketTypes?.reduce((min, tt) => Math.min(min, Number(tt.price)), Infinity) ?? 0;
+          return {
+            id: e.id,
+            image: e.images?.[0] || EventImageFallback,
+            title: e.title,
+            date: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            venue: e.venue?.name || '',
+            price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
+            description: e.shortDescription || '',
+          };
+        });
+        setEvents(mapped);
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   const categories = ['Music', 'Sports', 'Business', 'Arts', 'Food & Drink', 'Health', 'Technology', 'Fashion'];
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 4);
@@ -302,7 +274,7 @@ const SearchResult = () => {
             {/* Header with results count and view controls */}
             <div className="flex items-center justify-between mb-7">
               <h1 className="text-xl md:text-lg font-semibold text-black">
-                10 Results <span className="font-normal text-[#757575]">for Music</span>
+                {events.length} Results <span className="font-normal text-[#757575]">for Music</span>
               </h1>
 
               {/* View controls */}
@@ -366,7 +338,15 @@ const SearchResult = () => {
                   }`
                 : 'flex flex-col gap-6 w-full'
             }`}>
-              {mockEvents.map((event) => (
+              {isLoading ? (
+                <div className="col-span-full flex items-center justify-center py-20">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
+                </div>
+              ) : events.length === 0 ? (
+                <div className="col-span-full flex flex-col items-center justify-center py-20">
+                  <p className="text-[#757575] text-sm">No events found.</p>
+                </div>
+              ) : events.map((event) => (
                 viewMode === 'list' ? (
                   <div key={event.id} className="w-full">
                     {/* Petits écrans (<1024px): Toujours EventCard vertical - Image en haut, infos en bas */}
@@ -487,37 +467,25 @@ const SearchResult = () => {
 
             {/* Price markers */}
             <button 
-              onClick={() => setSelectedMapEvent(mockEvents[1])}
+              onClick={() => events[1] && setSelectedMapEvent(events[1])}
               className="absolute top-20 left-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
             >
               from $37.99
             </button>
             <button 
-              onClick={() => setSelectedMapEvent(mockEvents[5])}
+              onClick={() => events[5] && setSelectedMapEvent(events[5])}
               className="absolute top-32 left-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
             >
               from $40.99
             </button>
             <button 
-              onClick={() => setSelectedMapEvent(mockEvents[0])}
-              className="absolute top-48 left-24 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $65.99
-            </button>
-            <button 
-              onClick={() => setSelectedMapEvent(mockEvents[1])}
-              className="absolute bottom-48 left-40 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $37.99
-            </button>
-            <button 
-              onClick={() => setSelectedMapEvent(mockEvents[2])}
+              onClick={() => events[0] && setSelectedMapEvent(events[0])}
               className="absolute bottom-32 right-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
             >
               from $65.99
             </button>
             <button 
-              onClick={() => setSelectedMapEvent(mockEvents[4])}
+              onClick={() => events[4] && setSelectedMapEvent(events[4])}
               className="absolute bottom-56 left-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
             >
               from $40.99

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ReviewsModal from '../components/ReviewsModal';
+import eventService, { Event as ApiEvent } from '../services/eventService';
+import reviewService, { Review as ApiReview } from '../services/reviewService';
 
 import NextImageIcon from '../assets/Svgs/eventDetails/nextImage.svg';
 import PastImageIcon from '../assets/Svgs/eventDetails/pastImage.svg';
@@ -25,40 +27,43 @@ import Event3 from '../assets/imges/event myticket 3.jpg';
 import Event4 from '../assets/imges/event myticket 5.jpg';
 import Event5 from '../assets/imges/event myticket 6.jpg';
 
-const allReviews = [
-  { id: 1, name: 'Olivia Morgan', avatar: 'https://i.pravatar.cc/40?img=1', date: 'December 15, 2024', rating: 5, comment: 'Absolutely incredible vibe! The music, the crowd, the energy—everything was perfect. Already counting down the days for next year!' },
-  { id: 2, name: 'Jake Thompson', avatar: 'https://i.pravatar.cc/40?img=13', date: 'November 28, 2024', rating: 5, comment: 'The sound system was insane and the lineup didn\'t disappoint. One of the best music festivals I\'ve ever been to!' },
-  { id: 3, name: 'Mia Lawrence', avatar: 'https://i.pravatar.cc/40?img=5', date: 'October 5, 2024', rating: 5, comment: 'Loved every second! The atmosphere was electric, and the food trucks were a pleasant surprise. Definitely coming back with friends!' },
-  { id: 4, name: 'Ethan Reynolds', avatar: 'https://i.pravatar.cc/40?img=33', date: 'September 12, 2024', rating: 4, comment: 'Great mix of artists, smooth entry, and amazing stage visuals. Pulsewave really knows how to throw a festival!' },
-  { id: 5, name: 'Ryan Keller', avatar: 'https://i.pravatar.cc/40?img=12', date: 'August 22, 2024', rating: 3, comment: 'From the live sets to the lighting effects, everything was top-notch. Such a fun and safe environment to enjoy music!' },
-  { id: 6, name: 'Chloe Sanders', avatar: 'https://i.pravatar.cc/40?img=47', date: 'July 18, 2024', rating: 5, comment: 'The VIP area was totally worth it—great view, no lines, and amazing perks. Can\'t wait to return!' },
-  { id: 7, name: 'Marcus Johnson', avatar: 'https://i.pravatar.cc/40?img=15', date: 'June 30, 2024', rating: 5, comment: 'Best festival experience ever! The organization was flawless and the artists were phenomenal.' },
-  { id: 8, name: 'Sophie Chen', avatar: 'https://i.pravatar.cc/40?img=9', date: 'June 14, 2024', rating: 4, comment: 'Amazing lineup and great vibes throughout. Only minor issue was the long lines for food, but overall fantastic!' },
-  { id: 9, name: 'David Martinez', avatar: 'https://i.pravatar.cc/40?img=52', date: 'May 28, 2024', rating: 5, comment: 'Incredible production quality! The stage design and lighting were out of this world. Worth every penny!' },
-  { id: 10, name: 'Emma Wilson', avatar: 'https://i.pravatar.cc/40?img=24', date: 'May 10, 2024', rating: 4, comment: 'Great festival with diverse music styles. The crowd was friendly and the security was professional.' },
-  { id: 11, name: 'Alex Turner', avatar: 'https://i.pravatar.cc/40?img=68', date: 'April 25, 2024', rating: 5, comment: 'Absolutely loved it! The energy was contagious and every performance was memorable. Can\'t wait for next year!' },
-  { id: 12, name: 'Isabella Garcia', avatar: 'https://i.pravatar.cc/40?img=45', date: 'April 8, 2024', rating: 5, comment: 'Perfect festival experience! Great sound quality, amazing artists, and wonderful atmosphere throughout.' },
-  { id: 13, name: 'Noah Brown', avatar: 'https://i.pravatar.cc/40?img=59', date: 'March 22, 2024', rating: 4, comment: 'Really enjoyed the festival! The variety of music was impressive and the venue was well-organized.' },
-  { id: 14, name: 'Ava Rodriguez', avatar: 'https://i.pravatar.cc/40?img=32', date: 'March 5, 2024', rating: 5, comment: 'Outstanding event! Every detail was carefully planned. The best music festival I\'ve attended in years!' },
-  { id: 15, name: 'Liam Anderson', avatar: 'https://i.pravatar.cc/40?img=70', date: 'February 18, 2024', rating: 3, comment: 'Good festival overall. Some technical issues with sound at times, but the artists made up for it with great performances.' },
-  { id: 16, name: 'Sophia Lee', avatar: 'https://i.pravatar.cc/40?img=27', date: 'February 2, 2024', rating: 5, comment: 'Fantastic experience from start to finish! The venue, the music, the people - everything was perfect!' },
-  { id: 17, name: 'James Taylor', avatar: 'https://i.pravatar.cc/40?img=14', date: 'January 15, 2024', rating: 4, comment: 'Excellent festival with top-tier artists. The atmosphere was electric and the production value was impressive!' },
-];
+// Fallback images for when API images are missing
+const fallbackImages = [Event1, Event2, Event3, Event4, Event5];
 
-const mockEventData = {
-  id: '1',
-  title: 'Rhythm & Beats Music Festival',
-  description: 'Get ready for an unforgettable weekend of non-stop music, energy, and vibes at Rhythm & Beats Music Festival. Featuring top DJs, live bands, food trucks, and immersive experiences, this festival is your ticket to pure rhythm and fun. Dance, connect, and celebrate music like never before!',
-  images: [Event1, Event2, Event3, Event4, Event5],
-  price: '$49.99',
-  rating: 4.5,
-  reviewCount: '1.5K',
-  badge: 'Trending',
-  date: 'Saturday, April 20, 2025',
-  time: '3:00 PM – 11:00 PM',
-  venue: 'Sunset Grove Park',
-  address: '2890 Evergreen Way, San Mateo, CA 94403, California, USA',
-};
+interface EventData {
+  id: string;
+  title: string;
+  description: string;
+  images: string[];
+  price: string;
+  rating: number;
+  reviewCount: string;
+  badge: string;
+  date: string;
+  time: string;
+  venue: string;
+  address: string;
+  organizerName: string;
+  guidelines?: ApiEvent['guidelines'];
+}
+
+interface ReviewItem {
+  id: number | string;
+  name: string;
+  avatar: string;
+  date: string;
+  rating: number;
+  comment: string;
+}
+
+interface TrendingEventItem {
+  id: string;
+  title: string;
+  price: string;
+  badge: string | null;
+  badgeColor: string | null;
+  image: string;
+}
 
 const EventDetailsGlobal = () => {
   const navigate = useNavigate();
@@ -76,17 +81,97 @@ const EventDetailsGlobal = () => {
   const [trendingPage, setTrendingPage] = useState<number>(1);
   const isLoggedIn = true;
 
-  // Trending events data
-  const trendingEvents = [
-    { id: 1, title: 'Golden Beats Music Fe...', price: '$53.99', badge: 'Almost full', badgeColor: 'blue', image: Event1 },
-    { id: 2, title: 'Rooftop DJ Nights', price: '$53.99', badge: null, badgeColor: null, image: Event2 },
-    { id: 3, title: 'SoCal Street Bites', price: '$53.99', badge: 'Sales end soon', badgeColor: 'red', image: Event3 },
-    { id: 4, title: 'Local Artists Showca...', price: '$53.99', badge: 'Only few left', badgeColor: 'red', image: Event4 },
-    { id: 5, title: 'Summer Jazz Festival', price: '$53.99', badge: null, badgeColor: null, image: Event1 },
-    { id: 6, title: 'Urban Art Exhibition', price: '$53.99', badge: 'Almost full', badgeColor: 'blue', image: Event2 },
-    { id: 7, title: 'Wine Tasting Evening', price: '$53.99', badge: null, badgeColor: null, image: Event3 },
-    { id: 8, title: 'Comedy Night Special', price: '$53.99', badge: 'Sales end soon', badgeColor: 'red', image: Event4 },
-  ];
+  // API-driven state
+  const [eventData, setEventData] = useState<EventData | null>(null);
+  const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
+  const [trendingEvents, setTrendingEvents] = useState<TrendingEventItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (!eventId) return;
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [event, reviews, avgRating, allEvents] = await Promise.all([
+          eventService.getEventById(eventId),
+          reviewService.getByEvent(eventId).catch(() => [] as ApiReview[]),
+          reviewService.getEventAverageRating(eventId).catch(() => ({ average: 0, count: 0 })),
+          eventService.getAllEvents({ status: 'published' }).catch(() => [] as ApiEvent[]),
+        ]);
+
+        // Build event data
+        const startDate = new Date(event.startAt);
+        const endDate = new Date(event.endAt);
+        const dateStr = startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = `${startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} – ${endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        const lowestPrice = event.ticketTypes?.reduce((min, tt) => Math.min(min, Number(tt.price)), Infinity) ?? 0;
+        const venueAddress = event.customLocation
+          ? `${event.customLocation.address}, ${event.customLocation.city}, ${event.customLocation.state} ${event.customLocation.zipCode}, ${event.customLocation.country}`
+          : event.venue
+          ? `${event.venue.address}, ${event.venue.city}, ${event.venue.country}`
+          : '';
+
+        setEventData({
+          id: event.id,
+          title: event.title,
+          description: event.longDescription || event.shortDescription,
+          images: event.images && event.images.length > 0 ? event.images : fallbackImages,
+          price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
+          rating: avgRating.average || 0,
+          reviewCount: avgRating.count > 1000 ? `${(avgRating.count / 1000).toFixed(1)}K` : String(avgRating.count),
+          badge: event.status === 'published' ? 'Trending' : '',
+          date: dateStr,
+          time: timeStr,
+          venue: event.venue?.name || '',
+          address: venueAddress,
+          organizerName: event.organizer?.name || '',
+          guidelines: event.guidelines,
+        });
+
+        // Initialize calendar to event start date
+        setSelectedMonth(startDate.getMonth() + 1);
+        setSelectedYear(startDate.getFullYear());
+        setSelectedDate(startDate.getDate());
+
+        // Map reviews
+        const mappedReviews: ReviewItem[] = reviews.map((r: ApiReview, i: number) => ({
+          id: r.id || i + 1,
+          name: r.user?.name || 'Anonymous',
+          avatar: r.user?.profilePhoto || `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
+          date: new Date(r.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          rating: r.rating,
+          comment: r.comment || '',
+        }));
+        setAllReviews(mappedReviews);
+
+        // Map trending events (similar category, excluding current)
+        const trending: TrendingEventItem[] = allEvents
+          .filter((e: ApiEvent) => e.id !== eventId)
+          .slice(0, 10)
+          .map((e: ApiEvent, i: number) => {
+            const ePrice = e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free';
+            return {
+              id: e.id,
+              title: e.title,
+              price: ePrice,
+              badge: null,
+              badgeColor: null,
+              image: e.images?.[0] || fallbackImages[i % fallbackImages.length],
+            };
+          });
+        setTrendingEvents(trending);
+      } catch (err: any) {
+        console.error('Failed to fetch event details:', err);
+        setError(err.response?.data?.message || 'Failed to load event details.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEventData();
+  }, [eventId]);
 
   const cardsPerPage = 5;
   const totalPages = Math.ceil(trendingEvents.length / cardsPerPage);
@@ -102,15 +187,17 @@ const EventDetailsGlobal = () => {
     setTrendingPage((prev) => (prev < totalPages ? prev + 1 : prev));
   };
 
+  const images = eventData?.images || fallbackImages;
+
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === 0 ? mockEventData.images.length - 1 : prev - 1
+      prev === 0 ? images.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === mockEventData.images.length - 1 ? 0 : prev + 1
+      prev === images.length - 1 ? 0 : prev + 1
     );
   };
 
@@ -180,6 +267,29 @@ const EventDetailsGlobal = () => {
 
   const timeSlots = ['6:30 PM – 7:30 PM', '8:30 PM – 9:30 PM'];
 
+  if (isLoading) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-white">
+        <EventDetailsNavbar isLoggedIn={isLoggedIn} />
+        <div className="flex items-center justify-center flex-1 py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !eventData) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-white">
+        <EventDetailsNavbar isLoggedIn={isLoggedIn} />
+        <div className="flex flex-col items-center justify-center flex-1 py-20">
+          <p className="text-red-500 mb-4">{error || 'Event not found'}</p>
+          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-white">
       {/* Navbar */}
@@ -192,8 +302,8 @@ const EventDetailsGlobal = () => {
           {/* Main Image Container */}
           <div className="relative w-full aspect-[2.5/1] md:aspect-[2.8/1] lg:aspect-[2.2/1] rounded-2xl overflow-hidden">
             <img
-              src={mockEventData.images[currentImageIndex]}
-              alt={`${mockEventData.title} - Image ${currentImageIndex + 1}`}
+              src={images[currentImageIndex]}
+              alt={`${eventData.title} - Image ${currentImageIndex + 1}`}
               className="w-full h-full object-cover"
             />
 
@@ -217,7 +327,7 @@ const EventDetailsGlobal = () => {
 
             {/* Image Dots Indicator */}
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
-              {mockEventData.images.map((_, index) => (
+              {images.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => goToImage(index)}
@@ -240,12 +350,12 @@ const EventDetailsGlobal = () => {
             <div className="flex-1">
               {/* Title */}
               <h1 className="text-2xl md:text-3xl font-bold text-black mb-3">
-                {mockEventData.title}
+                {eventData.title}
               </h1>
 
               {/* Description */}
               <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed mb-4 max-w-[650px]">
-                {mockEventData.description}
+                {eventData.description}
               </p>
 
               {/* Rating and Actions Row */}
@@ -253,8 +363,8 @@ const EventDetailsGlobal = () => {
                 {/* Rating */}
                 <div className="flex items-center gap-1.5">
                   <img src={StarIcon} alt="Rating" className="w-5 h-5" />
-                  <span className="text-sm font-semibold text-black">{mockEventData.rating}</span>
-                  <span className="text-sm text-[#757575]">• {mockEventData.reviewCount} reviews</span>
+                  <span className="text-sm font-semibold text-black">{eventData.rating.toFixed(1)}</span>
+                  <span className="text-sm text-[#757575]">• {eventData.reviewCount} reviews</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -278,7 +388,7 @@ const EventDetailsGlobal = () => {
               <div className="mb-6">
                 <h2 className="text-base font-bold text-black mb-2">Date & Time</h2>
                 <p className="text-sm text-black">
-                  {mockEventData.date} <span className="text-[#757575] mx-2">|</span> {mockEventData.time}
+                  {eventData.date} <span className="text-[#757575] mx-2">|</span> {eventData.time}
                 </p>
                 <button 
                   onClick={() => setShowDateTimeSection(!showDateTimeSection)}
@@ -376,8 +486,8 @@ const EventDetailsGlobal = () => {
               <div className="mb-6">
                 <h2 className="text-base font-bold text-black mb-2">Location</h2>
                 <p className="text-sm text-black">
-                  {mockEventData.venue} <span className="text-[#757575] mx-2">|</span> 
-                  <span className="text-[#4F4F4F]">{mockEventData.address}</span>
+                  {eventData.venue} <span className="text-[#757575] mx-2">|</span> 
+                  <span className="text-[#4F4F4F]">{eventData.address}</span>
                 </p>
                 <button 
                   onClick={() => setShowLocationSection(!showLocationSection)}
@@ -632,157 +742,38 @@ const EventDetailsGlobal = () => {
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                  <span className="text-lg font-bold text-black">4.5</span>
-                  <span className="text-base text-[#4F4F4F]">• 1.5K reviews</span>
+                  <span className="text-lg font-bold text-black">{eventData.rating.toFixed(1)}</span>
+                  <span className="text-base text-[#4F4F4F]">• {eventData.reviewCount} reviews</span>
                 </div>
 
                 {/* Reviews Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  {/* Review 1 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=1" alt="Olivia Morgan" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Olivia Morgan</h4>
-                          <span className="text-xs text-[#757575]">December 15, 2024</span>
+                  {allReviews.slice(0, 6).map((review) => (
+                    <div key={review.id} className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
+                      <div className="flex items-start gap-3">
+                        <img src={review.avatar} alt={review.name} className="w-10 h-10 rounded-full" />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <h4 className="text-sm font-semibold text-black">{review.name}</h4>
+                            <span className="text-xs text-[#757575]">{review.date}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5 mb-2">
+                            {[...Array(5)].map((_, i) => (
+                              <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill={i < review.rating ? '#FFA500' : '#E0E0E0'}/>
+                              </svg>
+                            ))}
+                          </div>
+                          <p className="text-sm text-[#4F4F4F] leading-relaxed">
+                            {review.comment}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          Absolutely incredible vibe! The music, the crowd, the energy—everything was perfect. Already counting down the days for next year!
-                        </p>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Review 2 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=13" alt="Jake Thompson" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Jake Thompson</h4>
-                          <span className="text-xs text-[#757575]">November 28, 2024</span>
-                        </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          The sound system was insane and the lineup didn't disappoint. One of the best music festivals I've ever been to!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Review 3 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=5" alt="Mia Lawrence" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Mia Lawrence</h4>
-                          <span className="text-xs text-[#757575]">October 5, 2024</span>
-                        </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          Loved every second! The atmosphere was electric, and the food trucks were a pleasant surprise. Definitely coming back with friends!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Review 4 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=33" alt="Ethan Reynolds" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Ethan Reynolds</h4>
-                          <span className="text-xs text-[#757575]">September 12, 2024</span>
-                        </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(4)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#E0E0E0"/>
-                          </svg>
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          Great mix of artists, smooth entry, and amazing stage visuals. Pulsewave really knows how to throw a festival!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Review 5 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=12" alt="Ryan Keller" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Ryan Keller</h4>
-                          <span className="text-xs text-[#757575]">August 22, 2024</span>
-                        </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(3)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                          {[...Array(2)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#E0E0E0"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          From the live sets to the lighting effects, everything was top-notch. Such a fun and safe environment to enjoy music!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Review 6 */}
-                  <div className="p-4 bg-white border border-[#EEEEEE] rounded-xl">
-                    <div className="flex items-start gap-3">
-                      <img src="https://i.pravatar.cc/40?img=47" alt="Chloe Sanders" className="w-10 h-10 rounded-full" />
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <h4 className="text-sm font-semibold text-black">Chloe Sanders</h4>
-                          <span className="text-xs text-[#757575]">July 18, 2024</span>
-                        </div>
-                        <div className="flex items-center gap-0.5 mb-2">
-                          {[...Array(5)].map((_, i) => (
-                            <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                              <path d="M8 1.33398L9.86 5.10732L14.0667 5.78065L11.0333 8.72732L11.72 12.9139L8 10.9473L4.28 12.9139L4.96667 8.72732L1.93333 5.78065L6.14 5.10732L8 1.33398Z" fill="#FFA500"/>
-                            </svg>
-                          ))}
-                        </div>
-                        <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                          The VIP area was totally worth it—great view, no lines, and amazing perks. Can't wait to return!
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
+                  {allReviews.length === 0 && (
+                    <p className="text-sm text-[#757575] col-span-2">No reviews yet. Be the first to review this event!</p>
+                  )}
                 </div>
 
                 {/* View All Reviews Button */}
@@ -929,7 +920,7 @@ const EventDetailsGlobal = () => {
               {/* More from Pulsewave Entertainment Section */}
               <div className="mt-12 mb-8">
                 <h2 className="text-xl text-black mb-6">
-                  More from <span className="font-bold">Pulsewave Entertainment</span>
+                  More from <span className="font-bold">{eventData.organizerName || 'this organizer'}</span>
                 </h2>
                 
                 <div className="space-y-4">
@@ -1011,11 +1002,11 @@ const EventDetailsGlobal = () => {
               <div className="flex items-center gap-4">
                 <div className="flex items-baseline gap-1">
                   <span className="text-sm text-[#757575]">From</span>
-                  <span className="text-2xl md:text-3xl font-bold text-black">{mockEventData.price}</span>
+                  <span className="text-2xl md:text-3xl font-bold text-black">{eventData.price}</span>
                 </div>
-                {mockEventData.badge && (
+                {eventData.badge && (
                   <span className="px-3 py-1 text-xs font-medium text-[#34A853] border border-[#34A853] rounded-full">
-                    {mockEventData.badge}
+                    {eventData.badge}
                   </span>
                 )}
               </div>

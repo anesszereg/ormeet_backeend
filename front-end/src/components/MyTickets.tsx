@@ -1,25 +1,21 @@
-import { useState } from 'react';
-import Event1 from '../assets/imges/event myticket 1.jpg';
-import Event2 from '../assets/imges/event myticket 2.jpg';
-import Event3 from '../assets/imges/event myticket 3.jpg';
-import Event4 from '../assets/imges/event myticket 4.png';
-import Event5 from '../assets/imges/event myticket 5.jpg';
-import Event6 from '../assets/imges/event myticket 6.jpg';
-import Event7 from '../assets/imges/event myticket 7.png';
-import Event8 from '../assets/imges/event myticket 8.png';
+import { useState, useEffect } from 'react';
 import NewestIcon from '../assets/Svgs/newest.svg';
 import SearchIcon from '../assets/Svgs/recherche.svg';
 import OrganizerLogo from '../assets/imges/logoFollowing/images (1).png';
-import QRCode from '../assets/imges/14.jpg';
+import EventImageFallback from '../assets/imges/event myticket 1.jpg';
+import ticketService, { Ticket as ApiTicket } from '../services/ticketService';
+import { useAuth } from '../context/AuthContext';
 
-// Type pour les tickets
-interface Ticket {
+// Type pour les tickets (grouped by event)
+interface TicketGroup {
   id: string;
+  eventId: string;
   image: string;
   title: string;
   date: string;
   venue: string;
   ticketCount: number;
+  rawTickets: ApiTicket[];
 }
 
 // Type pour les événements sélectionnés
@@ -57,157 +53,138 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortOption, setSortOption] = useState('Newest First');
   const [searchQuery, setSearchQuery] = useState('');
+  const [allTickets, setAllTickets] = useState<ApiTicket[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
 
-  // Données des tickets - Upcoming
-  const upcomingTickets: Ticket[] = [
-    {
-      id: '1',
-      image: Event1,
-      title: 'Midnight Echo: Indie Rock Night',
-      date: 'Jul 20',
-      venue: 'Luna Hall',
-      ticketCount: 1,
-    },
-    {
-      id: '2',
-      image: Event2,
-      title: 'Voices of Summer: Acoustic Vibes',
-      date: 'Aug 26',
-      venue: 'Sunset Gardens',
-      ticketCount: 10,
-    },
-    {
-      id: '3',
-      image: Event3,
-      title: 'Jazz Over the Bay',
-      date: 'Sep 10',
-      venue: 'Bayview Pavilion',
-      ticketCount: 6,
-    },
-    {
-      id: '4',
-      image: Event4,
-      title: 'Soul City Nights: Live Performances',
-      date: 'Oct 6',
-      venue: 'Vibe Lounge',
-      ticketCount: 12,
-    },
-    {
-      id: '5',
-      image: Event5,
-      title: 'Electric Nights: A Journey Through Sound & Light',
-      date: 'Jun 27',
-      venue: 'The Edge Club',
-      ticketCount: 5,
-    },
-    {
-      id: '6',
-      image: Event6,
-      title: 'Strings in the Wild: Outdoor Classical Evening',
-      date: 'Sep 20',
-      venue: 'Redwood Hills Amphitheatre',
-      ticketCount: 3,
-    },
-  ];
+  useEffect(() => {
+    const fetchTickets = async () => {
+      if (!user) return;
+      setIsLoading(true);
+      try {
+        const tickets = await ticketService.getByUser(user.id);
+        setAllTickets(tickets);
+      } catch (err) {
+        console.error('Failed to fetch tickets:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTickets();
+  }, [user]);
 
-  // Données des tickets - Past
-  const pastTickets: Ticket[] = [
-    {
-      id: '7',
-      image: Event7,
-      title: 'Summer Music Festival 2024',
-      date: 'May 15',
-      venue: 'Central Park',
-      ticketCount: 2,
-    },
-    {
-      id: '8',
-      image: Event8,
-      title: 'Classical Orchestra Night',
-      date: 'Apr 10',
-      venue: 'Symphony Hall',
-      ticketCount: 4,
-    },
-  ];
+  // Group tickets by event and categorize by tab
+  const groupTicketsByEvent = (tickets: ApiTicket[]): TicketGroup[] => {
+    const grouped = new Map<string, ApiTicket[]>();
+    tickets.forEach(t => {
+      const eventId = t.eventId;
+      if (!grouped.has(eventId)) grouped.set(eventId, []);
+      grouped.get(eventId)!.push(t);
+    });
 
-  // Données des tickets - Cancelled
-  const cancelledTickets: Ticket[] = [
-    {
-      id: '9',
-      image: Event4,
-      title: 'Rock Concert 2024',
-      date: 'Mar 20',
-      venue: 'Arena Stadium',
-      ticketCount: 3,
-    },
-  ];
-
-  // Récupérer les tickets selon l'onglet actif et filtrer par recherche
-  const getActiveTickets = () => {
-    let tickets: Ticket[];
-    switch (activeTab) {
-      case 'upcoming':
-        tickets = upcomingTickets;
-        break;
-      case 'past':
-        tickets = pastTickets;
-        break;
-      case 'cancelled':
-        tickets = cancelledTickets;
-        break;
-      default:
-        tickets = upcomingTickets;
-    }
-    
-    // Filter by search query
-    if (searchQuery.trim()) {
-      return tickets.filter(ticket => 
-        ticket.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    return tickets;
+    return Array.from(grouped.entries()).map(([eventId, eventTickets]) => {
+      const first = eventTickets[0];
+      const eventStart = first.event ? new Date(first.event.startAt) : new Date(first.issuedAt);
+      return {
+        id: eventId,
+        eventId,
+        image: first.event?.images?.[0] || EventImageFallback,
+        title: first.event?.title || 'Event',
+        date: eventStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        venue: '',
+        ticketCount: eventTickets.length,
+        rawTickets: eventTickets,
+      };
+    });
   };
 
-  const currentTickets = getActiveTickets();
+  const now = new Date();
 
-  // Fonction pour générer les détails complets d'un événement
-  const generateEventDetails = (ticket: Ticket): SelectedEvent => {
-    // Générer des tickets individuels basés sur le ticketCount
-    const tickets = Array.from({ length: ticket.ticketCount }, (_, index) => ({
-      id: `${ticket.id}-ticket-${index + 1}`,
-      attendeeName: index === 0 ? 'Michael Thompson' : index === 1 ? 'Jessica Monroe' : `Emily Carter`,
-      ticketType: 'General Admission',
+  const getFilteredTickets = (): TicketGroup[] => {
+    let filtered: ApiTicket[];
+    switch (activeTab) {
+      case 'upcoming':
+        filtered = allTickets.filter(t => t.status === 'active' && t.event && new Date(t.event.startAt) >= now);
+        break;
+      case 'past':
+        filtered = allTickets.filter(t => (t.status === 'active' || t.status === 'used') && t.event && new Date(t.event.startAt) < now);
+        break;
+      case 'cancelled':
+        filtered = allTickets.filter(t => t.status === 'cancelled');
+        break;
+      default:
+        filtered = [];
+    }
+
+    let groups = groupTicketsByEvent(filtered);
+
+    // Filter by search query
+    if (searchQuery.trim()) {
+      groups = groups.filter(g => g.title.toLowerCase().includes(searchQuery.toLowerCase()));
+    }
+
+    // Sort
+    if (sortOption === 'Newest First') {
+      groups.sort((a, b) => new Date(b.rawTickets[0].issuedAt).getTime() - new Date(a.rawTickets[0].issuedAt).getTime());
+    } else if (sortOption === 'Oldest First') {
+      groups.sort((a, b) => new Date(a.rawTickets[0].issuedAt).getTime() - new Date(b.rawTickets[0].issuedAt).getTime());
+    } else if (sortOption === 'A-Z') {
+      groups.sort((a, b) => a.title.localeCompare(b.title));
+    }
+
+    return groups;
+  };
+
+  const currentTickets = getFilteredTickets();
+
+  // Build event details from real ticket data
+  const generateEventDetails = (group: TicketGroup): SelectedEvent => {
+    const first = group.rawTickets[0];
+    const eventStart = first.event ? new Date(first.event.startAt) : new Date();
+    const eventEnd = first.event ? new Date(first.event.endAt) : new Date();
+
+    const tickets = group.rawTickets.map((t, index) => ({
+      id: t.id,
+      attendeeName: t.owner?.name || user?.name || 'Attendee',
+      ticketType: t.ticketType?.title || 'General Admission',
       ticketNumber: `Ticket ${index + 1}`,
-      ticketId: `TK1-98${2312 + index}`,
-      status: 'Not Scanned',
-      qrCode: QRCode,
+      ticketId: t.code,
+      status: t.status === 'used' ? 'Scanned' : 'Not Scanned',
+      qrCode: t.code,
     }));
 
     return {
-      eventId: ticket.id,
-      eventImage: ticket.image,
-      eventTitle: ticket.title,
-      eventDate: `Sat, Oct 6`,
-      eventTime: '3:00 PM - 11:00 PM',
-      eventVenue: ticket.venue,
-      eventLocation: 'San Mateo, CA, California',
+      eventId: group.eventId,
+      eventImage: group.image,
+      eventTitle: group.title,
+      eventDate: eventStart.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      eventTime: `${eventStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${eventEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`,
+      eventVenue: group.venue,
+      eventLocation: '',
       tickets,
-      orderId: '45.32',
-      purchaseDate: 'Oct 1, 2025',
+      orderId: first.orderId || '',
+      purchaseDate: new Date(first.issuedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       refundPolicy: 'Refund available',
       refundDays: 7,
-      organizerName: 'Pulsewave Entertainment',
+      organizerName: '',
       organizerLogo: OrganizerLogo,
     };
   };
 
-  const handleEventClick = (ticket: Ticket) => {
+  const handleEventClick = (group: TicketGroup) => {
     if (onEventSelect) {
-      const eventDetails = generateEventDetails(ticket);
+      const eventDetails = generateEventDetails(group);
       onEventSelect(eventDetails);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="w-full flex items-center justify-center py-20">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full">

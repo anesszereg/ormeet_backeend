@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import EditIcon from '../../assets/Svgs/edit.svg';
 import SuccessIcon from '../../assets/Svgs/success.svg';
 import ErrorIcon from '../../assets/Svgs/error.svg';
@@ -13,6 +14,8 @@ interface BankAccount {
 }
 
 const BankAccountSettings = () => {
+  const { user } = useAuth();
+
   // Bank account state
   const [bankAccount, setBankAccount] = useState<BankAccount | null>(null);
   
@@ -43,9 +46,8 @@ const BankAccountSettings = () => {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   
-  // Mock current user role (in real app, this would come from auth context)
-  const userRole = 'admin'; // or 'member'
-  const isAdmin = userRole === 'admin';
+  // Determine admin status from user roles
+  const isAdmin = user?.roles?.includes('organizer') || user?.roles?.includes('admin') || false;
 
   // Validate IBAN - basic international format
   const validateIban = (value: string): string => {

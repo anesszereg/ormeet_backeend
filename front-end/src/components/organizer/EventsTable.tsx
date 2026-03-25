@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import organizerService, { Event as ApiEvent } from '../../services/organizerService';
+import eventService from '../../services/eventService';
 import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
@@ -74,6 +75,10 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
   const [eventToDelete, setEventToDelete] = useState<FullEventData | null>(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Send reminders states
+  const [isSendingReminders, setIsSendingReminders] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState<string | null>(null);
 
   // API Data States
   const [isLoading, setIsLoading] = useState(true);
@@ -1062,7 +1067,30 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 >
                   Duplicate Event
                 </button>
+                <button
+                  onClick={async () => {
+                    if (!selectedEvent) return;
+                    setIsSendingReminders(true);
+                    setReminderMessage(null);
+                    try {
+                      const res = await eventService.sendReminders(selectedEvent.id);
+                      setReminderMessage(res.message || 'Reminders sent successfully!');
+                    } catch (err: any) {
+                      setReminderMessage(err.response?.data?.message || 'Failed to send reminders.');
+                    } finally {
+                      setIsSendingReminders(false);
+                      setTimeout(() => setReminderMessage(null), 3000);
+                    }
+                  }}
+                  disabled={isSendingReminders}
+                  className="pl-5 pr-5 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-all whitespace-nowrap disabled:opacity-50"
+                >
+                  {isSendingReminders ? 'Sending...' : 'Send Reminders'}
+                </button>
               </div>
+              {reminderMessage && (
+                <p className="text-sm text-center mt-2 text-green-600">{reminderMessage}</p>
+              )}
             </div>
           </div>
         </div>

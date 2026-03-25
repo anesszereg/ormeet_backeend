@@ -9,7 +9,7 @@ interface AuthContextType {
   loginWithCode: (data: LoginWithCodeDto) => Promise<void>;
   register: (data: RegisterDto) => Promise<{ user: User; token: string; message?: string }>;
   logout: () => void;
-  refreshUser: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,14 +22,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state — load from localStorage first, then refresh from API
   useEffect(() => {
-    const initAuth = () => {
+    const initAuth = async () => {
       const currentUser = authService.getCurrentUser();
       const token = authService.getToken();
       
       if (currentUser && token) {
         setUser(currentUser);
+        // Fetch fresh profile from the server in the background
+        try {
+          const freshUser = await authService.getMe();
+          setUser(freshUser);
+        } catch (err) {
+          // Token may be expired — clear auth state
+          console.warn('[Auth] Failed to fetch /users/me, token may be expired:', err);
+          authService.logout();
+          setUser(null);
+        }
       }
       setIsLoading(false);
     };
@@ -67,9 +77,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
-  const refreshUser = () => {
-    const currentUser = authService.getCurrentUser();
-    setUser(currentUser);
+  const refreshUser = async () => {
+    try {
+      const freshUser = await authService.getMe();
+      setUser(freshUser);
+    } catch {
+      // Fallback to localStorage if API call fails
+      const currentUser = authService.getCurrentUser();
+      setUser(currentUser);
+    }
   };
 
   const value: AuthContextType = {

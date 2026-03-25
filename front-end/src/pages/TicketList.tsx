@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
+import ticketTypeService, { TicketType as ApiTicketType } from '../services/ticketTypeService';
+import eventService from '../services/eventService';
 
-// Import SVG icons
+// Import SVG icons (used as fallback based on ticket type)
 import GeneralAdmissionIcon from '../assets/Svgs/eventDetails/generalAdmission.svg';
 import VipTicketIcon from '../assets/Svgs/eventDetails/vipTicket.svg';
 import EarlyBirdTicketIcon from '../assets/Svgs/eventDetails/earlyBridTicket.svg';
 
-// Import event image (using same as EventDetailsGlobal)
-import EventImage from '../assets/imges/event myticket 1.jpg';
+// Fallback event image
+import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
-interface TicketType {
+interface TicketItem {
   id: string;
   name: string;
   price: number;
@@ -19,62 +21,113 @@ interface TicketType {
   badge?: string;
   badgeColor?: string;
   quantity: number;
+  available: number;
+  maxPerOrder?: number;
+  isFree: boolean;
 }
+
+interface EventInfo {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  venue: string;
+  location: string;
+  image: string;
+}
+
+const getIconForType = (type: string): string => {
+  switch (type) {
+    case 'vip': return VipTicketIcon;
+    case 'early-bird': return EarlyBirdTicketIcon;
+    default: return GeneralAdmissionIcon;
+  }
+};
+
+const getBadge = (available: number, quantityTotal: number): { badge?: string; badgeColor?: string } => {
+  const ratio = available / quantityTotal;
+  if (available === 0) return { badge: 'Sold out', badgeColor: 'orange' };
+  if (ratio <= 0.1) return { badge: 'Only few left', badgeColor: 'orange' };
+  if (ratio <= 0.25) return { badge: 'Almost full', badgeColor: 'blue' };
+  return {};
+};
 
 const TicketList: React.FC = () => {
   const navigate = useNavigate();
+  const { eventId } = useParams<{ eventId: string }>();
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
+  const [tickets, setTickets] = useState<TicketItem[]>([]);
+  const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [tickets, setTickets] = useState<TicketType[]>([
-    {
-      id: 'general',
-      name: 'General Admission',
-      price: 49.99,
-      icon: GeneralAdmissionIcon,
-      features: [
-        'Full access to the festival grounds',
-        'Entry to all general zones and performances',
-        'Access to food trucks, bars, and merch stalls',
-        'Festival wristband and welcome guide'
-      ],
-      quantity: 2
-    },
-    {
-      id: 'vip',
-      name: 'VIP Ticket',
-      price: 119.99,
-      icon: VipTicketIcon,
-      features: [
-        'Front-stage access with premium viewing',
-        'Dedicated VIP entry lane (skip the lines)',
-        'Meet & greet opportunity with featured artists',
-        'Complimentary drink + festival swag bag',
-        'Access to VIP lounge and restrooms'
-      ],
-      badge: 'Only few left',
-      badgeColor: 'orange',
-      quantity: 1
-    },
-    {
-      id: 'earlybird',
-      name: 'Early Bird Ticket',
-      price: 39.99,
-      icon: EarlyBirdTicketIcon,
-      features: [
-        'Full general admission access',
-        'Access to food and drink vendors',
-        'Entry to all performances and festival areas'
-      ],
-      quantity: 2
-    }
-  ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!eventId) return;
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [ticketTypes, event] = await Promise.all([
+          ticketTypeService.getByEvent(eventId),
+          eventService.getEventById(eventId),
+        ]);
+
+        // Map API ticket types to UI items
+        const mappedTickets: TicketItem[] = ticketTypes
+          .filter((tt: ApiTicketType) => tt.isVisible)
+          .map((tt: ApiTicketType) => {
+            const available = tt.quantityTotal - tt.quantitySold;
+            const { badge, badgeColor } = getBadge(available, tt.quantityTotal);
+            return {
+              id: tt.id,
+              name: tt.title,
+              price: Number(tt.price),
+              icon: getIconForType(tt.type),
+              features: tt.ticketBenefits || (tt.description ? [tt.description] : []),
+              badge,
+              badgeColor,
+              quantity: 0,
+              available,
+              maxPerOrder: tt.maxPerOrder || 10,
+              isFree: tt.isFree,
+            };
+          });
+
+        setTickets(mappedTickets);
+
+        // Map event info
+        const startDate = new Date(event.startAt);
+        const endDate = new Date(event.endAt);
+        const dateStr = startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = `${startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+
+        setEventInfo({
+          id: event.id,
+          title: event.title,
+          date: dateStr,
+          time: timeStr,
+          venue: event.venue?.name || '',
+          location: event.customLocation ? `${event.customLocation.city}, ${event.customLocation.country}` : (event.venue ? `${event.venue.city}, ${event.venue.country}` : ''),
+          image: event.images?.[0] || EventImageFallback,
+        });
+      } catch (err: any) {
+        console.error('Failed to fetch ticket data:', err);
+        setError(err.response?.data?.message || 'Failed to load tickets. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [eventId]);
 
   const serviceCharge = 20.00;
 
   const updateQuantity = (ticketId: string, change: number) => {
     setTickets(tickets.map(ticket => {
       if (ticket.id === ticketId) {
-        const newQuantity = Math.max(0, ticket.quantity + change);
+        const max = Math.min(ticket.available, ticket.maxPerOrder || 10);
+        const newQuantity = Math.max(0, Math.min(max, ticket.quantity + change));
         return { ...ticket, quantity: newQuantity };
       }
       return ticket;
@@ -92,6 +145,48 @@ const TicketList: React.FC = () => {
   const getOrderSummaryItems = () => {
     return tickets.filter(ticket => ticket.quantity > 0);
   };
+
+  const handleContinue = () => {
+    const orderItems = getOrderSummaryItems().map(t => ({
+      ticketTypeId: t.id,
+      quantity: t.quantity,
+      unitPrice: t.price,
+      name: t.name,
+    }));
+    navigate(`/event/${eventId}/tickets/confirmation`, {
+      state: {
+        eventId,
+        eventInfo,
+        orderItems,
+        subtotal: calculateSubtotal(),
+        serviceCharge,
+        total: calculateTotal(),
+      },
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8]">
+        <EventDetailsNavbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8]">
+        <EventDetailsNavbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
@@ -164,10 +259,10 @@ const TicketList: React.FC = () => {
                     {/* Quantity Controls */}
                     <div className="flex items-center gap-3 shrink-0">
                       <button
-                        onClick={() => updateQuantity(ticket.id, -1)}
-                        disabled={ticket.quantity === 0}
+                        onClick={(e) => { e.stopPropagation(); updateQuantity(ticket.id, -1); }}
+                        disabled={ticket.quantity === 0 || ticket.available === 0}
                         className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
-                          ticket.quantity === 0 
+                          ticket.quantity === 0 || ticket.available === 0
                             ? 'border-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed' 
                             : 'border-black text-black hover:bg-[#F8F8F8]'
                         }`}
@@ -178,8 +273,13 @@ const TicketList: React.FC = () => {
                       </button>
                       <span className="text-lg font-semibold text-black w-6 text-center">{ticket.quantity}</span>
                       <button
-                        onClick={() => updateQuantity(ticket.id, 1)}
-                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white hover:bg-[#333333] transition-colors cursor-pointer"
+                        onClick={(e) => { e.stopPropagation(); updateQuantity(ticket.id, 1); }}
+                        disabled={ticket.available === 0 || ticket.quantity >= Math.min(ticket.available, ticket.maxPerOrder || 10)}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
+                          ticket.available === 0 || ticket.quantity >= Math.min(ticket.available, ticket.maxPerOrder || 10)
+                            ? 'bg-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed'
+                            : 'bg-black text-white hover:bg-[#333333]'
+                        }`}
                       >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                           <path d="M8 4V12M4 8H12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
@@ -198,19 +298,19 @@ const TicketList: React.FC = () => {
               {/* Event Info */}
               <div className="flex gap-3 mb-6 pb-6 border-b border-[#EEEEEE]">
                 <img 
-                  src={EventImage} 
-                  alt="Rhythm & Beats Music Festival" 
+                  src={eventInfo?.image || EventImageFallback} 
+                  alt={eventInfo?.title || 'Event'} 
                   className="w-16 h-16 rounded-lg object-cover shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-bold text-black mb-1 line-clamp-2">
-                    Rhythm & Beats Music Festival
+                    {eventInfo?.title || 'Event'}
                   </h3>
                   <p className="text-xs text-[#757575] mb-1">
-                    Saturday, April 20, 2025 • 3:00 PM - 11:00 PM
+                    {eventInfo?.date} • {eventInfo?.time}
                   </p>
                   <p className="text-xs text-[#757575]">
-                    Sunset Grove Park • California, USA
+                    {eventInfo?.venue}{eventInfo?.location ? ` • ${eventInfo.location}` : ''}
                   </p>
                 </div>
               </div>
@@ -247,7 +347,7 @@ const TicketList: React.FC = () => {
 
               {/* Continue Button */}
               <button 
-                onClick={() => navigate(`/event/1/tickets/confirmation`)}
+                onClick={handleContinue}
                 className="w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
                 disabled={getOrderSummaryItems().length === 0}
               >

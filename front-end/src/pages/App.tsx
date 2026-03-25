@@ -17,6 +17,7 @@ import DashboardOrganizer from './dashboard/DashboardOrganizer';
 import SearchResult from './SearchResult';
 import EventDetailsGlobal from './EventDetailsGlobal';
 import TicketList from './TicketList';
+import PurchaseConfirmation from './PurchaseConfirmation';
 import Unauthorized from './Unauthorized';
 import OAuthCallback from './OAuthCallback';
 
@@ -106,6 +107,11 @@ const App = () => {
         <Route path="/search-results" element={<SearchResult />} />
         <Route path="/event/:eventId" element={<EventDetailsGlobal />} />
         <Route path="/event/:eventId/tickets" element={<TicketList />} />
+        <Route path="/event/:eventId/tickets/confirmation" element={
+          <ProtectedRoute>
+            <PurchaseConfirmation />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

@@ -15,15 +15,9 @@ import NotCheckedInIcon from '../../assets/Svgs/organiser/dashboard/Attendee/not
 import SuccessIcon from '../../assets/Svgs/success.svg';
 import ErrorIcon from '../../assets/Svgs/error.svg';
 import Event1 from '../../assets/imges/event myticket 1.jpg';
-import Event2 from '../../assets/imges/event myticket 2.jpg';
-import Event3 from '../../assets/imges/event myticket 3.jpg';
-import Event4 from '../../assets/imges/event myticket 4.png';
+
 import ProfilePhoto1 from '../../assets/imges/photoPorifle/Mask group.png';
-import ProfilePhoto2 from '../../assets/imges/photoPorifle/Mask group (1).png';
-import ProfilePhoto3 from '../../assets/imges/photoPorifle/Mask group (2).png';
-import ProfilePhoto4 from '../../assets/imges/photoPorifle/Mask group (3).png';
-import ProfilePhoto5 from '../../assets/imges/photoPorifle/Mask group (4).png';
-import ProfilePhoto6 from '../../assets/imges/photoPorifle/Mask group (5).png';
+
 
 interface Attendee {
   id: string;
@@ -1088,7 +1082,7 @@ const AttendeesTable = () => {
           console.log('Adding attendee:', data);
           setIsAddAttendeeModalOpen(false);
         }}
-        events={mockEvents}
+        events={apiEvents}
       />
     </div>
   );

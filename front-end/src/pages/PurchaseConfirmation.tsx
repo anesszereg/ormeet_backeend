@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
+import orderService, { CreateOrderDto, Order } from '../services/orderService';
+import eventService from '../services/eventService';
+import { useAuth } from '../context/AuthContext';
 
-// Import event images
-import EventImage from '../assets/imges/event myticket 1.jpg';
-import Event2 from '../assets/imges/event myticket 2.jpg';
-import Event3 from '../assets/imges/event myticket 3.jpg';
-import Event4 from '../assets/imges/event myticket 5.jpg';
+// Fallback event image
+import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
 interface RecommendedEvent {
   id: string;
@@ -19,91 +19,148 @@ interface RecommendedEvent {
   badgeColor?: 'orange' | 'blue';
 }
 
+interface LocationState {
+  eventId: string;
+  eventInfo: {
+    id: string;
+    title: string;
+    date: string;
+    time: string;
+    venue: string;
+    location: string;
+    image: string;
+  };
+  orderItems: Array<{
+    ticketTypeId: string;
+    quantity: number;
+    unitPrice: number;
+    name: string;
+  }>;
+  subtotal: number;
+  serviceCharge: number;
+  total: number;
+}
+
 const PurchaseConfirmation: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const state = location.state as LocationState | null;
+
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [order, setOrder] = useState<Order | null>(null);
+  const [isProcessing, setIsProcessing] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [recommendedEvents, setRecommendedEvents] = useState<RecommendedEvent[]>([]);
 
-  // Mock data - in real app this would come from state/context/API
-  const orderData = {
-    orderId: '#4532',
-    email: 'username@gmail.com',
-    event: {
-      title: 'Rhythm & Beats Music Festival',
-      date: 'Saturday, April 20, 2025',
-      time: '3:00 PM – 11:00 PM',
-      venue: 'Sunset Grove Park',
-      location: 'California, USA',
-      image: EventImage,
-    },
-    tickets: [
-      { type: 'General Admission', quantity: 2 },
-      { type: 'Early Bird Ticket', quantity: 2 },
-      { type: 'VIP Ticket', quantity: 1 },
-    ],
-  };
+  // Create order on mount
+  useEffect(() => {
+    const createOrder = async () => {
+      if (!state || !user) {
+        setError('Missing order information. Please go back and try again.');
+        setIsProcessing(false);
+        return;
+      }
 
-  const allRecommendedEvents: RecommendedEvent[] = [
-    {
-      id: '2',
-      image: Event2,
-      title: "New York's Best Croissant - The 2025 Finale",
-      date: 'Apr 20',
-      venue: 'ABC Cooking School',
-      price: '$65.99',
-      badge: 'Sales end soon',
-      badgeColor: 'orange',
-    },
-    {
-      id: '3',
-      image: Event3,
-      title: 'Epic Esports Championship',
-      date: 'Apr 20',
-      venue: 'Mercedes-Benz Arena',
-      price: '$65.99',
-      badge: 'Almost full',
-      badgeColor: 'blue',
-    },
-    {
-      id: '4',
-      image: Event4,
-      title: 'Global Tech Innovators Summit 2025',
-      date: 'Apr 20',
-      venue: 'Marina Convention Center',
-      price: '$65.99',
-      badge: 'Only few left',
-      badgeColor: 'orange',
-    },
-    {
-      id: '5',
-      image: Event2,
-      title: 'Summer Jazz & Blues Festival',
-      date: 'May 15',
-      venue: 'Riverside Amphitheater',
-      price: '$45.99',
-    },
-    {
-      id: '6',
-      image: Event3,
-      title: 'Modern Art Exhibition 2025',
-      date: 'May 22',
-      venue: 'Contemporary Art Museum',
-      price: '$35.99',
-      badge: 'Almost full',
-      badgeColor: 'blue',
-    },
-    {
-      id: '7',
-      image: Event4,
-      title: 'Street Food Festival',
-      date: 'Jun 5',
-      venue: 'Downtown Plaza',
-      price: '$25.99',
-      badge: 'Sales end soon',
-      badgeColor: 'orange',
-    },
-  ];
+      try {
+        const orderData: CreateOrderDto = {
+          userId: user.id,
+          eventId: state.eventId,
+          items: state.orderItems.map(item => ({
+            ticketTypeId: item.ticketTypeId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+          })),
+          billingName: user.name || '',
+          billingEmail: user.email || '',
+          billingAddress: {
+            address: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: '',
+          },
+          paymentMethod: 'credit_card',
+          metadata: { source: 'web_app' },
+        };
 
-  const recommendedEvents = showAllEvents ? allRecommendedEvents : allRecommendedEvents.slice(0, 3);
+        const createdOrder = await orderService.create(orderData);
+
+        // Auto-complete payment (simulated — in production, integrate Stripe/PayPal here)
+        const paidOrder = await orderService.completePayment(createdOrder.id, `sim_${Date.now()}`);
+        setOrder(paidOrder);
+      } catch (err: any) {
+        console.error('Order creation failed:', err);
+        setError(err.response?.data?.message || 'Failed to process your order. Please try again.');
+      } finally {
+        setIsProcessing(false);
+      }
+    };
+
+    createOrder();
+  }, []);
+
+  // Fetch recommended events
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      try {
+        const events = await eventService.getAllEvents();
+        const filtered = events
+          .filter((e: any) => e.id !== state?.eventId)
+          .slice(0, 6)
+          .map((e: any) => {
+            const startDate = new Date(e.startAt);
+            return {
+              id: e.id,
+              image: e.images?.[0] || EventImageFallback,
+              title: e.title,
+              date: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              venue: e.venue?.name || '',
+              price: e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free',
+            };
+          });
+        setRecommendedEvents(filtered);
+      } catch {
+        // Silently fail — recommended events are non-critical
+      }
+    };
+    fetchRecommended();
+  }, []);
+
+  const displayedRecommended = showAllEvents ? recommendedEvents : recommendedEvents.slice(0, 3);
+
+  const orderEmail = order?.billingEmail || user?.email || '';
+  const orderId = order?.id ? `#${order.id.slice(0, 8)}` : '';
+  const eventInfo = state?.eventInfo;
+  const ticketSummary = state?.orderItems || [];
+
+  if (isProcessing) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8]">
+        <EventDetailsNavbar />
+        <div className="flex flex-col items-center justify-center py-20 gap-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
+          <p className="text-[#4F4F4F] text-sm">Processing your order...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8]">
+        <EventDetailsNavbar />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+          <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 7v8M14 19v2" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"/></svg>
+          </div>
+          <h2 className="text-xl font-bold text-black mb-2">Order Failed</h2>
+          <p className="text-red-500 mb-6">{error}</p>
+          <button onClick={() => navigate(-1)} className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors">Go Back</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
@@ -142,7 +199,7 @@ const PurchaseConfirmation: React.FC = () => {
         
         <div className="flex items-center justify-center gap-2 mb-2">
           <p className="text-base text-[#4F4F4F] text-center">
-            Your tickets are confirmed and sent to {orderData.email}
+            Your tickets are confirmed and sent to {orderEmail}
           </p>
           <button className="text-[#4F4F4F] hover:text-[#FF4000] transition-colors cursor-pointer">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -158,7 +215,7 @@ const PurchaseConfirmation: React.FC = () => {
         </div>
 
         <p className="text-base text-[#4F4F4F] text-center mb-6">
-          Your order ID <span className="font-semibold text-black">{orderData.orderId}</span>
+          Your order ID <span className="font-semibold text-black">{orderId}</span>
         </p>
 
         {/* Go to My Tickets Button */}
@@ -193,19 +250,19 @@ const PurchaseConfirmation: React.FC = () => {
             
             <div className="flex gap-4">
               <img 
-                src={orderData.event.image} 
-                alt={orderData.event.title}
+                src={eventInfo?.image || EventImageFallback} 
+                alt={eventInfo?.title || 'Event'}
                 className="w-24 h-20 object-cover rounded-lg shrink-0"
               />
               <div>
                 <h3 className="text-base font-bold text-black mb-1">
-                  {orderData.event.title}
+                  {eventInfo?.title || 'Event'}
                 </h3>
                 <p className="text-sm text-[#757575] mb-1">
-                  {orderData.event.date} • {orderData.event.time}
+                  {eventInfo?.date} • {eventInfo?.time}
                 </p>
                 <p className="text-sm text-[#757575]">
-                  {orderData.event.venue} • {orderData.event.location}
+                  {eventInfo?.venue}{eventInfo?.location ? ` • ${eventInfo.location}` : ''}
                 </p>
               </div>
             </div>
@@ -219,9 +276,9 @@ const PurchaseConfirmation: React.FC = () => {
             </div>
             
             <div className="flex gap-8">
-              {orderData.tickets.map((ticket, index) => (
+              {ticketSummary.map((ticket, index) => (
                 <div key={index}>
-                  <p className="text-sm text-[#757575]">{ticket.type}</p>
+                  <p className="text-sm text-[#757575]">{ticket.name}</p>
                   <p className="text-sm font-semibold text-black">
                     {ticket.quantity} {ticket.quantity === 1 ? 'Ticket' : 'Tickets'}
                   </p>
@@ -236,7 +293,7 @@ const PurchaseConfirmation: React.FC = () => {
           <h2 className="text-lg font-bold text-black mb-4">You might also enjoy</h2>
           
           <div className="space-y-4">
-            {recommendedEvents.map((event) => (
+            {displayedRecommended.map((event) => (
               <div 
                 key={event.id}
                 onClick={() => navigate(`/event/${event.id}`)}

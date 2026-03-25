@@ -29,7 +29,7 @@ const AppDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'event_organization_db',
   entities: [User, Organization, Event, TicketType, Order, Ticket, Attendance, Venue, Review, Promotion, Media, OrganizationInvitation, VerificationCode],
-  synchronize: false,
+  synchronize: true,
   logging: true,
 });
 
