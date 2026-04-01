@@ -34,7 +34,8 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Returns current user profile' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getProfile(@Request() req) {
-    return this.usersService.findById(req.user.sub);
+    // req.user is the full user object from JwtStrategy.validate()
+    return this.usersService.findById(req.user.id);
   }
 
   @Patch('me/profile')
@@ -42,7 +43,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateProfile(@Request() req, @Body() dto: UpdateProfileDto) {
-    return this.usersService.updateProfile(req.user.sub, dto);
+    return this.usersService.updateProfile(req.user.id, dto);
   }
 
   @Patch('me/email')
@@ -51,7 +52,7 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Invalid password' })
   @ApiResponse({ status: 400, description: 'Email already in use' })
   async updateEmail(@Request() req, @Body() dto: UpdateEmailDto) {
-    return this.usersService.updateEmail(req.user.sub, dto);
+    return this.usersService.updateEmail(req.user.id, dto);
   }
 
   @Patch('me/phone')
@@ -59,7 +60,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Phone updated successfully' })
   @ApiResponse({ status: 401, description: 'Invalid password' })
   async updatePhone(@Request() req, @Body() dto: UpdatePhoneDto) {
-    return this.usersService.updatePhone(req.user.sub, dto);
+    return this.usersService.updatePhone(req.user.id, dto);
   }
 
   @Patch('me/password')
@@ -67,7 +68,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Password changed successfully' })
   @ApiResponse({ status: 401, description: 'Current password is incorrect' })
   async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
-    return this.usersService.changePassword(req.user.sub, dto);
+    return this.usersService.changePassword(req.user.id, dto);
   }
 
   @Patch('me/location')
@@ -75,6 +76,6 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Location updated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateLocation(@Request() req, @Body() dto: UpdateLocationDto) {
-    return this.usersService.updateLocation(req.user.sub, dto);
+    return this.usersService.updateLocation(req.user.id, dto);
   }
 }

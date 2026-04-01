@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import QRCode from 'qrcode';
 import NewestIcon from '../assets/Svgs/newest.svg';
 import SearchIcon from '../assets/Svgs/recherche.svg';
 import OrganizerLogo from '../assets/imges/logoFollowing/images (1).png';
@@ -59,13 +60,23 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log('⚠️ [MyTickets] No user found, skipping ticket fetch');
+        return;
+      }
+      console.log('🎫 [MyTickets] Fetching tickets for user:', user.id);
+      console.log('👤 [MyTickets] User email:', user.email);
+      console.log('📛 [MyTickets] User name:', user.name);
       setIsLoading(true);
       try {
         const tickets = await ticketService.getByUser(user.id);
+        console.log(`✅ [MyTickets] Received ${tickets.length} tickets from API`);
+        if (tickets.length > 0) {
+          console.log('📋 [MyTickets] First ticket:', tickets[0]);
+        }
         setAllTickets(tickets);
       } catch (err) {
-        console.error('Failed to fetch tickets:', err);
+        console.error('❌ [MyTickets] Failed to fetch tickets:', err);
       } finally {
         setIsLoading(false);
       }
@@ -138,20 +149,48 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
   const currentTickets = getFilteredTickets();
 
   // Build event details from real ticket data
-  const generateEventDetails = (group: TicketGroup): SelectedEvent => {
+  const generateEventDetails = async (group: TicketGroup): Promise<SelectedEvent> => {
     const first = group.rawTickets[0];
     const eventStart = first.event ? new Date(first.event.startAt) : new Date();
     const eventEnd = first.event ? new Date(first.event.endAt) : new Date();
 
-    const tickets = group.rawTickets.map((t, index) => ({
-      id: t.id,
-      attendeeName: t.owner?.name || user?.name || 'Attendee',
-      ticketType: t.ticketType?.title || 'General Admission',
-      ticketNumber: `Ticket ${index + 1}`,
-      ticketId: t.code,
-      status: t.status === 'used' ? 'Scanned' : 'Not Scanned',
-      qrCode: t.code,
-    }));
+    // Generate QR codes for all tickets
+    const ticketsWithQR = await Promise.all(
+      group.rawTickets.map(async (t, index) => {
+        try {
+          // Generate QR code as data URL
+          const qrCodeDataUrl = await QRCode.toDataURL(t.code, {
+            width: 300,
+            margin: 2,
+            color: {
+              dark: '#000000',
+              light: '#FFFFFF',
+            },
+          });
+          
+          return {
+            id: t.id,
+            attendeeName: t.owner?.name || user?.name || 'Attendee',
+            ticketType: t.ticketType?.title || 'General Admission',
+            ticketNumber: `Ticket ${index + 1}`,
+            ticketId: t.code,
+            status: t.status === 'used' ? 'Scanned' : 'Not Scanned',
+            qrCode: qrCodeDataUrl,
+          };
+        } catch (err) {
+          console.error('Failed to generate QR code for ticket:', t.code, err);
+          return {
+            id: t.id,
+            attendeeName: t.owner?.name || user?.name || 'Attendee',
+            ticketType: t.ticketType?.title || 'General Admission',
+            ticketNumber: `Ticket ${index + 1}`,
+            ticketId: t.code,
+            status: t.status === 'used' ? 'Scanned' : 'Not Scanned',
+            qrCode: '',
+          };
+        }
+      })
+    );
 
     return {
       eventId: group.eventId,
@@ -161,7 +200,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       eventTime: `${eventStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${eventEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`,
       eventVenue: group.venue,
       eventLocation: '',
-      tickets,
+      tickets: ticketsWithQR,
       orderId: first.orderId || '',
       purchaseDate: new Date(first.issuedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       refundPolicy: 'Refund available',
@@ -171,9 +210,9 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
     };
   };
 
-  const handleEventClick = (group: TicketGroup) => {
+  const handleEventClick = async (group: TicketGroup) => {
     if (onEventSelect) {
-      const eventDetails = generateEventDetails(group);
+      const eventDetails = await generateEventDetails(group);
       onEventSelect(eventDetails);
     }
   };

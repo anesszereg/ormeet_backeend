@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ReviewsModal from '../components/ReviewsModal';
 import eventService, { Event as ApiEvent } from '../services/eventService';
 import reviewService, { Review as ApiReview } from '../services/reviewService';
+import userPreferencesService from '../services/userPreferencesService';
 
 import NextImageIcon from '../assets/Svgs/eventDetails/nextImage.svg';
 import PastImageIcon from '../assets/Svgs/eventDetails/pastImage.svg';
@@ -38,12 +40,21 @@ interface EventData {
   price: string;
   rating: number;
   reviewCount: string;
+  views: number;
+  favorites: number;
   badge: string;
   date: string;
   time: string;
   venue: string;
   address: string;
+  organizerId: string;
   organizerName: string;
+  organizerWebsite: string;
+  organizerEmail: string;
+  capacity: number;
+  allowReentry: boolean;
+  refundsAllowed: boolean;
+  ageLimit: number | null;
   guidelines?: ApiEvent['guidelines'];
 }
 
@@ -68,6 +79,7 @@ interface TrendingEventItem {
 const EventDetailsGlobal = () => {
   const navigate = useNavigate();
   const { eventId } = useParams();
+  const { user } = useAuth();
   
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showDateTimeSection, setShowDateTimeSection] = useState(false);
@@ -75,11 +87,14 @@ const EventDetailsGlobal = () => {
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<number>(17);
   const [selectedMonth, setSelectedMonth] = useState<number>(4);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const [isTogglingFollow, setIsTogglingFollow] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('6:30 PM – 7:30 PM');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [trendingPage, setTrendingPage] = useState<number>(1);
-  const isLoggedIn = true;
 
   // API-driven state
   const [eventData, setEventData] = useState<EventData | null>(null);
@@ -100,6 +115,9 @@ const EventDetailsGlobal = () => {
           reviewService.getEventAverageRating(eventId).catch(() => ({ average: 0, count: 0 })),
           eventService.getAllEvents({ status: 'published' }).catch(() => [] as ApiEvent[]),
         ]);
+        console.log('📦 Event data from API:', event);
+        console.log('⭐ Reviews:', reviews);
+        console.log('📊 Average rating:', avgRating);
 
         // Build event data
         const startDate = new Date(event.startAt);
@@ -116,17 +134,26 @@ const EventDetailsGlobal = () => {
         setEventData({
           id: event.id,
           title: event.title,
-          description: event.longDescription || event.shortDescription,
+          description: event.longDescription || event.shortDescription || '',
           images: event.images && event.images.length > 0 ? event.images : fallbackImages,
           price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
           rating: avgRating.average || 0,
-          reviewCount: avgRating.count > 1000 ? `${(avgRating.count / 1000).toFixed(1)}K` : String(avgRating.count),
+          reviewCount: avgRating.count > 1000 ? `${(avgRating.count / 1000).toFixed(1)}K` : String(avgRating.count || 0),
+          views: event.views || 0,
+          favorites: event.favorites || 0,
           badge: event.status === 'published' ? 'Trending' : '',
           date: dateStr,
           time: timeStr,
-          venue: event.venue?.name || '',
+          venue: event.venue?.name || event.customLocation?.city || 'TBA',
           address: venueAddress,
+          organizerId: event.organizerId || '',
           organizerName: event.organizer?.name || '',
+          organizerWebsite: event.organizer?.website || '',
+          organizerEmail: event.organizer?.contactEmail || '',
+          capacity: event.capacity || 0,
+          allowReentry: event.allowReentry || false,
+          refundsAllowed: event.refundsAllowed || false,
+          ageLimit: event.ageLimit,
           guidelines: event.guidelines,
         });
 
@@ -162,16 +189,29 @@ const EventDetailsGlobal = () => {
             };
           });
         setTrendingEvents(trending);
+
+        // Check if event is favorited and if organizer is followed
+        if (user) {
+          try {
+            const [favoriteStatus, followStatus] = await Promise.all([
+              userPreferencesService.isFavoriteEvent(event.id),
+              event.organizerId ? userPreferencesService.isFollowingOrganizer(event.organizerId) : Promise.resolve(false),
+            ]);
+            setIsFavorite(favoriteStatus);
+            setIsFollowing(followStatus);
+          } catch (err) {
+            console.error('Failed to check favorite/follow status:', err);
+          }
+        }
       } catch (err: any) {
-        console.error('Failed to fetch event details:', err);
-        setError(err.response?.data?.message || 'Failed to load event details.');
+        console.error('Failed to fetch event:', err);
+        setError(err.response?.data?.message || 'Event not found');
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchEventData();
-  }, [eventId]);
+  }, [eventId, user]);
 
   const cardsPerPage = 5;
   const totalPages = Math.ceil(trendingEvents.length / cardsPerPage);
@@ -229,6 +269,60 @@ const EventDetailsGlobal = () => {
     setSelectedDate(day);
   };
 
+  const handleToggleFavorite = async () => {
+    if (!user) {
+      alert('Please login to add events to favorites');
+      return;
+    }
+    if (!eventId) return;
+
+    setIsTogglingFavorite(true);
+    try {
+      if (isFavorite) {
+        await userPreferencesService.removeFavoriteEvent(eventId);
+        setIsFavorite(false);
+        console.log('✅ Removed from favorites');
+      } else {
+        await userPreferencesService.addFavoriteEvent(eventId);
+        setIsFavorite(true);
+        console.log('✅ Added to favorites');
+      }
+    } catch (err: any) {
+      console.error('❌ Failed to toggle favorite:', err);
+      alert(err.response?.data?.message || 'Failed to update favorites');
+    } finally {
+      setIsTogglingFavorite(false);
+    }
+  };
+
+  const handleToggleFollow = async () => {
+    if (!user) {
+      alert('Please login to follow organizers');
+      return;
+    }
+    if (!eventData?.organizerId) return;
+
+    const organizerId = eventData.organizerId;
+    
+    setIsTogglingFollow(true);
+    try {
+      if (isFollowing) {
+        await userPreferencesService.unfollowOrganizer(organizerId);
+        setIsFollowing(false);
+        console.log('✅ Unfollowed organizer');
+      } else {
+        await userPreferencesService.followOrganizer(organizerId);
+        setIsFollowing(true);
+        console.log('✅ Following organizer');
+      }
+    } catch (err: any) {
+      console.error('❌ Failed to toggle follow:', err);
+      alert(err.response?.data?.message || 'Failed to update following status');
+    } finally {
+      setIsTogglingFollow(false);
+    }
+  };
+
   const handleTimeSlotSelect = (timeSlot: string) => {
     setSelectedTimeSlot(timeSlot);
   };
@@ -270,7 +364,7 @@ const EventDetailsGlobal = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col min-h-screen w-full bg-white">
-        <EventDetailsNavbar isLoggedIn={isLoggedIn} />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex items-center justify-center flex-1 py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
         </div>
@@ -281,7 +375,7 @@ const EventDetailsGlobal = () => {
   if (error || !eventData) {
     return (
       <div className="flex flex-col min-h-screen w-full bg-white">
-        <EventDetailsNavbar isLoggedIn={isLoggedIn} />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex flex-col items-center justify-center flex-1 py-20">
           <p className="text-red-500 mb-4">{error || 'Event not found'}</p>
           <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
@@ -290,10 +384,13 @@ const EventDetailsGlobal = () => {
     );
   }
 
+
+  console.log('✅ Mapped event data:', eventData);
+  
   return (
     <div className="flex flex-col min-h-screen w-full bg-white">
       {/* Navbar */}
-      <EventDetailsNavbar isLoggedIn={isLoggedIn} />
+      <EventDetailsNavbar isLoggedIn={!!user} />
 
       {/* Main Content */}
       <main className="flex-1 px-4 md:px-8 lg:px-12 xl:px-16 2xl:px-24 py-6">
@@ -366,14 +463,40 @@ const EventDetailsGlobal = () => {
                   <span className="text-sm font-semibold text-black">{eventData.rating.toFixed(1)}</span>
                   <span className="text-sm text-[#757575]">• {eventData.reviewCount} reviews</span>
                 </div>
+                
+                {/* Views */}
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-5 h-5 text-[#757575]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <span className="text-sm text-[#757575]">{eventData.views.toLocaleString()} views</span>
+                </div>
+                
+                {/* Favorites */}
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-5 h-5 text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
+                  <span className="text-sm text-[#757575]">{eventData.favorites.toLocaleString()} favorites</span>
+                </div>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button 
-                    className="hover:scale-105 transition-transform cursor-pointer"
-                    aria-label="Add to favorites"
+                    onClick={handleToggleFavorite}
+                    disabled={!user || isTogglingFavorite}
+                    className="hover:scale-105 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    title={!user ? "Login to add to favorites" : (isFavorite ? "Remove from favorites" : "Add to favorites")}
                   >
-                    <img src={FavoriteIcon} alt="Favorite" className="w-[42px] h-[42px]" />
+                    {isFavorite ? (
+                      <svg className="w-[42px] h-[42px] text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                      </svg>
+                    ) : (
+                      <img src={FavoriteIcon} alt="Favorite" className="w-[42px] h-[42px]" />
+                    )}
                   </button>
                   <button 
                     className="hover:scale-105 transition-transform cursor-pointer"
@@ -659,7 +782,7 @@ const EventDetailsGlobal = () => {
 
                       {/* Organizer Info */}
                       <div>
-                        <h3 className="text-base font-semibold text-black mb-3">Pulsewave Entertainment</h3>
+                        <h3 className="text-base font-semibold text-black mb-3">{eventData.organizerName || 'Organizer'}</h3>
                         
                         {/* Stats */}
                         <div className="flex items-center gap-6">
@@ -681,12 +804,26 @@ const EventDetailsGlobal = () => {
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
-                      <button className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-[#333333] transition-colors">
-                        Follow
+                      <button 
+                        onClick={handleToggleFollow}
+                        disabled={!user || isTogglingFollow || !eventData.organizerId}
+                        className={`px-6 py-2.5 text-sm font-medium rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                          isFollowing 
+                            ? 'bg-white text-black border border-black hover:bg-[#F8F8F8]' 
+                            : 'bg-black text-white hover:bg-[#333333]'
+                        }`}
+                        title={!user ? "Login to follow organizer" : (isFollowing ? "Unfollow" : "Follow")}
+                      >
+                        {isFollowing ? 'Following' : 'Follow'}
                       </button>
-                      <button className="px-6 py-2.5 bg-white text-black text-sm font-medium rounded-full border border-black hover:bg-[#F8F8F8] transition-colors">
-                        Contact
-                      </button>
+                      {eventData.organizerEmail && (
+                        <a 
+                          href={`mailto:${eventData.organizerEmail}`}
+                          className="px-6 py-2.5 bg-white text-black text-sm font-medium rounded-full border border-black hover:bg-[#F8F8F8] transition-colors"
+                        >
+                          Contact
+                        </a>
+                      )}
                     </div>
                   </div>
 

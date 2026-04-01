@@ -20,6 +20,8 @@ import TicketList from './TicketList';
 import PurchaseConfirmation from './PurchaseConfirmation';
 import Unauthorized from './Unauthorized';
 import OAuthCallback from './OAuthCallback';
+import Support from './Support';
+import HostEvents from './HostEvents';
 
 const App = () => {
   return (
@@ -104,6 +106,7 @@ const App = () => {
         <Route path="/oauth-callback" element={<OAuthCallback />} />
         
         {/* Public Routes - Accessible to everyone */}
+        <Route path="/browse-events" element={<SearchResult />} />
         <Route path="/search-results" element={<SearchResult />} />
         <Route path="/event/:eventId" element={<EventDetailsGlobal />} />
         <Route path="/event/:eventId/tickets" element={<TicketList />} />
@@ -112,6 +115,10 @@ const App = () => {
             <PurchaseConfirmation />
           </ProtectedRoute>
         } />
+        
+        {/* Support and Host Events Pages */}
+        <Route path="/support" element={<Support />} />
+        <Route path="/host-events" element={<HostEvents />} />
       </Routes>
     </Router>
   );

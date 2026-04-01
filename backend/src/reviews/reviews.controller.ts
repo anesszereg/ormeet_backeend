@@ -91,7 +91,7 @@ export class ReviewsController {
     @Body() updateReviewDto: UpdateReviewDto,
     @Request() req,
   ) {
-    return this.reviewsService.update(id, updateReviewDto, req.user.sub);
+    return this.reviewsService.update(id, updateReviewDto, req.user.id);
   }
 
   @Post(':id/approve')
@@ -128,6 +128,6 @@ export class ReviewsController {
   @ApiResponse({ status: 404, description: 'Review not found' })
   remove(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user.roles?.includes(UserRole.ADMIN);
-    return this.reviewsService.remove(id, req.user.sub, isAdmin);
+    return this.reviewsService.remove(id, req.user.id, isAdmin);
   }
 }

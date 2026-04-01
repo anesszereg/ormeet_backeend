@@ -16,6 +16,8 @@ import { PromotionsModule } from './promotions/promotions.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { UsersModule } from './users/users.module';
 import { UploadModule } from './upload/upload.module';
+import { UserPreferencesModule } from './user-preferences/user-preferences.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import {
   User,
   Organization,
@@ -30,6 +32,9 @@ import {
   Review,
   Promotion,
   Media,
+  UserFavoriteEvent,
+  UserFollowingOrganizer,
+  Notification,
 } from './entities';
 
 @Module({
@@ -64,6 +69,9 @@ import {
               Review,
               Promotion,
               Media,
+              UserFavoriteEvent,
+              UserFollowingOrganizer,
+              Notification,
             ],
             synchronize: !isProduction,
             logging: !isProduction,
@@ -95,6 +103,9 @@ import {
             Review,
             Promotion,
             Media,
+            UserFavoriteEvent,
+            UserFollowingOrganizer,
+            Notification,
           ],
           synchronize: !isProduction,
           logging: !isProduction,
@@ -115,6 +126,8 @@ import {
     AttendanceModule,
     UsersModule,
     UploadModule,
+    UserPreferencesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

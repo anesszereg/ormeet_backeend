@@ -28,18 +28,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const currentUser = authService.getCurrentUser();
       const token = authService.getToken();
       
+      console.log('🚀 [AuthContext] Initializing auth...');
+      console.log('📦 [AuthContext] User from localStorage:', currentUser);
+      console.log('🔑 [AuthContext] Token exists:', !!token);
+      
       if (currentUser && token) {
         setUser(currentUser);
+        console.log('✅ [AuthContext] Set initial user from localStorage');
         // Fetch fresh profile from the server in the background
         try {
+          console.log('🔄 [AuthContext] Fetching fresh user data from API...');
           const freshUser = await authService.getMe();
+          console.log('✅ [AuthContext] Received fresh user:', freshUser);
           setUser(freshUser);
+          console.log('✅ [AuthContext] Updated context with fresh user data');
         } catch (err) {
           // Token may be expired — clear auth state
-          console.warn('[Auth] Failed to fetch /users/me, token may be expired:', err);
+          console.warn('❌ [AuthContext] Failed to fetch /users/me, token may be expired:', err);
           authService.logout();
           setUser(null);
         }
+      } else {
+        console.log('⚠️ [AuthContext] No user or token found in localStorage');
       }
       setIsLoading(false);
     };

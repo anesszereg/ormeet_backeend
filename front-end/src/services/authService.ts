@@ -210,9 +210,15 @@ class AuthService {
   }
 
   async getMe(): Promise<User> {
+    console.log('🔍 [AuthService] Fetching /users/me from backend...');
     const response = await api.get<User>('/users/me');
+    console.log('✅ [AuthService] Received user from backend:', response.data);
+    console.log('📧 [AuthService] User email:', response.data.email);
+    console.log('👤 [AuthService] User name:', response.data.name);
+    console.log('🎭 [AuthService] User roles:', response.data.roles);
     // Sync localStorage with fresh server data
     localStorage.setItem('user', JSON.stringify(response.data));
+    console.log('💾 [AuthService] Updated localStorage with fresh user data');
     return response.data;
   }
 

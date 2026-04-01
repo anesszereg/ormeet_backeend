@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ticketTypeService, { TicketType as ApiTicketType } from '../services/ticketTypeService';
 import eventService from '../services/eventService';
@@ -55,6 +56,7 @@ const getBadge = (available: number, quantityTotal: number): { badge?: string; b
 const TicketList: React.FC = () => {
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
+  const { user } = useAuth();
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
   const [tickets, setTickets] = useState<TicketItem[]>([]);
   const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
@@ -168,7 +170,7 @@ const TicketList: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8F8F8]">
-        <EventDetailsNavbar />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
         </div>
@@ -179,7 +181,7 @@ const TicketList: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-[#F8F8F8]">
-        <EventDetailsNavbar />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <p className="text-red-500 mb-4">{error}</p>
           <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
@@ -191,7 +193,7 @@ const TicketList: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       {/* Navbar */}
-      <EventDetailsNavbar />
+      <EventDetailsNavbar isLoggedIn={!!user} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

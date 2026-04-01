@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import jsPDF from 'jspdf';
+import orderService from '../services/orderService';
+import ConfirmDialog from './ConfirmDialog';
 import GoBackIcon from '../assets/Svgs/goBack.svg';
 import ShowDetailsIcon from '../assets/Svgs/showDetails.svg';
 import ShowLessIcon from '../assets/Svgs/showLess.svg';
@@ -37,6 +40,7 @@ interface EventDetailsProps {
 }
 
 const EventDetails = ({
+  eventId,
   eventImage,
   eventTitle,
   eventDate,
@@ -54,6 +58,8 @@ const EventDetails = ({
 }: EventDetailsProps) => {
   const [expandedTickets, setExpandedTickets] = useState<Set<string>>(new Set());
   const [currentQRIndex, setCurrentQRIndex] = useState(0);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   const toggleTicketExpansion = (ticketId: string) => {
     const newExpanded = new Set(expandedTickets);
@@ -71,6 +77,93 @@ const EventDetails = ({
 
   const handleNextQR = () => {
     setCurrentQRIndex((prev) => (prev < tickets.length - 1 ? prev + 1 : 0));
+  };
+
+  const handleDownloadTicket = () => {
+    try {
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Add background color
+      pdf.setFillColor(255, 64, 0);
+      pdf.rect(0, 0, pageWidth, 40, 'F');
+
+      // Add title
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(24);
+      pdf.text('ORMEET', pageWidth / 2, 20, { align: 'center' });
+      pdf.setFontSize(16);
+      pdf.text('Event Ticket', pageWidth / 2, 32, { align: 'center' });
+
+      // Event details
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(20);
+      pdf.text(eventTitle, 20, 60);
+
+      pdf.setFontSize(12);
+      pdf.text(`Date: ${eventDate}`, 20, 75);
+      pdf.text(`Time: ${eventTime}`, 20, 85);
+      pdf.text(`Venue: ${eventVenue}`, 20, 95);
+      pdf.text(`Location: ${eventLocation}`, 20, 105);
+
+      // Ticket info
+      pdf.setFontSize(14);
+      pdf.text('Ticket Information', 20, 125);
+      pdf.setFontSize(11);
+      
+      const currentTicket = tickets[currentQRIndex];
+      pdf.text(`Attendee: ${currentTicket.attendeeName}`, 20, 138);
+      pdf.text(`Ticket Type: ${currentTicket.ticketType}`, 20, 148);
+      pdf.text(`Ticket ID: ${currentTicket.ticketId}`, 20, 158);
+      pdf.text(`Status: ${currentTicket.status}`, 20, 168);
+
+      // Add QR code if available
+      if (currentTicket.qrCode) {
+        const qrSize = 80;
+        const qrX = pageWidth - qrSize - 20;
+        const qrY = 120;
+        pdf.addImage(currentTicket.qrCode, 'PNG', qrX, qrY, qrSize, qrSize);
+        
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.text('Scan at venue', qrX + qrSize / 2, qrY + qrSize + 8, { align: 'center' });
+      }
+
+      // Order details
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`Order ID: ${orderId}`, 20, pageHeight - 30);
+      pdf.text(`Purchase Date: ${purchaseDate}`, 20, pageHeight - 20);
+
+      // Footer
+      pdf.setFontSize(8);
+      pdf.text('Please present this ticket at the venue entrance', pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+      // Save PDF
+      pdf.save(`Ormeet-Ticket-${currentTicket.ticketId}.pdf`);
+      console.log('✅ [EventDetails] Ticket downloaded successfully');
+    } catch (err) {
+      console.error('❌ [EventDetails] Failed to download ticket:', err);
+      alert('Failed to download ticket. Please try again.');
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    setIsCancelling(true);
+    try {
+      await orderService.cancel(orderId);
+      console.log('✅ [EventDetails] Order cancelled successfully');
+      setShowCancelDialog(false);
+      alert('Order cancelled successfully. You will receive a refund according to the refund policy.');
+      onGoBack(); // Go back to tickets list
+    } catch (err: any) {
+      console.error('❌ [EventDetails] Failed to cancel order:', err);
+      setShowCancelDialog(false);
+      alert(err.response?.data?.message || 'Failed to cancel order. Please try again or contact support.');
+    } finally {
+      setIsCancelling(false);
+    }
   };
 
   return (
@@ -273,11 +366,18 @@ const EventDetails = ({
 
               {/* Action Buttons */}
               <div className="w-full space-y-3">
-                <button className="w-full py-3.5 bg-black text-white text-sm font-semibold rounded-full hover:bg-[#333] transition-colors cursor-pointer">
+                <button 
+                  onClick={handleDownloadTicket}
+                  className="w-full py-3.5 bg-black text-white text-sm font-semibold rounded-full hover:bg-[#333] transition-colors cursor-pointer"
+                >
                   Download Ticket
                 </button>
-                <button className="w-full py-3.5 bg-white text-black text-sm font-semibold rounded-full border border-black hover:bg-[#F8F8F8] transition-colors cursor-pointer">
-                  Cancel Order
+                <button 
+                  onClick={() => setShowCancelDialog(true)}
+                  disabled={isCancelling}
+                  className="w-full py-3.5 bg-white text-black text-sm font-semibold rounded-full border border-black hover:bg-[#F8F8F8] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isCancelling ? 'Cancelling...' : 'Cancel Order'}
                 </button>
               </div>
             </div>
@@ -323,6 +423,17 @@ const EventDetails = ({
           </div>
         </div>
       </div>
+
+      {/* Cancel Order Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={showCancelDialog}
+        title="Cancel Order"
+        message="Are you sure you want to cancel this order? This action cannot be undone."
+        onConfirm={handleCancelOrder}
+        onCancel={() => setShowCancelDialog(false)}
+        confirmText="Yes, Cancel Order"
+        cancelText="Keep Order"
+      />
     </div>
   );
 };

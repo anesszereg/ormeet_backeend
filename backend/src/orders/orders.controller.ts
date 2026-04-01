@@ -164,7 +164,7 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
     @Body() updateOrderDto: UpdateOrderDto,
     @Request() req,
   ) {
-    return this.ordersService.update(id, updateOrderDto, req.user.sub);
+    return this.ordersService.update(id, updateOrderDto, req.user.id);
   }
 
   @Post(':id/complete-payment')
@@ -288,7 +288,7 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
   @ApiResponse({ status: 403, description: 'You do not have permission to cancel this order' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   cancel(@Param('id') id: string, @Request() req) {
-    return this.ordersService.cancel(id, req.user.sub);
+    return this.ordersService.cancel(id, req.user.id);
   }
 
   @Delete(':id')
@@ -301,6 +301,6 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
   @ApiResponse({ status: 403, description: 'Forbidden' })
   remove(@Param('id') id: string, @Request() req) {
     const isAdmin = req.user.roles?.includes(UserRole.ADMIN);
-    return this.ordersService.remove(id, req.user.sub, isAdmin);
+    return this.ordersService.remove(id, req.user.id, isAdmin);
   }
 }

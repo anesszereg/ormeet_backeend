@@ -1,15 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import LangueIcon from '../assets/Svgs/navbar/langue.svg';
 import LocationSearchIcon from '../assets/Svgs/searchResult/locationSearch.svg';
 import SearchIcon from '../assets/Svgs/searchResult/search.svg';
+import ProfilePhoto from '../assets/imges/photoProfil.jpg';
 
 // Mock data for suggestions
 const locationSuggestions = ['California', 'Los Angeles', 'San Francisco', 'San Diego', 'Sacramento'];
 const eventTypeSuggestions = ['Music', 'Music Festival', 'Music Concert', 'Live Music', 'Classical Music'];
 
 const SearchResultNavbar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
   const [locationQuery, setLocationQuery] = useState('California');
   const [eventTypeQuery, setEventTypeQuery] = useState('Music');
@@ -17,6 +23,7 @@ const SearchResultNavbar = () => {
   const [showEventTypeSuggestions, setShowEventTypeSuggestions] = useState(false);
   
   const languageMenuRef = useRef<HTMLDivElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
   const locationInputRef = useRef<HTMLDivElement>(null);
   const eventTypeInputRef = useRef<HTMLDivElement>(null);
 
@@ -37,6 +44,9 @@ const SearchResultNavbar = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (languageMenuRef.current && !languageMenuRef.current.contains(event.target as Node)) {
         setIsLanguageMenuOpen(false);
+      }
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
       }
       if (locationInputRef.current && !locationInputRef.current.contains(event.target as Node)) {
         setShowLocationSuggestions(false);
@@ -200,15 +210,62 @@ const SearchResultNavbar = () => {
         )}
       </div>
 
-        {/* Auth buttons */}
-        <div className="flex items-center gap-3">
-          <button className="px-6 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors">
-            Log in
-          </button>
-          <button className="px-6 py-2 text-sm font-medium text-white bg-[#FF4000] rounded-full hover:bg-[#E63900] transition-colors">
-            Sign up
-          </button>
-        </div>
+        {/* Auth section */}
+        {user ? (
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <img
+                src={user.avatarUrl || ProfilePhoto}
+                alt={user.name}
+                className="w-9 h-9 rounded-full object-cover border-2 border-[#FF4000]"
+              />
+              <span className="text-sm font-medium text-black">{user.name}</span>
+            </button>
+
+            {isProfileMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
+                <button
+                  onClick={() => {
+                    const dashboardPath = user.roles?.includes('organizer') ? '/dashboard-organizer' : '/dashboard-attendee';
+                    navigate(dashboardPath);
+                    setIsProfileMenuOpen(false);
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsProfileMenuOpen(false);
+                    navigate('/login');
+                  }}
+                  className="w-full px-4 py-2 text-left text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors"
+                >
+                  Log out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/login')}
+              className="px-6 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
+            >
+              Log in
+            </button>
+            <button
+              onClick={() => navigate('/register')}
+              className="px-6 py-2 text-sm font-medium text-white bg-[#FF4000] rounded-full hover:bg-[#E63900] transition-colors"
+            >
+              Sign up
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

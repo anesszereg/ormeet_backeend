@@ -57,10 +57,16 @@ const PurchaseConfirmation: React.FC = () => {
   useEffect(() => {
     const createOrder = async () => {
       if (!state || !user) {
+        console.error('❌ [PurchaseConfirmation] Missing state or user');
         setError('Missing order information. Please go back and try again.');
         setIsProcessing(false);
         return;
       }
+
+      console.log('🛒 [PurchaseConfirmation] Creating order...');
+      console.log('👤 [PurchaseConfirmation] User ID:', user.id);
+      console.log('📧 [PurchaseConfirmation] User email:', user.email);
+      console.log('📦 [PurchaseConfirmation] Order items:', state.orderItems);
 
       try {
         const orderData: CreateOrderDto = {
@@ -84,13 +90,18 @@ const PurchaseConfirmation: React.FC = () => {
           metadata: { source: 'web_app' },
         };
 
+        console.log('📤 [PurchaseConfirmation] Sending order to backend:', orderData);
         const createdOrder = await orderService.create(orderData);
+        console.log('✅ [PurchaseConfirmation] Order created:', createdOrder.id);
 
         // Auto-complete payment (simulated — in production, integrate Stripe/PayPal here)
+        console.log('💳 [PurchaseConfirmation] Completing payment...');
         const paidOrder = await orderService.completePayment(createdOrder.id, `sim_${Date.now()}`);
+        console.log('✅ [PurchaseConfirmation] Payment completed, order status:', paidOrder.status);
         setOrder(paidOrder);
       } catch (err: any) {
-        console.error('Order creation failed:', err);
+        console.error('❌ [PurchaseConfirmation] Order creation failed:', err);
+        console.error('❌ [PurchaseConfirmation] Error details:', err.response?.data);
         setError(err.response?.data?.message || 'Failed to process your order. Please try again.');
       } finally {
         setIsProcessing(false);
@@ -137,7 +148,7 @@ const PurchaseConfirmation: React.FC = () => {
   if (isProcessing) {
     return (
       <div className="min-h-screen bg-[#F8F8F8]">
-        <EventDetailsNavbar />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
           <p className="text-[#4F4F4F] text-sm">Processing your order...</p>
@@ -149,7 +160,7 @@ const PurchaseConfirmation: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-[#F8F8F8]">
-        <EventDetailsNavbar />
+        <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 7v8M14 19v2" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"/></svg>
@@ -165,7 +176,7 @@ const PurchaseConfirmation: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
       {/* Navbar */}
-      <EventDetailsNavbar />
+      <EventDetailsNavbar isLoggedIn={!!user} />
 
       {/* Main Content */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
