@@ -148,12 +148,12 @@ const EventDetailsGlobal = () => {
           address: venueAddress,
           organizerId: event.organizerId || '',
           organizerName: event.organizer?.name || '',
-          organizerWebsite: event.organizer?.website || '',
-          organizerEmail: event.organizer?.contactEmail || '',
+          organizerWebsite: '',
+          organizerEmail: '',
           capacity: event.capacity || 0,
           allowReentry: event.allowReentry || false,
           refundsAllowed: event.refundsAllowed || false,
-          ageLimit: event.ageLimit,
+          ageLimit: event.ageLimit ?? null,
           guidelines: event.guidelines,
         });
 

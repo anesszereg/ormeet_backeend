@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 
 interface Review {
-  id: number;
+  id: number | string;
   name: string;
   avatar: string;
   date: string;

@@ -8,7 +8,7 @@ const HostEvents = () => {
   const handleGetStarted = () => {
     if (!user) {
       navigate('/login');
-    } else if (user.role === 'organizer') {
+    } else if (user.roles?.includes('organizer')) {
       navigate('/dashboard-organizer');
     } else {
       // Attendee wants to become organizer

@@ -22,6 +22,7 @@ import Unauthorized from './Unauthorized';
 import OAuthCallback from './OAuthCallback';
 import Support from './Support';
 import HostEvents from './HostEvents';
+import Profile from './Profile';
 
 const App = () => {
   return (
@@ -119,6 +120,13 @@ const App = () => {
         {/* Support and Host Events Pages */}
         <Route path="/support" element={<Support />} />
         <Route path="/host-events" element={<HostEvents />} />
+        
+        {/* Profile Page - Protected Route */}
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
+          </ProtectedRoute>
+        } />
       </Routes>
     </Router>
   );

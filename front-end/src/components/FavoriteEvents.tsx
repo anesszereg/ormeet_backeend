@@ -4,7 +4,11 @@ import userPreferencesService from '../services/userPreferencesService';
 import { Event } from '../services/eventService';
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
-const FavoriteEvents = () => {
+interface FavoriteEventsProps {
+  onEventSelect?: (event: any) => void;
+}
+
+const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
