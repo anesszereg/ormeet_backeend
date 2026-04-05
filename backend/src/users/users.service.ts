@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from '../entities';
+import { User, UserRole, Organization } from '../entities';
 import {
   UpdateProfileDto,
   UpdateEmailDto,
@@ -21,6 +21,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
   ) {}
 
   async findById(id: string): Promise<User> {
@@ -114,6 +116,34 @@ export class UsersService {
     user.metadata = metadata;
 
     await this.userRepository.save(user);
+    return this.sanitizeUser(user);
+  }
+
+  async addOrganizerRole(userId: string): Promise<User> {
+    const user = await this.findById(userId);
+
+    // Check if user already has organizer role
+    if (user.roles?.includes(UserRole.ORGANIZER)) {
+      throw new BadRequestException('User already has organizer role');
+    }
+
+    // Add organizer role to existing roles
+    const currentRoles = user.roles || [UserRole.ATTENDEE];
+    user.roles = [...currentRoles, UserRole.ORGANIZER];
+
+    // Create organization if user doesn't have one
+    if (!user.organizationId) {
+      const org = this.organizationRepository.create({
+        name: `${user.name}'s Organization`,
+        ownerId: user.id,
+      });
+      const savedOrg = await this.organizationRepository.save(org);
+      user.organizationId = savedOrg.id;
+    }
+
+    await this.userRepository.save(user);
+    console.log(`✅ Added organizer role to user ${user.id}. Roles: ${user.roles.join(', ')}`);
+    
     return this.sanitizeUser(user);
   }
 

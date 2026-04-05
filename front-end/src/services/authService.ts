@@ -246,6 +246,17 @@ class AuthService {
     return response.data;
   }
 
+  async addOrganizerRole(): Promise<User> {
+    const response = await api.patch<User>('/users/me/add-organizer-role');
+    // Update local storage with new roles
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...response.data };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
   async updatePhone(data: { newPhone: string; password: string }): Promise<User> {
     const response = await api.patch<User>('/users/me/phone', data);
     // Update local storage

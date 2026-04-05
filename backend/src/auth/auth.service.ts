@@ -126,7 +126,33 @@ export class AuthService {
 
     // Check if email is verified
     if (!user.emailVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in. Check your inbox for the verification link.');
+      // Resend verification email
+      try {
+        // Generate new verification token if old one doesn't exist
+        if (!user.emailVerificationToken) {
+          user.emailVerificationToken = crypto.randomBytes(32).toString('hex');
+          await this.userRepository.save(user);
+        }
+        
+        await this.emailService.sendWelcomeEmail(
+          user.email,
+          user.name,
+          user.emailVerificationToken
+        );
+        console.log(`📧 Resent verification email to ${user.email}`);
+        
+        throw new UnauthorizedException(
+          'Your email is not verified. We have sent you a new verification link. Please check your inbox and verify your email to continue.'
+        );
+      } catch (error) {
+        if (error instanceof UnauthorizedException) {
+          throw error;
+        }
+        console.error('⚠️ Failed to resend verification email:', error.message);
+        throw new UnauthorizedException(
+          'Please verify your email before logging in. If you did not receive the verification email, please contact support.'
+        );
+      }
     }
 
     // // Send login notification email (disabled - email not working on Render)

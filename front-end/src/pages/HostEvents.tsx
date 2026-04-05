@@ -1,18 +1,36 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import authService from '../services/authService';
 
 const HostEvents = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
+  const [isUpgrading, setIsUpgrading] = useState(false);
 
-  const handleGetStarted = () => {
+  const handleGetStarted = async () => {
     if (!user) {
       navigate('/login');
-    } else if (user.roles?.includes('organizer')) {
+      return;
+    }
+    
+    if (user.roles?.includes('organizer')) {
       navigate('/dashboard-organizer');
-    } else {
-      // Attendee wants to become organizer
-      navigate('/onboarding-organizer');
+      return;
+    }
+    
+    // Attendee wants to become organizer - add organizer role
+    try {
+      setIsUpgrading(true);
+      const updatedUser = await authService.addOrganizerRole();
+      setUser(updatedUser);
+      console.log('✅ Successfully added organizer role');
+      navigate('/dashboard-organizer');
+    } catch (error: any) {
+      console.error('❌ Failed to add organizer role:', error);
+      alert(error.response?.data?.message || 'Failed to upgrade account. Please try again.');
+    } finally {
+      setIsUpgrading(false);
     }
   };
 

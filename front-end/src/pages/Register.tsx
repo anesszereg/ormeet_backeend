@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import PhoneInput from '../components/PhoneInput';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -22,14 +23,16 @@ const Register = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Only allow digits for phone number
-    if (name === 'phone' && value && !/^\d*$/.test(value)) {
-      return;
-    }
-    
     setFormData({
       ...formData,
       [name]: value,
+    });
+  };
+
+  const handlePhoneChange = (fullPhone: string) => {
+    setFormData({
+      ...formData,
+      phone: fullPhone,
     });
   };
 
@@ -180,15 +183,11 @@ const Register = () => {
 
             <div className="flex flex-col gap-2">
               <label htmlFor="phone" className="text-sm font-medium text-black">Phone number <span className="text-[#FF4000]">*</span></label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                placeholder="Enter your phone number"
+              <PhoneInput
                 value={formData.phone}
-                onChange={handleChange}
+                onChange={handlePhoneChange}
                 required
-                className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                placeholder="Phone number"
               />
             </div>
 

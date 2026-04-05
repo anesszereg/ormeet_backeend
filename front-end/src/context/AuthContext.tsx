@@ -3,6 +3,7 @@ import authService, { User, LoginDto, RegisterDto, LoginWithCodeDto } from '../s
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (data: LoginDto) => Promise<void>;
@@ -100,6 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     user,
+    setUser,
     isAuthenticated: !!user,
     isLoading,
     login,

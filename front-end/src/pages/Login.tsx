@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
+import PhoneInput from '../components/PhoneInput';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -16,12 +17,8 @@ const Login = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Only allow digits
-    if (/^\d*$/.test(value)) {
-      setPhone(value);
-    }
+  const handlePhoneChange = (fullPhone: string) => {
+    setPhone(fullPhone);
   };
 
   const { login } = useAuth();
@@ -165,14 +162,11 @@ const Login = () => {
                   className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
                 />
               ) : (
-                <input
-                  type="tel"
-                  id="phone"
-                  placeholder="Enter your phone number"
+                <PhoneInput
                   value={phone}
                   onChange={handlePhoneChange}
                   required
-                  className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                  placeholder="Phone number"
                 />
               )}
             </div>

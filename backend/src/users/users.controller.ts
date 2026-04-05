@@ -78,4 +78,13 @@ export class UsersController {
   async updateLocation(@Request() req, @Body() dto: UpdateLocationDto) {
     return this.usersService.updateLocation(req.user.id, dto);
   }
+
+  @Patch('me/add-organizer-role')
+  @ApiOperation({ summary: 'Add organizer role to user account' })
+  @ApiResponse({ status: 200, description: 'Organizer role added successfully' })
+  @ApiResponse({ status: 400, description: 'User already has organizer role' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async addOrganizerRole(@Request() req) {
+    return this.usersService.addOrganizerRole(req.user.id);
+  }
 }
