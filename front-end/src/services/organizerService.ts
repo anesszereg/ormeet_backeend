@@ -53,7 +53,7 @@ export interface CreateEventDto {
   startAt: string;
   endAt: string;
   timezone?: string;
-  locationType: 'physical' | 'online' | 'tba';
+  locationType: 'physical' | 'online' | 'to_be_announced';
   customLocation?: {
     address: string;
     city: string;

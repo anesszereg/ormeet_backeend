@@ -121,7 +121,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               buyerPhoto: order.user?.profilePhoto || ProfilePhoto1,
               ticketType: order.items?.[0]?.ticketTypeId ? 'General' : 'Unknown',
               qty: order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
-              totalPrice: order.amountTotal || 0,
+              totalPrice: typeof order.amountTotal === 'string' ? parseFloat(order.amountTotal) : (order.amountTotal || 0),
               payment,
               orderDate: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
               ticketStatus: order.status === 'paid' ? 'sent' : 'not-sent',

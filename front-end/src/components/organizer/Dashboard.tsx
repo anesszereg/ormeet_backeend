@@ -95,7 +95,10 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         // Calculate stats
         const paidOrders = organizerOrders.filter(o => o.status === 'paid');
         const refundedOrders = organizerOrders.filter(o => o.status === 'refunded');
-        const totalRevenue = paidOrders.reduce((sum, o) => sum + (parseFloat(String(o.amountTotal)) || 0), 0);
+        const totalRevenue = paidOrders.reduce((sum, o) => {
+          const amount = typeof o.amountTotal === 'string' ? parseFloat(o.amountTotal) : o.amountTotal;
+          return sum + (amount || 0);
+        }, 0);
 
         // No historical data available yet — show 0% change
         const ordersChange = 0;
