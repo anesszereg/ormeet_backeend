@@ -84,10 +84,15 @@ const Login = () => {
         // Redirect to onboarding based on role
         if (user?.roles?.includes('organizer')) {
           console.log('✅ [Login] Redirecting to organizer onboarding');
-          navigate('/onboarding-brand-info', { replace: true });
+          // Use setTimeout to ensure navigation happens after state updates
+          setTimeout(() => {
+            navigate('/onboarding-brand-info', { replace: true });
+          }, 100);
         } else {
           console.log('✅ [Login] Redirecting to attendee onboarding');
-          navigate('/onboarding-interests', { replace: true });
+          setTimeout(() => {
+            navigate('/onboarding-interests', { replace: true });
+          }, 100);
         }
         return;
       }
