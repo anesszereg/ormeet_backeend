@@ -29,7 +29,10 @@ const Register = () => {
     });
     
     // Clear error when user starts typing
-    if (error) setError('');
+    if (error) {
+      console.log('Clearing error on input change');
+      setError('');
+    }
   };
 
   const handlePhoneChange = (fullPhone: string) => {
@@ -39,7 +42,10 @@ const Register = () => {
     });
     
     // Clear error when user starts typing
-    if (error) setError('');
+    if (error) {
+      console.log('Clearing error on phone change');
+      setError('');
+    }
   };
 
   const { register } = useAuth();
@@ -76,6 +82,7 @@ const Register = () => {
       setShowSuccess(true);
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      console.log('Setting error:', errorMessage);
       setError(errorMessage);
       console.error('Registration error:', err);
     } finally {

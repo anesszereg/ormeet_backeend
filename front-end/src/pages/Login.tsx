@@ -19,13 +19,27 @@ const Login = () => {
 
   const handlePhoneChange = (fullPhone: string) => {
     setPhone(fullPhone);
-    if (error) setError(''); // Clear error when user starts typing
+    if (error) {
+      console.log('Clearing error on phone change');
+      setError('');
+    }
   };
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     if (field === 'email') setEmail(value);
     if (field === 'password') setPassword(value);
-    if (error) setError(''); // Clear error when user starts typing
+    if (error) {
+      console.log('Clearing error on input change');
+      setError('');
+    }
+  };
+
+  const handleLoginMethodChange = (method: 'email' | 'phone') => {
+    setLoginMethod(method);
+    if (error) {
+      console.log('Clearing error on login method change');
+      setError('');
+    }
   };
 
   const { login } = useAuth();
@@ -72,6 +86,7 @@ const Login = () => {
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please try again.';
+      console.log('Setting error:', errorMessage);
       setError(errorMessage);
       console.error('Login error:', err);
     } finally {
@@ -113,7 +128,7 @@ const Login = () => {
                   ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
                   : 'border-[#EEEEEE] bg-white text-[#4F4F4F] hover:border-[#FF4000] hover:text-[#FF4000]'
               }`}
-              onClick={() => setLoginMethod('email')}
+              onClick={() => handleLoginMethodChange('email')}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
@@ -127,7 +142,7 @@ const Login = () => {
                   ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
                   : 'border-[#EEEEEE] bg-white text-[#4F4F4F] hover:border-[#FF4000] hover:text-[#FF4000]'
               }`}
-              onClick={() => setLoginMethod('phone')}
+              onClick={() => handleLoginMethodChange('phone')}
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M5 2h10a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
