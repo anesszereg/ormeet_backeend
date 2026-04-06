@@ -168,7 +168,61 @@ class AuthService {
 
   private setAuthData(token: string, user: User): void {
     localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    
+    // Sanitize user object before storing to prevent quota exceeded errors
+    const sanitizedUser = this.sanitizeUserForStorage(user);
+    
+    try {
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+        console.error('❌ localStorage quota exceeded. Clearing old data and retrying...');
+        // Clear localStorage and try again with minimal data
+        localStorage.clear();
+        localStorage.setItem('token', token);
+        // Store only essential user data
+        const minimalUser = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          roles: user.roles,
+          emailVerified: user.emailVerified,
+        };
+        localStorage.setItem('user', JSON.stringify(minimalUser));
+      } else {
+        throw error;
+      }
+    }
+  }
+  
+  private sanitizeUserForStorage(user: User): User {
+    // Remove any relations or large objects that might be included
+    const sanitized: any = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      roles: user.roles,
+      emailVerified: user.emailVerified,
+      phoneVerified: user.phoneVerified,
+      organizationId: user.organizationId,
+      interestedEventCategories: user.interestedEventCategories,
+      hostingEventTypes: user.hostingEventTypes,
+      bio: user.bio,
+      avatarUrl: user.avatarUrl,
+      metadata: user.metadata,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    
+    // Remove any undefined values to reduce size
+    Object.keys(sanitized).forEach(key => {
+      if (sanitized[key] === undefined) {
+        delete sanitized[key];
+      }
+    });
+    
+    return sanitized;
   }
 
   private clearAuthData(): void {
@@ -209,7 +263,7 @@ class AuthService {
     return response.data;
   }
 
-  async getMe(): Promise<User> {
+  async getCurrentUserFromServer(): Promise<User> {
     console.log('🔍 [AuthService] Fetching /users/me from backend...');
     const response = await api.get<User>('/users/me');
     console.log('✅ [AuthService] Received user from backend:', response.data);
@@ -217,7 +271,8 @@ class AuthService {
     console.log('👤 [AuthService] User name:', response.data.name);
     console.log('🎭 [AuthService] User roles:', response.data.roles);
     // Sync localStorage with fresh server data
-    localStorage.setItem('user', JSON.stringify(response.data));
+    const sanitizedUser = this.sanitizeUserForStorage(response.data);
+    localStorage.setItem('user', JSON.stringify(sanitizedUser));
     console.log('💾 [AuthService] Updated localStorage with fresh user data');
     return response.data;
   }
@@ -230,7 +285,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, ...response.data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -241,7 +297,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, email: response.data.email, emailVerified: false };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -252,7 +309,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, ...response.data };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -263,7 +321,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, phone: response.data.phone, phoneVerified: false };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -279,7 +338,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, metadata: response.data.metadata };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -290,7 +350,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, interestedEventCategories: response.data.interestedEventCategories };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }
@@ -301,7 +362,8 @@ class AuthService {
     const currentUser = this.getCurrentUser();
     if (currentUser) {
       const updatedUser = { ...currentUser, hostingEventTypes: response.data.hostingEventTypes };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
+      localStorage.setItem('user', JSON.stringify(sanitizedUser));
     }
     return response.data;
   }

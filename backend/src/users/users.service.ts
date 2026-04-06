@@ -169,10 +169,16 @@ export class UsersService {
 
   private sanitizeUser(user: User): User {
     const sanitized = { ...user };
+    // Remove sensitive fields
     delete (sanitized as any).passwordHash;
     delete (sanitized as any).emailVerificationToken;
     delete (sanitized as any).passwordResetToken;
     delete (sanitized as any).passwordResetExpires;
+    // Remove relations to prevent localStorage quota exceeded error
+    delete (sanitized as any).orders;
+    delete (sanitized as any).tickets;
+    delete (sanitized as any).reviews;
+    delete (sanitized as any).organization;
     return sanitized;
   }
 }
