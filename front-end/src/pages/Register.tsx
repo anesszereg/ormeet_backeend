@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
@@ -15,11 +15,19 @@ const Register = () => {
     password: '',
     confirmPassword: '',
   });
-  const [selectedRole, setSelectedRole] = useState<'attendee' | 'organizer'>('attendee');
+  const [userType, setUserType] = useState<'attend' | 'organize'>('attend');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Read user type from localStorage on component mount
+  useEffect(() => {
+    const storedUserType = localStorage.getItem('userType') as 'attend' | 'organize' | null;
+    if (storedUserType) {
+      setUserType(storedUserType);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -72,13 +80,19 @@ const Register = () => {
     setIsLoading(true);
 
     try {
+      // Determine role based on user type selected in onboarding-choice
+      const role = userType === 'organize' ? 'organizer' : 'attendee';
+      
       await register({
         name: `${formData.firstName} ${formData.familyName}`,
         email: formData.email,
         phone: formData.phone || undefined,
         password: formData.password,
-        roles: [selectedRole],
+        roles: [role],
       });
+      
+      // Clear userType from localStorage after successful registration
+      localStorage.removeItem('userType');
       
       setShowSuccess(true);
     } catch (err: any) {
@@ -231,35 +245,6 @@ const Register = () => {
                 required
                 className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
               />
-            </div>
-
-            {/* Role Selection */}
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-black">I want to join as <span className="text-[#FF4000]">*</span></label>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('attendee')}
-                  className={`flex-1 px-4 py-3.5 border-[1.5px] rounded-lg text-sm font-medium transition-all ${
-                    selectedRole === 'attendee'
-                      ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
-                      : 'border-[#EEEEEE] bg-white text-[#4F4F4F] hover:border-[#FF4000] hover:text-[#FF4000]'
-                  }`}
-                >
-                  Attendee
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setSelectedRole('organizer')}
-                  className={`flex-1 px-4 py-3.5 border-[1.5px] rounded-lg text-sm font-medium transition-all ${
-                    selectedRole === 'organizer'
-                      ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
-                      : 'border-[#EEEEEE] bg-white text-[#4F4F4F] hover:border-[#FF4000] hover:text-[#FF4000]'
-                  }`}
-                >
-                  Organizer
-                </button>
-              </div>
             </div>
 
             <div className="flex items-start">
