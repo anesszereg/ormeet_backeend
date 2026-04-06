@@ -132,7 +132,7 @@ async function seed() {
         endAt: new Date('2025-06-21T23:00:00'),
         capacity: 300,
         tickets: [
-          { title: 'General Admission', price: 45, quantity: 200, type: TicketTypeEnum.GENERAL },
+          { title: 'General Admission', price: 45, quantity: 200, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP', price: 120, quantity: 50, type: TicketTypeEnum.VIP },
           { title: 'Early Bird', price: 35, quantity: 50, type: TicketTypeEnum.EARLY_BIRD },
         ],
@@ -149,7 +149,7 @@ async function seed() {
         endAt: new Date('2025-08-03T02:00:00'),
         capacity: 300,
         tickets: [
-          { title: 'General Admission', price: 55, quantity: 200, type: TicketTypeEnum.GENERAL },
+          { title: 'General Admission', price: 55, quantity: 200, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP Table', price: 500, quantity: 20, type: TicketTypeEnum.VIP },
         ],
       },
@@ -165,7 +165,7 @@ async function seed() {
         endAt: new Date('2025-05-26T22:00:00'),
         capacity: 300,
         tickets: [
-          { title: 'Standard', price: 85, quantity: 250, type: TicketTypeEnum.GENERAL },
+          { title: 'Standard', price: 85, quantity: 250, type: TicketTypeEnum.STANDARD },
           { title: 'Premium', price: 150, quantity: 50, type: TicketTypeEnum.VIP },
         ],
       },
@@ -182,9 +182,9 @@ async function seed() {
         endAt: new Date('2025-06-22T18:00:00'),
         capacity: 800,
         tickets: [
-          { title: 'In-Person', price: 299, quantity: 200, type: TicketTypeEnum.GENERAL },
-          { title: 'Virtual', price: 99, quantity: 500, type: TicketTypeEnum.GENERAL },
-          { title: 'Student', price: 49, quantity: 100, type: TicketTypeEnum.EARLY_BIRD },
+          { title: 'In-Person', price: 299, quantity: 200, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Virtual', price: 99, quantity: 500, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Student', price: 49, quantity: 100, type: TicketTypeEnum.STUDENT },
         ],
       },
       {
@@ -199,7 +199,7 @@ async function seed() {
         endAt: new Date('2025-08-02T21:00:00'),
         capacity: 150,
         tickets: [
-          { title: 'General', price: 25, quantity: 100, type: TicketTypeEnum.GENERAL },
+          { title: 'General', price: 25, quantity: 100, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'Investor Pass', price: 100, quantity: 50, type: TicketTypeEnum.VIP },
         ],
       },
@@ -216,7 +216,7 @@ async function seed() {
         capacity: 500,
         tickets: [
           { title: 'Early Bird', price: 75, quantity: 200, type: TicketTypeEnum.EARLY_BIRD },
-          { title: 'General', price: 100, quantity: 300, type: TicketTypeEnum.GENERAL },
+          { title: 'General', price: 100, quantity: 300, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
       {
@@ -232,7 +232,7 @@ async function seed() {
         capacity: 1000,
         tickets: [
           { title: 'VIP', price: 250, quantity: 100, type: TicketTypeEnum.VIP },
-          { title: 'General', price: 75, quantity: 900, type: TicketTypeEnum.GENERAL },
+          { title: 'General', price: 75, quantity: 900, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
       {
@@ -248,7 +248,7 @@ async function seed() {
         capacity: 400,
         tickets: [
           { title: 'Early Bird', price: 199, quantity: 100, type: TicketTypeEnum.EARLY_BIRD },
-          { title: 'General', price: 299, quantity: 300, type: TicketTypeEnum.GENERAL },
+          { title: 'General', price: 299, quantity: 300, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
     ];

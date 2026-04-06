@@ -67,10 +67,10 @@ async function seed() {
         capacity: 50000,
         images: ['https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3'],
         tickets: [
-          { title: 'General Admission - 3 Day Pass', price: 299, quantity: 30000, type: TicketTypeEnum.GENERAL },
+          { title: 'General Admission - 3 Day Pass', price: 299, quantity: 30000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP - 3 Day Pass', price: 799, quantity: 5000, type: TicketTypeEnum.VIP },
           { title: 'Early Bird - 3 Day Pass', price: 249, quantity: 10000, type: TicketTypeEnum.EARLY_BIRD },
-          { title: 'Single Day Pass', price: 129, quantity: 5000, type: TicketTypeEnum.GENERAL },
+          { title: 'Single Day Pass', price: 129, quantity: 5000, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
       {
@@ -94,9 +94,9 @@ async function seed() {
         capacity: 5000,
         images: ['https://images.unsplash.com/photo-1540575467063-178a50c2df87'],
         tickets: [
-          { title: 'In-Person Pass', price: 899, quantity: 2000, type: TicketTypeEnum.GENERAL },
-          { title: 'Virtual Pass', price: 299, quantity: 2500, type: TicketTypeEnum.GENERAL },
-          { title: 'Student Pass', price: 199, quantity: 500, type: TicketTypeEnum.EARLY_BIRD },
+          { title: 'In-Person Pass', price: 899, quantity: 2000, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Virtual Pass', price: 299, quantity: 2500, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Student Pass', price: 199, quantity: 500, type: TicketTypeEnum.STUDENT },
         ],
       },
       {
@@ -119,10 +119,10 @@ async function seed() {
         capacity: 10000,
         images: ['https://images.unsplash.com/photo-1414235077428-338989a2e8c0'],
         tickets: [
-          { title: 'Weekend Pass', price: 175, quantity: 5000, type: TicketTypeEnum.GENERAL },
+          { title: 'Weekend Pass', price: 175, quantity: 5000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP Tasting Pass', price: 350, quantity: 2000, type: TicketTypeEnum.VIP },
-          { title: 'Saturday Only', price: 95, quantity: 2000, type: TicketTypeEnum.GENERAL },
-          { title: 'Sunday Only', price: 95, quantity: 1000, type: TicketTypeEnum.GENERAL },
+          { title: 'Saturday Only', price: 95, quantity: 2000, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Sunday Only', price: 95, quantity: 1000, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
       {
@@ -145,8 +145,8 @@ async function seed() {
         capacity: 15000,
         images: ['https://images.unsplash.com/photo-1452626038306-9aae5e071dd3'],
         tickets: [
-          { title: 'Marathon Entry', price: 85, quantity: 5000, type: TicketTypeEnum.GENERAL },
-          { title: '5K Entry', price: 35, quantity: 8000, type: TicketTypeEnum.GENERAL },
+          { title: 'Marathon Entry', price: 85, quantity: 5000, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: '5K Entry', price: 35, quantity: 8000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'Early Bird Marathon', price: 65, quantity: 2000, type: TicketTypeEnum.EARLY_BIRD },
         ],
       },
@@ -170,8 +170,8 @@ async function seed() {
         capacity: 130000,
         images: ['https://images.unsplash.com/photo-1608889476561-6242cfdbf622'],
         tickets: [
-          { title: '4-Day Pass', price: 275, quantity: 50000, type: TicketTypeEnum.GENERAL },
-          { title: 'Single Day Pass', price: 85, quantity: 60000, type: TicketTypeEnum.GENERAL },
+          { title: '4-Day Pass', price: 275, quantity: 50000, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Single Day Pass', price: 85, quantity: 60000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP Experience', price: 1200, quantity: 5000, type: TicketTypeEnum.VIP },
           { title: 'Preview Night', price: 65, quantity: 15000, type: TicketTypeEnum.EARLY_BIRD },
         ],
@@ -196,9 +196,9 @@ async function seed() {
         capacity: 100,
         images: ['https://images.unsplash.com/photo-1506126613408-eca07ce68773'],
         tickets: [
-          { title: 'Shared Accommodation', price: 450, quantity: 60, type: TicketTypeEnum.GENERAL },
+          { title: 'Shared Accommodation', price: 450, quantity: 60, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'Private Room', price: 750, quantity: 30, type: TicketTypeEnum.VIP },
-          { title: 'Day Pass (No Accommodation)', price: 150, quantity: 10, type: TicketTypeEnum.GENERAL },
+          { title: 'Day Pass (No Accommodation)', price: 150, quantity: 10, type: TicketTypeEnum.GENERAL_ADMISSION },
         ],
       },
       {
@@ -221,7 +221,7 @@ async function seed() {
         capacity: 200,
         images: ['https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f'],
         tickets: [
-          { title: 'General Seating', price: 65, quantity: 120, type: TicketTypeEnum.GENERAL },
+          { title: 'General Seating', price: 65, quantity: 120, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'Premium Table', price: 150, quantity: 40, type: TicketTypeEnum.VIP },
           { title: 'VIP Front Row', price: 250, quantity: 20, type: TicketTypeEnum.VIP },
           { title: 'Dinner & Show Package', price: 195, quantity: 20, type: TicketTypeEnum.VIP },
@@ -247,8 +247,8 @@ async function seed() {
         capacity: 150,
         images: ['https://images.unsplash.com/photo-1559136555-9303baea8ebd'],
         tickets: [
-          { title: 'Founder Pass', price: 599, quantity: 100, type: TicketTypeEnum.GENERAL },
-          { title: 'Team Pass (3 people)', price: 1499, quantity: 30, type: TicketTypeEnum.GENERAL },
+          { title: 'Founder Pass', price: 599, quantity: 100, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Team Pass (3 people)', price: 1499, quantity: 30, type: TicketTypeEnum.GROUP },
           { title: 'Early Bird', price: 449, quantity: 20, type: TicketTypeEnum.EARLY_BIRD },
         ],
       },
@@ -272,10 +272,10 @@ async function seed() {
         capacity: 300,
         images: ['https://images.unsplash.com/photo-1531243269054-5ebf6f34081e'],
         tickets: [
-          { title: 'General Admission', price: 45, quantity: 200, type: TicketTypeEnum.GENERAL },
+          { title: 'General Admission', price: 45, quantity: 200, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP Preview', price: 125, quantity: 50, type: TicketTypeEnum.VIP },
           { title: 'Patron Circle', price: 500, quantity: 30, type: TicketTypeEnum.VIP },
-          { title: 'Student/Senior', price: 25, quantity: 20, type: TicketTypeEnum.EARLY_BIRD },
+          { title: 'Student/Senior', price: 25, quantity: 20, type: TicketTypeEnum.STUDENT },
         ],
       },
       {
@@ -298,7 +298,7 @@ async function seed() {
         capacity: 100000,
         images: ['https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3'],
         tickets: [
-          { title: '2-Day GA Pass', price: 349, quantity: 70000, type: TicketTypeEnum.GENERAL },
+          { title: '2-Day GA Pass', price: 349, quantity: 70000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: '2-Day VIP Pass', price: 899, quantity: 15000, type: TicketTypeEnum.VIP },
           { title: 'Early Bird GA', price: 279, quantity: 10000, type: TicketTypeEnum.EARLY_BIRD },
           { title: 'Platinum Experience', price: 2499, quantity: 5000, type: TicketTypeEnum.VIP },
@@ -324,8 +324,8 @@ async function seed() {
         capacity: 25000,
         images: ['https://images.unsplash.com/photo-1535223289827-42f1e9919769'],
         tickets: [
-          { title: '3-Day Pass', price: 129, quantity: 15000, type: TicketTypeEnum.GENERAL },
-          { title: 'Single Day', price: 55, quantity: 8000, type: TicketTypeEnum.GENERAL },
+          { title: '3-Day Pass', price: 129, quantity: 15000, type: TicketTypeEnum.GENERAL_ADMISSION },
+          { title: 'Single Day', price: 55, quantity: 8000, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'VIP All Access', price: 299, quantity: 2000, type: TicketTypeEnum.VIP },
         ],
       },
@@ -349,7 +349,7 @@ async function seed() {
         capacity: 30,
         images: ['https://images.unsplash.com/photo-1452587925148-ce544e77e70d'],
         tickets: [
-          { title: 'Workshop + Camping', price: 799, quantity: 20, type: TicketTypeEnum.GENERAL },
+          { title: 'Workshop + Camping', price: 799, quantity: 20, type: TicketTypeEnum.GENERAL_ADMISSION },
           { title: 'Workshop + Hotel', price: 1299, quantity: 10, type: TicketTypeEnum.VIP },
         ],
       },
