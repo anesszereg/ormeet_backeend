@@ -585,7 +585,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
     // Map event type
     const locationType = formData.eventType === 'in-person' ? 'physical' : 
-                         formData.eventType === 'online' ? 'online' : 'tba';
+                         formData.eventType === 'online' ? 'online' : 'to_be_announced';
 
     // Map tickets
     const tickets = formData.tickets
