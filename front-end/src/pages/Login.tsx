@@ -85,8 +85,9 @@ const Login = () => {
         if (user?.roles?.includes('organizer')) {
           console.log('✅ [Login] Redirecting to organizer onboarding');
           // Use setTimeout to ensure navigation happens after state updates
+          // For organizers who already registered, start with interests page
           setTimeout(() => {
-            navigate('/onboarding-brand-info', { replace: true });
+            navigate('/onboarding-interests', { replace: true });
           }, 100);
         } else {
           console.log('✅ [Login] Redirecting to attendee onboarding');

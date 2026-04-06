@@ -51,7 +51,7 @@ const eventCategories: EventCategory[] = [
 
 const OnboardingInterests = () => {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { refreshUser, user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('music');
   const [selectedSubtypes, setSelectedSubtypes] = useState<string[]>([]);
   const [categoryStartIndex, setCategoryStartIndex] = useState(0);
@@ -106,8 +106,13 @@ const OnboardingInterests = () => {
       // Refresh user data in context
       await refreshUser();
 
-      // Redirect to attendee dashboard
-      navigate('/dashboard-attendee', { replace: true });
+      // Check if user is organizer - if so, redirect to brand info page
+      if (user?.roles?.includes('organizer')) {
+        navigate('/onboarding-brand-info', { replace: true });
+      } else {
+        // Redirect to attendee dashboard
+        navigate('/dashboard-attendee', { replace: true });
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to save interests. Please try again.';
       setError(errorMessage);
