@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-
-interface CityCard {
-  id: number;
-  name: string;
-  price: string;
-  image: string;
-}
+import type { CityCard } from "@/types";
+import { FRONTEND_ORIGIN } from "@/lib/constants";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationControls from "@/components/ui/PaginationControls";
 
 const allCityPages: CityCard[][] = [
   [
@@ -34,11 +30,8 @@ const allCityPages: CityCard[][] = [
 const TOTAL_PAGES = allCityPages.length;
 
 const BigCities = () => {
-  const [page, setPage] = useState(1);
+  const { page, handlePrev, handleNext } = usePagination({ totalPages: TOTAL_PAGES });
   const currentCities = allCityPages[page - 1];
-
-  const handlePrev = () => setPage((p) => (p > 1 ? p - 1 : p));
-  const handleNext = () => setPage((p) => (p < TOTAL_PAGES ? p + 1 : p));
 
   return (
     <section className="w-full bg-white py-16 px-6 md:px-10 lg:px-16 xl:px-20">
@@ -52,44 +45,17 @@ const BigCities = () => {
 
         {/* Right: Description + Pagination */}
         <div className="flex flex-col items-start lg:items-end gap-4">
-          <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed max-w-md lg:text-right">
+          <p className="text-sm md:text-base text-muted leading-relaxed max-w-md lg:text-right">
             Where&apos;s the fun happening? Just pick a city and find
             out! Discover events, meetups, and unforgettable
             experiences.
           </p>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handlePrev}
-              disabled={page === 1}
-              className={`w-10 h-10 flex items-center justify-center rounded-full border border-[#EEEEEE] transition-colors ${
-                page === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#F8F8F8] cursor-pointer"
-              }`}
-              aria-label="Previous page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8L10 4" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <span className="text-sm text-[#757575]">
-              {page} of {TOTAL_PAGES}
-            </span>
-            <button
-              onClick={handleNext}
-              disabled={page === TOTAL_PAGES}
-              className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
-                page === TOTAL_PAGES
-                  ? "bg-gray-400 opacity-50 cursor-not-allowed"
-                  : "bg-black hover:bg-[#333333] cursor-pointer"
-              }`}
-              aria-label="Next page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 4L10 8L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
+          <PaginationControls
+            page={page}
+            totalPages={TOTAL_PAGES}
+            onPrev={handlePrev}
+            onNext={handleNext}
+          />
         </div>
       </div>
 
@@ -99,6 +65,7 @@ const BigCities = () => {
           <div
             key={city.id}
             className="relative group cursor-pointer rounded-2xl overflow-hidden"
+            onClick={() => window.open(`${FRONTEND_ORIGIN}/search-results?location=${encodeURIComponent(city.name)}`, "_blank", "noopener,noreferrer")}
           >
             {/* Image */}
             <div className="relative w-full h-[320px] sm:h-[360px] lg:h-[400px]">
@@ -114,8 +81,8 @@ const BigCities = () => {
             </div>
 
             {/* Price badge top-right */}
-            <div className="absolute top-3 right-3 bg-white border border-[#EEEEEE] rounded-full px-3 py-1.5 flex items-center gap-1">
-              <span className="text-xs text-[#757575]">From</span>
+            <div className="absolute top-3 right-3 bg-white border border-light-gray rounded-full px-3 py-1.5 flex items-center gap-1">
+              <span className="text-xs text-medium-gray">From</span>
               <span className="text-sm font-bold text-black">{city.price}</span>
             </div>
 

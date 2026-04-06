@@ -11,7 +11,7 @@
 
   --color-black: #000000;
   --color-dark-gray: #434343;
-  --color-gray: #4F4F4F;
+  --color-muted: #4F4F4F;
   --color-light-gray: #EEEEEE;
   --color-input-gray: #BCBCBC;
   --color-medium-gray: #757575;
@@ -20,5 +20,4 @@
 body {
   background: #ffffff;
   color: #000000;
-  font-family: 'Poppins', sans-serif;
 }

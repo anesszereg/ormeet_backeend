@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
+
+import { useSearchParams } from 'react-router-dom';
+
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import LangueIcon from '../assets/Svgs/navbar/langue.svg';
 import LocationSearchIcon from '../assets/Svgs/searchResult/locationSearch.svg';
@@ -12,13 +16,17 @@ const locationSuggestions = ['California', 'Los Angeles', 'San Francisco', 'San 
 const eventTypeSuggestions = ['Music', 'Music Festival', 'Music Concert', 'Live Music', 'Classical Music'];
 
 const SearchResultNavbar = () => {
+
+  const [searchParams] = useSearchParams();
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('EN');
-  const [locationQuery, setLocationQuery] = useState('California');
-  const [eventTypeQuery, setEventTypeQuery] = useState('Music');
+  const [locationQuery, setLocationQuery] = useState(searchParams.get('location') || '');
+  const [eventTypeQuery, setEventTypeQuery] = useState(searchParams.get('event') || '');
   const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [showEventTypeSuggestions, setShowEventTypeSuggestions] = useState(false);
   

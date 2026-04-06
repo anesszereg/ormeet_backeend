@@ -1,8 +1,9 @@
 {
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev:landing": "cd landing-page && npm run dev",
+    "build:landing": "cd landing-page && npm run build",
+    "dev:frontend": "cd front-end && npm run dev",
+    "build:frontend": "cd front-end && npm run build"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

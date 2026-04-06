@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import EventCarousel from "@/components/EventCarousel";
@@ -11,14 +14,16 @@ import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
 export default function Home() {
+  const [selectedCity, setSelectedCity] = useState("California");
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <HeroSection />
       <EventCarousel />
-      <DiscoverSection />
+      <DiscoverSection onCityChange={setSelectedCity} />
       <TrendingEvents />
-      <EventsInCalifornia />
+      <EventsInCalifornia selectedCity={selectedCity} />
       <FindYourVibe />
       <BigCities />
       <Testimonials />
