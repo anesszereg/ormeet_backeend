@@ -27,6 +27,9 @@ const Register = () => {
       ...formData,
       [name]: value,
     });
+    
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handlePhoneChange = (fullPhone: string) => {
@@ -34,13 +37,15 @@ const Register = () => {
       ...formData,
       phone: fullPhone,
     });
+    
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const { register } = useAuth();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');

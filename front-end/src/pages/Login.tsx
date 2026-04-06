@@ -19,6 +19,13 @@ const Login = () => {
 
   const handlePhoneChange = (fullPhone: string) => {
     setPhone(fullPhone);
+    if (error) setError(''); // Clear error when user starts typing
+  };
+
+  const handleInputChange = (field: 'email' | 'password', value: string) => {
+    if (field === 'email') setEmail(value);
+    if (field === 'password') setPassword(value);
+    if (error) setError(''); // Clear error when user starts typing
   };
 
   const { login } = useAuth();
@@ -34,7 +41,6 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     setIsLoading(true);
 
     try {
@@ -157,7 +163,7 @@ const Login = () => {
                   id="email"
                   placeholder="Enter your email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   required
                   className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
                 />
@@ -178,7 +184,7 @@ const Login = () => {
                 id="password"
                 placeholder="Enter your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handleInputChange('password', e.target.value)}
                 required
                 className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
               />
