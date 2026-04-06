@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -49,6 +51,7 @@ const eventCategories: EventCategory[] = [
 
 const OnboardingInterests = () => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('music');
   const [selectedSubtypes, setSelectedSubtypes] = useState<string[]>([]);
   const [categoryStartIndex, setCategoryStartIndex] = useState(0);
@@ -95,20 +98,20 @@ const OnboardingInterests = () => {
     setIsLoading(true);
 
     try {
-      const onboardingData = {
+      // Save interests to backend
+      await authService.updateInterests({
         interestedEventCategories: [selectedCategory, ...selectedSubtypes],
-      };
+      });
 
-      localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
-      localStorage.setItem('onboardingComplete', 'true');
-      localStorage.removeItem('userType');
+      // Refresh user data in context
+      await refreshUser();
 
       // Redirect to attendee dashboard
       navigate('/dashboard-attendee', { replace: true });
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to save data. Please try again.';
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to save interests. Please try again.';
       setError(errorMessage);
-      console.error('Save error:', err);
+      console.error('Failed to save interests:', err);
     } finally {
       setIsLoading(false);
     }

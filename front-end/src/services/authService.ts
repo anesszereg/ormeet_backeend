@@ -283,6 +283,28 @@ class AuthService {
     }
     return response.data;
   }
+
+  async updateInterests(data: { interestedEventCategories: string[] }): Promise<User> {
+    const response = await api.patch<User>('/users/me/interests', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, interestedEventCategories: response.data.interestedEventCategories };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
+  async updateHostingTypes(data: { hostingEventTypes: string[] }): Promise<User> {
+    const response = await api.patch<User>('/users/me/hosting-types', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, hostingEventTypes: response.data.hostingEventTypes };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
 }
 
 export default new AuthService();

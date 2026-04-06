@@ -64,14 +64,16 @@ const Login = () => {
       
       await login(credentials);
       
-      // Check if user has pending onboarding
-      const userType = localStorage.getItem('userType');
       const user = authService.getCurrentUser();
       
-      if (userType && !localStorage.getItem('onboardingComplete')) {
-        // User just registered and needs to complete onboarding
-        if (userType === 'organize') {
-          navigate('/onboarding-brand-info', { replace: true });
+      // Check if user needs onboarding (first time login)
+      // User needs onboarding if they don't have interests/hosting types set
+      const needsOnboarding = !user?.interestedEventCategories || user.interestedEventCategories.length === 0;
+      
+      if (needsOnboarding) {
+        // Redirect to onboarding based on role
+        if (user?.roles?.includes('organizer')) {
+          navigate('/onboarding-organizer', { replace: true });
         } else {
           navigate('/onboarding-interests', { replace: true });
         }

@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -21,6 +23,7 @@ const eventTypes = [
 
 const OnboardingBrandInfo = () => {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
   const [organisationName, setOrganisationName] = useState('');
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [eventsPerYear, setEventsPerYear] = useState('');
@@ -42,23 +45,27 @@ const OnboardingBrandInfo = () => {
     setIsLoading(true);
 
     try {
-      const onboardingData = {
-        organisationName,
+      // Save hosting event types to backend
+      await authService.updateHostingTypes({
         hostingEventTypes: selectedEventTypes,
-        eventsPerYear,
-        averageAttendees,
-      };
+      });
 
-      localStorage.setItem('onboardingData', JSON.stringify(onboardingData));
-      localStorage.setItem('onboardingComplete', 'true');
-      localStorage.removeItem('userType');
+      // Optionally save organization name and other metadata
+      if (organisationName) {
+        await authService.updateProfile({
+          bio: `${organisationName} - Events per year: ${eventsPerYear}, Avg attendees: ${averageAttendees}`,
+        });
+      }
+
+      // Refresh user data in context
+      await refreshUser();
 
       // Redirect to organizer dashboard
       navigate('/dashboard-organizer', { replace: true });
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || 'Failed to save data. Please try again.';
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to save brand info. Please try again.';
       setError(errorMessage);
-      console.error('Save error:', err);
+      console.error('Failed to save brand info:', err);
     } finally {
       setIsLoading(false);
     }
