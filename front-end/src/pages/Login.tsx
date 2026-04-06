@@ -68,12 +68,14 @@ const Login = () => {
       
       // Check if user needs onboarding (first time login)
       // User needs onboarding if they don't have interests/hosting types set
-      const needsOnboarding = !user?.interestedEventCategories || user.interestedEventCategories.length === 0;
+      const needsOnboarding = user?.roles?.includes('organizer') 
+        ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
+        : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       
       if (needsOnboarding) {
         // Redirect to onboarding based on role
         if (user?.roles?.includes('organizer')) {
-          navigate('/onboarding-organizer', { replace: true });
+          navigate('/onboarding-brand-info', { replace: true });
         } else {
           navigate('/onboarding-interests', { replace: true });
         }
