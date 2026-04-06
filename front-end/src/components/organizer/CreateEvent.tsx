@@ -581,7 +581,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       .filter(t => t.type && t.quantity)
       .map(t => ({
         name: t.type,
-        type: t.type.toLowerCase().replace(/\s+/g, '_') as 'general' | 'vip' | 'early_bird' | 'student' | 'group' | 'premium',
+        type: t.type, // Send the ticket type as-is (e.g., 'General Admission', 'VIP', etc.)
         quantityTotal: parseInt(t.quantity) || 0,
         price: t.priceType === 'free' ? 0 : parseFloat(t.price) || 0,
       }));
