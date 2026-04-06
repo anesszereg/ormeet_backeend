@@ -36,10 +36,14 @@ const SearchResultNavbar = () => {
   const eventTypeInputRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = () => {
-    if (locationQuery.trim() || eventTypeQuery.trim()) {
-      console.log('Searching for:', { location: locationQuery, eventType: eventTypeQuery });
-      // TODO: Implement actual search logic
+    const params = new URLSearchParams();
+    if (locationQuery.trim()) {
+      params.set('location', locationQuery.trim());
     }
+    if (eventTypeQuery.trim()) {
+      params.set('category', eventTypeQuery.trim());
+    }
+    navigate(`/browse-events?${params.toString()}`);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

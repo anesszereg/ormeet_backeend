@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import SearchResultNavbar from '../components/SearchResultNavbar';
 import EventCard from '../components/EventCard';
 import EventListCard from '../components/EventListCard';
@@ -40,7 +41,11 @@ const SearchResult = () => {
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [selectedMapEvent, setSelectedMapEvent] = useState<MappedEvent | null>(null);
   const [events, setEvents] = useState<MappedEvent[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<MappedEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const searchCategory = searchParams.get('category') || '';
+  const searchLocation = searchParams.get('location') || '';
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -61,6 +66,7 @@ const SearchResult = () => {
           };
         });
         setEvents(mapped);
+        setFilteredEvents(mapped);
       } catch (err) {
         console.error('Failed to fetch events:', err);
       } finally {
@@ -69,6 +75,46 @@ const SearchResult = () => {
     };
     fetchEvents();
   }, []);
+
+  // Filter events based on search params and filters
+  useEffect(() => {
+    let filtered = [...events];
+
+    // Filter by search category
+    if (searchCategory) {
+      filtered = filtered.filter(event => 
+        event.title.toLowerCase().includes(searchCategory.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchCategory.toLowerCase())
+      );
+    }
+
+    // Filter by selected categories from sidebar
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(event =>
+        selectedCategories.some(cat => 
+          event.title.toLowerCase().includes(cat.toLowerCase()) ||
+          event.description.toLowerCase().includes(cat.toLowerCase())
+        )
+      );
+    }
+
+    // Filter by price range
+    filtered = filtered.filter(event => {
+      if (event.price === 'Free') return priceRange.min === 0;
+      const price = parseFloat(event.price.replace('$', ''));
+      return price >= priceRange.min && price <= priceRange.max;
+    });
+
+    // Filter by location (if needed)
+    if (searchLocation && selectedLocation !== 'Oran') {
+      filtered = filtered.filter(event =>
+        event.venue.toLowerCase().includes(searchLocation.toLowerCase()) ||
+        event.venue.toLowerCase().includes(selectedLocation.toLowerCase())
+      );
+    }
+
+    setFilteredEvents(filtered);
+  }, [events, searchCategory, searchLocation, selectedCategories, priceRange, selectedLocation]);
 
   const categories = ['Music', 'Sports', 'Business', 'Arts', 'Food & Drink', 'Health', 'Technology', 'Fashion'];
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 4);
@@ -274,7 +320,7 @@ const SearchResult = () => {
             {/* Header with results count and view controls */}
             <div className="flex items-center justify-between mb-7">
               <h1 className="text-xl md:text-lg font-semibold text-black">
-                {events.length} Results <span className="font-normal text-[#757575]">for Music</span>
+                {filteredEvents.length} Results {searchCategory && <span className="font-normal text-[#757575]">for {searchCategory}</span>}
               </h1>
 
               {/* View controls */}
@@ -342,11 +388,20 @@ const SearchResult = () => {
                 <div className="col-span-full flex items-center justify-center py-20">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
                 </div>
-              ) : events.length === 0 ? (
+              ) : filteredEvents.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-20">
-                  <p className="text-[#757575] text-sm">No events found.</p>
+                  <p className="text-[#757575] text-sm">No events found matching your criteria.</p>
+                  <button 
+                    onClick={() => {
+                      setSelectedCategories([]);
+                      setPriceRange({ min: 0, max: 300 });
+                    }}
+                    className="mt-4 px-4 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
+                  >
+                    Clear Filters
+                  </button>
                 </div>
-              ) : events.map((event) => (
+              ) : filteredEvents.map((event) => (
                 viewMode === 'list' ? (
                   <div key={event.id} className="w-full">
                     {/* Petits écrans (<1024px): Toujours EventCard vertical - Image en haut, infos en bas */}
@@ -449,7 +504,7 @@ const SearchResult = () => {
             </div>
 
             {/* Event Map Card - Displayed when marker is clicked */}
-            {selectedMapEvent && (
+            {selectedMapEvent && filteredEvents.some(e => e.id === selectedMapEvent.id) && (
               <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50">
                 <EventMapCard
                   eventId={selectedMapEvent.id}
@@ -465,31 +520,39 @@ const SearchResult = () => {
               </div>
             )}
 
-            {/* Price markers */}
-            <button 
-              onClick={() => events[1] && setSelectedMapEvent(events[1])}
-              className="absolute top-20 left-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $37.99
-            </button>
-            <button 
-              onClick={() => events[5] && setSelectedMapEvent(events[5])}
-              className="absolute top-32 left-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $40.99
-            </button>
-            <button 
-              onClick={() => events[0] && setSelectedMapEvent(events[0])}
-              className="absolute bottom-32 right-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $65.99
-            </button>
-            <button 
-              onClick={() => events[4] && setSelectedMapEvent(events[4])}
-              className="absolute bottom-56 left-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
-            >
-              from $40.99
-            </button>
+            {/* Price markers - Only show for filtered events */}
+            {filteredEvents[1] && (
+              <button 
+                onClick={() => setSelectedMapEvent(filteredEvents[1])}
+                className="absolute top-20 left-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+              >
+                {filteredEvents[1].price}
+              </button>
+            )}
+            {filteredEvents[5] && (
+              <button 
+                onClick={() => setSelectedMapEvent(filteredEvents[5])}
+                className="absolute top-32 left-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+              >
+                {filteredEvents[5].price}
+              </button>
+            )}
+            {filteredEvents[0] && (
+              <button 
+                onClick={() => setSelectedMapEvent(filteredEvents[0])}
+                className="absolute bottom-32 right-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+              >
+                {filteredEvents[0].price}
+              </button>
+            )}
+            {filteredEvents[4] && (
+              <button 
+                onClick={() => setSelectedMapEvent(filteredEvents[4])}
+                className="absolute bottom-56 left-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+              >
+                {filteredEvents[4].price}
+              </button>
+            )}
           </div>
         </div>
       </div>
