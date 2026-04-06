@@ -63,8 +63,12 @@ export interface User {
   roles: string[];
   emailVerified: boolean;
   phoneVerified?: boolean;
+  organizationId?: string;
   interestedEventCategories?: string[];
   hostingEventTypes?: string[];
+  bio?: string;
+  avatarUrl?: string;
+  metadata?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
 }
@@ -198,6 +202,86 @@ class AuthService {
   isPhoneVerified(): boolean {
     const user = this.getCurrentUser();
     return user?.phoneVerified || false;
+  }
+
+  async getProfile(): Promise<User> {
+    const response = await api.get<User>('/auth/profile');
+    return response.data;
+  }
+
+  async getMe(): Promise<User> {
+    console.log('🔍 [AuthService] Fetching /users/me from backend...');
+    const response = await api.get<User>('/users/me');
+    console.log('✅ [AuthService] Received user from backend:', response.data);
+    console.log('📧 [AuthService] User email:', response.data.email);
+    console.log('👤 [AuthService] User name:', response.data.name);
+    console.log('🎭 [AuthService] User roles:', response.data.roles);
+    // Sync localStorage with fresh server data
+    localStorage.setItem('user', JSON.stringify(response.data));
+    console.log('💾 [AuthService] Updated localStorage with fresh user data');
+    return response.data;
+  }
+
+  // ========== User Profile Updates ==========
+
+  async updateProfile(data: { name?: string; phone?: string; bio?: string; avatarUrl?: string }): Promise<User> {
+    const response = await api.patch<User>('/users/me/profile', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...response.data };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
+  async updateEmail(data: { newEmail: string; password: string }): Promise<User> {
+    const response = await api.patch<User>('/users/me/email', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, email: response.data.email, emailVerified: false };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
+  async addOrganizerRole(): Promise<User> {
+    const response = await api.patch<User>('/users/me/add-organizer-role');
+    // Update local storage with new roles
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...response.data };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
+  async updatePhone(data: { newPhone: string; password: string }): Promise<User> {
+    const response = await api.patch<User>('/users/me/phone', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, phone: response.data.phone, phoneVerified: false };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
+  }
+
+  async changePassword(data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
+    const response = await api.patch<{ message: string }>('/users/me/password', data);
+    return response.data;
+  }
+
+  async updateLocation(data: { country?: string; city?: string; address?: string }): Promise<User> {
+    const response = await api.patch<User>('/users/me/location', data);
+    // Update local storage
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, metadata: response.data.metadata };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+    return response.data;
   }
 }
 

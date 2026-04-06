@@ -91,13 +91,13 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
         </div>
 
         {/* Conditional: Profile icon with dropdown or Auth buttons */}
-        {isLoggedIn ? (
+        {isLoggedIn && user ? (
           <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
               className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#FF4000] transition-all"
             >
-              <img src={ProfileImage} alt="Profile" className="w-full h-full object-cover" />
+              <img src={user.avatarUrl || ProfileImage} alt="Profile" className="w-full h-full object-cover" />
             </button>
 
             {/* Profile Dropdown menu */}

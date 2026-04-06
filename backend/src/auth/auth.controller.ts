@@ -1,13 +1,20 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Query, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import type { Request } from 'express';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, SendVerificationCodeDto, VerifyCodeDto, LoginWithCodeDto } from './dto';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { FacebookAuthGuard } from './guards/facebook-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ 
@@ -71,6 +78,27 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Invalid input data' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns the current user profile',
+    schema: {
+      example: {
+        id: 'uuid',
+        name: 'John Doe',
+        email: 'john@example.com',
+        roles: ['attendee'],
+        emailVerified: true,
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getProfile(@Req() req: Request) {
+    return req.user;
   }
 
   @Post('login')
@@ -340,5 +368,63 @@ POST /auth/login-with-code
     const ipAddress = req.ip || req.headers['x-forwarded-for'] as string || req.socket.remoteAddress || 'Unknown';
     const userAgent = req.headers['user-agent'] || 'Unknown';
     return this.authService.loginWithCode(loginWithCodeDto, ipAddress, userAgent);
+  }
+
+  // ==================== GOOGLE OAUTH ====================
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  @ApiOperation({ summary: 'Initiate Google OAuth login' })
+  @ApiResponse({ status: 302, description: 'Redirects to Google login page' })
+  async googleAuth() {
+    // Guard redirects to Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  @ApiExcludeEndpoint()
+  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const oauthUser = req.user as {
+      email: string;
+      firstName: string;
+      lastName: string;
+      picture?: string;
+      provider: 'google';
+    };
+
+    const result = await this.authService.validateOAuthUser(oauthUser);
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    
+    // Redirect to frontend with token
+    res.redirect(`${frontendUrl}/oauth-callback?token=${result.token}&provider=google`);
+  }
+
+  // ==================== FACEBOOK OAUTH ====================
+
+  @Get('facebook')
+  @UseGuards(FacebookAuthGuard)
+  @ApiOperation({ summary: 'Initiate Facebook OAuth login' })
+  @ApiResponse({ status: 302, description: 'Redirects to Facebook login page' })
+  async facebookAuth() {
+    // Guard redirects to Facebook
+  }
+
+  @Get('facebook/callback')
+  @UseGuards(FacebookAuthGuard)
+  @ApiExcludeEndpoint()
+  async facebookAuthCallback(@Req() req: Request, @Res() res: Response) {
+    const oauthUser = req.user as {
+      email: string;
+      firstName: string;
+      lastName: string;
+      picture?: string;
+      provider: 'facebook';
+    };
+
+    const result = await this.authService.validateOAuthUser(oauthUser);
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:5173';
+    
+    // Redirect to frontend with token
+    res.redirect(`${frontendUrl}/oauth-callback?token=${result.token}&provider=facebook`);
   }
 }

@@ -13,9 +13,14 @@ import { Event } from './event.entity';
 import { Ticket } from './ticket.entity';
 
 export enum TicketTypeEnum {
-  GENERAL = 'general',
-  VIP = 'vip',
-  EARLY_BIRD = 'early-bird',
+  GENERAL_ADMISSION = 'General Admission',
+  VIP = 'VIP',
+  EARLY_BIRD = 'Early Bird',
+  STUDENT = 'Student',
+  GROUP = 'Group',
+  PREMIUM = 'Premium',
+  STANDARD = 'Standard',
+  OTHER = 'Other',
 }
 
 @Entity('ticket_types')
@@ -71,7 +76,7 @@ export class TicketType {
   @Column({
     type: 'enum',
     enum: TicketTypeEnum,
-    default: TicketTypeEnum.GENERAL,
+    default: TicketTypeEnum.GENERAL_ADMISSION,
   })
   type: TicketTypeEnum;
 

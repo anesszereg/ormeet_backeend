@@ -2,8 +2,13 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: string;
+  phone?: string;
+  roles: string[];
   emailVerified: boolean;
+  phoneVerified?: boolean;
+  organizationId?: string;
+  interestedEventCategories?: string[];
+  hostingEventTypes?: string[];
   createdAt: string;
   updatedAt: string;
 }

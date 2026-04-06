@@ -127,9 +127,20 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
         <div className="relative" ref={profileMenuRef}>
           <button
             onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-            className="w-10 h-10 rounded-full overflow-hidden cursor-pointer hover:ring-2 hover:ring-[#FF4000] transition-all"
+            className="flex items-center gap-2 cursor-pointer"
           >
-            <img src={ProfilePhoto} alt="Profile" className="w-full h-full object-cover" />
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="Profile" className="w-10 h-10 rounded-full object-cover hover:ring-2 hover:ring-[#FF4000] transition-all" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center hover:ring-2 hover:ring-[#FF4000] transition-all">
+                <span className="text-sm font-semibold text-primary">
+                  {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?'}
+                </span>
+              </div>
+            )}
+            <span className="hidden sm:block text-sm font-medium text-black max-w-[120px] truncate">
+              {user?.name || 'User'}
+            </span>
           </button>
 
           {/* Profile Dropdown menu */}
@@ -156,12 +167,34 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
               >
                 Profile
               </a>
-              <a
-                href="/dashboard-attendee"
-                className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
-              >
-                My Tickets
-              </a>
+              {/* Role-based Dashboard Links */}
+              {user?.roles?.includes('attendee') && (
+                <a
+                  href="/dashboard-attendee"
+                  className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+                >
+                  Attendee Dashboard
+                </a>
+              )}
+              {user?.roles?.includes('organizer') && (
+                <a
+                  href="/dashboard-organizer"
+                  className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+                >
+                  Organizer Dashboard
+                </a>
+              )}
+              
+              {/* Show "Become an Organizer" option if user is only attendee */}
+              {user?.roles?.length === 1 && user?.roles?.includes('attendee') && (
+                <a
+                  href="/host-events"
+                  className="block px-4 py-2.5 text-sm text-[#FF4000] font-medium hover:bg-[#FFF4F3] transition-colors"
+                >
+                  🎯 Become an Organizer
+                </a>
+              )}
+              
               <a
                 href="/settings"
                 className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"

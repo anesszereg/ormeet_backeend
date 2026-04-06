@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -13,6 +14,10 @@ import { OrdersModule } from './orders/orders.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { UsersModule } from './users/users.module';
+import { UploadModule } from './upload/upload.module';
+import { UserPreferencesModule } from './user-preferences/user-preferences.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import {
   User,
   Organization,
@@ -27,6 +32,9 @@ import {
   Review,
   Promotion,
   Media,
+  UserFavoriteEvent,
+  UserFollowingOrganizer,
+  Notification,
 } from './entities';
 
 @Module({
@@ -35,33 +43,75 @@ import {
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DATABASE_HOST'),
-        port: configService.get('DATABASE_PORT'),
-        username: configService.get('DATABASE_USERNAME'),
-        password: configService.get('DATABASE_PASSWORD'),
-        database: configService.get('DATABASE_NAME'),
-        entities: [
-          User,
-          Organization,
-          OrganizationInvitation,
-          VerificationCode,
-          Venue,
-          Event,
-          TicketType,
-          Order,
-          Ticket,
-          Attendance,
-          Review,
-          Promotion,
-          Media,
-        ],
-        synchronize: configService.get('NODE_ENV') === 'development',
-        logging: configService.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const databaseUrl = configService.get('DATABASE_URL');
+        const isProduction = configService.get('NODE_ENV') === 'production';
+        
+        // Support both DATABASE_URL and individual variables
+        if (databaseUrl) {
+          return {
+            type: 'postgres',
+            url: databaseUrl,
+            entities: [
+              User,
+              Organization,
+              OrganizationInvitation,
+              VerificationCode,
+              Venue,
+              Event,
+              TicketType,
+              Order,
+              Ticket,
+              Attendance,
+              Review,
+              Promotion,
+              Media,
+              UserFavoriteEvent,
+              UserFollowingOrganizer,
+              Notification,
+            ],
+            synchronize: !isProduction,
+            logging: !isProduction,
+            ssl: isProduction ? { rejectUnauthorized: false } : false,
+            extra: {
+              family: 4,
+            },
+          };
+        }
+        
+        return {
+          type: 'postgres',
+          host: configService.get('DATABASE_HOST'),
+          port: configService.get('DATABASE_PORT'),
+          username: configService.get('DATABASE_USERNAME'),
+          password: configService.get('DATABASE_PASSWORD'),
+          database: configService.get('DATABASE_NAME'),
+          entities: [
+            User,
+            Organization,
+            OrganizationInvitation,
+            VerificationCode,
+            Venue,
+            Event,
+            TicketType,
+            Order,
+            Ticket,
+            Attendance,
+            Review,
+            Promotion,
+            Media,
+            UserFavoriteEvent,
+            UserFollowingOrganizer,
+            Notification,
+          ],
+          synchronize: !isProduction,
+          logging: !isProduction,
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
+        };
+      },
       inject: [ConfigService],
     }),
     AuthModule,
@@ -74,6 +124,10 @@ import {
     TicketsModule,
     PromotionsModule,
     AttendanceModule,
+    UsersModule,
+    UploadModule,
+    UserPreferencesModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

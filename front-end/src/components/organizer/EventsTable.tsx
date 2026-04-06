@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import organizerService, { Event as ApiEvent } from '../../services/organizerService';
+import eventService from '../../services/eventService';
+import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
@@ -6,15 +9,6 @@ import OngoingIcon from '../../assets/Svgs/organiser/dashboard/Events/ongoing.sv
 import UpcomingIcon from '../../assets/Svgs/organiser/dashboard/Events/upcoming.svg';
 import CompletedIcon from '../../assets/Svgs/organiser/dashboard/Events/completed.svg';
 import CreateEventIcon from '../../assets/Svgs/organiser/dashboard/Events/createEvent.svg';
-import Event1 from '../../assets/imges/event myticket 1.jpg';
-import Event2 from '../../assets/imges/event myticket 2.jpg';
-import Event3 from '../../assets/imges/event myticket 3.jpg';
-import Event4 from '../../assets/imges/event myticket 4.png';
-import Event5 from '../../assets/imges/event myticket 5.jpg';
-import Event6 from '../../assets/imges/event myticket 6.jpg';
-import Event7 from '../../assets/imges/event myticket 7.png';
-import Event8 from '../../assets/imges/event myticket 8.png';
-import Event9 from '../../assets/imges/event myticket 9.jpg';
 
 interface TicketData {
   id: string;
@@ -61,6 +55,7 @@ interface EventsTableProps {
 }
 
 const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTableProps) => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'ongoing' | 'upcoming' | 'past' | 'drafts'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Newest First');
@@ -74,10 +69,105 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
   const [isEventDetailsOpen, setIsEventDetailsOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const eventsPerPage = 9;
+
+  // Delete confirmation states
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<FullEventData | null>(null);
+  const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Send reminders states
+  const [isSendingReminders, setIsSendingReminders] = useState(false);
+  const [reminderMessage, setReminderMessage] = useState<string | null>(null);
+
+  // API Data States
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [apiEvents, setApiEvents] = useState<FullEventData[]>([]);
   
   const sortRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+
+  // Fetch events from API
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Use organizationId if available, otherwise fall back to user.id
+        const organizerId = user.organizationId || user.id;
+        console.log('📅 [EventsTable] Using organizerId:', organizerId);
+        
+        const eventsData = await organizerService.getEvents({ organizerId });
+        
+        // Transform API events to FullEventData format
+        console.log('📅 [EventsTable] Fetched Events from API:', eventsData);
+        
+        const transformedEvents: FullEventData[] = eventsData.map((event: ApiEvent) => {
+          // Determine status based on dates and API status
+          let status: 'ongoing' | 'upcoming' | 'completed' | 'draft' = 'draft';
+          const now = new Date();
+          const startDate = new Date(event.startAt);
+          const endDate = new Date(event.endAt);
+          
+          if (event.status === 'draft') {
+            status = 'draft';
+          } else if (event.status === 'cancelled' || event.status === 'completed') {
+            status = 'completed';
+          } else if (now < startDate) {
+            status = 'upcoming';
+          } else if (now >= startDate && now <= endDate) {
+            status = 'ongoing';
+          } else {
+            status = 'completed';
+          }
+
+          return {
+            id: event.id,
+            name: event.title,
+            image: event.images?.[0] || '',
+            images: event.images || [],
+            date: new Date(event.startAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            dateRange: [new Date(event.startAt), new Date(event.endAt)] as [Date | null, Date | null],
+            startTime: new Date(event.startAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+            endTime: new Date(event.endAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+            location: event.locationType === 'online' ? 'Online Event' : 'TBA',
+            country: '',
+            state: '',
+            mapAddress: '',
+            onlineLink: '',
+            status,
+            sold: (() => {
+              const ticketTypes = (event as any).ticketTypes || [];
+              const totalSold = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantitySold || 0), 0);
+              const totalCapacity = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantityTotal || 0), 0);
+              return `${totalSold}/${totalCapacity}`;
+            })(),
+            category: event.type || 'Other',
+            eventType: event.locationType === 'online' ? 'online' : event.locationType === 'physical' ? 'in-person' : 'hybrid',
+            description: event.description || event.shortDescription || '',
+            tickets: [],
+            faqs: [],
+            visibility: 'public' as const,
+          };
+        });
+        
+        console.log('📅 [EventsTable] Transformed Events:', transformedEvents);
+        setApiEvents(transformedEvents);
+      } catch (err) {
+        console.error('❌ [EventsTable] Failed to fetch events:', err);
+        setError('Failed to load events');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [user?.id]);
 
   // Close filters when clicking outside
   useEffect(() => {
@@ -101,337 +191,46 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
     setCurrentPage(1);
   }, [activeFilter]);
 
-  // Mock data - replace with actual API data
-  const mockEvents: FullEventData[] = [
-    {
-      id: '1',
-      name: 'Moonlight Melodies',
-      image: Event1,
-      images: [Event1, Event2, Event3],
-      date: 'Jun 21, 2025',
-      dateRange: [new Date(2025, 5, 21), new Date(2025, 5, 21)],
-      startTime: '7:00 PM',
-      endTime: '11:00 PM',
-      location: 'Seaside Pavilion, Santa Monica, CA',
-      country: 'United States',
-      state: 'California',
-      mapAddress: '1600 Ocean Front Walk, Santa Monica, CA 90401',
-      onlineLink: '',
-      status: 'ongoing',
-      sold: '150/300',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'Join us for an enchanting evening of live music under the moonlight at the iconic Seaside Pavilion. Featuring world-class jazz musicians, soulful vocalists, and an unforgettable atmosphere by the ocean. Experience the magic of Moonlight Melodies with gourmet food, craft cocktails, and stunning ocean views.',
-      tickets: [
-        { id: 't1', type: 'General Admission', priceType: 'paid', price: '45', quantity: '200' },
-        { id: 't2', type: 'VIP', priceType: 'paid', price: '120', quantity: '50' },
-        { id: 't3', type: 'Early Bird', priceType: 'paid', price: '35', quantity: '50' }
-      ],
-      faqs: [
-        { id: 'f1', question: 'What should I bring?', answer: 'Bring a blanket or lawn chair for seating on the grass areas. Food and beverages will be available for purchase.' },
-        { id: 'f2', question: 'Is parking available?', answer: 'Yes, free parking is available at the venue. We also encourage carpooling or using public transportation.' },
-        { id: 'f3', question: 'Are children allowed?', answer: 'Yes! This is a family-friendly event. Children under 12 get free admission with a paying adult.' }
-      ],
-      visibility: 'public'
-    },
-    {
-      id: '2',
-      name: 'Rooftop Rhythms',
-      image: Event2,
-      images: [Event2, Event4, Event5],
-      date: 'Aug 2, 2025',
-      dateRange: [new Date(2025, 7, 2), new Date(2025, 7, 2)],
-      startTime: '8:00 PM',
-      endTime: '2:00 AM',
-      location: 'HighNote Rooftop, Brooklyn, NY',
-      country: 'United States',
-      state: 'New York',
-      mapAddress: '250 Ashland Pl, Brooklyn, NY 11217',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '150/300',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'Experience the ultimate rooftop party with stunning views of the Manhattan skyline. Rooftop Rhythms brings together the hottest DJs spinning house, techno, and deep house beats all night long. Premium bottle service, signature cocktails, and an unforgettable atmosphere await.',
-      tickets: [
-        { id: 't1', type: 'General Admission', priceType: 'paid', price: '55', quantity: '200' },
-        { id: 't2', type: 'VIP Table', priceType: 'paid', price: '500', quantity: '20' }
-      ],
-      faqs: [
-        { id: 'f1', question: 'What is the dress code?', answer: 'Smart casual attire is required. No athletic wear, sandals, or shorts.' },
-        { id: 'f2', question: 'Is there an age restriction?', answer: 'This is a 21+ event. Valid ID is required for entry.' }
-      ],
-      visibility: 'public'
-    },
-    {
-      id: '3',
-      name: 'Harmony Under The Stars',
-      image: Event3,
-      images: [Event3, Event6, Event7],
-      date: 'May 26, 2025',
-      dateRange: [new Date(2025, 4, 26), new Date(2025, 4, 26)],
-      startTime: '6:00 PM',
-      endTime: '10:00 PM',
-      location: 'Red Rock Grove, Sedona, AZ',
-      country: 'United States',
-      state: 'Arizona',
-      mapAddress: '525 Boynton Canyon Rd, Sedona, AZ 86336',
-      onlineLink: '',
-      status: 'completed',
-      sold: '300/300',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'A magical evening of acoustic performances set against the breathtaking backdrop of Sedona\'s red rocks. Featuring Grammy-nominated artists performing intimate sets under the desert stars. Includes a gourmet farm-to-table dinner and local wine pairings.',
-      tickets: [
-        { id: 't1', type: 'Standard', priceType: 'paid', price: '85', quantity: '250' },
-        { id: 't2', type: 'Premium', priceType: 'paid', price: '150', quantity: '50' }
-      ],
-      faqs: [
-        { id: 'f1', question: 'What time should I arrive?', answer: 'Gates open at 5:00 PM. We recommend arriving early to explore the grounds and enjoy sunset.' }
-      ],
-      visibility: 'public'
-    },
-    {
-      id: '4',
-      name: 'Neon Vibes Festival',
-      image: Event4,
-      images: [Event4, Event8, Event9],
-      date: 'July 13, 2025',
-      dateRange: [new Date(2025, 6, 13), new Date(2025, 6, 14)],
-      startTime: '4:00 PM',
-      endTime: '12:00 AM',
-      location: 'Lumen Park Amphitheater, Austin, TX',
-      country: 'United States',
-      state: 'Texas',
-      mapAddress: '2100 Barton Springs Rd, Austin, TX 78704',
-      onlineLink: '',
-      status: 'ongoing',
-      sold: '200/500',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'Two days of non-stop electronic music featuring world-renowned DJs and stunning visual productions. Multiple stages, immersive art installations, and the best in EDM, house, and techno. Don\'t miss the largest neon-themed festival in Texas!',
-      tickets: [
-        { id: 't1', type: 'Single Day', priceType: 'paid', price: '75', quantity: '300' },
-        { id: 't2', type: 'Weekend Pass', priceType: 'paid', price: '130', quantity: '150' },
-        { id: 't3', type: 'VIP Weekend', priceType: 'paid', price: '250', quantity: '50' }
-      ],
-      faqs: [
-        { id: 'f1', question: 'Can I re-enter?', answer: 'Yes, your wristband allows unlimited re-entry throughout the festival.' },
-        { id: 'f2', question: 'Are there lockers?', answer: 'Yes, lockers are available for rent near the main entrance.' }
-      ],
-      visibility: 'public'
-    },
-    {
-      id: '5',
-      name: 'Echo Beats Live',
-      image: Event5,
-      images: [Event5, Event1, Event2],
-      date: 'Aug 10, 2025',
-      dateRange: [new Date(2025, 7, 10), new Date(2025, 7, 10)],
-      startTime: '7:30 PM',
-      endTime: '11:30 PM',
-      location: 'Skyline Arena, Denver, CO',
-      country: 'United States',
-      state: 'Colorado',
-      mapAddress: '1000 Chopper Cir, Denver, CO 80204',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '150/300',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'Echo Beats Live brings you an immersive concert experience with state-of-the-art sound systems and visual effects. Featuring headline performances from top indie and alternative artists.',
-      tickets: [
-        { id: 't1', type: 'General Admission', priceType: 'paid', price: '65', quantity: '250' },
-        { id: 't2', type: 'Front Row', priceType: 'paid', price: '150', quantity: '50' }
-      ],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '6',
-      name: 'Bass & Bloom',
-      image: Event6,
-      images: [Event6, Event3, Event4],
-      date: 'May 24, 2025',
-      dateRange: [new Date(2025, 4, 24), new Date(2025, 4, 24)],
-      startTime: '2:00 PM',
-      endTime: '10:00 PM',
-      location: 'Riverfront Sound Garden, Nashville, TN',
-      country: 'United States',
-      state: 'Tennessee',
-      mapAddress: '100 1st Ave N, Nashville, TN 37201',
-      onlineLink: '',
-      status: 'completed',
-      sold: '300/300',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'A unique fusion of live bass music and botanical garden exploration. Enjoy performances from bass and electronic artists while wandering through beautiful spring blooms.',
-      tickets: [
-        { id: 't1', type: 'General', priceType: 'paid', price: '40', quantity: '300' }
-      ],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '7',
-      name: 'Tech Innovation Summit',
-      image: Event7,
-      images: [Event7, Event5, Event6],
-      date: 'Jun 21, 2025',
-      dateRange: [new Date(2025, 5, 21), new Date(2025, 5, 22)],
-      startTime: '9:00 AM',
-      endTime: '6:00 PM',
-      location: 'Convention Center, San Jose, CA',
-      country: 'United States',
-      state: 'California',
-      mapAddress: '150 W San Carlos St, San Jose, CA 95113',
-      onlineLink: 'https://zoom.us/meeting/tech-summit-2025',
-      status: 'ongoing',
-      sold: '150/300',
-      category: 'Tech',
-      eventType: 'hybrid',
-      description: 'Join industry leaders and innovators for two days of keynotes, workshops, and networking at the Tech Innovation Summit. Topics include AI, blockchain, cloud computing, and the future of work. Both in-person and virtual attendance options available.',
-      tickets: [
-        { id: 't1', type: 'In-Person', priceType: 'paid', price: '299', quantity: '200' },
-        { id: 't2', type: 'Virtual', priceType: 'paid', price: '99', quantity: '500' },
-        { id: 't3', type: 'Student', priceType: 'paid', price: '49', quantity: '100' }
-      ],
-      faqs: [
-        { id: 'f1', question: 'Will sessions be recorded?', answer: 'Yes, all keynotes and main sessions will be recorded and available to ticket holders for 30 days.' },
-        { id: 'f2', question: 'Is lunch included?', answer: 'Yes, lunch and refreshments are included for in-person attendees.' }
-      ],
-      visibility: 'public'
-    },
-    {
-      id: '8',
-      name: 'Startup Pitch Night',
-      image: Event8,
-      images: [Event8, Event7, Event9],
-      date: 'Aug 2, 2025',
-      dateRange: [new Date(2025, 7, 2), new Date(2025, 7, 2)],
-      startTime: '6:00 PM',
-      endTime: '9:00 PM',
-      location: 'Innovation Hub, Brooklyn, NY',
-      country: 'United States',
-      state: 'New York',
-      mapAddress: '120 Water St, Brooklyn, NY 11201',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '80/150',
-      category: 'Business',
-      eventType: 'in-person',
-      description: 'Watch 10 promising startups pitch their ideas to a panel of investors and industry experts. Network with entrepreneurs, investors, and fellow innovators. Cash prizes for the top 3 pitches!',
-      tickets: [
-        { id: 't1', type: 'General', priceType: 'paid', price: '25', quantity: '100' },
-        { id: 't2', type: 'Investor Pass', priceType: 'paid', price: '100', quantity: '50' }
-      ],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '9',
-      name: 'Art Gallery Opening',
-      image: Event9,
-      images: [Event9, Event1, Event8],
-      date: 'May 26, 2025',
-      dateRange: [new Date(2025, 4, 26), new Date(2025, 4, 26)],
-      startTime: '7:00 PM',
-      endTime: '10:00 PM',
-      location: 'Contemporary Art Museum, Sedona, AZ',
-      country: 'United States',
-      state: 'Arizona',
-      mapAddress: '250 Art St, Sedona, AZ 86336',
-      onlineLink: '',
-      status: 'completed',
-      sold: '120/120',
-      category: 'Art',
-      eventType: 'in-person',
-      description: 'Exclusive opening night for our new contemporary art exhibition featuring works from emerging artists around the world. Complimentary champagne and hors d\'oeuvres. Meet the artists and collectors.',
-      tickets: [
-        { id: 't1', type: 'General', priceType: 'free', price: '0', quantity: '100' },
-        { id: 't2', type: 'Patron', priceType: 'paid', price: '250', quantity: '20' }
-      ],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '10',
-      name: 'Summer Beats Festival',
-      image: Event1,
-      images: [Event1],
-      date: 'Jul 15, 2025',
-      dateRange: [new Date(2025, 6, 15), new Date(2025, 6, 15)],
-      startTime: '3:00 PM',
-      endTime: '11:00 PM',
-      location: 'Central Park, New York, NY',
-      country: 'United States',
-      state: 'New York',
-      mapAddress: 'Central Park, New York, NY 10024',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '250/400',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'The ultimate summer music festival in the heart of NYC. Multiple stages featuring pop, rock, and electronic artists.',
-      tickets: [{ id: 't1', type: 'General Admission', priceType: 'paid', price: '75', quantity: '400' }],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '11',
-      name: 'Jazz & Wine Evening',
-      image: Event2,
-      images: [Event2],
-      date: 'Aug 20, 2025',
-      dateRange: [new Date(2025, 7, 20), new Date(2025, 7, 20)],
-      startTime: '6:00 PM',
-      endTime: '10:00 PM',
-      location: 'Vineyard Terrace, Napa, CA',
-      country: 'United States',
-      state: 'California',
-      mapAddress: '1000 Wine Country Rd, Napa, CA 94559',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '80/150',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'An elegant evening of live jazz and premium wine tastings at a stunning vineyard setting.',
-      tickets: [{ id: 't1', type: 'Standard', priceType: 'paid', price: '95', quantity: '150' }],
-      faqs: [],
-      visibility: 'public'
-    },
-    {
-      id: '12',
-      name: 'Electronic Dreams',
-      image: Event3,
-      images: [Event3],
-      date: 'Sep 5, 2025',
-      dateRange: [new Date(2025, 8, 5), new Date(2025, 8, 5)],
-      startTime: '9:00 PM',
-      endTime: '4:00 AM',
-      location: 'Metro Arena, Chicago, IL',
-      country: 'United States',
-      state: 'Illinois',
-      mapAddress: '1901 W Madison St, Chicago, IL 60612',
-      onlineLink: '',
-      status: 'upcoming',
-      sold: '400/600',
-      category: 'Music',
-      eventType: 'in-person',
-      description: 'A night of electronic music featuring world-class DJs and immersive visual experiences.',
-      tickets: [{ id: 't1', type: 'General', priceType: 'paid', price: '60', quantity: '600' }],
-      faqs: [],
-      visibility: 'public'
+  // Delete event handler
+  const handleDeleteEvent = async () => {
+    if (!eventToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await organizerService.deleteEvent(eventToDelete.id);
+      console.log('🗑️ [EventsTable] Event deleted:', eventToDelete.id);
+      
+      // Remove from local state
+      setApiEvents(prev => prev.filter(e => e.id !== eventToDelete.id));
+      setShowDeleteSuccess(true);
+      
+      setTimeout(() => {
+        setShowDeleteSuccess(false);
+        setIsDeleteConfirmOpen(false);
+        setEventToDelete(null);
+        setIsEventDetailsOpen(false);
+        setSelectedEvent(null);
+      }, 2000);
+    } catch (err) {
+      console.error('❌ [EventsTable] Failed to delete event:', err);
+      setError('Failed to delete event');
+      setIsDeleteConfirmOpen(false);
+    } finally {
+      setIsDeleting(false);
     }
-  ];
+  };
+
+  // Use only API events - no mock data fallback
+  const eventsToDisplay = apiEvents;
 
   // Filter events based on active filter and search query
-  const filteredEvents = mockEvents.filter(event => {
+  const filteredEvents = eventsToDisplay.filter(event => {
     const matchesFilter = 
       activeFilter === 'all' ? true :
       activeFilter === 'ongoing' ? event.status === 'ongoing' :
       activeFilter === 'upcoming' ? event.status === 'upcoming' :
       activeFilter === 'past' ? event.status === 'completed' :
+      activeFilter === 'drafts' ? event.status === 'draft' :
       false;
 
     const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -800,7 +599,35 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
 
         {/* Table Body */}
         <div className="divide-y divide-light-gray">
-          {currentEvents.map((event) => (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-sm text-gray">Loading events...</p>
+            </div>
+          ) : currentEvents.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 bg-white border border-light-gray ">
+          <div className="w-24 h-24 bg-secondary-light rounded-full flex items-center justify-center mb-4">
+            <svg className="w-12 h-12 text-input-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-black mb-2">No events found</h3>
+          <p className="text-sm text-gray mb-4">
+            {searchQuery ? 'Try adjusting your search or filters' : 'Create your first event to get started'}
+          </p>
+          {!searchQuery && (
+            <button
+              onClick={onCreateEvent}
+              className="relative flex items-center gap-2 pl-9 pr-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
+              style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
+            >
+              <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
+              <span>Create Event</span>
+            </button>
+          )}
+        </div>
+          ) : (
+          currentEvents.map((event) => (
             <div
               key={event.id}
               onClick={() => {
@@ -811,11 +638,19 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             >
               {/* Event Name with Image */}
               <div className="md:col-span-4 flex items-center gap-3">
-                <img
-                  src={event.image}
-                  alt={event.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
-                />
+                {event.image ? (
+                  <img
+                    src={event.image}
+                    alt={event.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-sm font-medium text-black">{event.name}</span>
               </div>
 
@@ -883,7 +718,8 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 <span className="text-xs lg:text-sm font-medium text-black">{event.sold}</span>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
 
@@ -960,30 +796,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
         </div>
       )}
 
-      {/* Empty State */}
-      {filteredEvents.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 bg-white border border-light-gray rounded-xl">
-          <div className="w-24 h-24 bg-secondary-light rounded-full flex items-center justify-center mb-4">
-            <svg className="w-12 h-12 text-input-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-black mb-2">No events found</h3>
-          <p className="text-sm text-gray mb-4">
-            {searchQuery ? 'Try adjusting your search or filters' : 'Create your first event to get started'}
-          </p>
-          {!searchQuery && (
-            <button
-              onClick={onCreateEvent}
-              className="relative flex items-center gap-2 pl-9 pr-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
-              style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
-            >
-              <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
-              <span>Create Event</span>
-            </button>
-          )}
-        </div>
-      )}
+      
 
       {/* Event Details Popup */}
       {isEventDetailsOpen && selectedEvent && (
@@ -994,11 +807,19 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           >
             {/* Header with Image Gallery */}
             <div className="relative h-64 sm:h-80">
-              <img
-                src={selectedEvent.images[currentImageIndex]}
-                alt={selectedEvent.name}
-                className="w-full h-full object-cover rounded-t-2xl"
-              />
+              {selectedEvent.images.length > 0 ? (
+                <img
+                  src={selectedEvent.images[currentImageIndex]}
+                  alt={selectedEvent.name}
+                  className="w-full h-full object-cover rounded-t-2xl"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/30 rounded-t-2xl flex items-center justify-center">
+                  <svg className="w-16 h-16 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+              )}
               {/* Close Button */}
               <button
                 onClick={() => {
@@ -1184,29 +1005,46 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {/* Sold Info - Modern Design */}
               <div className="mb-8">
                 <div className="bg-gradient-to-br from-primary-light to-secondary-light rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-black">Tickets Sold</h3>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-primary">{selectedEvent.sold.split('/')[0]}</p>
-                      <p className="text-sm text-gray">of {selectedEvent.sold.split('/')[1]}</p>
-                    </div>
-                  </div>
-                  <div className="relative h-2 bg-white rounded-full overflow-hidden">
-                    <div 
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${(parseInt(selectedEvent.sold.split('/')[0]) / parseInt(selectedEvent.sold.split('/')[1])) * 100}%` 
-                      }}
-                    />
-                  </div>
-                  <p className="text-xs text-gray mt-2">
-                    {Math.round((parseInt(selectedEvent.sold.split('/')[0]) / parseInt(selectedEvent.sold.split('/')[1])) * 100)}% capacity
-                  </p>
+                  {(() => {
+                    const soldParts = selectedEvent.sold.split('/');
+                    const soldCount = parseInt(soldParts[0]) || 0;
+                    const totalCapacity = parseInt(soldParts[1]) || 0;
+                    const percentage = totalCapacity > 0 ? Math.round((soldCount / totalCapacity) * 100) : 0;
+                    return (
+                      <>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-black">Tickets Sold</h3>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold text-primary">{soldCount}</p>
+                            <p className="text-sm text-gray">of {totalCapacity}</p>
+                          </div>
+                        </div>
+                        <div className="relative h-2 bg-white rounded-full overflow-hidden">
+                          <div 
+                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray mt-2">
+                          {percentage}% capacity
+                        </p>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 
               {/* Action Buttons - Styled like Cancel button from Create Event */}
               <div className="flex items-center justify-end gap-3">
+                <button
+                  onClick={() => {
+                    setEventToDelete(selectedEvent);
+                    setIsDeleteConfirmOpen(true);
+                  }}
+                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap"
+                >
+                  Delete
+                </button>
                 <button
                   onClick={() => {
                     setIsEventDetailsOpen(false);
@@ -1229,7 +1067,83 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 >
                   Duplicate Event
                 </button>
+                <button
+                  onClick={async () => {
+                    if (!selectedEvent) return;
+                    setIsSendingReminders(true);
+                    setReminderMessage(null);
+                    try {
+                      const res = await eventService.sendReminders(selectedEvent.id);
+                      setReminderMessage(res.message || 'Reminders sent successfully!');
+                    } catch (err: any) {
+                      setReminderMessage(err.response?.data?.message || 'Failed to send reminders.');
+                    } finally {
+                      setIsSendingReminders(false);
+                      setTimeout(() => setReminderMessage(null), 3000);
+                    }
+                  }}
+                  disabled={isSendingReminders}
+                  className="pl-5 pr-5 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-all whitespace-nowrap disabled:opacity-50"
+                >
+                  {isSendingReminders ? 'Sending...' : 'Send Reminders'}
+                </button>
               </div>
+              {reminderMessage && (
+                <p className="text-sm text-center mt-2 text-green-600">{reminderMessage}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmOpen && eventToDelete && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-60 flex items-center justify-center p-4" 
+          onClick={() => !showDeleteSuccess && !isDeleting && setIsDeleteConfirmOpen(false)}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              {!showDeleteSuccess ? (
+                <>
+                  <h2 className="text-xl font-bold text-black mb-4">Delete Event</h2>
+                  <p className="text-sm text-gray mb-6">
+                    Are you sure you want to delete <span className="font-semibold text-black">"{eventToDelete.name}"</span>? This action cannot be undone.
+                  </p>
+
+                  <div className="flex items-center justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setIsDeleteConfirmOpen(false);
+                        setEventToDelete(null);
+                      }}
+                      disabled={isDeleting}
+                      className="px-5 py-2 border border-gray-300 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteEvent}
+                      disabled={isDeleting}
+                      className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                    >
+                      {isDeleting ? 'Deleting...' : 'Delete Event'}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-lg font-semibold text-black">Event deleted successfully</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

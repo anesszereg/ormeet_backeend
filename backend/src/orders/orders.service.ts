@@ -10,6 +10,7 @@ import { Order, OrderStatus, TicketType, Promotion, PromotionType, Ticket, Event
 import { CreateOrderDto, UpdateOrderDto, CreateOrderEnhancedDto } from './dto';
 import { EmailService } from '../email/email.service';
 import { PdfTicketService } from './pdf-ticket.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import * as QRCode from 'qrcode';
 
 @Injectable()
@@ -27,6 +28,7 @@ export class OrdersService {
     private readonly eventRepository: Repository<Event>,
     private readonly emailService: EmailService,
     private readonly pdfTicketService: PdfTicketService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -325,6 +327,7 @@ export class OrdersService {
       });
 
       // Generate tickets for each quantity
+      console.log(`🎫 Creating ${item.quantity} tickets for ticket type ${item.ticketTypeId}`);
       for (let i = 0; i < item.quantity; i++) {
         const ticketCode = this.generateTicketCode();
         
@@ -338,6 +341,7 @@ export class OrdersService {
         });
 
         const savedTicket = await this.ticketRepository.save(ticket);
+        console.log(`✅ Ticket created: ID=${savedTicket.id}, Code=${ticketCode}, Owner=${savedOrder.userId}`);
         
         // Generate QR code buffer
         const qrCodeBuffer = await this.generateQRCode(ticketCode);
@@ -350,6 +354,7 @@ export class OrdersService {
           qrCodeBuffer,
         });
       }
+      console.log(`✅ Total tickets created: ${generatedTickets.length}`);
     }
 
     // Get event details for email
@@ -397,22 +402,46 @@ export class OrdersService {
       });
 
       // Send email with PDF and embedded QR codes
-      await this.emailService.sendOrderConfirmation({
-        email: order.billingEmail,
-        customerName: order.billingName,
-        orderId: order.id,
-        eventTitle: event.title,
-        eventDate,
-        eventLocation,
-        tickets: generatedTickets,
-        subtotal: Number(order.amountSubtotal),
-        discount: Number(order.discountAmount),
-        serviceFee: Number(order.serviceFee),
-        processingFee: Number(order.processingFee),
-        total: Number(order.amountTotal),
-        currency: order.currency,
-        pdfTicket: pdfBuffer,
-      });
+      try {
+        await this.emailService.sendOrderConfirmation({
+          email: order.billingEmail,
+          customerName: order.billingName,
+          orderId: order.id,
+          eventTitle: event.title,
+          eventDate,
+          eventLocation,
+          tickets: generatedTickets,
+          subtotal: Number(order.amountSubtotal),
+          discount: Number(order.discountAmount),
+          serviceFee: Number(order.serviceFee),
+          processingFee: Number(order.processingFee),
+          total: Number(order.amountTotal),
+          currency: order.currency,
+          pdfTicket: pdfBuffer,
+        });
+        console.log(`✅ Order confirmation email sent to ${order.billingEmail}`);
+      } catch (emailError) {
+        console.error('⚠️ Failed to send order confirmation email:', emailError.message);
+        // Don't fail the order if email fails
+      }
+
+      // Create notification for the user
+      try {
+        const totalTickets = generatedTickets.length;
+        
+        // Single order confirmation notification with ticket count
+        await this.notificationsService.createOrderConfirmation(
+          order.userId,
+          event.id,
+          event.title,
+          order.id,
+        );
+
+        console.log(`✅ Notification created for user ${order.userId}`);
+      } catch (notificationError) {
+        console.error('⚠️ Failed to create notification:', notificationError.message);
+        // Don't fail the order if notification fails
+      }
     }
 
     return savedOrder;

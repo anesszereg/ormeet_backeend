@@ -1,72 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
-import EventImg1 from '../assets/imges/event myticket 1.jpg';
-import EventImg2 from '../assets/imges/event myticket 2.jpg';
-import EventImg3 from '../assets/imges/event myticket 3.jpg';
-import EventImg5 from '../assets/imges/event myticket 5.jpg';
-import EventImg6 from '../assets/imges/event myticket 6.jpg';
+import notificationService, { Notification, NotificationType } from '../services/notificationService';
+import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
-interface Notification {
-  id: string;
-  type: 'event_cancelled' | 'event_updated' | 'event_reminder';
-  eventName: string;
-  message: string;
-  eventImage: string;
-  timestamp: Date;
-  read: boolean;
-}
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: '1',
-    type: 'event_reminder',
-    eventName: 'Tech Conference 2026',
-    message: 'Starts tomorrow at 10:00 AM — don\'t forget to check in!',
-    eventImage: EventImg1,
-    timestamp: new Date(Date.now() - 1000 * 60 * 15),
-    read: false,
-  },
-  {
-    id: '2',
-    type: 'event_updated',
-    eventName: 'Music Festival',
-    message: 'Venue changed to Grand Arena, Downtown.',
-    eventImage: EventImg2,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-    read: false,
-  },
-  {
-    id: '3',
-    type: 'event_cancelled',
-    eventName: 'Startup Pitch Night',
-    message: 'This event has been cancelled. A refund will be processed.',
-    eventImage: EventImg3,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5),
-    read: false,
-  },
-  {
-    id: '4',
-    type: 'event_reminder',
-    eventName: 'Design Workshop',
-    message: 'Your event is in 3 days. Get ready!',
-    eventImage: EventImg5,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24),
-    read: true,
-  },
-  {
-    id: '5',
-    type: 'event_updated',
-    eventName: 'AI Summit 2026',
-    message: 'The schedule has been updated. Check the new timetable.',
-    eventImage: EventImg6,
-    timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48),
-    read: true,
-  },
-];
-
-const TYPE_LABELS: Record<Notification['type'], string> = {
-  event_cancelled: 'Cancelled',
-  event_updated: 'Updated',
-  event_reminder: 'Reminder',
+const TYPE_LABELS: Record<NotificationType, string> = {
+  [NotificationType.EVENT_CANCELLED]: 'Cancelled',
+  [NotificationType.EVENT_UPDATED]: 'Updated',
+  [NotificationType.EVENT_REMINDER]: 'Reminder',
+  [NotificationType.TICKET_PURCHASED]: 'Purchase',
+  [NotificationType.ORDER_CONFIRMED]: 'Confirmed',
+  [NotificationType.REFUND_PROCESSED]: 'Refund',
 };
 
 const formatTimestamp = (date: Date): string => {
@@ -84,13 +26,29 @@ const formatTimestamp = (date: Date): string => {
 };
 
 const NotificationBell = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(() =>
-    MOCK_NOTIFICATIONS.slice(0, 10).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-  );
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setIsLoading(true);
+      try {
+        const data = await notificationService.getNotifications(20);
+        setNotifications(data);
+        console.log('✅ [NotificationBell] Loaded', data.length, 'notifications');
+      } catch (err) {
+        console.error('❌ [NotificationBell] Failed to load notifications:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNotifications();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -103,14 +61,20 @@ const NotificationBell = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleToggle = () => {
+  const handleToggle = async () => {
     const willOpen = !isOpen;
     setIsOpen(willOpen);
 
     if (willOpen && unreadCount > 0) {
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read: true }))
-      );
+      try {
+        await notificationService.markAllAsRead();
+        setNotifications((prev) =>
+          prev.map((n) => ({ ...n, read: true }))
+        );
+        console.log('✅ [NotificationBell] Marked all as read');
+      } catch (err) {
+        console.error('❌ [NotificationBell] Failed to mark as read:', err);
+      }
     }
   };
 
@@ -157,38 +121,44 @@ const NotificationBell = () => {
                 <p className="text-sm text-[#9CA3AF]">No notifications yet</p>
               </div>
             ) : (
-              notifications.map((notification, index) => (
-                <div
-                  key={notification.id}
-                  className={`flex items-start gap-3 px-5 py-3.5 hover:bg-[#FAFAFA] transition-colors cursor-default ${
-                    index < notifications.length - 1 ? 'border-b border-[#F5F5F5]' : ''
-                  }`}
-                >
-                  {/* Event Image */}
-                  <img
-                    src={notification.eventImage}
-                    alt={notification.eventName}
-                    className="w-10 h-10 rounded-lg object-cover shrink-0"
-                  />
+              notifications.map((notification, index) => {
+                const eventImage = notification.event?.images?.[0] || EventImageFallback;
+                const eventName = notification.event?.title || notification.title;
+                const timestamp = new Date(notification.createdAt);
+                
+                return (
+                  <div
+                    key={notification.id}
+                    className={`flex items-start gap-3 px-5 py-3.5 hover:bg-[#FAFAFA] transition-colors cursor-default ${
+                      index < notifications.length - 1 ? 'border-b border-[#F5F5F5]' : ''
+                    }`}
+                  >
+                    {/* Event Image */}
+                    <img
+                      src={eventImage}
+                      alt={eventName}
+                      className="w-10 h-10 rounded-lg object-cover shrink-0"
+                    />
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-[13px] font-semibold text-black truncate">
-                        {notification.eventName}
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[13px] font-semibold text-black truncate">
+                          {eventName}
+                        </p>
+                        <span className="text-[11px] text-[#9CA3AF] whitespace-nowrap shrink-0">
+                          {formatTimestamp(timestamp)}
+                        </span>
+                      </div>
+                      <p className="text-[12px] text-[#757575] mt-0.5 line-clamp-2 leading-relaxed">
+                        <span className="font-medium text-[#4F4F4F]">{TYPE_LABELS[notification.type]}</span>
+                        {' · '}
+                        {notification.message}
                       </p>
-                      <span className="text-[11px] text-[#9CA3AF] whitespace-nowrap shrink-0">
-                        {formatTimestamp(notification.timestamp)}
-                      </span>
                     </div>
-                    <p className="text-[12px] text-[#757575] mt-0.5 line-clamp-2 leading-relaxed">
-                      <span className="font-medium text-[#4F4F4F]">{TYPE_LABELS[notification.type]}</span>
-                      {' · '}
-                      {notification.message}
-                    </p>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

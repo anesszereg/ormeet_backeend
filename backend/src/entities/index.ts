@@ -12,6 +12,9 @@ export { Attendance } from './attendance.entity';
 export { Review } from './review.entity';
 export { Promotion } from './promotion.entity';
 export { Media } from './media.entity';
+export { UserFavoriteEvent } from './user-favorite-event.entity';
+export { UserFollowingOrganizer } from './user-following-organizer.entity';
+export { Notification, NotificationType } from './notification.entity';
 
 // Export enums
 export { UserRole, EventCategory } from './user.entity';

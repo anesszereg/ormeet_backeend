@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import PersonalInfoIcon from '../assets/Svgs/personalInfo.svg';
 import PaymentIcon from '../assets/Svgs/payment.svg';
 import EmailIcon from '../assets/Svgs/email.svg';
@@ -23,6 +24,7 @@ interface PaymentCard {
 }
 
 const AccountSettings = () => {
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState('personal-info');
   
   // Modal states
@@ -49,26 +51,26 @@ const AccountSettings = () => {
   
   // Form states for Personal Info
   const [profileData, setProfileData] = useState({
-    fullName: 'Lina Bensalem',
-    profilePhoto: ProfilePhoto
+    fullName: user?.name || '',
+    profilePhoto: user?.avatarUrl || ProfilePhoto
   });
   
   const [emailData, setEmailData] = useState({
-    currentEmail: 'sophia.reed@gmail.com',
+    currentEmail: user?.email || '',
     newEmail: '',
     password: ''
   });
   
   const [phoneData, setPhoneData] = useState({
-    currentPhone: '(775) 586-5206',
+    currentPhone: user?.phone || '',
     newPhone: '',
     password: ''
   });
   
   const [locationData, setLocationData] = useState({
-    country: 'Algeria',
-    city: 'Oran',
-    address: ''
+    country: user?.metadata?.location?.country || '',
+    city: user?.metadata?.location?.city || '',
+    address: user?.metadata?.location?.address || ''
   });
   
   // Payment Methods states

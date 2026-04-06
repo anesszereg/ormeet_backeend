@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import organizerService, { Attendee as ApiAttendee, Event as ApiEvent } from '../../services/organizerService';
+import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
@@ -13,15 +15,9 @@ import NotCheckedInIcon from '../../assets/Svgs/organiser/dashboard/Attendee/not
 import SuccessIcon from '../../assets/Svgs/success.svg';
 import ErrorIcon from '../../assets/Svgs/error.svg';
 import Event1 from '../../assets/imges/event myticket 1.jpg';
-import Event2 from '../../assets/imges/event myticket 2.jpg';
-import Event3 from '../../assets/imges/event myticket 3.jpg';
-import Event4 from '../../assets/imges/event myticket 4.png';
+
 import ProfilePhoto1 from '../../assets/imges/photoPorifle/Mask group.png';
-import ProfilePhoto2 from '../../assets/imges/photoPorifle/Mask group (1).png';
-import ProfilePhoto3 from '../../assets/imges/photoPorifle/Mask group (2).png';
-import ProfilePhoto4 from '../../assets/imges/photoPorifle/Mask group (3).png';
-import ProfilePhoto5 from '../../assets/imges/photoPorifle/Mask group (4).png';
-import ProfilePhoto6 from '../../assets/imges/photoPorifle/Mask group (5).png';
+
 
 interface Attendee {
   id: string;
@@ -43,6 +39,7 @@ interface Event {
 }
 
 const AttendeesTable = () => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Newest First');
   const [isSortOpen, setIsSortOpen] = useState(false);
@@ -62,12 +59,97 @@ const AttendeesTable = () => {
   const [showResendSuccess, setShowResendSuccess] = useState(false);
   const [showResendError, setShowResendError] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isAddAttendeeModalOpen, setIsAddAttendeeModalOpen] = useState(false);
   const attendeesPerPage = 9;
+
+  // API Data States
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [apiAttendees, setApiAttendees] = useState<Attendee[]>([]);
+  const [apiEvents, setApiEvents] = useState<Event[]>([]);
   
   const sortRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
   const filterRef = useRef<HTMLDivElement>(null);
+
+  // Fetch attendees from API
+  useEffect(() => {
+    const fetchAttendees = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Use organizationId if available, otherwise fall back to user.id
+        const organizerId = user.organizationId || user.id;
+        console.log('👥 [AttendeesTable] Using organizerId:', organizerId);
+        
+        // Fetch events first
+        const eventsData = await organizerService.getEvents({ organizerId });
+        console.log('👥 [AttendeesTable] Fetched Events:', eventsData);
+        const eventMap = new Map(eventsData.map((e: ApiEvent) => [e.id, e.title]));
+        
+        // Transform events for the event filter
+        const transformedEvents: Event[] = eventsData.map((event: ApiEvent) => {
+          let status: 'ongoing' | 'upcoming' | 'completed' | 'draft' = 'draft';
+          const now = new Date();
+          const startDate = new Date(event.startAt);
+          const endDate = new Date(event.endAt);
+          
+          if (event.status === 'draft') status = 'draft';
+          else if (now < startDate) status = 'upcoming';
+          else if (now >= startDate && now <= endDate) status = 'ongoing';
+          else status = 'completed';
+
+          return {
+            id: event.id,
+            name: event.title,
+            image: event.images?.[0] || Event1,
+            status,
+            createdDate: new Date(event.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          };
+        });
+        
+        setApiEvents(transformedEvents);
+
+        // Fetch attendees for each event
+        const allAttendees: Attendee[] = [];
+        
+        for (const event of eventsData) {
+          try {
+            const attendeesData = await organizerService.getAttendeesByEvent(event.id);
+            
+            const transformedAttendees = attendeesData.map((attendee: ApiAttendee) => ({
+              id: attendee.id,
+              name: attendee.ticket?.owner?.name || 'Unknown',
+              photo: attendee.ticket?.owner?.profilePhoto || ProfilePhoto1,
+              email: attendee.ticket?.owner?.email || 'unknown@email.com',
+              eventName: eventMap.get(event.id) || 'Unknown Event',
+              registrationDate: new Date(attendee.checkedInAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              ticketType: attendee.ticket?.ticketType?.name || 'General',
+              status: 'checked-in' as const,
+            }));
+            
+            allAttendees.push(...transformedAttendees);
+          } catch (err) {
+            console.warn(`Failed to fetch attendees for event ${event.id}:`, err);
+          }
+        }
+        
+        console.log('👥 [AttendeesTable] All Attendees:', allAttendees);
+        setApiAttendees(allAttendees);
+      } catch (err) {
+        console.error('❌ [AttendeesTable] Failed to fetch attendees:', err);
+        setError('Failed to load attendees');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAttendees();
+  }, [user?.id]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -88,191 +170,46 @@ const AttendeesTable = () => {
     };
   }, []);
 
-  const mockEvents: Event[] = [
-    {
-      id: '1',
-      name: 'Tech Summit 2025',
-      image: Event1,
-      status: 'upcoming',
-      createdDate: 'May 1, 2025'
-    },
-    {
-      id: '2',
-      name: 'Music Fest LA',
-      image: Event2,
-      status: 'ongoing',
-      createdDate: 'April 28, 2025'
-    },
-    {
-      id: '3',
-      name: 'AI Expo 2025',
-      image: Event3,
-      status: 'completed',
-      createdDate: 'April 20, 2025'
-    },
-    {
-      id: '4',
-      name: 'Business Conference',
-      image: Event4,
-      status: 'upcoming',
-      createdDate: 'May 5, 2025'
-    },
-  ];
+  // Check-in attendee handler
+  const handleCheckIn = async (attendee: Attendee) => {
+    setIsCheckingIn(true);
+    try {
+      // Find the event for this attendee
+      const event = apiEvents.find(e => e.name === attendee.eventName);
+      if (!event) {
+        console.error('❌ [AttendeesTable] Event not found for attendee');
+        return;
+      }
 
-  const mockAttendees: Attendee[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      photo: ProfilePhoto1,
-      email: 'johndoe@gmail.com',
-      eventName: 'Tech Summit 2025',
-      registrationDate: 'May 2, 2025',
-      ticketType: 'General',
-      status: 'checked-in'
-    },
-    {
-      id: '2',
-      name: 'Sarah Smith',
-      photo: ProfilePhoto2,
-      email: 'sarahsmith@gmail.com',
-      eventName: 'Music Fest LA',
-      registrationDate: 'May 1, 2025',
-      ticketType: 'VIP',
-      status: 'not-checked-in'
-    },
-    {
-      id: '3',
-      name: 'Emily Taylor',
-      photo: ProfilePhoto3,
-      email: 'emilytaylor@gmail.com',
-      eventName: 'AI Expo 2025',
-      registrationDate: 'April 28, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-    {
-      id: '4',
-      name: 'Christopher Remington',
-      photo: ProfilePhoto4,
-      email: 'christopheremington@gmail.com',
-      eventName: 'Tech Summit 2025',
-      registrationDate: 'May 3, 2025',
-      ticketType: 'General',
-      status: 'checked-in'
-    },
-    {
-      id: '5',
-      name: 'Jenny Whitmore',
-      photo: ProfilePhoto5,
-      email: 'genevievewhitmore@gmail.com',
-      eventName: 'Music Fest LA',
-      registrationDate: 'April 30, 2025',
-      ticketType: 'VIP',
-      status: 'not-checked-in'
-    },
-    {
-      id: '6',
-      name: 'Alexander Harrison',
-      photo: ProfilePhoto6,
-      email: 'alexanderharrison@gmail.com',
-      eventName: 'AI Expo 2025',
-      registrationDate: 'April 25, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-    {
-      id: '7',
-      name: 'Emily Taylor',
-      photo: ProfilePhoto1,
-      email: 'emilytaylor@gmail.com',
-      eventName: 'Business Conference',
-      registrationDate: 'May 5, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-    {
-      id: '8',
-      name: 'Christopher Remington',
-      photo: ProfilePhoto2,
-      email: 'christopheremington@gmail.com',
-      eventName: 'Tech Summit 2025',
-      registrationDate: 'May 4, 2025',
-      ticketType: 'General',
-      status: 'checked-in'
-    },
-    {
-      id: '9',
-      name: 'Alexander Harrison',
-      photo: ProfilePhoto3,
-      email: 'alexanderharrison@gmail.com',
-      eventName: 'Music Fest LA',
-      registrationDate: 'April 29, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-    {
-      id: '10',
-      name: 'Michael Johnson',
-      photo: ProfilePhoto4,
-      email: 'michaeljohnson@gmail.com',
-      eventName: 'AI Expo 2025',
-      registrationDate: 'April 27, 2025',
-      ticketType: 'VIP',
-      status: 'checked-in'
-    },
-    {
-      id: '11',
-      name: 'Jessica Brown',
-      photo: ProfilePhoto5,
-      email: 'jessicabrown@gmail.com',
-      eventName: 'Business Conference',
-      registrationDate: 'May 6, 2025',
-      ticketType: 'General',
-      status: 'not-checked-in'
-    },
-    {
-      id: '12',
-      name: 'David Wilson',
-      photo: ProfilePhoto6,
-      email: 'davidwilson@gmail.com',
-      eventName: 'Tech Summit 2025',
-      registrationDate: 'May 1, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-    {
-      id: '13',
-      name: 'Amanda Martinez',
-      photo: ProfilePhoto1,
-      email: 'amandamartinez@gmail.com',
-      eventName: 'Music Fest LA',
-      registrationDate: 'April 26, 2025',
-      ticketType: 'VIP',
-      status: 'checked-in'
-    },
-    {
-      id: '14',
-      name: 'Robert Garcia',
-      photo: ProfilePhoto2,
-      email: 'robertgarcia@gmail.com',
-      eventName: 'AI Expo 2025',
-      registrationDate: 'May 2, 2025',
-      ticketType: 'General',
-      status: 'not-checked-in'
-    },
-    {
-      id: '15',
-      name: 'Lisa Anderson',
-      photo: ProfilePhoto3,
-      email: 'lisaanderson@gmail.com',
-      eventName: 'Business Conference',
-      registrationDate: 'May 3, 2025',
-      ticketType: 'Early Bird',
-      status: 'checked-in'
-    },
-  ];
+      await organizerService.checkInAttendee({
+        ticketId: attendee.id,
+        eventId: event.id,
+      });
+      
+      console.log('✅ [AttendeesTable] Attendee checked in:', attendee.id);
+      
+      // Update local state
+      setApiAttendees(prev => prev.map(a => 
+        a.id === attendee.id ? { ...a, status: 'checked-in' as const } : a
+      ));
+      
+      // Update selected attendee if it's the same one
+      if (selectedAttendee?.id === attendee.id) {
+        setSelectedAttendee({ ...attendee, status: 'checked-in' });
+      }
+    } catch (err) {
+      console.error('❌ [AttendeesTable] Failed to check in attendee:', err);
+      setError('Failed to check in attendee');
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
 
-  const filteredAttendees = mockAttendees.filter(attendee => {
+  // Use only API data - no mock data fallback
+  const attendeesToDisplay = apiAttendees;
+  const eventsToDisplay = apiEvents;
+
+  const filteredAttendees = attendeesToDisplay.filter(attendee => {
     const matchesSearch = attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          attendee.email.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -710,7 +647,25 @@ const AttendeesTable = () => {
         </div>
 
         <div className="divide-y divide-light-gray">
-          {currentAttendees.map((attendee) => (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-sm text-gray">Loading attendees...</p>
+            </div>
+          ) : currentAttendees.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">No attendees yet</h3>
+              <p className="text-sm text-gray-500 text-center max-w-sm">
+                Attendees will appear here when they check in to your events.
+              </p>
+            </div>
+          ) : (
+          currentAttendees.map((attendee) => (
             <div
               key={attendee.id}
               onClick={() => setSelectedAttendee(attendee)}
@@ -772,7 +727,8 @@ const AttendeesTable = () => {
                 )}
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
 
@@ -868,7 +824,7 @@ const AttendeesTable = () => {
             </div>
 
             <div className="overflow-y-auto max-h-[calc(80vh-140px)]">
-              {mockEvents.filter(event => event.status !== 'draft').map((event) => (
+              {eventsToDisplay.filter((event: Event) => event.status !== 'draft').map((event: Event) => (
                 <button
                   key={event.id}
                   onClick={() => {
@@ -1000,32 +956,31 @@ const AttendeesTable = () => {
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 mt-4">
+                {selectedAttendee.status === 'not-checked-in' && (
+                  <button
+                    onClick={() => handleCheckIn(selectedAttendee)}
+                    disabled={isCheckingIn}
+                    className="pl-5 pr-5 py-2 bg-[#10B981] hover:bg-[#059669] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                  >
+                    {isCheckingIn ? 'Checking in...' : 'Check In'}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setAttendeeToDelete(selectedAttendee);
                     setIsDeleteConfirmOpen(true);
                   }}
-                  className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
+                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
                 >
                   Delete
                 </button>
                 <button
                   onClick={() => {
-                    // Logique de test : attendees avec ID pair = success, ID impair = error
-                    const attendeeIdNumber = parseInt(selectedAttendee.id);
-                    if (attendeeIdNumber % 2 === 0) {
-                      setShowResendSuccess(true);
-                      setTimeout(() => {
-                        setShowResendSuccess(false);
-                        setSelectedAttendee(null);
-                      }, 3000);
-                    } else {
-                      setShowResendError(true);
-                      setTimeout(() => {
-                        setShowResendError(false);
-                        setSelectedAttendee(null);
-                      }, 3000);
-                    }
+                    setShowResendSuccess(true);
+                    setTimeout(() => {
+                      setShowResendSuccess(false);
+                      setSelectedAttendee(null);
+                    }, 3000);
                   }}
                   className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
@@ -1116,7 +1071,7 @@ const AttendeesTable = () => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onConfirm={handleExport}
-        events={mockEvents}
+        events={eventsToDisplay}
       />
 
       {/* Add Attendee Modal */}
@@ -1127,7 +1082,7 @@ const AttendeesTable = () => {
           console.log('Adding attendee:', data);
           setIsAddAttendeeModalOpen(false);
         }}
-        events={mockEvents}
+        events={apiEvents}
       />
     </div>
   );

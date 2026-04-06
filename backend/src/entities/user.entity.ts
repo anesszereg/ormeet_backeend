@@ -67,6 +67,9 @@ export class User {
   @Column({ name: 'avatar_url', nullable: true })
   avatarUrl: string;
 
+  @Column({ name: 'oauth_provider', nullable: true })
+  oauthProvider: string;
+
   @Column({ type: 'jsonb', nullable: true, name: 'social_links' })
   socialLinks: Array<{ provider: string; url: string }>;
 

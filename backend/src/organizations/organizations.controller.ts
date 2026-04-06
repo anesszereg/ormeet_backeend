@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
-import { CreateOrganizationDto, UpdateOrganizationDto, UpdateMemberRoleDto } from './dto';
+import { CreateOrganizationDto, UpdateOrganizationDto, UpdateMemberRoleDto, InviteMemberDto, CreateCustomRoleDto, UpdateCustomRoleDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -79,7 +79,7 @@ export class OrganizationsController {
     return this.organizationsService.update(
       id,
       updateOrganizationDto,
-      req.user.sub,
+      req.user.id,
     );
   }
 
@@ -92,7 +92,7 @@ export class OrganizationsController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Organization not found' })
   remove(@Param('id') id: string, @Request() req) {
-    return this.organizationsService.remove(id, req.user.sub);
+    return this.organizationsService.remove(id, req.user.id);
   }
 
   @Post(':id/members/:userId/:role')
@@ -109,7 +109,7 @@ export class OrganizationsController {
     @Param('role') role: OrganizationMemberRole,
     @Request() req,
   ) {
-    return this.organizationsService.addMember(id, userId, role, req.user.sub);
+    return this.organizationsService.addMember(id, userId, role, req.user.id);
   }
 
   @Delete(':id/members/:userId')
@@ -125,7 +125,7 @@ export class OrganizationsController {
     @Param('userId') userId: string,
     @Request() req,
   ) {
-    return this.organizationsService.removeMember(id, userId, req.user.sub);
+    return this.organizationsService.removeMember(id, userId, req.user.id);
   }
 
   @Patch(':id/members/:userId/role')
@@ -146,7 +146,107 @@ export class OrganizationsController {
       id,
       userId,
       updateMemberRoleDto.role,
-      req.user.sub,
+      req.user.id,
     );
+  }
+
+  // ========== Invite by Email ==========
+
+  @Post(':id/invite')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Invite a team member by email' })
+  @ApiResponse({ status: 201, description: 'Invitation sent successfully' })
+  @ApiResponse({ status: 400, description: 'Already invited' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  inviteMember(
+    @Param('id') id: string,
+    @Body() inviteMemberDto: InviteMemberDto,
+    @Request() req,
+  ) {
+    return this.organizationsService.inviteMemberByEmail(
+      id,
+      inviteMemberDto.email,
+      inviteMemberDto.role,
+      req.user.id,
+    );
+  }
+
+  @Get(':id/invites')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get pending invitations' })
+  getPendingInvites(@Param('id') id: string, @Request() req) {
+    return this.organizationsService.getPendingInvites(id, req.user.id);
+  }
+
+  @Delete(':id/invites/:inviteId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Cancel a pending invitation' })
+  cancelInvite(
+    @Param('id') id: string,
+    @Param('inviteId') inviteId: string,
+    @Request() req,
+  ) {
+    return this.organizationsService.cancelInvite(id, inviteId, req.user.id);
+  }
+
+  // ========== Custom Roles ==========
+
+  @Get(':id/roles')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get custom roles for organization' })
+  getCustomRoles(@Param('id') id: string) {
+    return this.organizationsService.getCustomRoles(id);
+  }
+
+  @Post(':id/roles')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Create a custom role' })
+  @ApiResponse({ status: 201, description: 'Role created successfully' })
+  createCustomRole(
+    @Param('id') id: string,
+    @Body() createRoleDto: CreateCustomRoleDto,
+    @Request() req,
+  ) {
+    return this.organizationsService.createCustomRole(
+      id,
+      createRoleDto.name,
+      createRoleDto.permissions,
+      req.user.id,
+    );
+  }
+
+  @Patch(':id/roles/:roleId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update a custom role' })
+  updateCustomRole(
+    @Param('id') id: string,
+    @Param('roleId') roleId: string,
+    @Body() updateRoleDto: UpdateCustomRoleDto,
+    @Request() req,
+  ) {
+    return this.organizationsService.updateCustomRole(
+      id,
+      roleId,
+      updateRoleDto,
+      req.user.id,
+    );
+  }
+
+  @Delete(':id/roles/:roleId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Delete a custom role' })
+  deleteCustomRole(
+    @Param('id') id: string,
+    @Param('roleId') roleId: string,
+    @Request() req,
+  ) {
+    return this.organizationsService.deleteCustomRole(id, roleId, req.user.id);
   }
 }

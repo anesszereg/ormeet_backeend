@@ -1,4 +1,10 @@
 export { default as api } from './api';
 export { default as authService } from './authService';
 export { default as eventService } from './eventService';
-// Export other services as they are created
+export { default as organizerService } from './organizerService';
+export { default as ticketTypeService } from './ticketTypeService';
+export { default as ticketService } from './ticketService';
+export { default as orderService } from './orderService';
+export { default as promotionService } from './promotionService';
+export { default as reviewService } from './reviewService';
+export { default as venueService } from './venueService';

@@ -89,11 +89,28 @@ export class TicketsService {
   }
 
   async findByUser(userId: string): Promise<Ticket[]> {
-    return await this.ticketRepository.find({
+    console.log(`🔍 Fetching tickets for user: ${userId}`);
+    const tickets = await this.ticketRepository.find({
       where: { ownerId: userId },
-      relations: ['order', 'ticketType'],
+      relations: ['order', 'ticketType', 'event', 'event.venue'],
       order: { createdAt: 'DESC' },
     });
+    console.log(`✅ Found ${tickets.length} tickets for user ${userId}`);
+    if (tickets.length > 0) {
+      console.log('📋 Ticket IDs:', tickets.map(t => t.id));
+      console.log('📊 First ticket details:', {
+        id: tickets[0].id,
+        code: tickets[0].code,
+        status: tickets[0].status,
+        hasEvent: !!tickets[0].event,
+        eventId: tickets[0].eventId,
+        eventTitle: tickets[0].event?.title,
+        eventStartAt: tickets[0].event?.startAt,
+        hasTicketType: !!tickets[0].ticketType,
+        ticketTypeTitle: tickets[0].ticketType?.title,
+      });
+    }
+    return tickets;
   }
 
   async update(id: string, updateTicketDto: UpdateTicketDto): Promise<Ticket> {

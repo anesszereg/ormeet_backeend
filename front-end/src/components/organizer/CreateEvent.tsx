@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
+import organizerService, { CreateEventDto } from '../../services/organizerService';
+import { useAuth } from '../../context/AuthContext';
 import CalendarIcon from '../../assets/Svgs/organiser/dashboard/calendrier.svg';
 import EventPreviewModal from './EventPreviewModal';
 import StaticTimePicker from './StaticTimePicker';
@@ -91,6 +93,10 @@ const ticketTypes = [
 ];
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const getInitialFormData = (): EventFormData => {
     if (initialData) {
       return {
@@ -540,15 +546,152 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     return Object.keys(newErrors).length === 0 && Object.keys(newTicketErrors).length === 0 && Object.keys(newFaqErrors).length === 0;
   };
 
-  const handleSaveDraft = () => {
-    setFormData(prev => ({ ...prev, status: 'draft' }));
-    onSaveDraft?.();
+  // Helper to convert form data to API format
+  const convertToApiFormat = (status: 'draft' | 'publish', imageUrls: string[] = []): CreateEventDto => {
+    // Parse start and end times
+    const parseTime = (timeStr: string): { hours: number; minutes: number } => {
+      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
+      if (!match) return { hours: 0, minutes: 0 };
+      let hours = parseInt(match[1]);
+      const minutes = parseInt(match[2]);
+      const period = match[3]?.toUpperCase();
+      if (period === 'PM' && hours !== 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+      return { hours, minutes };
+    };
+
+    const startDate = formData.dateRange[0] || new Date();
+    const endDate = formData.dateRange[1] || formData.dateRange[0] || new Date();
+    
+    const startTime = parseTime(formData.startTime);
+    const endTime = parseTime(formData.endTime);
+    
+    const startAt = new Date(startDate);
+    startAt.setHours(startTime.hours, startTime.minutes, 0, 0);
+    
+    const endAt = new Date(endDate);
+    endAt.setHours(endTime.hours, endTime.minutes, 0, 0);
+
+    // Map event type
+    const locationType = formData.eventType === 'in-person' ? 'physical' : 
+                         formData.eventType === 'online' ? 'online' : 'tba';
+
+    // Map tickets
+    const tickets = formData.tickets
+      .filter(t => t.type && t.quantity)
+      .map(t => {
+        console.log('Ticket type being sent:', t.type, 'Type:', typeof t.type);
+        return {
+          name: t.type,
+          type: t.type as 'General Admission' | 'VIP' | 'Early Bird' | 'Student' | 'Group' | 'Premium' | 'Standard' | 'Other',
+          quantityTotal: parseInt(t.quantity) || 0,
+          price: t.priceType === 'free' ? 0 : parseFloat(t.price) || 0,
+        };
+      });
+
+    // Use uploaded image URLs
+    const validImages = imageUrls;
+
+    // Validate onlineLink is a proper URL or set to undefined
+    const onlineLink = locationType === 'online' && formData.onlineLink && 
+      (formData.onlineLink.startsWith('http://') || formData.onlineLink.startsWith('https://'))
+      ? formData.onlineLink 
+      : undefined;
+
+    // Use organizationId if available, otherwise fall back to user.id
+    const organizerId = user?.organizationId || user?.id || '';
+
+    return {
+      title: formData.title,
+      type: formData.category?.toLowerCase() || 'general',
+      shortDescription: formData.description.substring(0, 200) || 'Event description',
+      longDescription: formData.description || undefined,
+      organizerId,
+      dateType: 'one_time' as const,
+      startAt: startAt.toISOString(),
+      endAt: endAt.toISOString(),
+      locationType,
+      customLocation: locationType === 'physical' ? {
+        address: formData.mapAddress || 'TBA',
+        city: formData.state || 'TBA',
+        state: formData.state || 'TBA',
+        zipCode: '',
+        postalCode: '',
+        country: formData.country || 'TBA',
+      } : undefined,
+      onlineLink,
+      images: validImages.length > 0 ? validImages : undefined,
+      tickets: tickets.length > 0 ? tickets : undefined,
+      tags: formData.category ? [formData.category.toLowerCase()] : undefined,
+    };
   };
 
-  const handlePublish = () => {
-    if (validateForm()) {
+  const handleSaveDraft = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      // Upload images first
+      let imageUrls: string[] = [];
+      const filesToUpload = formData.eventImages.map(img => img.file);
+      if (filesToUpload.length > 0) {
+        imageUrls = await organizerService.uploadImages(filesToUpload);
+      }
+
+      const eventData = convertToApiFormat('draft', imageUrls);
+      
+      if (mode === 'edit' && initialData?.id) {
+        await organizerService.updateEvent(initialData.id, eventData);
+      } else {
+        await organizerService.createEvent(eventData);
+      }
+      
+      setFormData(prev => ({ ...prev, status: 'draft' }));
+      onSaveDraft?.();
+    } catch (err: any) {
+      console.error('Failed to save draft:', err);
+      setSubmitError(err.response?.data?.message || 'Failed to save draft');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!validateForm()) return;
+    
+    setIsSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      // Upload images first
+      let imageUrls: string[] = [];
+      const filesToUpload = formData.eventImages.map(img => img.file);
+      if (filesToUpload.length > 0) {
+        imageUrls = await organizerService.uploadImages(filesToUpload);
+      }
+
+      const eventData = convertToApiFormat('publish', imageUrls);
+      
+      let eventId: string;
+      
+      if (mode === 'edit' && initialData?.id) {
+        await organizerService.updateEvent(initialData.id, eventData);
+        eventId = initialData.id;
+      } else {
+        const createdEvent = await organizerService.createEvent(eventData);
+        eventId = createdEvent.id;
+      }
+      
+      // Publish the event
+      await organizerService.publishEvent(eventId);
+      
       setFormData(prev => ({ ...prev, status: 'publish' }));
       onPublish?.();
+    } catch (err: any) {
+      console.error('Failed to publish event:', err);
+      setSubmitError(err.response?.data?.message || 'Failed to publish event');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1593,13 +1736,21 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           </div>
         </div>
 
+        {/* Error Message */}
+        {submitError && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {submitError}
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex items-center justify-between gap-4 pt-4">
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => setIsPreviewModalOpen(true)}
-              className="flex items-center gap-2 pl-5 pr-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap"
+              disabled={isSubmitting}
+              className="flex items-center gap-2 pl-5 pr-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                 <path d="M10 3.33301C5.83333 3.33301 2.27499 5.73301 0.833328 9.16634C2.27499 12.5997 5.83333 14.9997 10 14.9997C14.1667 14.9997 17.725 12.5997 19.1667 9.16634C17.725 5.73301 14.1667 3.33301 10 3.33301Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1611,19 +1762,21 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               <button
                 type="button"
                 onClick={handleSaveDraft}
-                className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
+                disabled={isSubmitting}
+                className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Save as Draft
+                {isSubmitting ? 'Saving...' : 'Save as Draft'}
               </button>
             )}
           </div>
           <button
             type="button"
             onClick={mode === 'edit' ? onSaveChanges : handlePublish}
-            className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap"
+            disabled={isSubmitting}
+            className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
           >
-            {mode === 'edit' ? 'Save changes' : 'Publish Event'}
+            {isSubmitting ? 'Publishing...' : (mode === 'edit' ? 'Save changes' : 'Publish Event')}
           </button>
         </div>
       </form>

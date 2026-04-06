@@ -10,7 +10,7 @@ import { Repository, MoreThan } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User, UserRole, VerificationCode, VerificationType, VerificationPurpose } from '../entities';
+import { User, UserRole, VerificationCode, VerificationType, VerificationPurpose, Organization } from '../entities';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, SendVerificationCodeDto, VerifyCodeDto, LoginWithCodeDto } from './dto';
 import { EmailService } from '../email/email.service';
 
@@ -21,6 +21,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(VerificationCode)
     private readonly verificationCodeRepository: Repository<VerificationCode>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
@@ -63,18 +65,30 @@ export class AuthService {
       organizationId,
       interestedEventCategories,
       hostingEventTypes,
-      emailVerificationToken,
       emailVerified: false,
+      emailVerificationToken,
     });
 
     await this.userRepository.save(user);
+
+    // If registering as organizer and no organization provided, auto-create one
+    if (!organizationId && roles?.includes(UserRole.ORGANIZER)) {
+      const org = this.organizationRepository.create({
+        name: `${name}'s Organization`,
+        ownerId: user.id,
+      });
+      const savedOrg = await this.organizationRepository.save(org);
+
+      // Link the organization back to the user
+      user.organizationId = savedOrg.id;
+      await this.userRepository.update(user.id, { organizationId: savedOrg.id });
+    }
 
     // Send welcome email with verification link
     try {
       await this.emailService.sendWelcomeEmail(email, name, emailVerificationToken);
     } catch (error) {
-      console.error('⚠️ Failed to send welcome email, but user registration succeeded:', error.message);
-      // Don't fail registration if email fails
+      console.error('Failed to send welcome email:', error.message);
     }
 
     // Generate JWT token
@@ -110,19 +124,60 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Send login notification email (only if email exists)
-    if (user.email) {
+    // Check if email is verified
+    if (!user.emailVerified) {
+      // Resend verification email
       try {
-        await this.emailService.sendLoginNotification(
-          user.email, 
-          user.name, 
-          ipAddress || 'Unknown',
-          userAgent || 'Unknown'
+        // Generate new verification token if old one doesn't exist
+        if (!user.emailVerificationToken) {
+          user.emailVerificationToken = crypto.randomBytes(32).toString('hex');
+          await this.userRepository.save(user);
+        }
+        
+        await this.emailService.sendWelcomeEmail(
+          user.email,
+          user.name,
+          user.emailVerificationToken
+        );
+        console.log(`📧 Resent verification email to ${user.email}`);
+        
+        throw new UnauthorizedException(
+          'Your email is not verified. We have sent you a new verification link. Please check your inbox and verify your email to continue.'
         );
       } catch (error) {
-        console.error('⚠️ Failed to send login notification email:', error.message);
-        // Don't fail login if email fails
+        if (error instanceof UnauthorizedException) {
+          throw error;
+        }
+        console.error('⚠️ Failed to resend verification email:', error.message);
+        throw new UnauthorizedException(
+          'Please verify your email before logging in. If you did not receive the verification email, please contact support.'
+        );
       }
+    }
+
+    // // Send login notification email (disabled - email not working on Render)
+    // if (user.email) {
+    //   try {
+    //     // await this.emailService.sendLoginNotification(
+    //     //   user.email, 
+    //     //   user.name, 
+    //     //   ipAddress || 'Unknown',
+    //     //   userAgent || 'Unknown'
+    //     // );
+    //   } catch (error) {
+    //     console.error('⚠️ Failed to send login notification email:', error.message);
+    //   }
+    // }
+
+    // Auto-create organization for existing organizer users who don't have one
+    if (!user.organizationId && user.roles?.includes(UserRole.ORGANIZER)) {
+      const org = this.organizationRepository.create({
+        name: `${user.name}'s Organization`,
+        ownerId: user.id,
+      });
+      const savedOrg = await this.organizationRepository.save(org);
+      user.organizationId = savedOrg.id;
+      await this.userRepository.update(user.id, { organizationId: savedOrg.id });
     }
 
     // Generate JWT token
@@ -216,7 +271,11 @@ export class AuthService {
     await this.userRepository.save(user);
 
     // Send verification email
-    await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
+    try {
+      await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
+    } catch (error) {
+      console.error('Failed to send verification email:', error.message);
+    }
 
     return {
       message: 'Verification email sent successfully!',
@@ -349,9 +408,9 @@ export class AuthService {
     if (type === VerificationType.EMAIL && email) {
       try {
         await this.emailService.sendVerificationCode(email, code, purpose);
+        console.log(`📧 Verification code sent to ${email}`);
       } catch (error) {
-        console.error('⚠️ Failed to send verification code email:', error.message);
-        // Still log to console as fallback for development
+        console.error(`⚠️ Failed to send verification code email:`, error.message);
         console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
       }
     } else if (type === VerificationType.PHONE && phone) {
@@ -456,18 +515,72 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Send login notification email (only if email exists)
-    if (user.email) {
-      try {
-        await this.emailService.sendLoginNotification(
-          user.email,
-          user.name,
-          ipAddress || 'Unknown',
-          userAgent || 'Unknown',
-        );
-      } catch (error) {
-        console.error('⚠️ Failed to send login notification email:', error.message);
+    // // Send login notification email (disabled - email not working on Render)
+    // if (user.email) {
+    //   try {
+    //     await this.emailService.sendLoginNotification(
+    //       user.email,
+    //       user.name,
+    //       ipAddress || 'Unknown',
+    //       userAgent || 'Unknown',
+    //     );
+    //   } catch (error) {
+    //     console.error('⚠️ Failed to send login notification email:', error.message);
+    //   }
+    // }
+
+    // Generate JWT token
+    const token = this.generateToken(user);
+
+    return {
+      user: this.sanitizeUser(user),
+      token,
+    };
+  }
+
+  async validateOAuthUser(oauthUser: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    picture?: string;
+    provider: 'google' | 'facebook';
+  }) {
+    const { email, firstName, lastName, picture, provider } = oauthUser;
+
+    if (!email) {
+      throw new BadRequestException('Email is required from OAuth provider');
+    }
+
+    // Check if user already exists
+    let user = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (user) {
+      // User exists - update their avatar if provided and not set
+      if (picture && !user.avatarUrl) {
+        user.avatarUrl = picture;
+        await this.userRepository.save(user);
       }
+      
+      // Mark email as verified since OAuth providers verify emails
+      if (!user.emailVerified) {
+        user.emailVerified = true;
+        await this.userRepository.save(user);
+      }
+    } else {
+      // Create new user from OAuth data (no password required for OAuth users)
+      user = this.userRepository.create({
+        name: `${firstName} ${lastName}`.trim(),
+        email,
+        passwordHash: '', // OAuth users don't have a password
+        emailVerified: true, // OAuth providers verify emails
+        roles: [UserRole.ATTENDEE],
+        avatarUrl: picture,
+        oauthProvider: provider,
+      });
+
+      await this.userRepository.save(user);
     }
 
     // Generate JWT token

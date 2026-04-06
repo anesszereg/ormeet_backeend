@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
+import authService from '../../services/authService';
+import organizerService from '../../services/organizerService';
+import { useAuth } from '../../context/AuthContext';
 import PersonalInfoIcon from '../../assets/Svgs/organiser/dashboard/Account settings/personalInfo.svg';
 import OrganizationIcon from '../../assets/Svgs/organiser/dashboard/Account settings/organization.svg';
 import TeamRolesIcon from '../../assets/Svgs/organiser/dashboard/Account settings/teamRoles.svg';
@@ -37,7 +40,9 @@ interface Role {
 }
 
 const AccountSettingsOrganizer = () => {
+  const { user, refreshUser } = useAuth();
   const [activeSection, setActiveSection] = useState('personal-info');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Modal states
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -85,28 +90,29 @@ const AccountSettingsOrganizer = () => {
   const [locationError, setLocationError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   
-  // Form states for Personal Info
+  // Form states for Personal Info - initialized from user context
   const [profileData, setProfileData] = useState({
-    fullName: 'Lina Bensalem',
-    profilePhoto: ProfilePhoto
+    fullName: user?.name || '',
+    profilePhoto: user?.avatarUrl || ProfilePhoto
   });
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   
   const [emailData, setEmailData] = useState({
-    currentEmail: 'sophia.reed@gmail.com',
+    currentEmail: user?.email || '',
     newEmail: '',
     password: ''
   });
   
   const [phoneData, setPhoneData] = useState({
-    currentPhone: '(775) 586-5206',
+    currentPhone: user?.phone || '',
     newPhone: '',
     password: ''
   });
   
   const [locationData, setLocationData] = useState({
-    country: 'Algeria',
-    city: 'Oran',
-    address: ''
+    country: user?.metadata?.location?.country || '',
+    city: user?.metadata?.location?.city || '',
+    address: user?.metadata?.location?.address || ''
   });
   
   // Email Preferences states
@@ -130,7 +136,7 @@ const AccountSettingsOrganizer = () => {
   
   // About Organization states
   const [organizationData, setOrganizationData] = useState({
-    name: 'Pulsewave Entertainment',
+    name: '',
     logo: null as File | null,
     logoPreview: '',
     organizationType: '',
@@ -139,13 +145,44 @@ const AccountSettingsOrganizer = () => {
     phone: '',
     description: '',
     socialMedia: {
-      facebook: 'facebook.com/yourpage',
-      instagram: '@yourusername',
-      linkedin: 'linkedin.com/company/yourname',
-      youtube: 'youtube.com/@yourchannel'
+      facebook: '',
+      instagram: '',
+      linkedin: '',
+      youtube: ''
     }
   });
+  const [orgSaveSuccess, setOrgSaveSuccess] = useState(false);
+  const [orgSaveError, setOrgSaveError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch organization data from API
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!user?.organizationId) return;
+      try {
+        const org = await organizerService.getOrganizationById(user.organizationId);
+        setOrganizationData(prev => ({
+          ...prev,
+          name: org.name || '',
+          email: org.contactEmail || '',
+          phone: org.contactPhone || '',
+          description: org.description || '',
+          address: org.settings?.address || '',
+          organizationType: org.settings?.organizationType || '',
+          logoPreview: org.settings?.logoUrl || '',
+          socialMedia: {
+            facebook: org.settings?.socialMedia?.facebook || '',
+            instagram: org.settings?.socialMedia?.instagram || '',
+            linkedin: org.settings?.socialMedia?.linkedin || '',
+            youtube: org.settings?.socialMedia?.youtube || '',
+          }
+        }));
+      } catch (err) {
+        console.error('Failed to fetch organization:', err);
+      }
+    };
+    fetchOrganization();
+  }, [user?.organizationId]);
   
   // Team & Roles states
   const [activeTeamTab, setActiveTeamTab] = useState<'team' | 'roles'>('team');
@@ -219,9 +256,16 @@ const AccountSettingsOrganizer = () => {
   }, [isCreatingRole, roleMode]);
 
   // Handle role form submission
-  const handleCreateRole = () => {
+  const handleCreateRole = async () => {
+    if (!user?.organizationId) {
+      console.error('No organizationId found on user:', user);
+      alert('Organization not found. Please log out and log back in.');
+      return;
+    }
+    if (!roleFormData.roleName.trim()) return;
+
     // Check for duplicate role name (case-insensitive) - skip check if editing the same role
-    const isDuplicate = mockRoles.some(
+    const isDuplicate = roles.some(
       role => role.id !== editingRoleId && role.name.toLowerCase() === roleFormData.roleName.trim().toLowerCase()
     );
     
@@ -229,33 +273,65 @@ const AccountSettingsOrganizer = () => {
       setIsDuplicateRoleWarning(true);
       return;
     }
-    
-    if (roleMode === 'edit') {
-      console.log('Updating role:', editingRoleId, roleFormData);
-    } else {
-      console.log('Creating role:', roleFormData);
-    }
-    
-    setIsCreatingRole(false);
-    setRoleMode('create');
-    setEditingRoleId(null);
-    // Reset form
-    setRoleFormData({
-      roleName: '',
-      permissions: {
-        events: { deleteEvents: false, createAndEditEvents: false, viewEvents: false },
-        ticketsAndPricing: { viewTickets: false, editTicketTypesAndPricing: false, managePromoCodes: false },
-        ordersAndAttendees: { viewAttendees: false, exportAttendeeData: false, checkInAttendees: false, editAttendeeInfo: false },
-        reportsAndAnalytics: { viewAnalyticsDashboard: false, downloadReports: false },
-        emailAndNotifications: { viewScheduledMessages: false, editEmailTemplates: false, sendEventReminders: false },
-        settings: { viewSettings: false, manageTeamAccess: false }
+
+    setIsLoading(true);
+    try {
+      if (roleMode === 'edit' && editingRoleId) {
+        const updated = await organizerService.updateCustomRole(user.organizationId, editingRoleId, {
+          name: roleFormData.roleName,
+          permissions: roleFormData.permissions,
+        });
+        setRoles(prev => prev.map(r => r.id === editingRoleId ? {
+          id: updated.id,
+          name: updated.name,
+          permissions: Object.entries(updated.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        } : r));
+      } else {
+        const created = await organizerService.createCustomRole(user.organizationId, {
+          name: roleFormData.roleName,
+          permissions: roleFormData.permissions,
+        });
+        setRoles(prev => [...prev, {
+          id: created.id,
+          name: created.name,
+          permissions: Object.entries(created.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        }]);
       }
-    });
+
+      setIsCreatingRole(false);
+      setRoleMode('create');
+      setEditingRoleId(null);
+      // Reset form
+      setRoleFormData({
+        roleName: '',
+        permissions: {
+          events: { deleteEvents: false, createAndEditEvents: false, viewEvents: false },
+          ticketsAndPricing: { viewTickets: false, editTicketTypesAndPricing: false, managePromoCodes: false },
+          ordersAndAttendees: { viewAttendees: false, exportAttendeeData: false, checkInAttendees: false, editAttendeeInfo: false },
+          reportsAndAnalytics: { viewAnalyticsDashboard: false, downloadReports: false },
+          emailAndNotifications: { viewScheduledMessages: false, editEmailTemplates: false, sendEventReminders: false },
+          settings: { viewSettings: false, manageTeamAccess: false }
+        }
+      });
+    } catch (err: any) {
+      console.error('Failed to save role:', err);
+      if (err.response?.status === 409) {
+        setIsDuplicateRoleWarning(true);
+      } else {
+        alert(err.response?.data?.message || 'Failed to save role. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle edit role action
   const handleEditRole = (roleId: string) => {
-    const role = mockRoles.find(r => r.id === roleId);
+    const role = roles.find(r => r.id === roleId);
     if (!role) return;
 
     setRoleMode('edit');
@@ -277,7 +353,7 @@ const AccountSettingsOrganizer = () => {
 
   // Handle duplicate role action
   const handleDuplicateRole = (roleId: string) => {
-    const role = mockRoles.find(r => r.id === roleId);
+    const role = roles.find(r => r.id === roleId);
     if (!role) return;
 
     setRoleMode('duplicate');
@@ -315,27 +391,50 @@ const AccountSettingsOrganizer = () => {
     });
   };
   
-  // Mock team members data
-  const mockTeamMembers: TeamMember[] = [
-    { id: '1', name: 'Lina Bensalem', email: 'Lina@company.dz', role: 'Admin', status: 'active', lastActive: '', avatar: TeamPhoto1 },
-    { id: '2', name: 'Charlotte Anderson Charlotte Anderson', email: 'Charlotte@ormeet.dz', role: 'Finance Manager', status: 'active', lastActive: '', avatar: TeamPhoto2 },
-    { id: '3', name: 'John Lee', email: 'John@Company.Com', role: 'Ticketing Officer', status: 'pending', lastActive: '', avatar: TeamPhoto3 },
-  ];
-  
-  const filteredTeamMembers = mockTeamMembers.filter(member =>
+  // Team members & roles state (loaded from API)
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  // Fetch roles and pending invites from API
+  useEffect(() => {
+    const fetchTeamData = async () => {
+      if (!user?.organizationId) return;
+      try {
+        const [customRoles, pendingInvites] = await Promise.all([
+          organizerService.getCustomRoles(user.organizationId),
+          organizerService.getPendingInvites(user.organizationId).catch(() => []),
+        ]);
+        setRoles(customRoles.map((r: any) => ({
+          id: r.id,
+          name: r.name,
+          permissions: Object.entries(r.permissions || {})
+            .flatMap(([, perms]: [string, any]) => Object.entries(perms).filter(([, v]) => v).map(([k]) => k))
+            .join(', ') || 'No permissions',
+        })));
+        // Map pending invites as team members with 'pending' status
+        const pendingMembers: TeamMember[] = pendingInvites.map((inv: any) => ({
+          id: inv.id,
+          name: inv.email.split('@')[0],
+          email: inv.email,
+          role: inv.role,
+          status: 'pending' as const,
+          lastActive: `Invited ${new Date(inv.invitedAt).toLocaleDateString()}`,
+        }));
+        setTeamMembers(pendingMembers);
+      } catch (err) {
+        console.error('Failed to fetch team data:', err);
+      }
+    };
+    fetchTeamData();
+  }, [user?.organizationId]);
+
+  const filteredTeamMembers = teamMembers.filter(member =>
     member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
     member.email.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
     member.role.toLowerCase().includes(teamSearchQuery.toLowerCase())
   );
   
-  // Mock roles data
-  const mockRoles: Role[] = [
-    { id: '1', name: 'Admin', permissions: 'All Permissions' },
-    { id: '2', name: 'Finance Manager', permissions: '20 Permissions' },
-    { id: '3', name: 'Ticketing Officer', permissions: '10 Permissions' },
-  ];
-  
-  const filteredRoles = mockRoles.filter(role =>
+  const filteredRoles = roles.filter(role =>
     role.name.toLowerCase().includes(rolesSearchQuery.toLowerCase()) ||
     role.permissions.toLowerCase().includes(rolesSearchQuery.toLowerCase())
   );
@@ -370,20 +469,42 @@ const AccountSettingsOrganizer = () => {
   }, []);
   
   // Handlers for Personal Info
-  const handleProfileSave = () => {
+  const handleProfileSave = async () => {
     if (!profileData.fullName.trim()) {
       setProfileError('Full name is required');
       return;
     }
     setProfileError('');
-    setShowProfileSuccess(true);
-    setTimeout(() => {
-      setShowProfileSuccess(false);
-      setIsProfileModalOpen(false);
-    }, 2000);
+    setIsLoading(true);
+    
+    try {
+      let avatarUrl: string | undefined;
+      // Upload profile photo to Cloudinary if a new file was selected
+      if (profilePhotoFile) {
+        const urls = await organizerService.uploadImages([profilePhotoFile]);
+        if (urls.length > 0) {
+          avatarUrl = urls[0];
+        }
+      }
+      await authService.updateProfile({ name: profileData.fullName, ...(avatarUrl && { avatarUrl }) });
+      if (avatarUrl) {
+        setProfileData(prev => ({ ...prev, profilePhoto: avatarUrl! }));
+      }
+      setProfilePhotoFile(null);
+      refreshUser();
+      setShowProfileSuccess(true);
+      setTimeout(() => {
+        setShowProfileSuccess(false);
+        setIsProfileModalOpen(false);
+      }, 2000);
+    } catch (err: any) {
+      setProfileError(err.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleEmailSave = () => {
+  const handleEmailSave = async () => {
     if (!emailData.newEmail.trim()) {
       setEmailError('New email is required');
       return;
@@ -398,15 +519,25 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setEmailError('');
-    setShowEmailSuccess(true);
-    setTimeout(() => {
-      setShowEmailSuccess(false);
-      setEmailData({ ...emailData, currentEmail: emailData.newEmail, newEmail: '', password: '' });
-      setIsEmailModalOpen(false);
-    }, 2000);
+    setIsLoading(true);
+    
+    try {
+      await authService.updateEmail({ newEmail: emailData.newEmail, password: emailData.password });
+      refreshUser();
+      setShowEmailSuccess(true);
+      setTimeout(() => {
+        setShowEmailSuccess(false);
+        setEmailData({ ...emailData, currentEmail: emailData.newEmail, newEmail: '', password: '' });
+        setIsEmailModalOpen(false);
+      }, 2000);
+    } catch (err: any) {
+      setEmailError(err.response?.data?.message || 'Failed to update email');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handlePhoneSave = () => {
+  const handlePhoneSave = async () => {
     if (!phoneData.newPhone.trim()) {
       setPhoneError('New phone number is required');
       return;
@@ -416,15 +547,25 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setPhoneError('');
-    setShowPhoneSuccess(true);
-    setTimeout(() => {
-      setShowPhoneSuccess(false);
-      setPhoneData({ ...phoneData, currentPhone: phoneData.newPhone, newPhone: '', password: '' });
-      setIsPhoneModalOpen(false);
-    }, 2000);
+    setIsLoading(true);
+    
+    try {
+      await authService.updatePhone({ newPhone: phoneData.newPhone, password: phoneData.password });
+      refreshUser();
+      setShowPhoneSuccess(true);
+      setTimeout(() => {
+        setShowPhoneSuccess(false);
+        setPhoneData({ ...phoneData, currentPhone: phoneData.newPhone, newPhone: '', password: '' });
+        setIsPhoneModalOpen(false);
+      }, 2000);
+    } catch (err: any) {
+      setPhoneError(err.response?.data?.message || 'Failed to update phone');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  const handleLocationSave = () => {
+  const handleLocationSave = async () => {
     if (!locationData.country.trim()) {
       setLocationError('Country is required');
       return;
@@ -434,11 +575,25 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setLocationError('');
-    setShowLocationSuccess(true);
-    setTimeout(() => {
-      setShowLocationSuccess(false);
-      setIsLocationModalOpen(false);
-    }, 2000);
+    setIsLoading(true);
+    
+    try {
+      await authService.updateLocation({
+        country: locationData.country,
+        city: locationData.city,
+        address: locationData.address
+      });
+      refreshUser();
+      setShowLocationSuccess(true);
+      setTimeout(() => {
+        setShowLocationSuccess(false);
+        setIsLocationModalOpen(false);
+      }, 2000);
+    } catch (err: any) {
+      setLocationError(err.response?.data?.message || 'Failed to update location');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   // Handlers for About Organization
@@ -487,8 +642,51 @@ const AccountSettingsOrganizer = () => {
     setIsOrgTypeDropdownOpen(false);
   };
 
-  const handleOrganizationSave = () => {
-    console.log('Saving organization data:', organizationData);
+  const handleOrganizationSave = async () => {
+    if (!user?.organizationId) {
+      setOrgSaveError('No organization found. Please re-login.');
+      return;
+    }
+    if (!organizationData.name.trim()) {
+      setOrgSaveError('Organization name is required');
+      return;
+    }
+    setOrgSaveError('');
+    setIsLoading(true);
+
+    try {
+      // Upload logo if a new file was selected
+      let logoUrl: string | undefined;
+      if (organizationData.logo) {
+        const urls = await organizerService.uploadImages([organizationData.logo]);
+        if (urls.length > 0) {
+          logoUrl = urls[0];
+        }
+      }
+
+      await organizerService.updateOrganization(user.organizationId, {
+        name: organizationData.name,
+        description: organizationData.description || undefined,
+        contactEmail: organizationData.email || undefined,
+        contactPhone: organizationData.phone || undefined,
+        settings: {
+          address: organizationData.address,
+          organizationType: organizationData.organizationType,
+          logoUrl: logoUrl || organizationData.logoPreview || undefined,
+          socialMedia: organizationData.socialMedia,
+        },
+      });
+
+      if (logoUrl) {
+        setOrganizationData(prev => ({ ...prev, logoPreview: logoUrl!, logo: null }));
+      }
+      setOrgSaveSuccess(true);
+      setTimeout(() => setOrgSaveSuccess(false), 3000);
+    } catch (err: any) {
+      setOrgSaveError(err.response?.data?.message || 'Failed to save organization');
+    } finally {
+      setIsLoading(false);
+    }
   };
   
   const organizationTypes = ['Company', 'Association', 'Agency', 'Individual', 'Other'];
@@ -502,7 +700,8 @@ const AccountSettingsOrganizer = () => {
     setIsRoleDropdownOpen(false);
   };
 
-  const handleSendInvite = () => {
+  const handleSendInvite = async () => {
+    if (!user?.organizationId) return;
     if (!inviteTeamMemberData.email.trim()) {
       setInviteError('Email address is required');
       return;
@@ -517,8 +716,29 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setInviteError('');
-    console.log('Sending invite:', inviteTeamMemberData);
-    setShowInviteConfirmation(true);
+    setIsLoading(true);
+    try {
+      const result = await organizerService.inviteTeamMember(user.organizationId, {
+        email: inviteTeamMemberData.email,
+        role: inviteTeamMemberData.assignedRole,
+      });
+      // Update invitation code in the UI
+      setInviteTeamMemberData(prev => ({ ...prev, invitationCode: result.inviteCode }));
+      // Add to team members list as pending
+      setTeamMembers(prev => [...prev, {
+        id: result.inviteCode,
+        name: inviteTeamMemberData.email.split('@')[0],
+        email: inviteTeamMemberData.email,
+        role: inviteTeamMemberData.assignedRole,
+        status: 'pending',
+        lastActive: `Invited ${new Date().toLocaleDateString()}`,
+      }]);
+      setShowInviteConfirmation(true);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.message || 'Failed to send invitation');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancelInvite = () => {
@@ -554,7 +774,7 @@ const AccountSettingsOrganizer = () => {
   };
 
   const handleCancelChangeRole = () => {
-    const memberToRestore = mockTeamMembers.find(m => m.role === changeRoleData.currentRole);
+    const memberToRestore = teamMembers.find(m => m.role === changeRoleData.currentRole);
     setIsChangeRoleOpen(false);
     setChangeRoleData({ currentRole: '', newRole: '' });
     if (memberToRestore) {
@@ -589,7 +809,7 @@ const AccountSettingsOrganizer = () => {
   };
   
   // Handlers for Login & Security
-  const handlePasswordSave = () => {
+  const handlePasswordSave = async () => {
     if (!passwordData.currentPassword.trim()) {
       setPasswordError('Current password is required');
       return;
@@ -607,12 +827,24 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     setPasswordError('');
-    setShowPasswordSuccess(true);
-    setTimeout(() => {
-      setShowPasswordSuccess(false);
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      setIsEditPasswordOpen(false);
-    }, 2000);
+    setIsLoading(true);
+    
+    try {
+      await authService.changePassword({
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      setShowPasswordSuccess(true);
+      setTimeout(() => {
+        setShowPasswordSuccess(false);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setIsEditPasswordOpen(false);
+      }, 2000);
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || 'Failed to change password');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const menuItems = [
@@ -982,14 +1214,28 @@ const AccountSettingsOrganizer = () => {
                 </div>
               </div>
 
+              {/* Error/Success Messages */}
+              {orgSaveError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                  {orgSaveError}
+                </div>
+              )}
+              {orgSaveSuccess && (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+                  <img src={SuccessIcon} alt="Success" className="w-5 h-5" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
+                  Organization saved successfully!
+                </div>
+              )}
+
               {/* Save Changes Button */}
               <div className="flex justify-end">
                 <button
                   onClick={handleOrganizationSave}
-                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                  disabled={isLoading}
+                  className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {isLoading ? 'Saving...' : 'Save changes'}
                 </button>
               </div>
             </div>
@@ -1207,7 +1453,7 @@ const AccountSettingsOrganizer = () => {
 
                             {isRoleDropdownOpen && (
                               <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                {mockRoles.map((role) => (
+                                {roles.map((role) => (
                                   <button
                                     key={role.id}
                                     type="button"
@@ -1963,6 +2209,7 @@ const AccountSettingsOrganizer = () => {
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          setProfilePhotoFile(file);
                           const reader = new FileReader();
                           reader.onloadend = () => {
                             setProfileData({ ...profileData, profilePhoto: reader.result as string });
@@ -2353,14 +2600,22 @@ const AccountSettingsOrganizer = () => {
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        console.log('Deleting role:', roleToDelete.id);
-                        setShowDeleteRoleSuccess(true);
-                        setTimeout(() => {
-                          setShowDeleteRoleSuccess(false);
+                      onClick={async () => {
+                        if (!user?.organizationId) return;
+                        try {
+                          await organizerService.deleteCustomRole(user.organizationId, roleToDelete.id);
+                          setRoles(prev => prev.filter(r => r.id !== roleToDelete.id));
+                          setShowDeleteRoleSuccess(true);
+                          setTimeout(() => {
+                            setShowDeleteRoleSuccess(false);
+                            setIsDeleteRoleConfirmOpen(false);
+                            setRoleToDelete(null);
+                          }, 3000);
+                        } catch (err) {
+                          console.error('Failed to delete role:', err);
                           setIsDeleteRoleConfirmOpen(false);
                           setRoleToDelete(null);
-                        }, 3000);
+                        }
                       }}
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
@@ -2650,7 +2905,7 @@ const AccountSettingsOrganizer = () => {
 
                     {isNewRoleDropdownOpen && (
                       <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                        {mockRoles.map((role) => (
+                        {roles.map((role) => (
                           <button
                             key={role.id}
                             onClick={() => handleNewRoleSelect(role.name)}

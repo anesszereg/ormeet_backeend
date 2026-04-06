@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import organizerService, { Order as ApiOrder, Event as ApiEvent } from '../../services/organizerService';
+import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
@@ -39,6 +41,7 @@ interface OrdersTableProps {
 }
 
 const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'draft' | 'in-transit' | 'completed' | 'cancelled'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Newest First');
@@ -53,10 +56,91 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const ordersPerPage = 6;
+
+  // API Data States
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [apiOrders, setApiOrders] = useState<Order[]>([]);
   
   const sortRef = useRef<HTMLDivElement>(null);
   const datePickerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch orders from API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!user?.id) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        // Fetch events first to filter orders by organizer's events
+        // Use organizationId if available, otherwise fall back to user.id
+        const organizerId = user.organizationId || user.id;
+        console.log('🛒 [OrdersTable] Using organizerId:', organizerId);
+        
+        const eventsData = await organizerService.getEvents({ organizerId });
+        const eventIds = new Set(eventsData.map((e: ApiEvent) => e.id));
+        const eventMap = new Map(eventsData.map((e: ApiEvent) => [e.id, e.title]));
+        
+        // Fetch all orders
+        const ordersData = await organizerService.getOrders();
+        
+        console.log('🛒 [OrdersTable] Fetched Events:', eventsData);
+        console.log('🛒 [OrdersTable] Fetched Orders:', ordersData);
+        
+        // Filter and transform orders for organizer's events
+        const transformedOrders: Order[] = ordersData
+          .filter((order: ApiOrder) => eventIds.has(order.eventId))
+          .map((order: ApiOrder) => {
+            // Map API status to UI status
+            let status: 'active' | 'draft' | 'in-transit' | 'completed' | 'cancelled' = 'active';
+            let payment: 'paid' | 'pending' | 'failed' = 'pending';
+            
+            if (order.status === 'paid') {
+              status = 'active';
+              payment = 'paid';
+            } else if (order.status === 'pending') {
+              status = 'draft';
+              payment = 'pending';
+            } else if (order.status === 'cancelled') {
+              status = 'cancelled';
+              payment = 'failed';
+            } else if (order.status === 'refunded') {
+              status = 'completed';
+              payment = 'paid';
+            }
+
+            return {
+              id: order.id,
+              orderId: `#${order.id.substring(0, 4).toUpperCase()}`,
+              eventName: eventMap.get(order.eventId) || 'Unknown Event',
+              buyerName: order.user?.name || order.billingName || 'Unknown',
+              buyerPhoto: order.user?.profilePhoto || ProfilePhoto1,
+              ticketType: order.items?.[0]?.ticketTypeId ? 'General' : 'Unknown',
+              qty: order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
+              totalPrice: order.amountTotal || 0,
+              payment,
+              orderDate: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              ticketStatus: order.status === 'paid' ? 'sent' : 'not-sent',
+              status,
+            };
+          });
+        
+        console.log('🛒 [OrdersTable] Transformed Orders:', transformedOrders);
+        setApiOrders(transformedOrders);
+      } catch (err) {
+        console.error('❌ [OrdersTable] Failed to fetch orders:', err);
+        setError('Failed to load orders');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user?.id]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,101 +162,72 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
     setCurrentPage(1);
   }, [activeFilter]);
 
-  const mockEvents = [
-    { id: '1', name: 'Tech Summit 2025' },
-    { id: '2', name: 'Music Fest LA' },
-    { id: '3', name: 'AI Expo 2025' },
-    { id: '4', name: 'Business Conference' },
-  ];
+  // Delete order handler
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await organizerService.deleteOrder(orderToDelete.id);
+      console.log('🗑️ [OrdersTable] Order deleted:', orderToDelete.id);
+      
+      // Remove from local state
+      setApiOrders(prev => prev.filter(o => o.id !== orderToDelete.id));
+      setShowDeleteSuccess(true);
+      
+      setTimeout(() => {
+        setShowDeleteSuccess(false);
+        setIsDeleteConfirmOpen(false);
+        setSelectedOrder(null);
+        setOrderToDelete(null);
+      }, 2000);
+    } catch (err) {
+      console.error('❌ [OrdersTable] Failed to delete order:', err);
+      setError('Failed to delete order');
+      setIsDeleteConfirmOpen(false);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
-  const mockOrders: Order[] = [
-    {
-      id: '1',
-      orderId: '#4532',
-      eventName: 'Tech Summit 2025',
-      buyerName: 'John Doe',
-      buyerPhoto: ProfilePhoto1,
-      ticketType: 'General',
-      qty: 2,
-      totalPrice: 300,
-      payment: 'paid',
-      orderDate: 'May 2, 2025',
-      ticketStatus: 'sent',
-      status: 'active'
-    },
-    {
-      id: '2',
-      orderId: '#4533',
-      eventName: 'Music Fest LA',
-      buyerName: 'Sarah Smith',
-      buyerPhoto: ProfilePhoto2,
-      ticketType: 'VIP',
-      qty: 1,
-      totalPrice: 75,
-      payment: 'pending',
-      orderDate: 'May 2, 2025',
-      ticketStatus: 'not-sent',
-      status: 'draft'
-    },
-    {
-      id: '3',
-      orderId: '#4534',
-      eventName: 'AI Expo 2025',
-      buyerName: 'Emily Taylor',
-      buyerPhoto: ProfilePhoto3,
-      ticketType: 'Early Bird',
-      qty: 3,
-      totalPrice: 225,
-      payment: 'paid',
-      orderDate: 'May 1, 2025',
-      ticketStatus: 'sent',
-      status: 'completed'
-    },
-    {
-      id: '4',
-      orderId: '#4535',
-      eventName: 'Tech Summit 2025',
-      buyerName: 'John Doe',
-      buyerPhoto: ProfilePhoto4,
-      ticketType: 'General',
-      qty: 2,
-      totalPrice: 300,
-      payment: 'failed',
-      orderDate: 'May 2, 2025',
-      ticketStatus: 'sent',
-      status: 'cancelled'
-    },
-    {
-      id: '5',
-      orderId: '#4536',
-      eventName: 'Music Fest LA',
-      buyerName: 'Sarah Smith',
-      buyerPhoto: ProfilePhoto5,
-      ticketType: 'VIP',
-      qty: 1,
-      totalPrice: 75,
-      payment: 'pending',
-      orderDate: 'May 2, 2025',
-      ticketStatus: 'not-sent',
-      status: 'in-transit'
-    },
-    {
-      id: '6',
-      orderId: '#4537',
-      eventName: 'AI Expo 2025',
-      buyerName: 'Emily Taylor',
-      buyerPhoto: ProfilePhoto6,
-      ticketType: 'Early Bird',
-      qty: 3,
-      totalPrice: 225,
-      payment: 'paid',
-      orderDate: 'May 1, 2025',
-      ticketStatus: 'sent',
-      status: 'active'
-    },
-  ];
+  // Refund order handler
+  const handleRefundOrder = async (orderId: string) => {
+    try {
+      await organizerService.refundOrder(orderId);
+      console.log('💰 [OrdersTable] Order refunded:', orderId);
+      
+      // Update local state
+      setApiOrders(prev => prev.map(o => 
+        o.id === orderId ? { ...o, payment: 'paid' as const, status: 'completed' as const } : o
+      ));
+      setSelectedOrder(null);
+    } catch (err) {
+      console.error('❌ [OrdersTable] Failed to refund order:', err);
+      setError('Failed to refund order');
+    }
+  };
 
-  const filteredOrders = mockOrders.filter(order => {
+  // Cancel order handler
+  const handleCancelOrder = async (orderId: string) => {
+    try {
+      await organizerService.cancelOrder(orderId);
+      console.log('❌ [OrdersTable] Order cancelled:', orderId);
+      
+      // Update local state
+      setApiOrders(prev => prev.map(o => 
+        o.id === orderId ? { ...o, payment: 'failed' as const, status: 'cancelled' as const } : o
+      ));
+      setSelectedOrder(null);
+    } catch (err) {
+      console.error('❌ [OrdersTable] Failed to cancel order:', err);
+      setError('Failed to cancel order');
+    }
+  };
+
+  // Use only API orders - no mock data fallback
+  const ordersToDisplay = apiOrders;
+
+  const filteredOrders = ordersToDisplay.filter(order => {
     const matchesSearch = order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          order.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          order.buyerName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -378,15 +433,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Orders</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">463</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : apiOrders.length.toLocaleString()}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowUpIcon} alt="Up" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#10B981]">28.5%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>
@@ -395,15 +450,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Returns</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">287</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : apiOrders.filter(o => o.status === 'cancelled').length.toLocaleString()}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={DownIcon} alt="Down trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowDownIcon} alt="Down" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#EF4444]">47.3%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>
@@ -412,15 +467,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           <div className="flex items-start justify-between mb-2">
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">Total Revenue</p>
-              <h3 className="text-2xl lg:text-3xl font-bold text-black">$12,964</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-black">
+                {isLoading ? '...' : `$${apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
+              </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={ArrowUpIcon} alt="Up" className="w-3 h-3" />
-            <span className="text-xs lg:text-sm font-medium text-[#10B981]">39.8%</span>
             <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
           </div>
         </div>
@@ -591,7 +646,25 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         </div>
 
         <div className="divide-y divide-light-gray">
-          {currentOrders.map((order) => (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-sm text-gray">Loading orders...</p>
+            </div>
+          ) : currentOrders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 px-4">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">No orders yet</h3>
+              <p className="text-sm text-gray-500 text-center max-w-sm">
+                Orders will appear here when customers purchase tickets for your events.
+              </p>
+            </div>
+          ) : (
+          currentOrders.map((order) => (
             <div
               key={order.id}
               onClick={() => setSelectedOrder(order)}
@@ -648,7 +721,8 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               </div>
 
             </div>
-          ))}
+          ))
+          )}
         </div>
       </div>
 
@@ -830,14 +904,30 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Action Buttons */}
               <div className="flex items-center justify-end gap-3 mt-4">
+                {selectedOrder.payment === 'paid' && selectedOrder.status !== 'completed' && (
+                  <button
+                    onClick={() => handleRefundOrder(selectedOrder.id)}
+                    className="pl-5 pr-5 py-2 border border-yellow-500 text-yellow-600 rounded-full text-sm font-medium hover:bg-yellow-50 transition-all whitespace-nowrap cursor-pointer"
+                  >
+                    Refund
+                  </button>
+                )}
+                {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'completed' && (
+                  <button
+                    onClick={() => handleCancelOrder(selectedOrder.id)}
+                    className="pl-5 pr-5 py-2 border border-gray-400 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 transition-all whitespace-nowrap cursor-pointer"
+                  >
+                    Cancel Order
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     setOrderToDelete(selectedOrder);
                     setIsDeleteConfirmOpen(true);
                   }}
-                  className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
+                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
                 >
                   Delete
                 </button>
@@ -876,20 +966,12 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                       Cancel
                     </button>
                     <button
-                      onClick={() => {
-                        console.log('Deleting order:', orderToDelete.id);
-                        setShowDeleteSuccess(true);
-                        setTimeout(() => {
-                          setShowDeleteSuccess(false);
-                          setIsDeleteConfirmOpen(false);
-                          setSelectedOrder(null);
-                          setOrderToDelete(null);
-                        }, 3000);
-                      }}
-                      className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                      onClick={handleDeleteOrder}
+                      disabled={isDeleting}
+                      className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Confirm
+                      {isDeleting ? 'Deleting...' : 'Confirm'}
                     </button>
                   </div>
                 </>
@@ -909,7 +991,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onConfirm={handleExport}
-        events={mockEvents}
+        events={[]}
       />
     </div>
   );

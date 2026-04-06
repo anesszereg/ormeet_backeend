@@ -1,33 +1,57 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { ConfigService } from '@nestjs/config';
+import { Resend } from 'resend';
+import {
+  welcomeEmailHtml,
+  verificationEmailHtml,
+  passwordResetEmailHtml,
+  passwordChangedEmailHtml,
+  loginNotificationEmailHtml,
+  verificationCodeEmailHtml,
+  orderConfirmationEmailHtml,
+  teamInviteEmailHtml,
+  eventReminderEmailHtml,
+  checkInConfirmationEmailHtml,
+} from './email-templates';
 
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
+  private readonly resend: Resend;
+  private readonly fromEmail: string;
 
   constructor(
-    private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
+    this.fromEmail = this.configService.get('EMAIL_FROM') || 'Ormeet <onboarding@resend.dev>';
+
+    this.logger.log('📧 Email service initialized with Resend HTTP API');
+  }
+
+  private async sendEmail(to: string, subject: string, html: string) {
+    const { data, error } = await this.resend.emails.send({
+      from: this.fromEmail,
+      to: [to],
+      subject,
+      html,
+    });
+
+    if (error) {
+      throw new Error(`Resend error: ${JSON.stringify(error)}`);
+    }
+
+    this.logger.log(`📧 Email sent: ${data?.id}`);
+    return data;
+  }
 
   async sendWelcomeEmail(email: string, name: string, verificationToken: string) {
-    const verificationUrl = `${this.configService.get('APP_URL')}/auth/verify-email?token=${verificationToken}`;
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
     try {
       this.logger.log(`📧 Sending welcome email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Welcome to Ormeet - Verify Your Email',
-        template: 'welcome',
-        context: {
-          name,
-          verificationUrl,
-          appName: 'Ormeet',
-        },
-      });
-
+      await this.sendEmail(email, 'Welcome to Ormeet — Verify Your Email', welcomeEmailHtml(name, verificationUrl));
       this.logger.log(`✅ Welcome email sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send welcome email to: ${email}`, error.stack);
@@ -36,22 +60,12 @@ export class EmailService {
   }
 
   async sendEmailVerification(email: string, name: string, verificationToken: string) {
-    const verificationUrl = `${this.configService.get('APP_URL')}/auth/verify-email?token=${verificationToken}`;
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+    const verificationUrl = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
     try {
       this.logger.log(`📧 Sending verification email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Verify Your Email - Ormeet',
-        template: 'verify-email',
-        context: {
-          name,
-          verificationUrl,
-          appName: 'Ormeet',
-        },
-      });
-
+      await this.sendEmail(email, 'Verify Your Email — Ormeet', verificationEmailHtml(name, verificationUrl));
       this.logger.log(`✅ Verification email sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send verification email to: ${email}`, error.stack);
@@ -60,23 +74,12 @@ export class EmailService {
   }
 
   async sendPasswordResetEmail(email: string, name: string, resetToken: string) {
-    const resetUrl = `${this.configService.get('APP_URL')}/auth/reset-password?token=${resetToken}`;
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
 
     try {
       this.logger.log(`📧 Sending password reset email to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Reset Your Password - Ormeet',
-        template: 'reset-password',
-        context: {
-          name,
-          resetUrl,
-          appName: 'Ormeet',
-          expirationTime: '1 hour',
-        },
-      });
-
+      await this.sendEmail(email, 'Reset Your Password — Ormeet', passwordResetEmailHtml(name, resetUrl));
       this.logger.log(`✅ Password reset email sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send password reset email to: ${email}`, error.stack);
@@ -87,18 +90,8 @@ export class EmailService {
   async sendPasswordChangedEmail(email: string, name: string) {
     try {
       this.logger.log(`📧 Sending password changed confirmation to: ${email}`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'Password Changed Successfully - Ormeet',
-        template: 'password-changed',
-        context: {
-          name,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('EMAIL_USER'),
-        },
-      });
-
+      const supportEmail = this.configService.get('EMAIL_USER') || 'hello@ormeet.com';
+      await this.sendEmail(email, 'Password Changed — Ormeet', passwordChangedEmailHtml(name, supportEmail));
       this.logger.log(`✅ Password changed email sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send password changed email to: ${email}`, error.stack);
@@ -109,20 +102,8 @@ export class EmailService {
   async sendLoginNotification(email: string, name: string, ipAddress: string, userAgent: string) {
     try {
       this.logger.log(`📧 Sending login notification to: ${email} (IP: ${ipAddress})`);
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject: 'New Login to Your Account - Ormeet',
-        template: 'login-notification',
-        context: {
-          name,
-          ipAddress,
-          userAgent,
-          loginTime: new Date().toLocaleString(),
-          appName: 'Ormeet',
-        },
-      });
-
+      const loginTime = new Date().toLocaleString();
+      await this.sendEmail(email, 'New Login Detected — Ormeet', loginNotificationEmailHtml(name, loginTime, ipAddress, userAgent));
       this.logger.log(`✅ Login notification sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send login notification to: ${email}`, error.stack);
@@ -133,29 +114,15 @@ export class EmailService {
   async sendVerificationCode(email: string, code: string, purpose: string) {
     try {
       this.logger.log(`📧 Sending verification code to: ${email} (Purpose: ${purpose})`);
-
-      const subjectMap = {
-        login: 'Your Login Code - Ormeet',
-        registration: 'Complete Your Registration - Ormeet',
-        email_verification: 'Verify Your Email - Ormeet',
-        phone_verification: 'Verify Your Phone - Ormeet',
-        password_reset: 'Reset Your Password - Ormeet',
+      const subjectMap: Record<string, string> = {
+        login: 'Your Login Code — Ormeet',
+        registration: 'Complete Your Registration — Ormeet',
+        email_verification: 'Verify Your Email — Ormeet',
+        phone_verification: 'Verify Your Phone — Ormeet',
+        password_reset: 'Reset Your Password — Ormeet',
       };
-
-      const subject = subjectMap[purpose] || 'Your Verification Code - Ormeet';
-      
-      await this.mailerService.sendMail({
-        to: email,
-        subject,
-        template: 'verification-code',
-        context: {
-          code,
-          purpose,
-          expiresIn: '10 minutes',
-          appName: 'Ormeet',
-        },
-      });
-
+      const subject = subjectMap[purpose] || 'Your Verification Code — Ormeet';
+      await this.sendEmail(email, subject, verificationCodeEmailHtml(code, purpose));
       this.logger.log(`✅ Verification code sent successfully to: ${email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send verification code to: ${email}`, error.stack);
@@ -187,60 +154,65 @@ export class EmailService {
   }) {
     try {
       this.logger.log(`📧 Sending order confirmation to: ${orderData.email}`);
-
-      // Prepare attachments for QR codes
-      const attachments = orderData.tickets.map((ticket, index) => ({
-        filename: `qr-${ticket.code}.png`,
-        content: ticket.qrCodeBuffer,
-        cid: `qr-${ticket.code}`, // Content ID for embedding in HTML
-      }));
-
-      // Add PDF ticket as attachment if provided
-      if (orderData.pdfTicket) {
-        attachments.push({
-          filename: `Tickets-${orderData.orderId}.pdf`,
-          content: orderData.pdfTicket,
-          contentType: 'application/pdf',
-        } as any);
-      }
-
-      // Prepare tickets with CID references for template
-      const ticketsForTemplate = orderData.tickets.map((ticket) => ({
-        id: ticket.id,
-        code: ticket.code,
-        ticketType: ticket.ticketType,
-        price: ticket.price,
-        qrCodeCid: `qr-${ticket.code}`, // CID reference
-      }));
-
-      await this.mailerService.sendMail({
-        to: orderData.email,
-        subject: `Order Confirmation - ${orderData.eventTitle}`,
-        template: 'order-confirmation',
-        context: {
-          customerName: orderData.customerName,
-          orderId: orderData.orderId,
-          eventTitle: orderData.eventTitle,
-          eventDate: orderData.eventDate,
-          eventLocation: orderData.eventLocation,
-          tickets: ticketsForTemplate,
-          ticketCount: orderData.tickets.length,
-          subtotal: orderData.subtotal.toFixed(2),
-          discount: orderData.discount.toFixed(2),
-          serviceFee: orderData.serviceFee.toFixed(2),
-          processingFee: orderData.processingFee.toFixed(2),
-          total: orderData.total.toFixed(2),
-          currency: orderData.currency,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com',
-        },
-        attachments,
-      });
-
+      await this.sendEmail(
+        orderData.email,
+        `Order Confirmed — ${orderData.eventTitle}`,
+        orderConfirmationEmailHtml(orderData),
+      );
       this.logger.log(`✅ Order confirmation sent successfully to: ${orderData.email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send order confirmation to: ${orderData.email}`, error.stack);
-      // Don't throw - we don't want to fail the order if email fails
+      console.error('Email error:', error);
+    }
+  }
+
+  async sendTeamInviteEmail(inviteData: {
+    email: string;
+    organizationName: string;
+    inviterName: string;
+    roleName: string;
+    inviteCode: string;
+  }) {
+    try {
+      this.logger.log(`📧 Sending team invite to: ${inviteData.email}`);
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+      const inviteUrl = `${frontendUrl}/join-team?code=${inviteData.inviteCode}`;
+      await this.sendEmail(
+        inviteData.email,
+        `You're invited to join ${inviteData.organizationName} — Ormeet`,
+        teamInviteEmailHtml(inviteData.inviterName, inviteData.organizationName, inviteData.roleName, inviteData.inviteCode, inviteUrl),
+      );
+      this.logger.log(`✅ Team invite email sent successfully to: ${inviteData.email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send team invite email to: ${inviteData.email}`, error.stack);
+      throw error;
+    }
+  }
+
+  async sendEventReminder(reminderData: {
+    email: string;
+    attendeeName: string;
+    eventTitle: string;
+    eventDate: string;
+    eventLocation: string;
+    ticketCode?: string;
+    ticketType?: string;
+    hoursUntilEvent: number;
+  }) {
+    try {
+      this.logger.log(`📧 Sending event reminder to: ${reminderData.email} (${reminderData.hoursUntilEvent}h before)`);
+      const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+      const timeLabel = reminderData.hoursUntilEvent >= 24
+        ? `${Math.round(reminderData.hoursUntilEvent / 24)} day(s)`
+        : reminderData.hoursUntilEvent === 0 ? 'now' : `${reminderData.hoursUntilEvent} hour(s)`;
+      await this.sendEmail(
+        reminderData.email,
+        `⏰ Reminder: ${reminderData.eventTitle} starts in ${timeLabel}!`,
+        eventReminderEmailHtml({ ...reminderData, frontendUrl }),
+      );
+      this.logger.log(`✅ Event reminder sent successfully to: ${reminderData.email}`);
+    } catch (error) {
+      this.logger.error(`❌ Failed to send event reminder to: ${reminderData.email}`, error.stack);
       console.error('Email error:', error);
     }
   }
@@ -259,30 +231,15 @@ export class EmailService {
   }) {
     try {
       this.logger.log(`📧 Sending check-in confirmation to: ${checkInData.email}`);
-
-      await this.mailerService.sendMail({
-        to: checkInData.email,
-        subject: `✓ Check-In Confirmed - ${checkInData.eventTitle}`,
-        template: 'check-in-confirmation',
-        context: {
-          attendeeName: checkInData.attendeeName,
-          eventTitle: checkInData.eventTitle,
-          eventDate: checkInData.eventDate,
-          eventLocation: checkInData.eventLocation,
-          ticketCode: checkInData.ticketCode,
-          ticketType: checkInData.ticketType,
-          checkInTime: checkInData.checkInTime,
-          checkInMethod: checkInData.checkInMethod.toUpperCase(),
-          seatInfo: checkInData.seatInfo,
-          appName: 'Ormeet',
-          supportEmail: this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com',
-        },
-      });
-
+      const supportEmail = this.configService.get('SUPPORT_EMAIL') || 'support@ormeet.com';
+      await this.sendEmail(
+        checkInData.email,
+        `✓ Check-In Confirmed — ${checkInData.eventTitle}`,
+        checkInConfirmationEmailHtml({ ...checkInData, supportEmail }),
+      );
       this.logger.log(`✅ Check-in confirmation sent successfully to: ${checkInData.email}`);
     } catch (error) {
       this.logger.error(`❌ Failed to send check-in confirmation to: ${checkInData.email}`, error.stack);
-      // Don't throw - we don't want to fail the check-in if email fails
       console.error('Email error:', error);
     }
   }
