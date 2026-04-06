@@ -19,6 +19,8 @@ import {
   UpdatePhoneDto,
   ChangePasswordDto,
   UpdateLocationDto,
+  UpdateInterestsDto,
+  UpdateHostingTypesDto,
 } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
@@ -86,5 +88,21 @@ export class UsersController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async addOrganizerRole(@Request() req) {
     return this.usersService.addOrganizerRole(req.user.id);
+  }
+
+  @Patch('me/interests')
+  @ApiOperation({ summary: 'Update user interested event categories' })
+  @ApiResponse({ status: 200, description: 'Interests updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateInterests(@Request() req, @Body() dto: UpdateInterestsDto) {
+    return this.usersService.updateInterests(req.user.id, dto);
+  }
+
+  @Patch('me/hosting-types')
+  @ApiOperation({ summary: 'Update organizer hosting event types' })
+  @ApiResponse({ status: 200, description: 'Hosting types updated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async updateHostingTypes(@Request() req, @Body() dto: UpdateHostingTypesDto) {
+    return this.usersService.updateHostingTypes(req.user.id, dto);
   }
 }

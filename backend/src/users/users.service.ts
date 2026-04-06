@@ -14,6 +14,8 @@ import {
   UpdatePhoneDto,
   ChangePasswordDto,
   UpdateLocationDto,
+  UpdateInterestsDto,
+  UpdateHostingTypesDto,
 } from './dto';
 
 @Injectable()
@@ -144,6 +146,24 @@ export class UsersService {
     await this.userRepository.save(user);
     console.log(`✅ Added organizer role to user ${user.id}. Roles: ${user.roles.join(', ')}`);
     
+    return this.sanitizeUser(user);
+  }
+
+  async updateInterests(userId: string, dto: UpdateInterestsDto): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.interestedEventCategories = dto.interestedEventCategories as any;
+
+    await this.userRepository.save(user);
+    return this.sanitizeUser(user);
+  }
+
+  async updateHostingTypes(userId: string, dto: UpdateHostingTypesDto): Promise<User> {
+    const user = await this.findById(userId);
+
+    user.hostingEventTypes = dto.hostingEventTypes as any;
+
+    await this.userRepository.save(user);
     return this.sanitizeUser(user);
   }
 

@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsEmail, MinLength, IsArray } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
@@ -77,4 +77,18 @@ export class UpdateLocationDto {
   @IsOptional()
   @IsString()
   address?: string;
+}
+
+export class UpdateInterestsDto {
+  @ApiProperty({ description: 'Array of interested event categories', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  interestedEventCategories: string[];
+}
+
+export class UpdateHostingTypesDto {
+  @ApiProperty({ description: 'Array of hosting event types', type: [String] })
+  @IsArray()
+  @IsString({ each: true })
+  hostingEventTypes: string[];
 }
