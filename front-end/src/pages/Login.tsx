@@ -66,21 +66,33 @@ const Login = () => {
       
       const user = authService.getCurrentUser();
       
+      console.log('🔍 [Login] User data:', user);
+      console.log('🔍 [Login] User roles:', user?.roles);
+      console.log('🔍 [Login] interestedEventCategories:', user?.interestedEventCategories);
+      console.log('🔍 [Login] hostingEventTypes:', user?.hostingEventTypes);
+      
       // Check if user needs onboarding (first time login)
       // User needs onboarding if they don't have interests/hosting types set
       const needsOnboarding = user?.roles?.includes('organizer') 
         ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       
+      console.log('🔍 [Login] needsOnboarding:', needsOnboarding);
+      console.log('🔍 [Login] Is organizer:', user?.roles?.includes('organizer'));
+      
       if (needsOnboarding) {
         // Redirect to onboarding based on role
         if (user?.roles?.includes('organizer')) {
+          console.log('✅ [Login] Redirecting to organizer onboarding');
           navigate('/onboarding-brand-info', { replace: true });
         } else {
+          console.log('✅ [Login] Redirecting to attendee onboarding');
           navigate('/onboarding-interests', { replace: true });
         }
         return;
       }
+      
+      console.log('✅ [Login] User has completed onboarding, redirecting to dashboard');
       
       // Navigate to dashboard based on user role
       if (user?.roles?.includes('organizer')) {
