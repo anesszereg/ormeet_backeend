@@ -20,7 +20,7 @@ export interface EventGuidelines {
 
 export interface TicketTypeDto {
   name: string;
-  type: 'general' | 'vip' | 'early_bird' | 'student' | 'group' | 'premium';
+  type: 'General Admission' | 'VIP' | 'Early Bird' | 'Student' | 'Group' | 'Premium' | 'Standard' | 'Other';
   quantityTotal: number;
   price: number;
   maxPerOrder?: number;

@@ -579,12 +579,15 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     // Map tickets
     const tickets = formData.tickets
       .filter(t => t.type && t.quantity)
-      .map(t => ({
-        name: t.type,
-        type: t.type, // Send the ticket type as-is (e.g., 'General Admission', 'VIP', etc.)
-        quantityTotal: parseInt(t.quantity) || 0,
-        price: t.priceType === 'free' ? 0 : parseFloat(t.price) || 0,
-      }));
+      .map(t => {
+        console.log('Ticket type being sent:', t.type, 'Type:', typeof t.type);
+        return {
+          name: t.type,
+          type: t.type as 'General Admission' | 'VIP' | 'Early Bird' | 'Student' | 'Group' | 'Premium' | 'Standard' | 'Other',
+          quantityTotal: parseInt(t.quantity) || 0,
+          price: t.priceType === 'free' ? 0 : parseFloat(t.price) || 0,
+        };
+      });
 
     // Use uploaded image URLs
     const validImages = imageUrls;
