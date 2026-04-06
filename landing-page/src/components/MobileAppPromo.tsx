@@ -26,7 +26,7 @@ const MobileAppPromo = () => {
               <br />
               All from Your Phone
             </h2>
-            <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed max-w-md mb-6">
+            <p className="text-sm md:text-base text-muted leading-relaxed max-w-md mb-6">
               Book tickets, access your QR code, and get real-time
               updates — all in one place. Fast, easy, and made for
               event day!
@@ -64,7 +64,7 @@ const MobileAppPromo = () => {
 
           {/* QR Code */}
           <div className="hidden lg:flex flex-col items-center justify-center pr-10 xl:pr-16 py-12">
-            <span className="text-xs text-[#4F4F4F] font-medium mb-3 whitespace-nowrap">
+            <span className="text-xs text-muted font-medium mb-3 whitespace-nowrap">
               Scan to Get the App
             </span>
             <div className="w-[120px] h-[120px] bg-white rounded-xl p-2 shadow-sm">

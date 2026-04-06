@@ -22,19 +22,19 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-6">
           <Link
             href="/browse"
-            className="text-sm font-medium text-black hover:text-[#FF4000] transition-colors cursor-pointer"
+            className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Browse events
           </Link>
           <Link
             href="/host"
-            className="text-sm font-medium text-black hover:text-[#FF4000] transition-colors cursor-pointer"
+            className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Host events
           </Link>
           <Link
             href="/support"
-            className="text-sm font-medium text-black hover:text-[#FF4000] transition-colors cursor-pointer"
+            className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Support
           </Link>
@@ -44,7 +44,7 @@ const Navbar = () => {
       {/* Right: Language + Auth Buttons */}
       <div className="flex items-center gap-4">
         {/* Language Selector */}
-        <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-black hover:text-[#FF4000] transition-colors cursor-pointer">
+        <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-black hover:text-primary transition-colors cursor-pointer">
           <svg
             width="20"
             height="20"
@@ -92,7 +92,7 @@ const Navbar = () => {
         {/* Log In Button */}
         <Link
           href="/login"
-          className="px-5 py-2 text-sm font-semibold text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors cursor-pointer"
+          className="px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
         >
           Log In
         </Link>
@@ -100,7 +100,7 @@ const Navbar = () => {
         {/* Sign Up Button */}
         <Link
           href="/register"
-          className="px-5 py-2 text-sm font-semibold text-white bg-[#FF4000] rounded-full hover:bg-[#E63900] transition-colors cursor-pointer"
+          className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-dark transition-colors"
         >
           Sign up
         </Link>

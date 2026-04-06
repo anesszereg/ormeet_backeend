@@ -1,18 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-
-interface CaliforniaEvent {
-  id: number;
-  image: string;
-  title: string;
-  date: string;
-  venue: string;
-  price: string;
-  badge: string | null;
-  badgeColor: "green" | "red" | null;
-}
+import type { CaliforniaEvent } from "@/types";
+import { FRONTEND_ORIGIN } from "@/lib/constants";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationControls from "@/components/ui/PaginationControls";
 
 const californiaEvents: CaliforniaEvent[] = [
   { id: 1, image: "/images/landingPage/event-myticket-7.png", title: "Laugh Out Loud Live!", date: "Nov 3", venue: "The Spotlight Theatre", price: "$53.99", badge: null, badgeColor: null },
@@ -24,57 +16,31 @@ const californiaEvents: CaliforniaEvent[] = [
 
 const CARDS_PER_PAGE = 3;
 
-const EventsInCalifornia = () => {
-  const [page, setPage] = useState(1);
+interface EventsInCaliforniaProps {
+  /** City selected in the DiscoverSection dropdown */
+  selectedCity?: string;
+}
+
+const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaProps) => {
   const totalPages = Math.ceil(californiaEvents.length / CARDS_PER_PAGE);
+  const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
   const currentEvents = californiaEvents.slice(startIndex, startIndex + CARDS_PER_PAGE);
-
-  const handlePrev = () => setPage((p) => (p > 1 ? p - 1 : p));
-  const handleNext = () => setPage((p) => (p < totalPages ? p + 1 : p));
 
   return (
     <section className="w-full px-6 md:px-10 lg:px-16 xl:px-20 pt-10 pb-8 bg-white">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          Events in <span className="font-bold">California</span>
+          Events in <span className="font-bold">{selectedCity}</span>
         </h2>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-[#757575]">
-            {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={handlePrev}
-              disabled={page === 1}
-              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#EEEEEE] transition-colors ${
-                page === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#F8F8F8] cursor-pointer"
-              }`}
-              aria-label="Previous page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8L10 4" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={page === totalPages}
-              className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
-                page === totalPages
-                  ? "bg-gray-400 opacity-50 cursor-not-allowed"
-                  : "bg-black hover:bg-[#333333] cursor-pointer"
-              }`}
-              aria-label="Next page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 4L10 8L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          size="sm"
+        />
       </div>
 
       {/* Cards Grid */}
@@ -83,6 +49,7 @@ const EventsInCalifornia = () => {
           <div
             key={event.id}
             className="group cursor-pointer"
+            onClick={() => window.open(`${FRONTEND_ORIGIN}/event/${event.id}`, "_blank", "noopener,noreferrer")}
           >
             {/* Image */}
             <div className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] rounded-2xl overflow-hidden mb-3">
@@ -99,7 +66,7 @@ const EventsInCalifornia = () => {
             <h3 className="text-base font-semibold text-black mb-1 line-clamp-1">
               {event.title}
             </h3>
-            <p className="text-sm text-[#757575] mb-1.5">
+            <p className="text-sm text-medium-gray mb-1.5">
               {event.date} • {event.venue}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
@@ -109,7 +76,7 @@ const EventsInCalifornia = () => {
                   className={`text-xs font-medium px-2 py-1 rounded ${
                     event.badgeColor === "green"
                       ? "text-[#34A853] bg-[#E8F5E9]"
-                      : "text-[#FF4000] bg-[#FFF4F3]"
+                      : "text-primary bg-primary-light"
                   }`}
                 >
                   {event.badge}

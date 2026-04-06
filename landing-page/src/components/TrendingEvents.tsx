@@ -1,20 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-
-interface TrendingEvent {
-  id: number;
-  image: string;
-  title: string;
-  price: string;
-  badge: string | null;
-  badgeColor: "blue" | "red" | null;
-}
+import type { TrendingEvent } from "@/types";
+import { FRONTEND_ORIGIN } from "@/lib/constants";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationControls from "@/components/ui/PaginationControls";
 
 const trendingEvents: TrendingEvent[] = [
   { id: 1, image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badge: "Almost full", badgeColor: "blue" },
-  { id: 2, image: "https://images.unsplash.com/photo-1571266028243-d220c6a8b0e5?w=600&h=800&fit=crop", title: "Rooftop DJ Nights", price: "$53.99", badge: null, badgeColor: null },
+  { id: 2, image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=800&fit=crop", title: "Rooftop DJ Nights", price: "$53.99", badge: null, badgeColor: null },
   { id: 3, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=800&fit=crop", title: "SoCal Street Bites", price: "$53.99", badge: "Sales end soon", badgeColor: "red" },
   { id: 4, image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=800&fit=crop", title: "Local Artists Showcase", price: "$53.99", badge: "Only few left", badgeColor: "red" },
   { id: 5, image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badge: null, badgeColor: null },
@@ -26,13 +20,10 @@ const trendingEvents: TrendingEvent[] = [
 const CARDS_PER_PAGE = 5;
 
 const TrendingEvents = () => {
-  const [page, setPage] = useState(1);
   const totalPages = Math.ceil(trendingEvents.length / CARDS_PER_PAGE);
+  const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
   const currentEvents = trendingEvents.slice(startIndex, startIndex + CARDS_PER_PAGE);
-
-  const handlePrev = () => setPage((p) => (p > 1 ? p - 1 : p));
-  const handleNext = () => setPage((p) => (p < totalPages ? p + 1 : p));
 
   return (
     <section className="w-full px-6 md:px-10 lg:px-16 xl:px-20 pt-10 pb-8 bg-white">
@@ -41,41 +32,13 @@ const TrendingEvents = () => {
         <h2 className="text-xl text-black">
           <span className="font-bold">Trending</span> events
         </h2>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-[#757575]">
-            {page} of {totalPages}
-          </span>
-          <div className="flex gap-2">
-            <button
-              onClick={handlePrev}
-              disabled={page === 1}
-              className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#EEEEEE] transition-colors ${
-                page === 1
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:bg-[#F8F8F8] cursor-pointer"
-              }`}
-              aria-label="Previous page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M10 12L6 8L10 4" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={page === totalPages}
-              className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
-                page === totalPages
-                  ? "bg-gray-400 opacity-50 cursor-not-allowed"
-                  : "bg-black hover:bg-[#333333] cursor-pointer"
-              }`}
-              aria-label="Next page"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M6 4L10 8L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <PaginationControls
+          page={page}
+          totalPages={totalPages}
+          onPrev={handlePrev}
+          onNext={handleNext}
+          size="sm"
+        />
       </div>
 
       {/* Cards Grid */}
@@ -86,6 +49,7 @@ const TrendingEvents = () => {
             <div
               key={event.id}
               className="relative group cursor-pointer transition-transform duration-300 hover:scale-105"
+              onClick={() => window.open(`${FRONTEND_ORIGIN}/event/${event.id}`, "_blank", "noopener,noreferrer")}
             >
               {/* Image + Number */}
               <div className="relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
@@ -121,7 +85,7 @@ const TrendingEvents = () => {
                     className={`inline-block mt-1.5 text-xs font-medium px-2 py-1 rounded ${
                       event.badgeColor === "blue"
                         ? "text-[#00A3FF] bg-[#E6F7FF]"
-                        : "text-[#FF4000] bg-[#FFF4F3]"
+                        : "text-primary bg-primary-light"
                     }`}
                   >
                     {event.badge}

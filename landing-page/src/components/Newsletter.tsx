@@ -19,7 +19,7 @@ const Newsletter = () => {
           <h2 className="text-xl md:text-2xl font-bold text-black mb-2">
             Be the first to know. never miss an event again!
           </h2>
-          <p className="text-sm text-[#4F4F4F] leading-relaxed">
+          <p className="text-sm text-muted leading-relaxed">
             Get exclusive updates, early bird access, and handpicked events — delivered
             straight to your inbox.
           </p>
@@ -27,27 +27,25 @@ const Newsletter = () => {
 
         {/* Right: Email Input + Button */}
         <form onSubmit={handleSubmit} className="flex items-center w-full lg:w-auto">
-          <div className="flex items-center flex-1 lg:flex-none border border-[#EEEEEE] rounded-full overflow-hidden focus-within:border-[#FF4000] transition-colors">
+          <div className="relative flex items-center flex-1 lg:flex-none border border-light-gray rounded-full focus-within:border-primary transition-colors">
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full lg:w-[280px] h-12 pl-5 pr-4 text-sm font-medium text-black placeholder-[#BDBDBD] placeholder:font-normal bg-transparent border-none outline-none"
+              className="w-full lg:w-[340px] h-12 pl-5 pr-14 text-sm font-medium text-black placeholder-input-gray placeholder:font-normal bg-transparent border-none outline-none"
               required
             />
             <button
               type="submit"
-              className="shrink-0 h-10 px-5 mr-1 bg-[#FF4000] text-white text-sm font-semibold rounded-full flex items-center gap-2 hover:bg-[#E63900] hover:shadow-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark hover:shadow-lg transition-all duration-200 cursor-pointer"
               style={{ boxShadow: '0 2px 8px rgba(255, 64, 0, 0.2)' }}
+              aria-label="Keep Me Updated"
             >
-              Keep Me Updated
-              <span className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center">
-                <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
-                  <path d="M4 10L10 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M4 4H10V10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </span>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <path d="M4 10L10 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 4H10V10" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </button>
           </div>
         </form>

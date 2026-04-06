@@ -1,16 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useId } from "react";
 import Image from "next/image";
-
-interface Testimonial {
-  id: number;
-  name: string;
-  role: string;
-  avatar: string;
-  rating: number;
-  text: string;
-}
+import type { Testimonial } from "@/types";
+import { usePagination } from "@/hooks/usePagination";
+import PaginationControls from "@/components/ui/PaginationControls";
 
 const allTestimonialPages: Testimonial[][] = [
   [
@@ -167,7 +161,12 @@ const allTestimonialPages: Testimonial[][] = [
 
 const TOTAL_PAGES = allTestimonialPages.length;
 
+const STAR_PATH = "M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z";
+
+/** Uses useId() to generate a unique gradient ID per instance, preventing SVG ID collisions. */
 const StarRating = ({ rating }: { rating: number }) => {
+  const uniqueId = useId();
+  const gradientId = `halfStar-${uniqueId}`;
   const fullStars = Math.floor(rating);
   const hasHalf = rating % 1 !== 0;
   const emptyStars = 5 - fullStars - (hasHalf ? 1 : 0);
@@ -176,23 +175,23 @@ const StarRating = ({ rating }: { rating: number }) => {
     <div className="flex items-center gap-0.5">
       {[...Array(fullStars)].map((_, i) => (
         <svg key={`full-${i}`} width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" />
+          <path d={STAR_PATH} fill="#FFA500" />
         </svg>
       ))}
       {hasHalf && (
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
           <defs>
-            <linearGradient id="halfStar">
+            <linearGradient id={gradientId}>
               <stop offset="50%" stopColor="#FFA500" />
               <stop offset="50%" stopColor="#E0E0E0" />
             </linearGradient>
           </defs>
-          <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="url(#halfStar)" />
+          <path d={STAR_PATH} fill={`url(#${gradientId})`} />
         </svg>
       )}
       {[...Array(emptyStars)].map((_, i) => (
         <svg key={`empty-${i}`} width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#E0E0E0" />
+          <path d={STAR_PATH} fill="#E0E0E0" />
         </svg>
       ))}
     </div>
@@ -203,7 +202,7 @@ const TestimonialCard = ({ t }: { t: Testimonial }) => (
   <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#F5F5F5] flex flex-col justify-between">
     <div>
       <StarRating rating={t.rating} />
-      <p className="text-sm text-[#4F4F4F] leading-relaxed mt-4 mb-6">
+      <p className="text-sm text-muted leading-relaxed mt-4 mb-6">
         {t.text}
       </p>
     </div>
@@ -213,20 +212,17 @@ const TestimonialCard = ({ t }: { t: Testimonial }) => (
       </div>
       <div>
         <p className="text-sm font-semibold text-black">{t.name}</p>
-        <p className="text-xs text-[#757575]">{t.role}</p>
+        <p className="text-xs text-medium-gray">{t.role}</p>
       </div>
     </div>
   </div>
 );
 
 const Testimonials = () => {
-  const [page, setPage] = useState(1);
+  const { page, handlePrev, handleNext } = usePagination({ totalPages: TOTAL_PAGES });
   const currentTestimonials = allTestimonialPages[page - 1];
   const topRow = currentTestimonials.slice(0, 3);
   const bottomRow = currentTestimonials.slice(3, 6);
-
-  const handlePrev = () => setPage((p) => (p > 1 ? p - 1 : p));
-  const handleNext = () => setPage((p) => (p < TOTAL_PAGES ? p + 1 : p));
 
   return (
     <section className="w-full bg-white py-16 px-6 md:px-10 lg:px-16 xl:px-20">
@@ -246,7 +242,7 @@ const Testimonials = () => {
         </div>
 
         {/* Subtitle */}
-        <span className="text-xs font-semibold tracking-widest text-[#4F4F4F] uppercase mb-4">
+        <span className="text-xs font-semibold tracking-widest text-muted uppercase mb-4">
           5000+ Happy Ormeet Users
         </span>
 
@@ -275,38 +271,13 @@ const Testimonials = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-center gap-3 mt-10">
-        <button
-          onClick={handlePrev}
-          disabled={page === 1}
-          className={`w-10 h-10 flex items-center justify-center rounded-full border border-[#EEEEEE] transition-colors ${
-            page === 1
-              ? "opacity-50 cursor-not-allowed"
-              : "hover:bg-white cursor-pointer"
-          }`}
-          aria-label="Previous page"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8L10 4" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <span className="text-sm text-[#757575]">
-          {page} of {TOTAL_PAGES}
-        </span>
-        <button
-          onClick={handleNext}
-          disabled={page === TOTAL_PAGES}
-          className={`w-10 h-10 flex items-center justify-center rounded-full transition-colors ${
-            page === TOTAL_PAGES
-              ? "bg-gray-400 opacity-50 cursor-not-allowed"
-              : "bg-black hover:bg-[#333333] cursor-pointer"
-          }`}
-          aria-label="Next page"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M6 4L10 8L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+      <div className="flex items-center justify-center mt-10">
+        <PaginationControls
+          page={page}
+          totalPages={TOTAL_PAGES}
+          onPrev={handlePrev}
+          onNext={handleNext}
+        />
       </div>
     </section>
   );

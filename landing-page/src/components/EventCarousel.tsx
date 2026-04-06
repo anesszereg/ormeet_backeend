@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
-
-interface CarouselEvent {
-  id: number;
-  image: string;
-  title: string;
-  date: string;
-  venue: string;
-}
+import Link from "next/link";
+import type { CarouselEvent } from "@/types";
+import { FRONTEND_ORIGIN } from "@/lib/constants";
 
 const events: CarouselEvent[] = [
   {
@@ -52,15 +47,20 @@ const events: CarouselEvent[] = [
 const EventCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(1);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? events.length - 1 : prev - 1));
-  };
+  }, []);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev === events.length - 1 ? 0 : prev + 1));
-  };
+  }, []);
 
-  const getVisibleEvents = () => {
+  /** Navigate to event detail page - frontend route */
+  const handleEventClick = useCallback((eventId: number) => {
+    window.location.href = `${FRONTEND_ORIGIN}/event/${eventId}`;
+  }, []);
+
+  const { prev, current, next } = useMemo(() => {
     const prevIndex =
       currentIndex === 0 ? events.length - 1 : currentIndex - 1;
     const nextIndex =
@@ -70,9 +70,7 @@ const EventCarousel = () => {
       current: events[currentIndex],
       next: events[nextIndex],
     };
-  };
-
-  const { prev, current, next } = getVisibleEvents();
+  }, [currentIndex]);
 
   return (
     <section className="w-full overflow-hidden py-2 mb-8">
@@ -80,13 +78,14 @@ const EventCarousel = () => {
         {/* Previous (Left) Card */}
         <div
           onClick={handlePrev}
-          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -ml-10 md:-ml-6 lg:-ml-2 cursor-pointer transition-all duration-500 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -ml-10 md:-ml-6 lg:-ml-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          style={{ willChange: 'transform, opacity' }}
         >
           <Image
             src={prev.image}
             alt={prev.title}
             fill
-            className="object-cover transition-transform duration-500"
+            className="object-cover transition-transform duration-300"
             sizes="240px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
@@ -114,8 +113,12 @@ const EventCarousel = () => {
           />
         </button>
 
-        {/* Center (Active) Card */}
-        <div className="relative shrink-0 w-[calc(100%-360px)] md:w-[calc(100%-440px)] lg:w-[calc(100%-530px)] max-w-[680px] h-[280px] md:h-[340px] lg:h-[380px] rounded-2xl overflow-hidden shadow-xl transition-all duration-500">
+        {/* Center (Active) Card - Clickable */}
+        <div 
+          onClick={() => handleEventClick(current.id)}
+          className="relative shrink-0 w-[calc(100%-360px)] md:w-[calc(100%-440px)] lg:w-[calc(100%-530px)] max-w-[680px] h-[280px] md:h-[340px] lg:h-[380px] rounded-2xl overflow-hidden shadow-xl transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-[1.02]"
+          style={{ willChange: 'transform, box-shadow' }}
+        >
           <Image
             src={current.image}
             alt={current.title}
@@ -152,13 +155,14 @@ const EventCarousel = () => {
         {/* Next (Right) Card */}
         <div
           onClick={handleNext}
-          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -mr-10 md:-mr-6 lg:-mr-2 cursor-pointer transition-all duration-500 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -mr-10 md:-mr-6 lg:-mr-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          style={{ willChange: 'transform, opacity' }}
         >
           <Image
             src={next.image}
             alt={next.title}
             fill
-            className="object-cover transition-transform duration-500"
+            className="object-cover transition-transform duration-300"
             sizes="240px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
