@@ -201,8 +201,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           // Encode the address for Google Maps embed URL
           const encodedLocation = encodeURIComponent(processedValue);
           setMapLocation(encodedLocation);
+        } else {
+          // Clear map location if address is empty
+          setMapLocation('');
         }
-      }, 1000);
+      }, 500);
     }
   };
 
@@ -222,6 +225,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setShowEndTimePicker(false);
     setShowDatePicker(false);
   };
+
+  // Initialize map location from initial data
+  useEffect(() => {
+    if (initialData?.mapAddress) {
+      const encodedLocation = encodeURIComponent(initialData.mapAddress);
+      setMapLocation(encodedLocation);
+    }
+  }, [initialData?.mapAddress]);
 
   // Click outside to close all dropdowns
   useEffect(() => {
