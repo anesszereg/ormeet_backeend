@@ -1,0 +1,15 @@
+{
+  "name": "Ormeet",
+  "short_name": "Ormeet",
+  "description": "Event Organization Platform",
+  "icons": [
+    {
+      "src": "/ormeet-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#FF4000",
+  "background_color": "#ffffff",
+  "display": "standalone"
+}
