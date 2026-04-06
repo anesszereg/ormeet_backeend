@@ -123,6 +123,7 @@ const Login = () => {
           {/* Login Method Toggle */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button
+              type="button"
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] rounded-lg text-sm font-medium transition-all cursor-pointer ${
                 loginMethod === 'email'
                   ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
@@ -137,6 +138,7 @@ const Login = () => {
               Log in with Email
             </button>
             <button
+              type="button"
               className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] rounded-lg text-sm font-medium transition-all cursor-pointer ${
                 loginMethod === 'phone'
                   ? 'border-[#FF4000] bg-[#FFF4F3] text-[#FF4000]'
