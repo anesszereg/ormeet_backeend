@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Fetch fresh profile from the server in the background
         try {
           console.log('🔄 [AuthContext] Fetching fresh user data from API...');
-          const freshUser = await authService.getMe();
+          const freshUser = await authService.getCurrentUserFromServer();
           console.log('✅ [AuthContext] Received fresh user:', freshUser);
           setUser(freshUser);
           console.log('✅ [AuthContext] Updated context with fresh user data');
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
-      const freshUser = await authService.getMe();
+      const freshUser = await authService.getCurrentUserFromServer();
       setUser(freshUser);
     } catch {
       // Fallback to localStorage if API call fails
