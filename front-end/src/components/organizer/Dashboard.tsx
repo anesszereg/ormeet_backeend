@@ -424,11 +424,19 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                   <div key={activity.id}>
                     <div className="flex items-start gap-3">
                       {/* Organizer Photo */}
-                      <img 
-                        src={activity.organizerPhoto} 
-                        alt={activity.organizerName}
-                        className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                      />
+                      {activity.organizerPhoto ? (
+                        <img 
+                          src={activity.organizerPhoto} 
+                          alt={activity.organizerName}
+                          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                          <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
                       
                       {/* Activity Content */}
                       <div className="flex-1 min-w-0">
@@ -509,11 +517,19 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                 {recentActivities.map((activity) => (
                   <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-light-gray last:border-0 last:pb-0">
                     {/* Organizer Photo */}
-                    <img 
-                      src={activity.organizerPhoto} 
-                      alt={activity.organizerName}
-                      className="w-10 h-10 rounded-full object-cover shrink-0"
-                    />
+                    {activity.organizerPhoto ? (
+                      <img 
+                        src={activity.organizerPhoto} 
+                        alt={activity.organizerName}
+                        className="w-10 h-10 rounded-full object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                        <svg className="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                     
                     {/* Activity Content */}
                     <div className="flex-1 min-w-0">

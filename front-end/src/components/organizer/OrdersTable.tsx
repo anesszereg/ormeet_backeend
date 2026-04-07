@@ -669,11 +669,19 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               </div>
 
               <div className="md:col-span-2 flex items-center gap-2">
-                <img
-                  src={order.buyerPhoto}
-                  alt={order.buyerName}
-                  className="w-8 h-8 rounded-full object-cover shrink-0"
-                />
+                {order.buyerPhoto ? (
+                  <img
+                    src={order.buyerPhoto}
+                    alt={order.buyerName}
+                    className="w-8 h-8 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-xs lg:text-sm text-black">{order.buyerName}</span>
               </div>
 
@@ -817,11 +825,19 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               <div className="flex flex-col sm:flex-row gap-6">
                 {/* Buyer Photo & Name */}
                 <div className="shrink-0 flex flex-col items-center gap-3">
-                  <img
-                    src={selectedOrder.buyerPhoto}
-                    alt={selectedOrder.buyerName}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-light-gray"
-                  />
+                  {selectedOrder.buyerPhoto ? (
+                    <img
+                      src={selectedOrder.buyerPhoto}
+                      alt={selectedOrder.buyerName}
+                      className="w-20 h-20 rounded-full object-cover border-2 border-light-gray"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-light-gray">
+                      <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
                   <p className="text-sm font-semibold text-black text-center">{selectedOrder.buyerName}</p>
                 </div>
 

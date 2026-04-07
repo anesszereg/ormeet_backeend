@@ -670,11 +670,19 @@ const AttendeesTable = () => {
               className="flex flex-col md:grid md:grid-cols-12 gap-2 md:gap-4 px-4 lg:px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <div className="md:col-span-3 flex items-center gap-3">
-                <img
-                  src={attendee.photo}
-                  alt={attendee.name}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
-                />
+                {attendee.photo ? (
+                  <img
+                    src={attendee.photo}
+                    alt={attendee.name}
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shrink-0"
+                  />
+                ) : (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                    <svg className="w-6 h-6 sm:w-7 sm:h-7 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
                 <span className="text-sm font-medium text-black">{attendee.name}</span>
               </div>
 
@@ -898,11 +906,19 @@ const AttendeesTable = () => {
               <div className="flex flex-col sm:flex-row gap-6">
                 {/* Profile Photo & Name */}
                 <div className="shrink-0 flex flex-col items-center gap-3">
-                  <img
-                    src={selectedAttendee.photo}
-                    alt={selectedAttendee.name}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-light-gray"
-                  />
+                  {selectedAttendee.photo ? (
+                    <img
+                      src={selectedAttendee.photo}
+                      alt={selectedAttendee.name}
+                      className="w-20 h-20 rounded-full object-cover border-2 border-light-gray"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-2 border-light-gray">
+                      <svg className="w-12 h-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
                   <p className="text-sm font-semibold text-black text-center">{selectedAttendee.name}</p>
                 </div>
 
