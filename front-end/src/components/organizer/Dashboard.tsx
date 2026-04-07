@@ -10,11 +10,6 @@ import UpTrendIcon from '../../assets/Svgs/organiser/dashboard/dashboard/up.svg'
 import DownTrendIcon from '../../assets/Svgs/organiser/dashboard/dashboard/down.svg';
 import NoChangeIcon from '../../assets/Svgs/organiser/dashboard/dashboard/noChange.svg';
 import SeeAllIcon from '../../assets/Svgs/organiser/dashboard/dashboard/seeAll.svg';
-import ProfilePhoto1 from '../../assets/imges/photoPorifle/Mask group.png';
-import ProfilePhoto2 from '../../assets/imges/photoPorifle/Mask group (1).png';
-import ProfilePhoto3 from '../../assets/imges/photoPorifle/Mask group (2).png';
-import ProfilePhoto4 from '../../assets/imges/photoPorifle/Mask group (3).png';
-import ProfilePhoto5 from '../../assets/imges/photoPorifle/Mask group (4).png';
 
 interface DashboardProps {
   onCreateEvent: () => void;
@@ -23,7 +18,7 @@ interface DashboardProps {
 interface Activity {
   id: string;
   organizerName: string;
-  organizerPhoto: string;
+  organizerPhoto?: string;
   action: string;
   eventName: string;
   time: string;
@@ -128,13 +123,12 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
   }, [user?.id]);
 
   // Generate recent activities from real orders data
-  const recentActivities: Activity[] = orders.slice(0, 5).map((order, index) => {
-    const photos = [ProfilePhoto1, ProfilePhoto2, ProfilePhoto3, ProfilePhoto4, ProfilePhoto5];
+  const recentActivities: Activity[] = orders.slice(0, 5).map((order) => {
     const event = events.find(e => e.id === order.eventId);
     return {
       id: order.id,
       organizerName: order.billingName || 'Customer',
-      organizerPhoto: photos[index % photos.length],
+      organizerPhoto: order.user?.profilePhoto || undefined,
       action: order.status === 'paid' ? 'purchased tickets for' : 'placed an order for',
       eventName: event?.title || 'an event',
       time: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })

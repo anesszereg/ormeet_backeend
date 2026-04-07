@@ -14,19 +14,13 @@ import ArrowDownIcon from '../../assets/Svgs/organiser/dashboard/Orders/arrowDow
 import UpIcon from '../../assets/Svgs/organiser/dashboard/Orders/up.svg';
 import DownIcon from '../../assets/Svgs/organiser/dashboard/Orders/down.svg';
 import SuccessIcon from '../../assets/Svgs/success.svg';
-import ProfilePhoto1 from '../../assets/imges/photoPorifle/Mask group.png';
-import ProfilePhoto2 from '../../assets/imges/photoPorifle/Mask group (1).png';
-import ProfilePhoto3 from '../../assets/imges/photoPorifle/Mask group (2).png';
-import ProfilePhoto4 from '../../assets/imges/photoPorifle/Mask group (3).png';
-import ProfilePhoto5 from '../../assets/imges/photoPorifle/Mask group (4).png';
-import ProfilePhoto6 from '../../assets/imges/photoPorifle/Mask group (5).png';
 
 interface Order {
   id: string;
   orderId: string;
   eventName: string;
   buyerName: string;
-  buyerPhoto: string;
+  buyerPhoto?: string;
   ticketType: string;
   qty: number;
   totalPrice: number;
@@ -118,7 +112,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               orderId: `#${order.id.substring(0, 4).toUpperCase()}`,
               eventName: eventMap.get(order.eventId) || 'Unknown Event',
               buyerName: order.user?.name || order.billingName || 'Unknown',
-              buyerPhoto: order.user?.profilePhoto || ProfilePhoto1,
+              buyerPhoto: order.user?.profilePhoto || undefined,
               ticketType: order.items?.[0]?.ticketTypeId ? 'General' : 'Unknown',
               qty: order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
               totalPrice: typeof order.amountTotal === 'string' ? parseFloat(order.amountTotal) : (order.amountTotal || 0),

@@ -16,13 +16,11 @@ import SuccessIcon from '../../assets/Svgs/success.svg';
 import ErrorIcon from '../../assets/Svgs/error.svg';
 import Event1 from '../../assets/imges/event myticket 1.jpg';
 
-import ProfilePhoto1 from '../../assets/imges/photoPorifle/Mask group.png';
-
 
 interface Attendee {
   id: string;
   name: string;
-  photo: string;
+  photo?: string;
   email: string;
   eventName: string;
   registrationDate: string;
@@ -124,7 +122,7 @@ const AttendeesTable = () => {
             const transformedAttendees = attendeesData.map((attendee: ApiAttendee) => ({
               id: attendee.id,
               name: attendee.ticket?.owner?.name || 'Unknown',
-              photo: attendee.ticket?.owner?.profilePhoto || ProfilePhoto1,
+              photo: attendee.ticket?.owner?.profilePhoto || undefined,
               email: attendee.ticket?.owner?.email || 'unknown@email.com',
               eventName: eventMap.get(event.id) || 'Unknown Event',
               registrationDate: new Date(attendee.checkedInAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
