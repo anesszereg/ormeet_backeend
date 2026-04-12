@@ -30,7 +30,8 @@
     "docker:dev": "docker compose -f docker-compose.dev.yml up -d",
     "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
     "docker:dev:logs": "docker compose -f docker-compose.dev.yml logs -f",
-    "seed": "ts-node -r tsconfig-paths/register src/database/seeds/organizer-seed.ts",
+    "seed": "ts-node -r tsconfig-paths/register src/scripts/seed.ts",
+    "seed:full": "ts-node -r tsconfig-paths/register src/scripts/seed.ts",
     "seed:organizer": "ts-node -r tsconfig-paths/register src/database/seeds/organizer-seed.ts"
   },
   "dependencies": {
