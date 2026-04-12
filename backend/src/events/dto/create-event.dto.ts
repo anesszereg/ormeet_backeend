@@ -7,9 +7,61 @@ import {
   IsInt,
   IsBoolean,
   IsUUID,
+  ValidateNested,
+  IsObject,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventStatus } from '../../entities';
+
+class EventGuidelinesDto {
+  @ApiPropertyOptional({ example: '18+' })
+  @IsOptional()
+  @IsString()
+  ageRequirement?: string;
+
+  @ApiPropertyOptional({ example: 'Refunds available up to 48 hours before event' })
+  @IsOptional()
+  @IsString()
+  refundPolicy?: string;
+
+  @ApiPropertyOptional({ example: 'Wheelchair accessible venue' })
+  @IsOptional()
+  @IsString()
+  accessibleInfo?: string;
+
+  @ApiPropertyOptional({ example: 'Doors open 30 minutes before start' })
+  @IsOptional()
+  @IsString()
+  entryPolicy?: string;
+
+  @ApiPropertyOptional({ example: ['Outside food', 'Weapons'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  prohibitedItems?: string[];
+
+  @ApiPropertyOptional({ example: ['Small bags', 'Water bottles'] })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  allowedItems?: string[];
+
+  @ApiPropertyOptional({ example: 'Free parking available' })
+  @IsOptional()
+  @IsString()
+  parkingInfo?: string;
+
+  @ApiPropertyOptional({
+    example: [{ question: 'Can I get a refund?', answer: 'Yes, within 48 hours' }],
+  })
+  @IsOptional()
+  @IsArray()
+  faqs?: Array<{
+    question: string;
+    answer: string;
+  }>;
+}
 
 export class CreateEventDto {
   @ApiProperty({ example: 'Tech Conference 2025' })
@@ -111,6 +163,7 @@ export class CreateEventDto {
   refundsAllowed?: boolean;
 
   @ApiPropertyOptional({
+    type: EventGuidelinesDto,
     example: {
       ageRequirement: '18+',
       refundPolicy: 'Refunds available up to 48 hours before event',
@@ -125,17 +178,7 @@ export class CreateEventDto {
     },
   })
   @IsOptional()
-  guidelines?: {
-    ageRequirement?: string;
-    refundPolicy?: string;
-    accessibleInfo?: string;
-    entryPolicy?: string;
-    prohibitedItems?: string[];
-    allowedItems?: string[];
-    parkingInfo?: string;
-    faqs?: Array<{
-      question: string;
-      answer: string;
-    }>;
-  };
+  @ValidateNested()
+  @Type(() => EventGuidelinesDto)
+  guidelines?: EventGuidelinesDto;
 }
