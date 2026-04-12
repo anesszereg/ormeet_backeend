@@ -109,4 +109,33 @@ export class CreateEventDto {
   @IsOptional()
   @IsBoolean()
   refundsAllowed?: boolean;
+
+  @ApiPropertyOptional({
+    example: {
+      ageRequirement: '18+',
+      refundPolicy: 'Refunds available up to 48 hours before event',
+      accessibleInfo: 'Wheelchair accessible venue',
+      entryPolicy: 'Doors open 30 minutes before start',
+      prohibitedItems: ['Outside food', 'Weapons'],
+      allowedItems: ['Small bags', 'Water bottles'],
+      parkingInfo: 'Free parking available',
+      faqs: [
+        { question: 'Can I get a refund?', answer: 'Yes, within 48 hours' }
+      ],
+    },
+  })
+  @IsOptional()
+  guidelines?: {
+    ageRequirement?: string;
+    refundPolicy?: string;
+    accessibleInfo?: string;
+    entryPolicy?: string;
+    prohibitedItems?: string[];
+    allowedItems?: string[];
+    parkingInfo?: string;
+    faqs?: Array<{
+      question: string;
+      answer: string;
+    }>;
+  };
 }

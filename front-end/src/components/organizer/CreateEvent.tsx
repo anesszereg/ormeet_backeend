@@ -622,18 +622,31 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       startAt: startAt.toISOString(),
       endAt: endAt.toISOString(),
       locationType,
-      customLocation: locationType === 'physical' ? {
-        address: formData.mapAddress || 'TBA',
-        city: formData.state || 'TBA',
-        state: formData.state || 'TBA',
+      customLocation: locationType === 'physical' && (formData.mapAddress || formData.country || formData.state) ? {
+        address: formData.mapAddress || '',
+        city: formData.state || '',
+        state: formData.state || '',
         zipCode: '',
         postalCode: '',
-        country: formData.country || 'TBA',
+        country: formData.country || '',
       } : undefined,
       onlineLink,
       images: validImages.length > 0 ? validImages : undefined,
       tickets: tickets.length > 0 ? tickets : undefined,
       tags: formData.category ? [formData.category.toLowerCase()] : undefined,
+      guidelines: formData.faqs.length > 0 ? {
+        ageRequirement: '',
+        refundPolicy: '',
+        accessibleInfo: '',
+        entryPolicy: '',
+        prohibitedItems: [],
+        allowedItems: [],
+        parkingInfo: '',
+        faqs: formData.faqs.map(faq => ({
+          question: faq.question,
+          answer: faq.answer
+        }))
+      } : undefined,
     };
   };
 

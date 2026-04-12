@@ -184,6 +184,10 @@ export class Event {
     prohibitedItems: string[];
     allowedItems: string[];
     parkingInfo: string;
+    faqs?: Array<{
+      question: string;
+      answer: string;
+    }>;
   };
 
   @Column({ type: 'timestamp', nullable: true, name: 'published_at' })

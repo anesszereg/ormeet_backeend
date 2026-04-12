@@ -71,6 +71,19 @@ export interface CreateEventDto {
   allowReentry?: boolean;
   refundsAllowed?: boolean;
   tickets?: TicketTypeDto[];
+  guidelines?: {
+    ageRequirement?: string;
+    refundPolicy?: string;
+    accessibleInfo?: string;
+    entryPolicy?: string;
+    prohibitedItems?: string[];
+    allowedItems?: string[];
+    parkingInfo?: string;
+    faqs?: Array<{
+      question: string;
+      answer: string;
+    }>;
+  };
 }
 
 export interface UpdateEventDto extends Partial<CreateEventDto> {}
