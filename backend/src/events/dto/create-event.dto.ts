@@ -9,6 +9,7 @@ import {
   IsUUID,
   ValidateNested,
   IsObject,
+  Allow,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -55,8 +56,7 @@ class EventGuidelinesDto {
   @ApiPropertyOptional({
     example: [{ question: 'Can I get a refund?', answer: 'Yes, within 48 hours' }],
   })
-  @IsOptional()
-  @IsArray()
+  @Allow()
   faqs?: Array<{
     question: string;
     answer: string;
