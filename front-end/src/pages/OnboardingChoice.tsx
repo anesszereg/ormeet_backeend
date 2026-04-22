@@ -27,13 +27,13 @@ const OnboardingChoice = () => {
 
   const handleContinue = () => {
     if (selectedType === 'organize') {
-      // Store user type in localStorage for registration
+      // Store user type in localStorage for login
       localStorage.setItem('userType', 'organize');
-      navigate('/register');
+      navigate('/login');
     } else if (selectedType === 'attend') {
-      // Store user type in localStorage for registration
+      // Store user type in localStorage for login
       localStorage.setItem('userType', 'attend');
-      navigate('/register');
+      navigate('/login');
     }
   };
 
