@@ -1124,12 +1124,12 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   Map Preview
                 </label>
                 <div className="flex-1 border border-light-gray rounded-lg overflow-hidden relative">
-                  {/* Google Map iframe */}
+                  {/* Google Map iframe - Interactive, centered on Algeria */}
                   <iframe
                     key={mapLocation}
                     src={mapLocation 
                       ? `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${mapLocation}&zoom=15`
-                      : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3355089.3864504!2d-121.4944!3d37.2719!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia%2C%20USA!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+                      : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6876839.3!2d1.6596!3d28.0339!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd7e8a6a28037bd1%3A0x7140bee3abd7f8a2!2sAlgeria!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
                     }
                     width="100%"
                     height="100%"
@@ -1139,50 +1139,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     referrerPolicy="no-referrer-when-downgrade"
                     title="Event location map"
                   />
-
-                  {/* Map controls overlay */}
-                  <div className="absolute top-4 right-4 flex flex-col gap-2">
-                    {/* Fullscreen button */}
-                    <button 
-                      type="button"
-                      className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M2.5 7.5V2.5H7.5M12.5 2.5H17.5V7.5M17.5 12.5V17.5H12.5M7.5 17.5H2.5V12.5" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-
-                    {/* Zoom in */}
-                    <button 
-                      type="button"
-                      className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M10 5V15M5 10H15" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                    </button>
-
-                    {/* Zoom out */}
-                    <button 
-                      type="button"
-                      className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <path d="M5 10H15" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                    </button>
-
-                    {/* My location */}
-                    <button 
-                      type="button"
-                      className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors"
-                    >
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <circle cx="10" cy="10" r="3" fill="#4F4F4F"/>
-                        <path d="M10 2V5M10 15V18M18 10H15M5 10H2" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
-                      </svg>
-                    </button>
-                  </div>
                 </div>
               </div>
             )}
