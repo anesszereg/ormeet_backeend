@@ -90,4 +90,5 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
   );
 };
 
+
 export default EventsInCalifornia;
