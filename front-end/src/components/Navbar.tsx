@@ -73,7 +73,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
 
       {/* Center section: Navigation links - Hidden on mobile */}
       <div className="hidden md:flex items-center gap-4 lg:gap-8">
-        <a href="/browse-events" className="text-sm font-medium text-black hover:text-primary transition-colors">
+        {/* <a href="/browse-events" className="text-sm font-medium text-black hover:text-primary transition-colors">
           Browse events
         </a>
         <a href="/host-events" className="text-sm font-medium text-black hover:text-primary transition-colors">
@@ -81,7 +81,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
         </a>
         <a href="/support" className="text-sm font-medium text-black hover:text-primary transition-colors">
           Support
-        </a>
+        </a> */}
       </div>
 
       {/* Right section: Language selector + Profile icon */}

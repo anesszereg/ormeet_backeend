@@ -28,8 +28,8 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Redirect root to onboarding choice */}
-        <Route path="/" element={<Navigate to="/onboarding-choice" replace />} />
+        {/* Public landing page - browse events */}
+        <Route path="/" element={<SearchResult />} />
         
         {/* Auth Routes - Redirect authenticated users to dashboard */}
         <Route path="/login" element={

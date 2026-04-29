@@ -20,6 +20,8 @@ const Register = () => {
   const [error, setError] = useState('');
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
 
   // Read user type from localStorage on component mount
   useEffect(() => {
@@ -29,6 +31,16 @@ const Register = () => {
     }
   }, []);
 
+  const validatePassword = (password: string): string[] => {
+    const errors: string[] = [];
+    if (password.length < 8) errors.push('At least 8 characters');
+    if (!/[A-Z]/.test(password)) errors.push('One uppercase letter');
+    if (!/[a-z]/.test(password)) errors.push('One lowercase letter');
+    if (!/[0-9]/.test(password)) errors.push('One number');
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('One special character');
+    return errors;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
@@ -36,6 +48,11 @@ const Register = () => {
       ...formData,
       [name]: value,
     });
+    
+    // Validate password in real-time
+    if (name === 'password') {
+      setPasswordErrors(validatePassword(value));
+    }
     
     // Clear error when user starts typing
     if (error) {
@@ -72,8 +89,9 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
+    const passwordValidationErrors = validatePassword(formData.password);
+    if (passwordValidationErrors.length > 0) {
+      setError('Password does not meet requirements: ' + passwordValidationErrors.join(', '));
       return;
     }
 
@@ -227,10 +245,39 @@ const Register = () => {
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
+                onFocus={() => setShowPasswordRequirements(true)}
+                onBlur={() => setShowPasswordRequirements(false)}
                 required
-                minLength={6}
+                minLength={8}
                 className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
               />
+              {(showPasswordRequirements || passwordErrors.length > 0) && formData.password && (
+                <div className="px-3 py-2 bg-gray-50 rounded-lg text-xs space-y-1">
+                  <p className="font-medium text-gray-700 mb-1">Password must contain:</p>
+                  <div className="space-y-0.5">
+                    <div className={`flex items-center gap-1.5 ${formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span>{formData.password.length >= 8 ? '✓' : '○'}</span>
+                      <span>At least 8 characters</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span>{/[A-Z]/.test(formData.password) ? '✓' : '○'}</span>
+                      <span>One uppercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${/[a-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span>{/[a-z]/.test(formData.password) ? '✓' : '○'}</span>
+                      <span>One lowercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${/[0-9]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span>{/[0-9]/.test(formData.password) ? '✓' : '○'}</span>
+                      <span>One number</span>
+                    </div>
+                    <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span>{/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? '✓' : '○'}</span>
+                      <span>One special character (!@#$%^&*...)</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">

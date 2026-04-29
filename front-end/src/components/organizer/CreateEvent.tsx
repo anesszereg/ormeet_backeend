@@ -527,9 +527,22 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     
     // Validate tickets
     const newTicketErrors: Record<string, Partial<Record<keyof TicketData, string>>> = {};
+    const ticketTypeNames = new Map<string, string>(); // Map of lowercase type name to ticket ID
+    
     formData.tickets.forEach(ticket => {
       const ticketError: Partial<Record<keyof TicketData, string>> = {};
-      if (!ticket.type.trim()) ticketError.type = 'Ticket type is required';
+      if (!ticket.type.trim()) {
+        ticketError.type = 'Ticket type is required';
+      } else {
+        // Check for duplicate ticket types (case-insensitive)
+        const normalizedType = ticket.type.trim().toLowerCase();
+        const existingTicketId = ticketTypeNames.get(normalizedType);
+        if (existingTicketId && existingTicketId !== ticket.id) {
+          ticketError.type = 'Duplicate ticket type. Each ticket type must be unique';
+        } else {
+          ticketTypeNames.set(normalizedType, ticket.id);
+        }
+      }
       if (!ticket.priceType) ticketError.priceType = 'Price type is required';
       if (!ticket.quantity.trim()) ticketError.quantity = 'Quantity is required';
       if (ticket.priceType === 'paid' && !ticket.price.trim()) ticketError.price = 'Price is required';
@@ -1308,64 +1321,39 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   )}
                 </div>
 
-                {/* Line 1: Ticket Type */}
+                {/* Line 1: Custom Ticket Type Input */}
                 <div className="mb-3 max-w-sm">
-                  <div className="relative">
-                    <label className="block text-sm font-medium text-black mb-2">
-                      Ticket Type <span className="text-[#FF3425]">*</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        closeAllDropdowns();
-                        setOpenTicketTypeDropdown(openTicketTypeDropdown === ticket.id ? null : ticket.id);
-                      }}
-                      className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
-                        ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'
-                      } ${ticket.type ? 'text-black' : 'text-[#9CA3AF]'}`}
-                    >
-                      {ticket.type || 'Select ticket type'}
-                      <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </button>
-                    
-                    {openTicketTypeDropdown === ticket.id && (
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                        {ticketTypes.map((type) => (
-                          <button
-                            key={type}
-                            type="button"
-                            onClick={() => {
-                              setFormData(prev => ({
-                                ...prev,
-                                tickets: prev.tickets.map(t =>
-                                  t.id === ticket.id ? { ...t, type } : t
-                                )
-                              }));
-                              setOpenTicketTypeDropdown(null);
-                              if (ticketErrors[ticket.id]?.type) {
-                                setTicketErrors(prev => ({
-                                  ...prev,
-                                  [ticket.id]: { ...prev[ticket.id], type: '' }
-                                }));
-                              }
-                            }}
-                            className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                              ticket.type === type
-                                ? 'bg-primary-light text-primary font-medium'
-                                : 'text-gray hover:bg-secondary-light'
-                            }`}
-                          >
-                            {type}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    {ticketErrors[ticket.id]?.type && (
-                      <p className="mt-1 text-xs text-[#FF3425]">{ticketErrors[ticket.id].type}</p>
-                    )}
-                  </div>
+                  <label className="block text-sm font-medium text-black mb-2">
+                    Ticket Type <span className="text-[#FF3425]">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., VIP, General Admission, Early Bird"
+                    value={ticket.type}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFormData(prev => ({
+                        ...prev,
+                        tickets: prev.tickets.map(t =>
+                          t.id === ticket.id ? { ...t, type: value } : t
+                        )
+                      }));
+                      // Clear error when typing
+                      if (ticketErrors[ticket.id]?.type) {
+                        setTicketErrors(prev => ({
+                          ...prev,
+                          [ticket.id]: { ...prev[ticket.id], type: '' }
+                        }));
+                      }
+                    }}
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary transition-all ${
+                      ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'
+                    }`}
+                  />
+                  {ticketErrors[ticket.id]?.type && (
+                    <p className="mt-1 text-xs text-[#FF3425]">{ticketErrors[ticket.id].type}</p>
+                  )}
+                  <p className="mt-1 text-xs text-[#757575]">Enter a custom ticket type name</p>
                 </div>
 
                 {/* Line 2: Price Type, Quantity, and Price */}

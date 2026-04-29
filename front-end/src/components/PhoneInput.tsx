@@ -43,20 +43,21 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
 
         setCountries(formattedCountries);
         
-        // Set default to US or first country
-        const defaultCountry = formattedCountries.find(c => c.code === 'US') || formattedCountries[0];
+        // Set default to Algeria (DZ) or first country
+        const defaultCountry = formattedCountries.find(c => c.code === 'DZ') || formattedCountries[0];
         setSelectedCountry(defaultCountry);
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to fetch countries:', error);
-        // Fallback to a basic list
+        // Fallback to a basic list with Algeria as default
         const fallbackCountries: Country[] = [
-          { name: 'United States', code: 'US', dialCode: '+1', flag: '🇺🇸' },
-          { name: 'United Kingdom', code: 'GB', dialCode: '+44', flag: '🇬🇧' },
-          { name: 'Morocco', code: 'MA', dialCode: '+212', flag: '🇲🇦' },
+          { name: 'Algeria', code: 'DZ', dialCode: '+213', flag: '🇩🇿' },
+          { name: 'Morocco', code: 'MA', dialCode: '+212', flag: '��' },
+          { name: 'Tunisia', code: 'TN', dialCode: '+216', flag: '��' },
+          { name: 'France', code: 'FR', dialCode: '+33', flag: '��' },
         ];
         setCountries(fallbackCountries);
-        setSelectedCountry(fallbackCountries[0]);
+        setSelectedCountry(fallbackCountries[0]); // Algeria
         setIsLoading(false);
       }
     };
