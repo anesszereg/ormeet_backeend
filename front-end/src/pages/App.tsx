@@ -28,8 +28,8 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Public landing page - browse events */}
-        <Route path="/" element={<SearchResult />} />
+        {/* Root redirects to landing page (served by Next.js at /) */}
+        {/* Main app handles all /app/* routes */}
         
         {/* Auth Routes - Redirect authenticated users to dashboard */}
         <Route path="/login" element={

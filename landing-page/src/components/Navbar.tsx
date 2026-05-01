@@ -1,6 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 
+// Main app URL - update this for production
+const MAIN_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173';
+
 const Navbar = () => {
   return (
     <nav className="w-full px-6 md:px-10 lg:px-16 xl:px-20 py-4 flex items-center justify-between bg-white">
@@ -20,24 +23,24 @@ const Navbar = () => {
 
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-6">
-          <Link
-            href="/browse"
+          <a
+            href={`${MAIN_APP_URL}/browse-events`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Browse events
-          </Link>
-          <Link
-            href="/host"
+          </a>
+          <a
+            href={`${MAIN_APP_URL}/host-events`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Host events
-          </Link>
-          <Link
-            href="/support"
+          </a>
+          <a
+            href={`${MAIN_APP_URL}/support`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
             Support
-          </Link>
+          </a>
         </div>
       </div>
 
@@ -90,20 +93,20 @@ const Navbar = () => {
         </button>
 
         {/* Log In Button */}
-        <Link
-          href="/login"
+        <a
+          href={`${MAIN_APP_URL}/login`}
           className="px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
         >
           Log In
-        </Link>
+        </a>
 
         {/* Sign Up Button */}
-        <Link
-          href="/register"
+        <a
+          href={`${MAIN_APP_URL}/register`}
           className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-dark transition-colors"
         >
           Sign up
-        </Link>
+        </a>
       </div>
     </nav>
   );
