@@ -28,8 +28,8 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* Root route - redirect to browse events or landing page */}
-        <Route path="/" element={<Navigate to="/browse-events" replace />} />
+        {/* No root route - Next.js landing page handles / */}
+        {/* React app handles all other routes */}
         
         {/* Auth Routes - Redirect authenticated users to dashboard */}
         <Route path="/login" element={

@@ -6,6 +6,19 @@
 - Node.js 18+ installed
 - PostgreSQL database running
 - Git installed
+- Nginx (optional, for integrated setup)
+
+---
+
+## Two Setup Options
+
+### Option 1: With Nginx (Recommended - Integrated Experience)
+Landing page at root, seamless navigation
+**See:** `SETUP_WITH_NGINX.md`
+
+### Option 2: Without Nginx (Quick Development)
+Separate ports, manual navigation between apps
+**Continue below** ⬇️
 
 ---
 
