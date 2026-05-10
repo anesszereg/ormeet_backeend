@@ -20,6 +20,11 @@ export const metadata: Metadata = {
       "Find concerts, workshops, meetups, and more — your next event is just a search away.",
     type: "website",
   },
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
