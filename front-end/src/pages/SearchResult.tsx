@@ -151,6 +151,19 @@ const SearchResult = () => {
     );
   };
 
+  /**
+   * The location the embedded Google Map should center on. Priority:
+   *   1. URL `?location` from the landing-page search bar
+   *   2. The active sidebar dropdown
+   *   3. A venue from one of the matched events (so even a free-text
+   *      query like "alger" recenters the map)
+   *   4. "world" — global view as a last resort
+   */
+  const mapQuery = (searchLocation
+    || selectedLocation
+    || filteredEvents[0]?.venue
+    || 'world').trim() || 'world';
+
   return (
     <div className="flex flex-col min-h-screen w-full bg-white">
       {/* Navbar */}
@@ -485,9 +498,11 @@ const SearchResult = () => {
           style={{ height: 'calc(100vh - 64px)' }}
         >
           <div className="w-full h-full relative rounded-lg overflow-hidden">
-            {/* Google Map iframe */}
+            {/* Google Map iframe — pins on whatever location the user
+                searched for, falling back to a global view. */}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3355089.3864504!2d-121.4944!3d37.2719!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia%2C%20USA!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+              key={mapQuery}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed&z=${mapQuery === 'world' ? 2 : 10}`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
