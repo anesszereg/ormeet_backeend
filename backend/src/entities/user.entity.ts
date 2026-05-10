@@ -36,7 +36,11 @@ export enum EventCategory {
 }
 
 @Entity('users')
-@Index(['email'], { unique: true })
+// Composite uniqueness: same email may exist for different roles (e.g. one
+// attendee account and one organizer account share an email). Run the
+// SQL migration in `backend/migrations/2026-05-10-split-user-roles.sql`
+// before deploying this change against an existing database.
+@Index('IDX_users_email_role', ['email', 'role'], { unique: true })
 @Index(['organizationId'])
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -45,7 +49,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column({ name: 'password_hash' })
@@ -54,11 +58,17 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  /**
+   * Single role per account. To get both attendee and organizer
+   * capabilities, a user creates two separate accounts under the
+   * same email — see auth.service register/login.
+   */
   @Column({
-    type: 'simple-array',
+    type: 'varchar',
+    length: 32,
     default: UserRole.ATTENDEE,
   })
-  roles: UserRole[];
+  role: UserRole;
 
   // Profile information
   @Column({ type: 'text', nullable: true })

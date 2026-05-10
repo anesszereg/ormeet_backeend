@@ -1,5 +1,6 @@
-import { IsEmail, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { UserRole } from '../../entities';
 
 export class LoginDto {
   @ApiPropertyOptional({
@@ -26,4 +27,15 @@ export class LoginDto {
   })
   @IsString()
   password: string;
+
+  @ApiPropertyOptional({
+    description:
+      'Optional account role. Required only when the same email is used ' +
+      'for both an attendee and an organizer account.',
+    enum: UserRole,
+    example: 'attendee',
+  })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role?: UserRole;
 }

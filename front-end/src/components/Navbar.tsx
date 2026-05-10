@@ -168,7 +168,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
                 Profile
               </a>
               {/* Role-based Dashboard Links */}
-              {user?.roles?.includes('attendee') && (
+              {user?.role === 'attendee' && (
                 <a
                   href="/dashboard-attendee"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
@@ -176,7 +176,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
                   Attendee Dashboard
                 </a>
               )}
-              {user?.roles?.includes('organizer') && (
+              {user?.role === 'organizer' && (
                 <a
                   href="/dashboard-organizer"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
@@ -186,7 +186,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
               )}
               
               {/* Show "Become an Organizer" option if user is only attendee */}
-              {user?.roles?.length === 1 && user?.roles?.includes('attendee') && (
+              {user?.role === 'attendee' && (
                 <a
                   href="/host-events"
                   className="block px-4 py-2.5 text-sm text-[#FF4000] font-medium hover:bg-[#FFF4F3] transition-colors"

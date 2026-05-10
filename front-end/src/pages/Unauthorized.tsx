@@ -7,10 +7,10 @@ const Unauthorized = () => {
 
   const handleGoBack = () => {
     // Redirect based on user role
-    if (isAuthenticated && user?.roles) {
-      if (user.roles.includes('organizer')) {
+    if (isAuthenticated && user?.role) {
+      if (user.role === 'organizer') {
         navigate('/dashboard-organizer');
-      } else if (user.roles.includes('attendee')) {
+      } else if (user.role === 'attendee') {
         navigate('/dashboard-attendee');
       } else {
         navigate('/');

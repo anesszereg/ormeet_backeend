@@ -54,7 +54,7 @@ const Profile = () => {
               <h1 className="text-2xl font-bold text-black mb-1">{user?.name || 'User'}</h1>
               <p className="text-[#757575] text-sm mb-2">{user?.email}</p>
               <span className="inline-block px-3 py-1 bg-[#FF4000]/10 text-[#FF4000] text-xs font-medium rounded-full">
-                {user?.roles?.includes('organizer') ? 'Organizer' : 'Attendee'}
+                {user?.role === 'organizer' ? 'Organizer' : 'Attendee'}
               </span>
             </div>
 

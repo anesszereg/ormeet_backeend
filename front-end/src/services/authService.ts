@@ -2,12 +2,15 @@ import api from './api';
 
 // ========== DTOs (Data Transfer Objects) ==========
 
+export type UserRole = 'attendee' | 'organizer' | 'admin';
+
 export interface RegisterDto {
   name: string;
   email: string;
   password: string;
   phone?: string;
-  roles?: ('attendee' | 'organizer' | 'admin')[];
+  /** Single role per account; the same email may register a separate account per role. */
+  role?: UserRole;
   organizationId?: string;
   interestedEventCategories?: string[];
   hostingEventTypes?: string[];
@@ -17,6 +20,8 @@ export interface LoginDto {
   email?: string;
   phone?: string;
   password: string;
+  /** Disambiguator for emails that have both an attendee and organizer account. */
+  role?: UserRole;
 }
 
 export interface ForgotPasswordDto {
@@ -60,7 +65,7 @@ export interface User {
   name: string;
   email: string;
   phone?: string;
-  roles: string[];
+  role: UserRole;
   emailVerified: boolean;
   phoneVerified?: boolean;
   organizationId?: string;
@@ -185,7 +190,7 @@ class AuthService {
           id: user.id,
           name: user.name,
           email: user.email,
-          roles: user.roles,
+          role: user.role,
           emailVerified: user.emailVerified,
         };
         localStorage.setItem('user', JSON.stringify(minimalUser));
@@ -202,7 +207,7 @@ class AuthService {
       name: user.name,
       email: user.email,
       phone: user.phone,
-      roles: user.roles,
+      role: user.role,
       emailVerified: user.emailVerified,
       phoneVerified: user.phoneVerified,
       organizationId: user.organizationId,
@@ -245,7 +250,7 @@ class AuthService {
 
   hasRole(role: string): boolean {
     const user = this.getCurrentUser();
-    return user?.roles?.includes(role) || false;
+    return user?.role === role;
   }
 
   isEmailVerified(): boolean {
@@ -269,7 +274,7 @@ class AuthService {
     console.log('✅ [AuthService] Received user from backend:', response.data);
     console.log('📧 [AuthService] User email:', response.data.email);
     console.log('👤 [AuthService] User name:', response.data.name);
-    console.log('🎭 [AuthService] User roles:', response.data.roles);
+    console.log('🎭 [AuthService] User role:', response.data.role);
     // Sync localStorage with fresh server data
     const sanitizedUser = this.sanitizeUserForStorage(response.data);
     localStorage.setItem('user', JSON.stringify(sanitizedUser));

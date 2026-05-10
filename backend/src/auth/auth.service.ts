@@ -28,24 +28,29 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { 
-      email, 
-      password, 
-      name, 
-      phone, 
-      roles, 
+    const {
+      email,
+      password,
+      name,
+      phone,
+      role: requestedRole,
       organizationId,
       interestedEventCategories,
       hostingEventTypes,
     } = registerDto;
 
-    // Check if user already exists
+    const role = requestedRole || UserRole.ATTENDEE;
+
+    // Uniqueness is per (email, role): the same email may have one
+    // attendee account AND one organizer account, but not two of either.
     const existingUser = await this.userRepository.findOne({
-      where: { email },
+      where: { email, role },
     });
 
     if (existingUser) {
-      throw new ConflictException('User with this email already exists');
+      throw new ConflictException(
+        `An ${role} account with this email already exists. Please log in instead.`,
+      );
     }
 
     // Hash password
@@ -61,7 +66,7 @@ export class AuthService {
       email,
       passwordHash,
       phone,
-      roles: roles || [UserRole.ATTENDEE],
+      role,
       organizationId,
       interestedEventCategories,
       hostingEventTypes,
@@ -72,7 +77,7 @@ export class AuthService {
     await this.userRepository.save(user);
 
     // If registering as organizer and no organization provided, auto-create one
-    if (!organizationId && roles?.includes(UserRole.ORGANIZER)) {
+    if (!organizationId && role === UserRole.ORGANIZER) {
       const org = this.organizationRepository.create({
         name: `${name}'s Organization`,
         ownerId: user.id,
@@ -102,19 +107,40 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
-    const { email, phone, password } = loginDto;
+    const { email, phone, password, role } = loginDto;
 
     if (!email && !phone) {
       throw new BadRequestException('Email or phone number is required');
     }
 
-    // Find user by email or phone
-    const user = await this.userRepository.findOne({
+    // Same email may belong to multiple accounts (one per role). Look up
+    // every candidate and either disambiguate by `role` or by which
+    // password matches.
+    const candidates = await this.userRepository.find({
       where: email ? { email } : { phone },
     });
 
-    if (!user) {
+    if (candidates.length === 0) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    let user: User | undefined;
+
+    if (role) {
+      user = candidates.find((c) => c.role === role);
+      if (!user) {
+        throw new UnauthorizedException('Invalid credentials');
+      }
+    } else if (candidates.length === 1) {
+      user = candidates[0];
+    } else {
+      // Multiple accounts share this email. Frontend must resend with `role`.
+      throw new ConflictException({
+        code: 'MULTIPLE_ACCOUNTS',
+        message:
+          'This email has multiple accounts. Please choose which one to log into.',
+        availableRoles: candidates.map((c) => c.role),
+      });
     }
 
     // Verify password
@@ -170,7 +196,7 @@ export class AuthService {
     // }
 
     // Auto-create organization for existing organizer users who don't have one
-    if (!user.organizationId && user.roles?.includes(UserRole.ORGANIZER)) {
+    if (!user.organizationId && user.role === UserRole.ORGANIZER) {
       const org = this.organizationRepository.create({
         name: `${user.name}'s Organization`,
         ownerId: user.id,
@@ -205,7 +231,7 @@ export class AuthService {
     const payload = {
       sub: user.id,
       email: user.email,
-      roles: user.roles,
+      role: user.role,
     };
 
     return this.jwtService.sign(payload);
@@ -253,67 +279,69 @@ export class AuthService {
   }
 
   async resendVerificationEmail(email: string) {
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
+    // Send a fresh verification link for every unverified account
+    // tied to this email (attendee + organizer if both exist).
+    const users = await this.userRepository.find({ where: { email } });
 
-    if (!user) {
+    if (users.length === 0) {
       throw new NotFoundException('User not found');
     }
 
-    if (user.emailVerified) {
+    const unverified = users.filter((u) => !u.emailVerified);
+    if (unverified.length === 0) {
       throw new BadRequestException('Email already verified');
     }
 
-    // Generate new verification token
-    const emailVerificationToken = crypto.randomBytes(32).toString('hex');
-    user.emailVerificationToken = emailVerificationToken;
-    await this.userRepository.save(user);
+    for (const user of unverified) {
+      const token = crypto.randomBytes(32).toString('hex');
+      user.emailVerificationToken = token;
+      await this.userRepository.save(user);
 
-    // Send verification email
-    try {
-      await this.emailService.sendEmailVerification(email, user.name, emailVerificationToken);
-    } catch (error) {
-      console.error('Failed to send verification email:', error.message);
+      try {
+        await this.emailService.sendEmailVerification(email, user.name, token);
+      } catch (error) {
+        console.error(
+          `Failed to send verification email for ${user.role} account:`,
+          error.message,
+        );
+      }
     }
 
-    return {
-      message: 'Verification email sent successfully!',
-    };
+    return { message: 'Verification email sent successfully!' };
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
     const { email } = forgotPasswordDto;
 
-    const user = await this.userRepository.findOne({
-      where: { email },
-    });
+    // Send a separate reset link per account (one per role).
+    const users = await this.userRepository.find({ where: { email } });
 
-    if (!user) {
+    if (users.length === 0) {
       // Don't reveal if user exists
       return {
         message: 'If the email exists, a password reset link has been sent.',
       };
     }
 
-    // Generate password reset token
-    const passwordResetToken = crypto.randomBytes(32).toString('hex');
-    const passwordResetExpires = new Date();
-    passwordResetExpires.setHours(passwordResetExpires.getHours() + 1); // 1 hour expiry
+    const expires = new Date();
+    expires.setHours(expires.getHours() + 1); // 1 hour expiry
 
-    user.passwordResetToken = passwordResetToken;
-    user.passwordResetExpires = passwordResetExpires;
-    await this.userRepository.save(user);
+    for (const user of users) {
+      const token = crypto.randomBytes(32).toString('hex');
+      user.passwordResetToken = token;
+      user.passwordResetExpires = expires;
+      await this.userRepository.save(user);
 
-    // Debug log
-    console.log('🔑 Generated password reset token:', passwordResetToken);
-    console.log('⏰ Token expires at:', passwordResetExpires);
+      console.log(`🔑 Generated reset token for ${user.role} account ${user.id}`);
 
-    // Send password reset email
-    try {
-      await this.emailService.sendPasswordResetEmail(email, user.name, passwordResetToken);
-    } catch (error) {
-      console.error('⚠️ Failed to send password reset email:', error.message);
+      try {
+        await this.emailService.sendPasswordResetEmail(email, user.name, token);
+      } catch (error) {
+        console.error(
+          `Failed to send reset email for ${user.role} account:`,
+          error.message,
+        );
+      }
     }
 
     return {
@@ -551,10 +579,13 @@ export class AuthService {
       throw new BadRequestException('Email is required from OAuth provider');
     }
 
-    // Check if user already exists
-    let user = await this.userRepository.findOne({
-      where: { email },
-    });
+    // OAuth maps to a single account. If the email already has multiple
+    // accounts (attendee + organizer), prefer the attendee one since
+    // OAuth is most commonly used by consumers.
+    const candidates = await this.userRepository.find({ where: { email } });
+    let user =
+      candidates.find((c) => c.role === UserRole.ATTENDEE) ||
+      candidates[0];
 
     if (user) {
       // User exists - update their avatar if provided and not set
@@ -575,7 +606,7 @@ export class AuthService {
         email,
         passwordHash: '', // OAuth users don't have a password
         emailVerified: true, // OAuth providers verify emails
-        roles: [UserRole.ATTENDEE],
+        role: UserRole.ATTENDEE,
         avatarUrl: picture,
         oauthProvider: provider,
       });

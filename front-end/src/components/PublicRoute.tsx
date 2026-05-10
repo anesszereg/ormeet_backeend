@@ -31,9 +31,9 @@ const PublicRoute: React.FC<PublicRouteProps> = ({
     }
 
     // Redirect based on user role
-    if (user?.roles?.includes('organizer')) {
+    if (user?.role === 'organizer') {
       return <Navigate to="/dashboard-organizer" replace />;
-    } else if (user?.roles?.includes('attendee')) {
+    } else if (user?.role === 'attendee') {
       return <Navigate to="/dashboard-attendee" replace />;
     } else {
       return <Navigate to="/onboarding-choice" replace />;

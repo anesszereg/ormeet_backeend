@@ -241,7 +241,7 @@ const SearchResultNavbar = () => {
               <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
                 <button
                   onClick={() => {
-                    const dashboardPath = user.roles?.includes('organizer') ? '/dashboard-organizer' : '/dashboard-attendee';
+                    const dashboardPath = user.role === 'organizer' ? '/dashboard-organizer' : '/dashboard-attendee';
                     navigate(dashboardPath);
                     setIsProfileMenuOpen(false);
                   }}

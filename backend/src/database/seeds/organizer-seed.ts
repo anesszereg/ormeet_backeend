@@ -60,7 +60,7 @@ async function seed() {
       email: 'organizer@ormeet.com',
       passwordHash,
       phone: '+1234567890',
-      roles: [UserRole.ORGANIZER],
+      role: UserRole.ORGANIZER,
       emailVerified: true,
       emailVerifiedAt: new Date(),
     });
@@ -88,7 +88,7 @@ async function seed() {
         name: data.name,
         email: data.email,
         passwordHash,
-        roles: [UserRole.ATTENDEE],
+        role: UserRole.ATTENDEE,
         emailVerified: true,
         emailVerifiedAt: new Date(),
       });

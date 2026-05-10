@@ -300,7 +300,7 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   remove(@Param('id') id: string, @Request() req) {
-    const isAdmin = req.user.roles?.includes(UserRole.ADMIN);
+    const isAdmin = req.user?.role === UserRole.ADMIN;
     return this.ordersService.remove(id, req.user.id, isAdmin);
   }
 }

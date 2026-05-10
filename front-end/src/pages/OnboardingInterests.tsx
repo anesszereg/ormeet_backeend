@@ -107,7 +107,7 @@ const OnboardingInterests = () => {
       await refreshUser();
 
       // Check if user is organizer - if so, redirect to brand info page
-      if (user?.roles?.includes('organizer')) {
+      if (user?.role === 'organizer') {
         navigate('/onboarding-brand-info', { replace: true });
       } else {
         // Redirect to attendee dashboard

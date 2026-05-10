@@ -19,6 +19,10 @@ const Login = () => {
   const [showVerificationError, setShowVerificationError] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const [isResending, setIsResending] = useState(false);
+  // When the same email has multiple accounts (e.g. attendee + organizer),
+  // the backend returns 409 MULTIPLE_ACCOUNTS and we ask the user which one
+  // to log into.
+  const [availableRoles, setAvailableRoles] = useState<string[] | null>(null);
 
   const handlePhoneChange = (fullPhone: string) => {
     setPhone(fullPhone);
@@ -56,36 +60,50 @@ const Login = () => {
     }
   }, [location]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async (
+    eOrRole: React.FormEvent | string,
+  ) => {
+    let chosenRole: string | undefined;
+    if (typeof eOrRole === 'string') {
+      chosenRole = eOrRole;
+    } else {
+      eOrRole.preventDefault();
+      // Use the role the user picked on /onboarding-choice (if any) as a hint.
+      const userType = localStorage.getItem('userType');
+      if (userType === 'organize') chosenRole = 'organizer';
+      else if (userType === 'attend') chosenRole = 'attendee';
+    }
+
     setIsLoading(true);
+    setAvailableRoles(null);
 
     try {
-      const credentials = loginMethod === 'email' 
-        ? { email, password } 
+      const credentials: any = loginMethod === 'email'
+        ? { email, password }
         : { phone, password };
-      
+      if (chosenRole) credentials.role = chosenRole;
+
       await login(credentials);
       
       const user = authService.getCurrentUser();
       
       console.log('🔍 [Login] User data:', user);
-      console.log('🔍 [Login] User roles:', user?.roles);
+      console.log('🔍 [Login] User role:', user?.role);
       console.log('🔍 [Login] interestedEventCategories:', user?.interestedEventCategories);
       console.log('🔍 [Login] hostingEventTypes:', user?.hostingEventTypes);
       
       // Check if user needs onboarding (first time login)
       // User needs onboarding if they don't have interests/hosting types set
-      const needsOnboarding = user?.roles?.includes('organizer') 
+      const needsOnboarding = user?.role === 'organizer'
         ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       
       console.log('🔍 [Login] needsOnboarding:', needsOnboarding);
-      console.log('🔍 [Login] Is organizer:', user?.roles?.includes('organizer'));
+      console.log('🔍 [Login] Is organizer:', user?.role === 'organizer');
       
       if (needsOnboarding) {
         // Redirect to onboarding based on role
-        if (user?.roles?.includes('organizer')) {
+        if (user?.role === 'organizer') {
           console.log('✅ [Login] Redirecting to organizer onboarding');
           // Use setTimeout to ensure navigation happens after state updates
           setTimeout(() => {
@@ -103,15 +121,35 @@ const Login = () => {
       console.log('✅ [Login] User has completed onboarding, redirecting to dashboard');
       
       // Navigate to dashboard based on user role
-      if (user?.roles?.includes('organizer')) {
+      if (user?.role === 'organizer') {
         navigate('/dashboard-organizer', { replace: true });
       } else {
         navigate('/dashboard-attendee', { replace: true });
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please try again.';
+      const data = err.response?.data;
+
+      // Backend returns 409 with code MULTIPLE_ACCOUNTS when this email
+      // belongs to both an attendee and an organizer account.
+      if (
+        err.response?.status === 409 &&
+        (data?.code === 'MULTIPLE_ACCOUNTS' || data?.message?.code === 'MULTIPLE_ACCOUNTS')
+      ) {
+        const roles =
+          data?.availableRoles || data?.message?.availableRoles || [
+            'attendee',
+            'organizer',
+          ];
+        setAvailableRoles(roles);
+        setError('');
+        setShowVerificationError(false);
+        return;
+      }
+
+      const rawMessage = data?.message ?? err.message ?? 'Login failed. Please try again.';
+      const errorMessage = typeof rawMessage === 'string' ? rawMessage : (rawMessage?.message || 'Login failed.');
       console.log('Setting error:', errorMessage);
-      
+
       // Check if error is due to unverified email
       if (errorMessage.toLowerCase().includes('verify') || errorMessage.toLowerCase().includes('verification')) {
         setShowVerificationError(true);
@@ -155,6 +193,43 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      {availableRoles && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h2 className="text-lg font-semibold text-black mb-1">
+              Choose an account
+            </h2>
+            <p className="text-sm text-[#4F4F4F] mb-5">
+              This email has more than one account. Which one do you want to log
+              into?
+            </p>
+            <div className="space-y-2">
+              {availableRoles.map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => handleLogin(r)}
+                  disabled={isLoading}
+                  className="w-full text-left px-4 py-3 rounded-lg border border-[#EEE] hover:border-[#FF4000] hover:bg-[#FFF4F3] transition-colors text-sm font-medium text-black disabled:opacity-60"
+                >
+                  Continue as {r.charAt(0).toUpperCase() + r.slice(1)}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setAvailableRoles(null)}
+              className="mt-4 w-full text-sm text-[#4F4F4F] hover:text-black"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       {/* Left Side - Form */}
       <div className="flex-1 flex items-start justify-center p-4 sm:p-6 md:p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-[460px] flex flex-col gap-4 sm:gap-6 py-6 sm:py-8 md:py-4">

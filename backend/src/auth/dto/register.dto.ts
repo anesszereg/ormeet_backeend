@@ -35,15 +35,15 @@ export class RegisterDto {
   phone?: string;
 
   @ApiPropertyOptional({
-    description: 'User roles',
+    description:
+      'Account role. The same email may register a separate account ' +
+      'for each role (one attendee account and one organizer account).',
     enum: UserRole,
-    isArray: true,
-    example: ['attendee'],
+    example: 'attendee',
   })
   @IsOptional()
-  @IsArray()
-  @IsEnum(UserRole, { each: true })
-  roles?: UserRole[];
+  @IsEnum(UserRole)
+  role?: UserRole;
 
   @ApiPropertyOptional({
     description: 'Organization ID (if user belongs to an organization)',

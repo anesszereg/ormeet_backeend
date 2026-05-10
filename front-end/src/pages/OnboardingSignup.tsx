@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import authService from '../services/authService';
+import authService, { RegisterDto } from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -54,16 +54,16 @@ const OnboardingSignup = () => {
 
     try {
       const userType = localStorage.getItem('userType') || 'attend';
-      const roles: ('attendee' | 'organizer' | 'admin')[] = userType === 'organize' ? ['organizer'] : ['attendee'];
-      
+      const role: 'attendee' | 'organizer' = userType === 'organize' ? 'organizer' : 'attendee';
+
       const name = signupMethod === 'email' ? email.split('@')[0] : `User${phone.slice(-4)}`;
-      
-      const registerData = {
+
+      const registerData: RegisterDto = {
         name,
         email: signupMethod === 'email' ? email : `${phone}@temp.ormeet.com`,
         password,
         phone: signupMethod === 'phone' ? phone : undefined,
-        roles,
+        role,
       };
 
       const response = await authService.register(registerData);

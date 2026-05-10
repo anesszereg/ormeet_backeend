@@ -14,7 +14,7 @@ const HostEvents = () => {
       return;
     }
     
-    if (user.roles?.includes('organizer')) {
+    if (user.role === 'organizer') {
       navigate('/dashboard-organizer');
       return;
     }

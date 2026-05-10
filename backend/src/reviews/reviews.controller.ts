@@ -127,7 +127,7 @@ export class ReviewsController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Review not found' })
   remove(@Param('id') id: string, @Request() req) {
-    const isAdmin = req.user.roles?.includes(UserRole.ADMIN);
+    const isAdmin = req.user?.role === UserRole.ADMIN;
     return this.reviewsService.remove(id, req.user.id, isAdmin);
   }
 }

@@ -106,7 +106,7 @@ const Register = () => {
         email: formData.email,
         phone: formData.phone || undefined,
         password: formData.password,
-        roles: [role],
+        role,
       });
       
       // Clear userType from localStorage after successful registration

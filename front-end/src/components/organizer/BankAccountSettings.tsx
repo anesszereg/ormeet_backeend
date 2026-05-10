@@ -47,7 +47,7 @@ const BankAccountSettings = () => {
   const [showDeleteSuccess, setShowDeleteSuccess] = useState(false);
   
   // Determine admin status from user roles
-  const isAdmin = user?.roles?.includes('organizer') || user?.roles?.includes('admin') || false;
+  const isAdmin = user?.role === 'organizer' || user?.role === 'admin';
 
   // Validate IBAN - basic international format
   const validateIban = (value: string): string => {

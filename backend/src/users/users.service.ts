@@ -121,32 +121,51 @@ export class UsersService {
     return this.sanitizeUser(user);
   }
 
+  /**
+   * Create a sister organizer account for an existing attendee. Each role
+   * lives in its own row (see the entity comment), so "adding the
+   * organizer role" really means cloning the account with role=organizer
+   * and provisioning an organization.
+   */
   async addOrganizerRole(userId: string): Promise<User> {
     const user = await this.findById(userId);
 
-    // Check if user already has organizer role
-    if (user.roles?.includes(UserRole.ORGANIZER)) {
-      throw new BadRequestException('User already has organizer role');
+    // If they already have an organizer account under this email, bail.
+    const existingOrganizer = await this.userRepository.findOne({
+      where: { email: user.email, role: UserRole.ORGANIZER },
+    });
+    if (existingOrganizer) {
+      throw new BadRequestException(
+        'An organizer account already exists for this email. Please log in to it instead.',
+      );
     }
 
-    // Add organizer role to existing roles
-    const currentRoles = user.roles || [UserRole.ATTENDEE];
-    user.roles = [...currentRoles, UserRole.ORGANIZER];
+    const org = this.organizationRepository.create({
+      name: `${user.name}'s Organization`,
+      ownerId: user.id,
+    });
+    const savedOrg = await this.organizationRepository.save(org);
 
-    // Create organization if user doesn't have one
-    if (!user.organizationId) {
-      const org = this.organizationRepository.create({
-        name: `${user.name}'s Organization`,
-        ownerId: user.id,
-      });
-      const savedOrg = await this.organizationRepository.save(org);
-      user.organizationId = savedOrg.id;
-    }
+    const organizer = this.userRepository.create({
+      name: user.name,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      phone: user.phone,
+      role: UserRole.ORGANIZER,
+      organizationId: savedOrg.id,
+      emailVerified: user.emailVerified,
+      emailVerifiedAt: user.emailVerifiedAt,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      locale: user.locale,
+    });
+    const savedOrganizer = await this.userRepository.save(organizer);
 
-    await this.userRepository.save(user);
-    console.log(`✅ Added organizer role to user ${user.id}. Roles: ${user.roles.join(', ')}`);
-    
-    return this.sanitizeUser(user);
+    console.log(
+      `✅ Created sister organizer account ${savedOrganizer.id} for ${user.email}`,
+    );
+
+    return this.sanitizeUser(savedOrganizer);
   }
 
   async updateInterests(userId: string, dto: UpdateInterestsDto): Promise<User> {

@@ -52,7 +52,7 @@ const OAuthCallback = () => {
             } else {
               navigate('/onboarding-interests');
             }
-          } else if (response.roles?.includes('organizer')) {
+          } else if (response.role === 'organizer') {
             navigate('/dashboard-organizer');
           } else {
             navigate('/dashboard-attendee');
