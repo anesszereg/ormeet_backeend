@@ -149,7 +149,10 @@ export class EventsService {
       longDescription: createEventDto.longDescription,
       organizerId: createEventDto.organizerId,
       status: createEventDto.status || EventStatus.DRAFT,
-      category: createEventDto.type, // Map 'type' to 'category'
+      // `type` is a free-form, organizer-supplied label (e.g. "Music" or
+      // a custom value like "Open-mic night") that we persist as the
+      // event's category column.
+      category: createEventDto.type,
       tags: createEventDto.tags,
       images: createEventDto.images,
       videos: createEventDto.videos,

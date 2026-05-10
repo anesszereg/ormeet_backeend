@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import organizerService, { CreateEventDto } from '../../services/organizerService';
+import authService from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import CalendarIcon from '../../assets/Svgs/organiser/dashboard/calendrier.svg';
 import EventPreviewModal from './EventPreviewModal';
@@ -68,7 +69,7 @@ interface EventFormData {
 }
 
 
-const categories = [
+const PRESET_CATEGORIES = [
   'Music',
   'Tech',
   'Business',
@@ -78,7 +79,7 @@ const categories = [
   'Health & Wellness',
   'Education',
   'Community',
-  'Other'
+  'Other',
 ];
 
 const ticketTypes = [
@@ -93,9 +94,23 @@ const ticketTypes = [
 ];
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Organizer's own custom event types are stored on `user.hostingEventTypes`.
+  // We merge them with the preset categories and let the organizer add new ones
+  // inline from the dropdown.
+  const [customCategories, setCustomCategories] = useState<string[]>(() => {
+    const fromUser = (user?.hostingEventTypes as unknown as string[]) || [];
+    return Array.from(new Set(fromUser.filter(Boolean)));
+  });
+  const [newCustomCategory, setNewCustomCategory] = useState('');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+
+  const categories = Array.from(
+    new Set([...PRESET_CATEGORIES, ...customCategories]),
+  );
 
   const getInitialFormData = (): EventFormData => {
     if (initialData) {
@@ -214,6 +229,55 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setIsCategoryDropdownOpen(false);
     if (errors.category) {
       setErrors(prev => ({ ...prev, category: '' }));
+    }
+  };
+
+  /**
+   * Persist a brand-new event category for this organizer. Saved on
+   * `user.hostingEventTypes` so it stays available across events and
+   * sessions.
+   */
+  const handleAddCustomCategory = async () => {
+    const value = newCustomCategory.trim();
+    if (!value) return;
+
+    // De-dupe case-insensitively against everything we already know about.
+    const existing = categories.find(
+      (c) => c.toLowerCase() === value.toLowerCase(),
+    );
+    if (existing) {
+      handleCategorySelect(existing);
+      setNewCustomCategory('');
+      setIsAddingCategory(false);
+      return;
+    }
+
+    // Optimistically add to the UI so the dropdown doesn't flicker.
+    const nextCustom = [...customCategories, value];
+    setCustomCategories(nextCustom);
+    handleCategorySelect(value);
+    setNewCustomCategory('');
+    setIsAddingCategory(false);
+
+    // Best-effort persist to backend; if it fails we still let the
+    // organizer publish the event with this custom type — the value is
+    // stored on the event itself regardless.
+    try {
+      const merged = Array.from(
+        new Set([
+          ...((user?.hostingEventTypes as unknown as string[]) || []),
+          value,
+        ]),
+      );
+      const updated = await authService.updateHostingTypes({
+        hostingEventTypes: merged,
+      });
+      setUser(updated);
+    } catch (err) {
+      console.warn(
+        '⚠️ Failed to persist custom category to user profile:',
+        err,
+      );
     }
   };
 
@@ -807,21 +871,83 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 </button>
                 
                 {isCategoryDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => handleCategorySelect(category)}
-                        className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                          formData.category === category
-                            ? 'bg-primary-light text-primary font-medium'
-                            : 'text-gray hover:bg-secondary-light'
-                        }`}
-                      >
-                        {category}
-                      </button>
-                    ))}
+                  <div className="absolute z-10 w-full mt-1 bg-white border border-light-gray rounded-lg shadow-lg max-h-72 overflow-y-auto">
+                    {categories.map((category) => {
+                      const isCustom = !PRESET_CATEGORIES.includes(category);
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          onClick={() => handleCategorySelect(category)}
+                          className={`w-full px-4 py-2 text-left text-sm transition-colors flex items-center justify-between ${
+                            formData.category === category
+                              ? 'bg-primary-light text-primary font-medium'
+                              : 'text-gray hover:bg-secondary-light'
+                          }`}
+                        >
+                          <span>{category}</span>
+                          {isCustom && (
+                            <span className="text-[10px] uppercase tracking-wide text-primary/70 ml-2">
+                              custom
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+
+                    {/* Add custom category */}
+                    <div className="border-t border-light-gray bg-secondary-light/40">
+                      {isAddingCategory ? (
+                        <div className="flex items-center gap-2 p-2">
+                          <input
+                            type="text"
+                            autoFocus
+                            value={newCustomCategory}
+                            onChange={(e) => setNewCustomCategory(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddCustomCategory();
+                              } else if (e.key === 'Escape') {
+                                setIsAddingCategory(false);
+                                setNewCustomCategory('');
+                              }
+                            }}
+                            placeholder="e.g. Open-mic night"
+                            className="flex-1 px-3 py-1.5 text-sm border border-light-gray rounded-md focus:outline-none focus:border-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddCustomCategory}
+                            disabled={!newCustomCategory.trim()}
+                            className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-md disabled:opacity-50 hover:bg-primary/90"
+                          >
+                            Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsAddingCategory(false);
+                              setNewCustomCategory('');
+                            }}
+                            className="px-2 py-1.5 text-xs text-gray hover:text-black"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setIsAddingCategory(true)}
+                          className="w-full px-4 py-2 text-left text-sm text-primary font-medium hover:bg-primary-light transition-colors flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          Add custom category
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
                 {errors.category && (

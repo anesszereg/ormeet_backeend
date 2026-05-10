@@ -91,6 +91,17 @@ export class CreateEventDto {
   @IsString()
   category?: string;
 
+  /**
+   * Free-form event type label chosen by the organizer (preset like "Music"
+   * or custom like "Open-mic night"). Mapped onto `event.category` server-side.
+   * The frontend currently sends this field; declared here so global
+   * `whitelist: true` does not strip it.
+   */
+  @ApiPropertyOptional({ example: 'music' })
+  @IsOptional()
+  @IsString()
+  type?: string;
+
   @ApiPropertyOptional({ example: ['tech', 'conference', 'networking'] })
   @IsOptional()
   @IsArray()

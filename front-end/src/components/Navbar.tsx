@@ -185,16 +185,6 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
                 </a>
               )}
               
-              {/* Show "Become an Organizer" option if user is only attendee */}
-              {user?.role === 'attendee' && (
-                <a
-                  href="/host-events"
-                  className="block px-4 py-2.5 text-sm text-[#FF4000] font-medium hover:bg-[#FFF4F3] transition-colors"
-                >
-                  🎯 Become an Organizer
-                </a>
-              )}
-              
               <a
                 href="/settings"
                 className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
