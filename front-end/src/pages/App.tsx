@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PublicRoute from '../components/PublicRoute';
+import LandingRedirect from '../components/LandingRedirect';
 import Login from './Login';
 import Register from './Register';
 import ForgotPassword from './ForgotPassword';
@@ -28,9 +29,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        {/* No root route - Next.js landing page handles / */}
-        {/* React app handles all other routes */}
-        
+        {/* Root: redirect to the Next.js landing page (configurable). */}
+        <Route path="/" element={<LandingRedirect />} />
+
         {/* Auth Routes - Redirect authenticated users to dashboard */}
         <Route path="/login" element={
           <PublicRoute>
