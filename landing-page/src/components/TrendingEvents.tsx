@@ -1,29 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import type { TrendingEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
+import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
 import PaginationControls from "@/components/ui/PaginationControls";
 
-const trendingEvents: TrendingEvent[] = [
-  { id: 1, image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badge: "Almost full", badgeColor: "blue" },
-  { id: 2, image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=800&fit=crop", title: "Rooftop DJ Nights", price: "$53.99", badge: null, badgeColor: null },
-  { id: 3, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=800&fit=crop", title: "SoCal Street Bites", price: "$53.99", badge: "Sales end soon", badgeColor: "red" },
-  { id: 4, image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=800&fit=crop", title: "Local Artists Showcase", price: "$53.99", badge: "Only few left", badgeColor: "red" },
-  { id: 5, image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badge: null, badgeColor: null },
-  { id: 6, image: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&h=800&fit=crop", title: "Urban Art Exhibition", price: "$53.99", badge: "Almost full", badgeColor: "blue" },
-  { id: 7, image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=800&fit=crop", title: "Wine Tasting Evening", price: "$53.99", badge: null, badgeColor: null },
-  { id: 8, image: "https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=600&h=800&fit=crop", title: "Comedy Night Special", price: "$53.99", badge: "Sales end soon", badgeColor: "red" },
-];
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=800&fit=crop";
 
 const CARDS_PER_PAGE = 5;
 
-const TrendingEvents = () => {
-  const totalPages = Math.ceil(trendingEvents.length / CARDS_PER_PAGE);
+interface TrendingEventsProps {
+  events: LandingEvent[];
+  /** True after the backend fetch settled — used to skip rendering
+   *  while we wait, so we don't flash an empty grid. */
+  hasLoaded: boolean;
+}
+
+const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
+  if (!hasLoaded) return null;
+  if (events.length === 0) return null;
+
+  const totalPages = Math.max(1, Math.ceil(events.length / CARDS_PER_PAGE));
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
-  const currentEvents = trendingEvents.slice(startIndex, startIndex + CARDS_PER_PAGE);
+  const currentEvents = events.slice(startIndex, startIndex + CARDS_PER_PAGE);
 
   return (
     <section className="w-full px-6 md:px-10 lg:px-16 xl:px-20 pt-10 pb-8 bg-white">
@@ -55,7 +57,7 @@ const TrendingEvents = () => {
               <div className="relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
                 <div className="relative w-full h-[280px] sm:h-[300px] lg:h-[320px]">
                   <Image
-                    src={event.image}
+                    src={event.image || FALLBACK_IMAGE}
                     alt={event.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
@@ -78,17 +80,13 @@ const TrendingEvents = () => {
                   {event.title}
                 </h3>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm text-black">from {event.price}</span>
+                  {event.price && (
+                    <span className="text-sm text-black">from {event.price}</span>
+                  )}
                 </div>
-                {event.badge && (
-                  <span
-                    className={`inline-block mt-1.5 text-xs font-medium px-2 py-1 rounded ${
-                      event.badgeColor === "blue"
-                        ? "text-[#00A3FF] bg-[#E6F7FF]"
-                        : "text-primary bg-primary-light"
-                    }`}
-                  >
-                    {event.badge}
+                {event.category && (
+                  <span className="inline-block mt-1.5 text-xs font-medium px-2 py-1 rounded text-primary bg-primary-light">
+                    {event.category}
                   </span>
                 )}
               </div>

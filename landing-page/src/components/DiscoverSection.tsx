@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
+import type { LandingEvent } from "@/lib/api";
 
 /* ------------------------------------------------------------------ */
 /*  Static data                                                        */
@@ -33,61 +34,18 @@ const CATEGORIES = [
 
 type Category = (typeof CATEGORIES)[number];
 
-interface DiscoverEvent {
-  id: number;
-  title: string;
-  date: string;
-  venue: string;
-  price: string;
-  image: string;
-  category: Category;
-}
-
-/** Category-representative images from Unsplash */
-const CATEGORY_IMAGES = {
-  Music: [
-    "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?w=600&h=400&fit=crop",
-  ],
-  Sports: [
-    "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&h=400&fit=crop",
-  ],
-  "Food & Drink": [
-    "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop",
-  ],
-  "Art & Performance": [
-    "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&h=400&fit=crop",
-  ],
-};
-
-/** Mock event data — each event has a category for filtering */
-const ALL_EVENTS: DiscoverEvent[] = [
-  { id: 1,  title: "Golden Beats Music Fest",   date: "Apr 20", venue: "Sunset Arena",         price: "$53.99", image: CATEGORY_IMAGES.Music[0],                category: "Music" },
-  { id: 2,  title: "Rooftop DJ Nights",         date: "May 5",  venue: "Skyline Lounge",       price: "$45.99", image: CATEGORY_IMAGES.Music[1],                category: "Music" },
-  { id: 3,  title: "Acoustic Unplugged",        date: "Jun 12", venue: "Bayview Terrace",      price: "$29.99", image: CATEGORY_IMAGES.Music[2],                category: "Music" },
-  { id: 4,  title: "Championship Finals",       date: "May 18", venue: "Grand Stadium",        price: "$89.99", image: CATEGORY_IMAGES.Sports[0],               category: "Sports" },
-  { id: 5,  title: "City Marathon 2025",        date: "Jun 1",  venue: "Downtown Circuit",     price: "$35.00", image: CATEGORY_IMAGES.Sports[1],               category: "Sports" },
-  { id: 6,  title: "Swim Invitational",         date: "Jul 8",  venue: "Aquatic Center",       price: "$25.00", image: CATEGORY_IMAGES.Sports[2],               category: "Sports" },
-  { id: 7,  title: "SoCal Street Bites",        date: "Apr 28", venue: "Greenleaf Pavilion",   price: "$15.99", image: CATEGORY_IMAGES["Food & Drink"][0],      category: "Food & Drink" },
-  { id: 8,  title: "Wine & Dine Evening",       date: "May 22", venue: "Vineyard Estate",      price: "$65.99", image: CATEGORY_IMAGES["Food & Drink"][1],      category: "Food & Drink" },
-  { id: 9,  title: "Gourmet Food Festival",     date: "Jun 15", venue: "Central Park",         price: "$20.00", image: CATEGORY_IMAGES["Food & Drink"][2],      category: "Food & Drink" },
-  { id: 10, title: "Street Art Walkthrough",    date: "Jun 3",  venue: "Arts District",        price: "$12.00", image: CATEGORY_IMAGES["Art & Performance"][1], category: "Art & Performance" },
-  { id: 11, title: "Abstract Expressions",      date: "Jul 20", venue: "Modern Art Museum",    price: "$38.00", image: CATEGORY_IMAGES["Art & Performance"][2], category: "Art & Performance" },
-  { id: 12, title: "Live Theater Night",        date: "Aug 5",  venue: "City Playhouse",       price: "$42.00", image: CATEGORY_IMAGES["Art & Performance"][0], category: "Art & Performance" },
-];
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop";
 
 /* ------------------------------------------------------------------ */
 /*  Component props                                                    */
 /* ------------------------------------------------------------------ */
 
 interface DiscoverSectionProps {
+  /** Real events fetched from the backend. */
+  events: LandingEvent[];
+  /** True after the fetch settled. */
+  hasLoaded: boolean;
   /** Callback when user selects a different city */
   onCityChange?: (city: string) => void;
 }
@@ -96,7 +54,43 @@ interface DiscoverSectionProps {
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
 
-const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
+/**
+ * Map a free-form backend category (e.g. "Music", "music",
+ * "Open-mic night") onto one of our pill buckets. Anything that doesn't
+ * match a known bucket falls into "Art & Performance" so it still shows
+ * up under at least one filter.
+ */
+const bucketFor = (raw: string): Category => {
+  const c = raw.trim().toLowerCase();
+  if (!c) return "Art & Performance";
+  if (
+    c.includes("music") ||
+    c.includes("concert") ||
+    c.includes("dj") ||
+    c.includes("party")
+  ) return "Music";
+  if (
+    c.includes("sport") ||
+    c.includes("marathon") ||
+    c.includes("game") ||
+    c.includes("football") ||
+    c.includes("soccer")
+  ) return "Sports";
+  if (
+    c.includes("food") ||
+    c.includes("drink") ||
+    c.includes("wine") ||
+    c.includes("dine") ||
+    c.includes("tasting")
+  ) return "Food & Drink";
+  return "Art & Performance";
+};
+
+const DiscoverSection = ({
+  events,
+  hasLoaded,
+  onCityChange,
+}: DiscoverSectionProps) => {
   const [selectedCity, setSelectedCity] = useState<City>("California");
   const [activeCategory, setActiveCategory] = useState<Category>("All Categories");
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
@@ -123,21 +117,15 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
   );
 
   /**
-   * "All Categories" shows only the first 3 cards (one per category)
-   * to keep the layout clean. Specific category shows all 3 of its cards.
+   * "All Categories" shows up to 6 most-recent real events; selecting
+   * a specific bucket filters by its mapped category.
    */
   const filteredEvents = useMemo(() => {
     if (activeCategory === "All Categories") {
-      const seen = new Set<string>();
-      const firstPerCategory = ALL_EVENTS.filter((e) => {
-        if (seen.has(e.category)) return false;
-        seen.add(e.category);
-        return true;
-      });
-      return firstPerCategory.slice(0, 3);
+      return events.slice(0, 6);
     }
-    return ALL_EVENTS.filter((e) => e.category === activeCategory);
-  }, [activeCategory]);
+    return events.filter((e) => bucketFor(e.category) === activeCategory);
+  }, [events, activeCategory]);
 
   return (
     <section className="w-full flex flex-col items-center pt-10 pb-6 bg-white">
@@ -245,16 +233,18 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
               {/* Image */}
               <div className="relative w-full h-[200px] sm:h-[220px] lg:h-[240px] rounded-2xl overflow-hidden mb-3">
                 <Image
-                  src={event.image}
+                  src={event.image || FALLBACK_IMAGE}
                   alt={event.title}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 {/* Category badge overlay */}
-                <span className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-black/60 text-white rounded-full backdrop-blur-sm">
-                  {event.category}
-                </span>
+                {event.category && (
+                  <span className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-black/60 text-white rounded-full backdrop-blur-sm">
+                    {event.category}
+                  </span>
+                )}
               </div>
 
               {/* Info */}
@@ -262,19 +252,21 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
                 {event.title}
               </h3>
               <p className="text-sm text-medium-gray mb-1.5">
-                {event.date} • {event.venue}
+                {[event.date, event.venue].filter(Boolean).join(" • ")}
               </p>
-              <span className="text-sm font-semibold text-black">
-                from {event.price}
-              </span>
+              {event.price && (
+                <span className="text-sm font-semibold text-black">
+                  from {event.price}
+                </span>
+              )}
             </div>
           ))}
         </div>
 
         {/* Empty state */}
-        {filteredEvents.length === 0 && (
+        {hasLoaded && filteredEvents.length === 0 && (
           <p className="text-center text-medium-gray py-12 text-sm">
-            No events found in this category.
+            No events found in this category yet.
           </p>
         )}
       </div>

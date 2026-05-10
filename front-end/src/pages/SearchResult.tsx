@@ -30,9 +30,23 @@ interface MappedEvent {
 }
 
 const SearchResult = () => {
+  const [searchParams] = useSearchParams();
+  const searchCategory = searchParams.get('category') || '';
+  const searchLocation = searchParams.get('location') || '';
+  // The landing-page hero search bar sends the "What" input as `event`
+  // (free-text title query). `q` is also accepted as an alias.
+  const searchQuery =
+    searchParams.get('event') || searchParams.get('q') || '';
+
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState('Oran');
+  // Seed the location filter from the URL when the landing page passes
+  // one in; fall back to the default city otherwise.
+  // Empty string means "no location filter" — otherwise we'd hide every
+  // event that doesn't happen to be in the default city.
+  const [selectedLocation, setSelectedLocation] = useState(
+    searchLocation || '',
+  );
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 300 });
   const [selectedDate, setSelectedDate] = useState('Apr 20, 2025');
@@ -43,9 +57,6 @@ const SearchResult = () => {
   const [events, setEvents] = useState<MappedEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<MappedEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchParams] = useSearchParams();
-  const searchCategory = searchParams.get('category') || '';
-  const searchLocation = searchParams.get('location') || '';
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -80,6 +91,16 @@ const SearchResult = () => {
   useEffect(() => {
     let filtered = [...events];
 
+    // Free-text query from the landing-page hero search ("What" field)
+    // — matches against title or description.
+    if (searchQuery) {
+      const needle = searchQuery.toLowerCase();
+      filtered = filtered.filter(event =>
+        event.title.toLowerCase().includes(needle) ||
+        event.description.toLowerCase().includes(needle),
+      );
+    }
+
     // Filter by search category
     if (searchCategory) {
       filtered = filtered.filter(event => 
@@ -105,16 +126,21 @@ const SearchResult = () => {
       return price >= priceRange.min && price <= priceRange.max;
     });
 
-    // Filter by location (if needed)
-    if (searchLocation && selectedLocation !== 'Oran') {
+    // Filter by location. We honour both the URL-supplied `location`
+    // (from the landing page) and the sidebar dropdown — an event needs
+    // to match the active dropdown value to be shown. We don't gate on
+    // a specific city anymore, so a search from the landing page
+    // actually narrows the results.
+    const locationNeedle = (searchLocation || selectedLocation || '').trim();
+    if (locationNeedle) {
+      const needle = locationNeedle.toLowerCase();
       filtered = filtered.filter(event =>
-        event.venue.toLowerCase().includes(searchLocation.toLowerCase()) ||
-        event.venue.toLowerCase().includes(selectedLocation.toLowerCase())
+        event.venue.toLowerCase().includes(needle),
       );
     }
 
     setFilteredEvents(filtered);
-  }, [events, searchCategory, searchLocation, selectedCategories, priceRange, selectedLocation]);
+  }, [events, searchQuery, searchCategory, searchLocation, selectedCategories, priceRange, selectedLocation]);
 
   const categories = ['Music', 'Sports', 'Business', 'Arts', 'Food & Drink', 'Health', 'Technology', 'Fashion'];
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 4);

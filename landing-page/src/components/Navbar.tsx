@@ -24,12 +24,6 @@ const Navbar = () => {
         {/* Nav Links */}
         <div className="hidden md:flex items-center gap-6">
           <a
-            href={`${MAIN_APP_URL}/browse-events`}
-            className="text-sm font-medium text-black hover:text-primary transition-colors"
-          >
-            Browse events
-          </a>
-          <a
             href={`${MAIN_APP_URL}/host-events`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
@@ -94,7 +88,7 @@ const Navbar = () => {
 
         {/* Log In Button */}
         <a
-          href={`${MAIN_APP_URL}/login`}
+          href={`${MAIN_APP_URL}/onboarding-choice`}
           className="px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
         >
           Log In
@@ -102,7 +96,7 @@ const Navbar = () => {
 
         {/* Sign Up Button */}
         <a
-          href={`${MAIN_APP_URL}/register`}
+          href={`${MAIN_APP_URL}/onboarding-choice`}
           className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-dark transition-colors"
         >
           Sign up

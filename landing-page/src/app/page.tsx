@@ -12,18 +12,29 @@ import BigCities from "@/components/BigCities";
 import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import { useLandingEvents } from "@/hooks/useLandingEvents";
 
 export default function Home() {
   const [selectedCity, setSelectedCity] = useState("California");
+  // One backend call shared by every event-listing section below.
+  const { events, isLoading, hasLoaded } = useLandingEvents();
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <HeroSection />
-      <EventCarousel />
-      <DiscoverSection onCityChange={setSelectedCity} />
-      <TrendingEvents />
-      <EventsInCalifornia selectedCity={selectedCity} />
+      <EventCarousel events={events} isLoading={isLoading} />
+      <DiscoverSection
+        events={events}
+        hasLoaded={hasLoaded}
+        onCityChange={setSelectedCity}
+      />
+      <TrendingEvents events={events} hasLoaded={hasLoaded} />
+      <EventsInCalifornia
+        events={events}
+        hasLoaded={hasLoaded}
+        selectedCity={selectedCity}
+      />
       <FindYourVibe />
       <BigCities />
       <Testimonials />

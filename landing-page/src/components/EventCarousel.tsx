@@ -2,75 +2,87 @@
 
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import type { CarouselEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
+import type { LandingEvent } from "@/lib/api";
 
-const events: CarouselEvent[] = [
+const FALLBACK_EVENTS: LandingEvent[] = [
   {
-    id: 1,
+    id: "fallback-1",
     image: "/images/landingPage/event-myticket-6.jpg",
     title: "Neon Nights DJ Party",
     date: "Apr 20",
     venue: "Skyline Lounge",
+    city: "",
+    category: "",
+    price: "",
   },
   {
-    id: 2,
+    id: "fallback-2",
     image: "/images/landingPage/event-myticket-3.jpg",
     title: "Rhythm & Beats Music Festival",
     date: "Apr 20",
     venue: "Hyde Park",
+    city: "",
+    category: "",
+    price: "",
   },
   {
-    id: 3,
+    id: "fallback-3",
     image: "/images/landingPage/event-myticket-2.jpg",
     title: "Global Tech Innovators Summit",
     date: "Apr 20",
     venue: "Marina Convention Center",
-  },
-  {
-    id: 4,
-    image: "/images/landingPage/event-myticket-8.png",
-    title: "Summer Jazz & Blues Festival",
-    date: "May 15",
-    venue: "Riverside Amphitheater",
-  },
-  {
-    id: 5,
-    image: "/images/landingPage/event-myticket-7.png",
-    title: "Street Food Festival",
-    date: "Jun 5",
-    venue: "Downtown Plaza",
+    city: "",
+    category: "",
+    price: "",
   },
 ];
 
-const EventCarousel = () => {
-  const [currentIndex, setCurrentIndex] = useState(1);
+interface EventCarouselProps {
+  events: LandingEvent[];
+  isLoading: boolean;
+}
+
+const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
+  // While the fetch is in flight, show evergreen marketing imagery so
+  // the hero area never looks empty.
+  const list = events.length >= 3
+    ? events
+    : isLoading
+      ? FALLBACK_EVENTS
+      : events.length > 0
+        ? events
+        : FALLBACK_EVENTS;
+
+  const [currentIndex, setCurrentIndex] = useState(
+    list.length > 1 ? 1 : 0,
+  );
 
   const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? events.length - 1 : prev - 1));
-  }, []);
+    setCurrentIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
+  }, [list.length]);
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === events.length - 1 ? 0 : prev + 1));
-  }, []);
+    setCurrentIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
+  }, [list.length]);
 
   /** Navigate to event detail page - frontend route */
-  const handleEventClick = useCallback((eventId: number) => {
+  const handleEventClick = useCallback((eventId: string) => {
     window.location.href = `${FRONTEND_ORIGIN}/event/${eventId}`;
   }, []);
 
   const { prev, current, next } = useMemo(() => {
-    const prevIndex =
-      currentIndex === 0 ? events.length - 1 : currentIndex - 1;
-    const nextIndex =
-      currentIndex === events.length - 1 ? 0 : currentIndex + 1;
+    const safeIndex = Math.min(currentIndex, list.length - 1);
+    const prevIndex = safeIndex === 0 ? list.length - 1 : safeIndex - 1;
+    const nextIndex = safeIndex === list.length - 1 ? 0 : safeIndex + 1;
     return {
-      prev: events[prevIndex],
-      current: events[currentIndex],
-      next: events[nextIndex],
+      prev: list[prevIndex],
+      current: list[safeIndex],
+      next: list[nextIndex],
     };
-  }, [currentIndex]);
+  }, [currentIndex, list]);
+
+  if (!current) return null;
 
   return (
     <section className="w-full overflow-hidden py-2 mb-8">
@@ -82,7 +94,7 @@ const EventCarousel = () => {
           style={{ willChange: 'transform, opacity' }}
         >
           <Image
-            src={prev.image}
+            src={prev.image || "/images/landingPage/event-myticket-2.jpg"}
             alt={prev.title}
             fill
             className="object-cover transition-transform duration-300"
@@ -115,12 +127,12 @@ const EventCarousel = () => {
 
         {/* Center (Active) Card - Clickable */}
         <div 
-          onClick={() => handleEventClick(current.id)}
+          onClick={() => current.id.startsWith("fallback-") ? null : handleEventClick(current.id)}
           className="relative shrink-0 w-[calc(100%-360px)] md:w-[calc(100%-440px)] lg:w-[calc(100%-530px)] max-w-[680px] h-[280px] md:h-[340px] lg:h-[380px] rounded-2xl overflow-hidden shadow-xl transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-[1.02]"
           style={{ willChange: 'transform, box-shadow' }}
         >
           <Image
-            src={current.image}
+            src={current.image || "/images/landingPage/event-myticket-3.jpg"}
             alt={current.title}
             fill
             className="object-cover"
@@ -159,7 +171,7 @@ const EventCarousel = () => {
           style={{ willChange: 'transform, opacity' }}
         >
           <Image
-            src={next.image}
+            src={next.image || "/images/landingPage/event-myticket-6.jpg"}
             alt={next.title}
             fill
             className="object-cover transition-transform duration-300"
