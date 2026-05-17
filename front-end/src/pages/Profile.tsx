@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 
 const Profile = () => {
+  const { t } = useTranslation(['attendee', 'common']);
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -32,7 +34,7 @@ const Profile = () => {
               {user?.avatarUrl ? (
                 <img 
                   src={user.avatarUrl} 
-                  alt="Profile" 
+                  alt={t('profile.photoAlt')} 
                   className="w-24 h-24 rounded-full object-cover"
                 />
               ) : (
@@ -42,7 +44,7 @@ const Profile = () => {
                   </span>
                 </div>
               )}
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-[#FF4000] rounded-full flex items-center justify-center text-white hover:bg-[#E63900] transition-colors">
+              <button className="absolute bottom-0 end-0 w-8 h-8 bg-[#FF4000] rounded-full flex items-center justify-center text-white hover:bg-[#E63900] transition-colors">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                 </svg>
@@ -54,7 +56,7 @@ const Profile = () => {
               <h1 className="text-2xl font-bold text-black mb-1">{user?.name || 'User'}</h1>
               <p className="text-[#757575] text-sm mb-2">{user?.email}</p>
               <span className="inline-block px-3 py-1 bg-[#FF4000]/10 text-[#FF4000] text-xs font-medium rounded-full">
-                {user?.roles?.includes('organizer') ? 'Organizer' : 'Attendee'}
+                {user?.roles?.includes('organizer') ? t('profile.roleOrganizer') : t('profile.roleAttendee')}
               </span>
             </div>
 
@@ -64,7 +66,7 @@ const Profile = () => {
                 onClick={() => setIsEditing(true)}
                 className="px-6 py-2.5 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
               >
-                Edit Profile
+                {t('profile.editProfile')}
               </button>
             )}
           </div>
@@ -72,13 +74,13 @@ const Profile = () => {
 
         {/* Profile Form */}
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-xl font-bold text-black mb-6">Personal Information</h2>
+          <h2 className="text-xl font-bold text-black mb-6">{t('profile.personalInfo')}</h2>
           
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name */}
             <div>
               <label className="block text-sm font-medium text-[#4F4F4F] mb-2">
-                Full Name
+                {t('profile.fullName')}
               </label>
               <input
                 type="text"
@@ -92,7 +94,7 @@ const Profile = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-[#4F4F4F] mb-2">
-                Email Address
+                {t('profile.emailAddress')}
               </label>
               <input
                 type="email"
@@ -106,14 +108,14 @@ const Profile = () => {
             {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-[#4F4F4F] mb-2">
-                Phone Number
+                {t('profile.phoneNumber')}
               </label>
               <input
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 disabled={!isEditing}
-                placeholder="Add your phone number"
+                placeholder={t('profile.phonePlaceholder')}
                 className="w-full px-4 py-3 border border-[#EEEEEE] rounded-lg text-black disabled:bg-[#F8F8F8] disabled:cursor-not-allowed focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
               />
             </div>
@@ -121,13 +123,13 @@ const Profile = () => {
             {/* Bio */}
             <div>
               <label className="block text-sm font-medium text-[#4F4F4F] mb-2">
-                Bio
+                {t('profile.bio')}
               </label>
               <textarea
                 value={formData.bio}
                 onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                 disabled={!isEditing}
-                placeholder="Tell us about yourself"
+                placeholder={t('profile.bioPlaceholder')}
                 rows={4}
                 className="w-full px-4 py-3 border border-[#EEEEEE] rounded-lg text-black disabled:bg-[#F8F8F8] disabled:cursor-not-allowed focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all resize-none"
               />
@@ -140,7 +142,7 @@ const Profile = () => {
                   type="submit"
                   className="flex-1 px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
                 >
-                  Save Changes
+                  {t('profile.saveChanges')}
                 </button>
                 <button
                   type="button"
@@ -155,7 +157,7 @@ const Profile = () => {
                   }}
                   className="flex-1 px-6 py-3 bg-white text-black font-semibold rounded-full border-2 border-[#EEEEEE] hover:bg-[#F8F8F8] transition-colors"
                 >
-                  Cancel
+                  {t('common:cta.cancel')}
                 </button>
               </div>
             )}
@@ -164,25 +166,25 @@ const Profile = () => {
 
         {/* Account Settings */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mt-6">
-          <h2 className="text-xl font-bold text-black mb-6">Account Settings</h2>
+          <h2 className="text-xl font-bold text-black mb-6">{t('profile.accountSettings')}</h2>
           
           <div className="space-y-4">
             <button className="w-full flex items-center justify-between px-4 py-3 border border-[#EEEEEE] rounded-lg hover:bg-[#F8F8F8] transition-colors">
-              <span className="text-sm font-medium text-[#4F4F4F]">Change Password</span>
+              <span className="text-sm font-medium text-[#4F4F4F]">{t('profile.changePassword')}</span>
               <svg className="w-5 h-5 text-[#BCBCBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
             <button className="w-full flex items-center justify-between px-4 py-3 border border-[#EEEEEE] rounded-lg hover:bg-[#F8F8F8] transition-colors">
-              <span className="text-sm font-medium text-[#4F4F4F]">Privacy Settings</span>
+              <span className="text-sm font-medium text-[#4F4F4F]">{t('profile.privacySettings')}</span>
               <svg className="w-5 h-5 text-[#BCBCBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
             <button className="w-full flex items-center justify-between px-4 py-3 border border-[#EEEEEE] rounded-lg hover:bg-[#F8F8F8] transition-colors">
-              <span className="text-sm font-medium text-[#4F4F4F]">Notification Preferences</span>
+              <span className="text-sm font-medium text-[#4F4F4F]">{t('profile.notificationPreferences')}</span>
               <svg className="w-5 h-5 text-[#BCBCBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>

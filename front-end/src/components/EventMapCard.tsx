@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface EventMapCardProps {
   image: string;
@@ -23,6 +24,7 @@ const EventMapCard = ({
   eventId,
   onClose 
 }: EventMapCardProps) => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
 
   const handleCardClick = (e: React.MouseEvent) => {
@@ -46,7 +48,7 @@ const EventMapCard = ({
         {/* Close button */}
         <button 
           onClick={onClose}
-          className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md"
+          className="absolute top-2 end-2 w-6 h-6 bg-white rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors shadow-md"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
             <path d="M9 3L3 9M3 3L9 9" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
@@ -65,7 +67,7 @@ const EventMapCard = ({
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-1">
-            <span className="text-xs text-[#757575]">from</span>
+            <span className="text-xs text-[#757575]">{t('eventMapCard.fromPrice')}</span>
             <span className="text-base font-semibold text-black">{price}</span>
           </div>
           {badge && (

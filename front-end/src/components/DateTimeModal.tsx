@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface DateTimeModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface DateTimeModalProps {
 }
 
 const DateTimeModal = ({ isOpen, onClose, currentDate, currentTime, onDateTimeChange }: DateTimeModalProps) => {
+  const { t } = useTranslation('organizer');
   const [selectedDate, setSelectedDate] = useState<number>(17);
   const [selectedMonth, setSelectedMonth] = useState<number>(4);
   const [selectedYear, setSelectedYear] = useState<number>(2025);
@@ -86,12 +88,12 @@ const DateTimeModal = ({ isOpen, onClose, currentDate, currentTime, onDateTimeCh
       <div className="bg-white rounded-2xl w-full max-w-[660px] max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="p-6 border-b border-[#EEEEEE]">
-          <h2 className="text-lg font-bold text-black mb-2">Date & Time</h2>
+          <h2 className="text-lg font-bold text-black mb-2">{t('dateTimeModal.title')}</h2>
           <p className="text-sm text-black mb-1">
             Saturday, April 20, 2025 <span className="text-[#757575] mx-2">|</span> 3:00 PM – 11:00 PM
           </p>
           <button onClick={onClose} className="text-sm font-medium text-[#FF4000] hover:underline">
-            Close Calendar
+            {t('dateTimeModal.closeCalendar')}
           </button>
         </div>
 
@@ -132,9 +134,9 @@ const DateTimeModal = ({ isOpen, onClose, currentDate, currentTime, onDateTimeCh
               <div>
                 {/* Day Headers */}
                 <div className="grid grid-cols-7 gap-1 mb-2">
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                  {(['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const).map((day) => (
                     <div key={day} className="h-10 flex items-center justify-center text-xs font-medium text-[#757575]">
-                      {day}
+                      {t(`dateTimeModal.days.${day}`)}
                     </div>
                   ))}
                 </div>
@@ -150,10 +152,10 @@ const DateTimeModal = ({ isOpen, onClose, currentDate, currentTime, onDateTimeCh
             <div>
               <div className="bg-[#F8F8F8] rounded-xl p-4">
                 <h3 className="text-sm font-semibold text-black mb-2">
-                  2 times available for Tue, May 17
+                  {t('dateTimeModal.timesAvailable_other', { count: timeSlots.length, date: 'Tue, May 17' })}
                 </h3>
                 <p className="text-xs text-[#757575] mb-4">
-                  Please select a suitable time for your event from the options below.
+                  {t('dateTimeModal.selectTimeSubtitle')}
                 </p>
 
                 {/* Time Slot Options */}
@@ -162,7 +164,7 @@ const DateTimeModal = ({ isOpen, onClose, currentDate, currentTime, onDateTimeCh
                     <button
                       key={slot}
                       onClick={() => handleTimeSlotSelect(slot)}
-                      className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-left transition-colors ${
+                      className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-start transition-colors ${
                         selectedTimeSlot === slot
                           ? 'bg-white text-black border-2 border-[#FF4000]'
                           : 'bg-white text-black hover:bg-[#EEEEEE]'

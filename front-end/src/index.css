@@ -5,6 +5,7 @@
 @theme {
   /* Font Family */
   --font-poppins: 'Poppins', sans-serif;
+  --font-arabic: 'Cairo', system-ui, sans-serif;
   --font-family-base: 'Poppins', sans-serif;
 
   /* Font Weights */

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode';
 import NewestIcon from '../assets/Svgs/newest.svg';
 import SearchIcon from '../assets/Svgs/recherche.svg';
@@ -49,10 +50,13 @@ interface MyTicketsProps {
   onEventSelect?: (event: SelectedEvent) => void;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
+  const { t, i18n } = useTranslation('attendee');
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'cancelled'>('upcoming');
   const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('Newest First');
+  const [sortOption, setSortOption] = useState<string>('newestFirst');
   const [searchQuery, setSearchQuery] = useState('');
   const [allTickets, setAllTickets] = useState<ApiTicket[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,7 +105,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
         eventId,
         image: first.event?.images?.[0] || EventImageFallback,
         title: first.event?.title || 'Event',
-        date: eventStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date: eventStart.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
         venue: '',
         ticketCount: eventTickets.length,
         rawTickets: eventTickets,
@@ -135,11 +139,11 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
     }
 
     // Sort
-    if (sortOption === 'Newest First') {
+    if (sortOption === 'newestFirst') {
       groups.sort((a, b) => new Date(b.rawTickets[0].issuedAt).getTime() - new Date(a.rawTickets[0].issuedAt).getTime());
-    } else if (sortOption === 'Oldest First') {
+    } else if (sortOption === 'oldestFirst') {
       groups.sort((a, b) => new Date(a.rawTickets[0].issuedAt).getTime() - new Date(b.rawTickets[0].issuedAt).getTime());
-    } else if (sortOption === 'A-Z') {
+    } else if (sortOption === 'az') {
       groups.sort((a, b) => a.title.localeCompare(b.title));
     }
 
@@ -196,13 +200,13 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       eventId: group.eventId,
       eventImage: group.image,
       eventTitle: group.title,
-      eventDate: eventStart.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
-      eventTime: `${eventStart.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${eventEnd.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`,
+      eventDate: eventStart.toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+      eventTime: `${eventStart.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })} - ${eventEnd.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })}`,
       eventVenue: group.venue,
       eventLocation: '',
       tickets: ticketsWithQR,
       orderId: first.orderId || '',
-      purchaseDate: new Date(first.issuedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      purchaseDate: new Date(first.issuedAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       refundPolicy: 'Refund available',
       refundDays: 7,
       organizerName: '',
@@ -228,7 +232,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
   return (
     <div className="w-full">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold text-black mb-6">My Tickets</h1>
+      <h1 className="text-2xl font-bold text-black mb-6">{t('myTickets.title')}</h1>
 
       {/* Tabs Navigation */}
       {/* Tabs: Upcoming, Past, Cancelled with orange underline for active tab */}
@@ -239,10 +243,10 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             activeTab === 'upcoming' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
-          Upcoming
+          {t('myTickets.tabs.upcoming')}
           {/* Active tab indicator: orange bottom border, 2px height */}
           {activeTab === 'upcoming' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4000]" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-[#FF4000]" />
           )}
         </button>
         <button
@@ -251,9 +255,9 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             activeTab === 'past' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
-          Past
+          {t('myTickets.tabs.past')}
           {activeTab === 'past' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4000]" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-[#FF4000]" />
           )}
         </button>
         <button
@@ -262,9 +266,9 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             activeTab === 'cancelled' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
-          Cancelled
+          {t('myTickets.tabs.cancelled')}
           {activeTab === 'cancelled' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FF4000]" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-[#FF4000]" />
           )}
         </button>
       </div>
@@ -273,7 +277,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       <div className="flex items-center justify-between mb-6">
         {/* Ticket count */}
         <h2 className="text-base font-semibold text-black">
-          {currentTickets.length} Ticket{currentTickets.length !== 1 ? 's' : ''}
+          {t('myTickets.ticketCount', { count: currentTickets.length })}
         </h2>
 
         {/* Search and Sort controls */}
@@ -282,17 +286,17 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search Tickets"
+              placeholder={t('myTickets.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-4 pr-10 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
+              className="ps-4 pe-10 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
               style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
             />
             {/* Search icon positioned on the right */}
             <img 
               src={SearchIcon} 
               alt="Search" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
             />
           </div>
 
@@ -300,12 +304,12 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
           <div className="relative">
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="flex items-center gap-2 pl-11 pr-3 border border-[#EEEEEE] bg-white cursor-pointer hover:border-[#FF4000] transition-colors"
+              className="flex items-center gap-2 ps-11 pe-3 border border-[#EEEEEE] bg-white cursor-pointer hover:border-[#FF4000] transition-colors"
               style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
             >
               {/* Newest icon on the left */}
-              <img src={NewestIcon} alt="Sort" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-              <span className="text-sm font-medium text-[#4F4F4F] truncate flex-1">{sortOption}</span>
+              <img src={NewestIcon} alt="Sort" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <span className="text-sm font-medium text-[#4F4F4F] truncate flex-1">{t(`myTickets.sort.${sortOption}`)}</span>
               {/* Dropdown arrow */}
               <svg className="w-4 h-4 text-[#4F4F4F] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -314,21 +318,21 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
             
             {/* Dropdown menu */}
             {isSortOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
+              <div className="absolute end-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
+                {(['newestFirst', 'oldestFirst', 'az'] as const).map((option) => (
                   <button
                     key={option}
                     onClick={() => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                    className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
                         : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
                     }`}
                   >
-                    {option}
+                    {t(`myTickets.sort.${option}`)}
                   </button>
                 ))}
               </div>
@@ -377,7 +381,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
               {/* Ticket Count */}
               {/* Font: 14px, semibold, orange color for emphasis */}
               <p className="text-sm font-semibold text-[#FF4000]">
-                {ticket.ticketCount} Ticket{ticket.ticketCount !== 1 ? 's' : ''}
+                {t('myTickets.ticketBadge', { count: ticket.ticketCount })}
               </p>
             </div>
           </div>
@@ -392,11 +396,11 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-black mb-2">No tickets found</h3>
+          <h3 className="text-lg font-semibold text-black mb-2">{t('myTickets.empty.title')}</h3>
           <p className="text-sm text-[#4F4F4F]">
-            {activeTab === 'upcoming' && "You don't have any upcoming events."}
-            {activeTab === 'past' && "You don't have any past events."}
-            {activeTab === 'cancelled' && "You don't have any cancelled events."}
+            {activeTab === 'upcoming' && t('myTickets.empty.upcoming')}
+            {activeTab === 'past' && t('myTickets.empty.past')}
+            {activeTab === 'cancelled' && t('myTickets.empty.cancelled')}
           </p>
         </div>
       )}

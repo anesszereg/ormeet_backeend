@@ -6,7 +6,7 @@ const MobileAppPromo = () => {
       <div className="relative w-full bg-[#E8F5F3] rounded-3xl overflow-hidden">
         <div className="flex flex-col lg:flex-row items-center lg:items-stretch">
           {/* Phone Image */}
-          <div className="relative w-[220px] md:w-[260px] lg:w-[300px] shrink-0 -mb-2 lg:mb-0 lg:ml-10 xl:ml-16">
+          <div className="relative w-[220px] md:w-[260px] lg:w-[300px] shrink-0 -mb-2 lg:mb-0 lg:ms-10 xl:ms-16">
             <div className="relative w-full h-[320px] md:h-[380px] lg:h-[420px] mt-8 lg:mt-6">
               <Image
                 src="/images/landingPage/phone.png"
@@ -63,7 +63,7 @@ const MobileAppPromo = () => {
           </div>
 
           {/* QR Code */}
-          <div className="hidden lg:flex flex-col items-center justify-center pr-10 xl:pr-16 py-12">
+          <div className="hidden lg:flex flex-col items-center justify-center pe-10 xl:pe-16 py-12">
             <span className="text-xs text-muted font-medium mb-3 whitespace-nowrap">
               Scan to Get the App
             </span>

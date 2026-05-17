@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useApplyDirection } from '../i18n/useApplyDirection';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PublicRoute from '../components/PublicRoute';
 import Login from './Login';
@@ -25,6 +26,8 @@ import HostEvents from './HostEvents';
 import Profile from './Profile';
 
 const App = () => {
+  useApplyDirection();
+
   return (
     <Router>
       <Routes>

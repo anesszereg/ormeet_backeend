@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface StaticTimePickerProps {
   value: string;
@@ -7,6 +8,7 @@ interface StaticTimePickerProps {
 }
 
 const StaticTimePicker: React.FC<StaticTimePickerProps> = ({ value, onChange, onClose }) => {
+  const { t } = useTranslation('organizer');
   const [mode, setMode] = useState<'hour' | 'minute'>('hour');
   const [selectedHour, setSelectedHour] = useState<number | null>(() => {
     if (value) {
@@ -83,7 +85,7 @@ const StaticTimePicker: React.FC<StaticTimePickerProps> = ({ value, onChange, on
       <div className="flex items-start gap-4">
         {/* Left side - Time display and AM/PM selector */}
         <div className="flex flex-col items-start gap-2">
-          <span className="text-xs font-medium text-gray uppercase tracking-wide">SELECT TIME</span>
+          <span className="text-xs font-medium text-gray uppercase tracking-wide">{t('timePicker.selectTimeLabel')}</span>
           
           <div className="flex items-center gap-1">
             <button

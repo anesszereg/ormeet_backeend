@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import EditIcon from '../../assets/Svgs/edit.svg';
 import SuccessIcon from '../../assets/Svgs/success.svg';
@@ -14,6 +15,7 @@ interface BankAccount {
 }
 
 const BankAccountSettings = () => {
+  const { t } = useTranslation(['organizer', 'common']);
   const { user } = useAuth();
 
   // Bank account state
@@ -58,7 +60,7 @@ const BankAccountSettings = () => {
     // Length: 15-34 characters
     const ibanRegex = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$/;
     if (!ibanRegex.test(cleanValue.toUpperCase())) {
-      return 'Invalid IBAN format';
+      return t('organizer:bankAccount.modal.validation.ibanInvalid');
     }
     return '';
   };
@@ -70,7 +72,7 @@ const BankAccountSettings = () => {
     // Format: 4 letters (bank code) + 2 letters (country code) + 2 alphanumeric (location) + optional 3 alphanumeric (branch)
     const swiftRegex = /^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$/;
     if (!swiftRegex.test(value.toUpperCase())) {
-      return 'Invalid SWIFT/BIC code';
+      return t('organizer:bankAccount.modal.validation.swiftInvalid');
     }
     return '';
   };
@@ -127,23 +129,23 @@ const BankAccountSettings = () => {
   const handleSubmit = () => {
     // Validation
     if (!formData.accountHolderName.trim()) {
-      setFormError('Account holder name is required');
+      setFormError(t('organizer:bankAccount.modal.validation.accountHolderRequired'));
       return;
     }
     if (!formData.bankName.trim()) {
-      setFormError('Bank name is required');
+      setFormError(t('organizer:bankAccount.modal.validation.bankNameRequired'));
       return;
     }
     if (!formData.country.trim()) {
-      setFormError('Country is required');
+      setFormError(t('organizer:bankAccount.modal.validation.countryRequired'));
       return;
     }
     if (!formData.iban.trim()) {
-      setFormError('IBAN is required');
+      setFormError(t('organizer:bankAccount.modal.validation.ibanRequired'));
       return;
     }
     if (!formData.swiftBic.trim()) {
-      setFormError('SWIFT/BIC is required');
+      setFormError(t('organizer:bankAccount.modal.validation.swiftRequired'));
       return;
     }
 
@@ -162,7 +164,7 @@ const BankAccountSettings = () => {
       setBankAccount(newBankAccount);
       
       // Show success popup
-      setSuccessMessage('Bank account saved successfully');
+      setSuccessMessage(t('organizer:bankAccount.modal.success'));
       setShowSuccess(true);
       
       setTimeout(() => {
@@ -219,9 +221,9 @@ const BankAccountSettings = () => {
       <div className="bg-white rounded-xl border border-light-gray p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-bold text-black">Bank Account</h2>
+            <h2 className="text-lg font-bold text-black">{t('organizer:bankAccount.sectionTitle')}</h2>
             <p className="text-sm text-gray mt-1">
-              Manage the bank account that will receive event payouts
+              {t('organizer:bankAccount.sectionSubtitle')}
             </p>
           </div>
         </div>
@@ -234,9 +236,9 @@ const BankAccountSettings = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
               </svg>
             </div>
-            <h3 className="text-base font-semibold text-black mb-2">No bank account added</h3>
+            <h3 className="text-base font-semibold text-black mb-2">{t('organizer:bankAccount.empty.title')}</h3>
             <p className="text-sm text-gray mb-6">
-              You must add a bank account to receive payouts from your events.
+              {t('organizer:bankAccount.empty.description')}
             </p>
             {isAdmin ? (
               <button
@@ -244,10 +246,10 @@ const BankAccountSettings = () => {
                 className="px-6 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer"
                 style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
               >
-                Add bank account
+                {t('organizer:bankAccount.empty.addButton')}
               </button>
             ) : (
-              <p className="text-sm text-[#9CA3AF] italic">Only admin can add bank account</p>
+              <p className="text-sm text-[#9CA3AF] italic">{t('organizer:bankAccount.empty.adminOnly')}</p>
             )}
           </div>
         ) : (
@@ -258,37 +260,37 @@ const BankAccountSettings = () => {
                 <div className="flex-1">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-1">Account Holder Name</p>
+                      <p className="text-xs text-[#9CA3AF] mb-1">{t('organizer:bankAccount.card.accountHolderName')}</p>
                       <p className="text-sm font-medium text-black">{bankAccount.accountHolderName}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-1">Bank Name</p>
+                      <p className="text-xs text-[#9CA3AF] mb-1">{t('organizer:bankAccount.card.bankName')}</p>
                       <p className="text-sm font-medium text-black">{bankAccount.bankName}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-1">Country</p>
+                      <p className="text-xs text-[#9CA3AF] mb-1">{t('organizer:bankAccount.card.country')}</p>
                       <p className="text-sm font-medium text-black">{bankAccount.country}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-[#9CA3AF] mb-1">IBAN</p>
+                      <p className="text-xs text-[#9CA3AF] mb-1">{t('organizer:bankAccount.card.iban')}</p>
                       <p className="text-sm font-medium text-black">{maskIban(bankAccount.iban)}</p>
                     </div>
                   </div>
                 </div>
-                <div className="ml-4">
+                <div className="ms-4">
                   {bankAccount.status === 'verified' ? (
                     <div className="flex items-center gap-1 px-3 py-1 bg-[#E8F5E9] rounded-full">
                       <svg className="w-3 h-3 text-[#2E7D32]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
-                      <span className="text-xs font-medium text-[#2E7D32]">Verified</span>
+                      <span className="text-xs font-medium text-[#2E7D32]">{t('organizer:bankAccount.card.statusVerified')}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 px-3 py-1 bg-[#FFF4E6] rounded-full">
                       <svg className="w-3 h-3 text-[#F57C00]" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                       </svg>
-                      <span className="text-xs font-medium text-[#F57C00]">Pending verification</span>
+                      <span className="text-xs font-medium text-[#F57C00]">{t('organizer:bankAccount.card.statusPending')}</span>
                     </div>
                   )}
                 </div>
@@ -299,18 +301,18 @@ const BankAccountSettings = () => {
                   <button
                     onClick={handleDeleteClick}
                     className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-[#FF4000] hover:bg-[#FFF4F3] rounded-lg transition-all cursor-pointer group"
-                    title="Delete bank account"
+                    title={t('organizer:bankAccount.card.deleteTitle')}
                   >
                     <svg className="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <span className="group-hover:underline">Delete</span>
+                    <span className="group-hover:underline">{t('organizer:bankAccount.card.deleteButton')}</span>
                   </button>
                   <button
                     onClick={() => handleOpenModal('edit')}
                     className="px-4 py-2 text-sm font-medium text-primary hover:bg-primary-light rounded-lg transition-all cursor-pointer hover:shadow-sm"
                   >
-                    Edit bank account
+                    {t('organizer:bankAccount.card.editButton')}
                   </button>
                 </div>
               )}
@@ -333,56 +335,56 @@ const BankAccountSettings = () => {
               {!showSuccess && !showError ? (
                 <>
                   <h2 className="text-xl font-bold text-black mb-4">
-                    {modalMode === 'add' ? 'Add Bank Account' : 'Edit Bank Account'}
+                    {modalMode === 'add' ? t('organizer:bankAccount.modal.titleAdd') : t('organizer:bankAccount.modal.titleEdit')}
                   </h2>
 
                   <div className="space-y-4">
                     {/* Account Holder Name */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Account Holder Name <span className="text-[#FF3425]">*</span>
+                        {t('organizer:bankAccount.modal.fields.accountHolderName')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="text"
                         value={formData.accountHolderName}
                         onChange={(e) => setFormData({ ...formData, accountHolderName: e.target.value })}
                         className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-                        placeholder="Enter account holder name"
+                        placeholder={t('organizer:bankAccount.modal.fields.accountHolderNamePlaceholder')}
                       />
                     </div>
 
                     {/* Bank Name */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Bank Name <span className="text-[#FF3425]">*</span>
+                        {t('organizer:bankAccount.modal.fields.bankName')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="text"
                         value={formData.bankName}
                         onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                         className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-                        placeholder="Enter bank name"
+                        placeholder={t('organizer:bankAccount.modal.fields.bankNamePlaceholder')}
                       />
                     </div>
 
                     {/* Country */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Country <span className="text-[#FF3425]">*</span>
+                        {t('organizer:bankAccount.modal.fields.country')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="text"
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                         className="w-full px-4 py-2.5 border border-[#E0E0E0] rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-                        placeholder="Enter country"
+                        placeholder={t('organizer:bankAccount.modal.fields.countryPlaceholder')}
                       />
                     </div>
 
                     {/* IBAN */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        IBAN <span className="text-[#FF3425]">*</span>
+                        {t('organizer:bankAccount.modal.fields.iban')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="text"
@@ -395,7 +397,7 @@ const BankAccountSettings = () => {
                         className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 transition-all ${
                           ibanError ? 'border-[#FF3425] focus:border-[#FF3425] focus:ring-[#FF3425]/10' : 'border-[#E0E0E0] focus:border-[#FF4000] focus:ring-[#FF4000]/10'
                         }`}
-                        placeholder="Enter IBAN (e.g., GB29NWBK60161331926819)"
+                        placeholder={t('organizer:bankAccount.modal.fields.ibanPlaceholder')}
                       />
                       {ibanError && (
                         <p className="text-xs text-[#FF3425] mt-1">{ibanError}</p>
@@ -405,7 +407,7 @@ const BankAccountSettings = () => {
                     {/* SWIFT/BIC */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        SWIFT / BIC <span className="text-[#FF3425]">*</span>
+                        {t('organizer:bankAccount.modal.fields.swiftBic')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="text"
@@ -418,7 +420,7 @@ const BankAccountSettings = () => {
                         className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 transition-all ${
                           swiftError ? 'border-[#FF3425] focus:border-[#FF3425] focus:ring-[#FF3425]/10' : 'border-[#E0E0E0] focus:border-[#FF4000] focus:ring-[#FF4000]/10'
                         }`}
-                        placeholder="Enter SWIFT/BIC code (e.g., NWBKGB2L)"
+                        placeholder={t('organizer:bankAccount.modal.fields.swiftBicPlaceholder')}
                       />
                       {swiftError && (
                         <p className="text-xs text-[#FF3425] mt-1">{swiftError}</p>
@@ -439,7 +441,7 @@ const BankAccountSettings = () => {
                       onClick={handleCancel}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('common:cta.cancel')}
                     </button>
                     <button
                       onClick={handleSubmit}
@@ -451,7 +453,7 @@ const BankAccountSettings = () => {
                       }`}
                       style={isFormValid() ? { boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' } : {}}
                     >
-                      Save changes
+                      {t('organizer:bankAccount.modal.saveChanges')}
                     </button>
                   </div>
                 </>
@@ -476,7 +478,7 @@ const BankAccountSettings = () => {
                     alt="Error" 
                     className="w-16 h-16 mb-4"
                   />
-                  <p className="text-lg font-semibold text-black">Action failed. Please try again</p>
+                  <p className="text-lg font-semibold text-black">{t('organizer:bankAccount.modal.error')}</p>
                 </div>
               )}
             </div>
@@ -497,9 +499,9 @@ const BankAccountSettings = () => {
             <div className="p-6">
               {!showDeleteSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Confirm deletion</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('organizer:bankAccount.deleteModal.title')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to delete this bank account?
+                    {t('organizer:bankAccount.deleteModal.description')}
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -507,14 +509,14 @@ const BankAccountSettings = () => {
                       onClick={handleCancelDelete}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('common:cta.cancel')}
                     </button>
                     <button
                       onClick={handleConfirmDelete}
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Confirm
+                      {t('organizer:bankAccount.deleteModal.confirm')}
                     </button>
                   </div>
                 </>
@@ -527,7 +529,7 @@ const BankAccountSettings = () => {
                     style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} 
                   />
                   <p className="text-lg font-semibold text-black">
-                    Bank account deleted successfully
+                    {t('organizer:bankAccount.deleteModal.success')}
                   </p>
                 </div>
               )}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Event {
   id: string;
@@ -13,6 +14,7 @@ interface ExportModalProps {
 }
 
 const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) => {
+  const { t } = useTranslation(['organizer', 'common']);
   const [selectedEvent, setSelectedEvent] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
 
   const getSelectedEventName = () => {
     if (!selectedEvent) return '–';
-    if (selectedEvent === 'all') return 'All events';
+    if (selectedEvent === 'all') return t('organizer:export.allEvents');
     const event = events.find(e => e.id === selectedEvent);
     return event ? event.name : '–';
   };
@@ -63,16 +65,16 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
       >
         <div className="p-6">
           <h2 className="text-xl font-bold text-black mb-3">
-            Export data
+            {t('organizer:export.title')}
           </h2>
           
           <p className="text-sm text-gray mb-6">
-            Select the event you want to export data for.
+            {t('organizer:export.description')}
           </p>
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-black mb-2">
-              Select Event
+              {t('organizer:export.selectEventLabel')}
             </label>
             <div className="relative" ref={dropdownRef}>
               <button
@@ -91,19 +93,19 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
               </button>
               
               {isDropdownOpen && (
-                <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-60 overflow-y-auto">
+                <div className="absolute top-full start-0 end-0 mt-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-60 overflow-y-auto">
                   <button
                     onClick={() => {
                       setSelectedEvent('all');
                       setIsDropdownOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                    className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                       selectedEvent === 'all'
                         ? 'bg-primary-light text-primary font-medium'
                         : 'text-gray hover:bg-secondary-light'
                     }`}
                   >
-                    All events
+                    {t('organizer:export.allEvents')}
                   </button>
                   {events.map((event) => (
                     <button
@@ -112,7 +114,7 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
                         setSelectedEvent(event.id);
                         setIsDropdownOpen(false);
                       }}
-                      className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                      className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                         selectedEvent === event.id
                           ? 'bg-primary-light text-primary font-medium'
                           : 'text-gray hover:bg-secondary-light'
@@ -131,7 +133,7 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
               onClick={onClose}
               className="flex-1 px-4 py-2.5 bg-white border border-light-gray text-gray hover:text-black hover:border-gray-400 font-medium text-sm rounded-full transition-all cursor-pointer"
             >
-              Cancel
+              {t('common:cta.cancel')}
             </button>
             <button
               onClick={handleConfirm}
@@ -139,7 +141,7 @@ const ExportModal = ({ isOpen, onClose, onConfirm, events }: ExportModalProps) =
               className="flex-1 px-4 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
               style={{ boxShadow: !selectedEvent ? 'none' : '0 4px 12px rgba(255, 64, 0, 0.25)' }}
             >
-              Confirm
+              {t('organizer:export.confirm')}
             </button>
           </div>
         </div>

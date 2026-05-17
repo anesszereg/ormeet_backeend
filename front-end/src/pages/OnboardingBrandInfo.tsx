@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -21,7 +22,24 @@ const eventTypes = [
   'Business & Finance',
 ];
 
+const eventTypeKeys: Record<string, string> = {
+  'Live Music': 'onboarding.brandInfo.eventTypesList.0',
+  'Nightlife Events': 'onboarding.brandInfo.eventTypesList.1',
+  'DJ Events': 'onboarding.brandInfo.eventTypesList.2',
+  'Art Exhibitions': 'onboarding.brandInfo.eventTypesList.3',
+  'Fitness': 'onboarding.brandInfo.eventTypesList.4',
+  'Holiday': 'onboarding.brandInfo.eventTypesList.5',
+  'Dating': 'onboarding.brandInfo.eventTypesList.6',
+  'Webinars': 'onboarding.brandInfo.eventTypesList.7',
+  'Conferences': 'onboarding.brandInfo.eventTypesList.8',
+  'Food & Drink': 'onboarding.brandInfo.eventTypesList.9',
+  'Kids & Family': 'onboarding.brandInfo.eventTypesList.10',
+  'Gaming & Tech': 'onboarding.brandInfo.eventTypesList.11',
+  'Business & Finance': 'onboarding.brandInfo.eventTypesList.12',
+};
+
 const OnboardingBrandInfo = () => {
+  const { t } = useTranslation('organizer');
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const [organisationName, setOrganisationName] = useState('');
@@ -63,7 +81,7 @@ const OnboardingBrandInfo = () => {
       // Redirect to organizer dashboard
       navigate('/dashboard-organizer', { replace: true });
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to save brand info. Please try again.';
+      const errorMessage = err.response?.data?.message || err.message || t('onboarding.brandInfo.errorFallback');
       setError(errorMessage);
       console.error('Failed to save brand info:', err);
     } finally {
@@ -83,7 +101,7 @@ const OnboardingBrandInfo = () => {
 
           {/* Welcome Text */}
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Welcome to Ormeet!</h1>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('onboarding.brandInfo.title')}</h1>
             
             {/* Progress Bar */}
             <div className="flex gap-2">
@@ -97,7 +115,7 @@ const OnboardingBrandInfo = () => {
           {/* Instruction Text */}
           <div>
             <h2 className="text-lg sm:text-xl text-[#4F4F4F]">
-              Tell us about your brand or yourself
+              {t('onboarding.brandInfo.subtitle')}
             </h2>
           </div>
 
@@ -113,14 +131,14 @@ const OnboardingBrandInfo = () => {
             {/* Organisation Name */}
             <div className="flex flex-col gap-2">
               <label htmlFor="organisation" className="text-sm font-medium text-black">
-                Organisation Name
+                {t('onboarding.brandInfo.fields.organisationName')}
               </label>
               <input
                 id="organisation"
                 type="text"
                 value={organisationName}
                 onChange={(e) => setOrganisationName(e.target.value)}
-                placeholder="Enter your organisation name"
+                placeholder={t('onboarding.brandInfo.fields.organisationPlaceholder')}
                 className="w-full px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#FF4000] focus:ring-1 focus:ring-[#FF4000] transition-all"
                 required
               />
@@ -129,10 +147,10 @@ const OnboardingBrandInfo = () => {
             {/* Event Types */}
             <div className="flex flex-col gap-3">
               <label className="text-sm font-medium text-black">
-                What kind of events do you host?
+                {t('onboarding.brandInfo.fields.eventTypes')}
               </label>
               <div className="flex flex-wrap gap-2">
-                {eventTypes.map((eventType) => (
+                {eventTypes.map((eventType, index) => (
                   <button
                     key={eventType}
                     type="button"
@@ -143,7 +161,7 @@ const OnboardingBrandInfo = () => {
                         : 'bg-white text-black border border-[#EEEEEE] hover:border-black'
                     }`}
                   >
-                    {eventType}
+                    {t(`onboarding.brandInfo.eventTypesList.${index}`)}
                   </button>
                 ))}
               </div>
@@ -152,25 +170,25 @@ const OnboardingBrandInfo = () => {
             {/* Events Per Year */}
             <div className="flex flex-col gap-2">
               <label htmlFor="eventsPerYear" className="text-sm font-medium text-black">
-                How many events will you host next year?
+                {t('onboarding.brandInfo.fields.eventsPerYear')}
               </label>
               <div className="relative">
                 <select
                   id="eventsPerYear"
                   value={eventsPerYear}
                   onChange={(e) => setEventsPerYear(e.target.value)}
-                  className="w-full px-4 py-3 pr-10 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black appearance-none focus:outline-none focus:border-[#FF4000] focus:ring-1 focus:ring-[#FF4000] transition-all bg-white cursor-pointer"
+                  className="w-full px-4 py-3 pe-10 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black appearance-none focus:outline-none focus:border-[#FF4000] focus:ring-1 focus:ring-[#FF4000] transition-all bg-white cursor-pointer"
                   required
                 >
-                  <option value="" disabled>Number of events</option>
-                  <option value="1-5">1-5 events</option>
-                  <option value="6-10">6-10 events</option>
-                  <option value="11-20">11-20 events</option>
-                  <option value="21-50">21-50 events</option>
-                  <option value="50+">50+ events</option>
+                  <option value="" disabled>{t('onboarding.brandInfo.fields.eventsPerYearPlaceholder')}</option>
+                  <option value="1-5">{t('onboarding.brandInfo.fields.eventsPerYearOptions.1-5')}</option>
+                  <option value="6-10">{t('onboarding.brandInfo.fields.eventsPerYearOptions.6-10')}</option>
+                  <option value="11-20">{t('onboarding.brandInfo.fields.eventsPerYearOptions.11-20')}</option>
+                  <option value="21-50">{t('onboarding.brandInfo.fields.eventsPerYearOptions.21-50')}</option>
+                  <option value="50+">{t('onboarding.brandInfo.fields.eventsPerYearOptions.50+')}</option>
                 </select>
                 <svg
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none"
                   fill="none"
                   viewBox="0 0 20 20"
                 >
@@ -188,26 +206,26 @@ const OnboardingBrandInfo = () => {
             {/* Average Attendees */}
             <div className="flex flex-col gap-2">
               <label htmlFor="averageAttendees" className="text-sm font-medium text-black">
-                Average number of attendees per event
+                {t('onboarding.brandInfo.fields.averageAttendees')}
               </label>
               <div className="relative">
                 <select
                   id="averageAttendees"
                   value={averageAttendees}
                   onChange={(e) => setAverageAttendees(e.target.value)}
-                  className="w-full px-4 py-3 pr-10 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black appearance-none focus:outline-none focus:border-[#FF4000] focus:ring-1 focus:ring-[#FF4000] transition-all bg-white cursor-pointer"
+                  className="w-full px-4 py-3 pe-10 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black appearance-none focus:outline-none focus:border-[#FF4000] focus:ring-1 focus:ring-[#FF4000] transition-all bg-white cursor-pointer"
                   required
                 >
-                  <option value="" disabled>Number of attendees</option>
-                  <option value="1-50">1-50 attendees</option>
-                  <option value="51-100">51-100 attendees</option>
-                  <option value="101-250">101-250 attendees</option>
-                  <option value="251-500">251-500 attendees</option>
-                  <option value="500-1000">500-1000 attendees</option>
-                  <option value="1000+">1000+ attendees</option>
+                  <option value="" disabled>{t('onboarding.brandInfo.fields.averageAttendeesPlaceholder')}</option>
+                  <option value="1-50">{t('onboarding.brandInfo.fields.averageAttendeesOptions.1-50')}</option>
+                  <option value="51-100">{t('onboarding.brandInfo.fields.averageAttendeesOptions.51-100')}</option>
+                  <option value="101-250">{t('onboarding.brandInfo.fields.averageAttendeesOptions.101-250')}</option>
+                  <option value="251-500">{t('onboarding.brandInfo.fields.averageAttendeesOptions.251-500')}</option>
+                  <option value="500-1000">{t('onboarding.brandInfo.fields.averageAttendeesOptions.500-1000')}</option>
+                  <option value="1000+">{t('onboarding.brandInfo.fields.averageAttendeesOptions.1000+')}</option>
                 </select>
                 <svg
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none"
                   fill="none"
                   viewBox="0 0 20 20"
                 >
@@ -228,7 +246,7 @@ const OnboardingBrandInfo = () => {
               disabled={isLoading}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
             >
-              {isLoading ? 'Saving...' : 'Finish & Login'}
+              {isLoading ? t('onboarding.brandInfo.saving') : t('onboarding.brandInfo.submit')}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

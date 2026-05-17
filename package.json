@@ -1,21 +1,20 @@
 {
+  "name": "ormeet",
+  "private": true,
+  "workspaces": [
+    "landing-page",
+    "front-end",
+    "packages/*"
+  ],
   "scripts": {
-    "dev:landing": "cd landing-page && npm run dev",
-    "build:landing": "cd landing-page && npm run build",
-    "dev:frontend": "cd front-end && npm run dev",
-    "build:frontend": "cd front-end && npm run build"
+    "dev:landing": "npm run dev -w landing-page",
+    "build:landing": "npm run build -w landing-page",
+    "dev:platform": "npm run dev -w front-end",
+    "build:platform": "npm run build -w front-end",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
   },
-  "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.1",
-    "@mui/material": "^7.3.7",
-    "@mui/x-date-pickers": "^8.24.0",
-    "dayjs": "^1.11.19",
-    "leaflet": "^1.9.4",
-    "next": "^16.1.6",
-    "react": "^19.2.4",
-    "react-datepicker": "^9.1.0",
-    "react-dom": "^19.2.4",
-    "react-leaflet": "^5.0.0"
+  "devDependencies": {
+    "next": "^16.1.6"
   }
 }

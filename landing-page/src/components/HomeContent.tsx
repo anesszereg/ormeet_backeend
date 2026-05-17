@@ -13,7 +13,7 @@ import Testimonials from "@/components/Testimonials";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 
-export default function Home() {
+export default function HomeContent() {
   const [selectedCity, setSelectedCity] = useState("California");
 
   return (

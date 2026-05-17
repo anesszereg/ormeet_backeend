@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import FooterBg from '../assets/imges/footer.png';
 
 const Footer = () => {
+  const { t } = useTranslation('common');
   return (
     <div className="w-full">
       {/* Footer Content - Full width, positioned above image */}
@@ -13,13 +15,13 @@ const Footer = () => {
           <div className="md:col-span-1">
             {/* Logo */}
             <div className="flex items-center gap-2 mb-4">
-              <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
+              <img src={Logo} alt={t('footer.company.title')} className="w-6 h-8" />
               <span className="text-xl font-bold text-black">Ormeet</span>
             </div>
             
             {/* Description */}
             <p className="text-sm text-[#4F4F4F] leading-relaxed mb-6">
-              Ormeet connects people through unforgettable events — from live concerts to workshops. Discover and book nearby experiences, or host your own with ease. Whether you're attending or organizing, Ormeet makes events simple, exciting, and effortlessly accessible.
+              {t('footer.description')}
             </p>
             
             {/* Social Media Icons */}
@@ -63,54 +65,54 @@ const Footer = () => {
           
           {/* Browse Events Column */}
           <div>
-            <h3 className="text-base font-semibold text-black mb-4">Browse Events</h3>
+            <h3 className="text-base font-semibold text-black mb-4">{t('footer.browseEvents.title')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Music</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Sports</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Business</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Fitness</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Nightlife</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Holiday</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Dating</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Festival</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.music')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.sports')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.business')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.fitness')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.nightlife')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.holiday')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.dating')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.browseEvents.festival')}</a></li>
             </ul>
           </div>
           
           {/* Host Events Column */}
           <div>
-            <h3 className="text-base font-semibold text-black mb-4">Host Events</h3>
+            <h3 className="text-base font-semibold text-black mb-4">{t('footer.hostEvents.title')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Create Events</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Features</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Pricing</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.hostEvents.createEvents')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.hostEvents.features')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.hostEvents.pricing')}</a></li>
             </ul>
             
-            <h3 className="text-base font-semibold text-black mb-4 mt-6">Support</h3>
+            <h3 className="text-base font-semibold text-black mb-4 mt-6">{t('footer.support.title')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Help center</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Find your tickets</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Contact event organizer</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.support.helpCenter')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.support.findTickets')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.support.contactOrganizer')}</a></li>
             </ul>
           </div>
           
           {/* Company Column */}
           <div>
-            <h3 className="text-base font-semibold text-black mb-4">Company</h3>
+            <h3 className="text-base font-semibold text-black mb-4">{t('footer.company.title')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">About us</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Contact us</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Blog</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.company.aboutUs')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.company.contactUs')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.company.blog')}</a></li>
             </ul>
           </div>
           
           {/* Legal Column */}
           <div>
-            <h3 className="text-base font-semibold text-black mb-4">Legal</h3>
+            <h3 className="text-base font-semibold text-black mb-4">{t('footer.legal.title')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Cookie Policy</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">Refund & Cancellation</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.termsOfService')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.privacyPolicy')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.cookiePolicy')}</a></li>
+              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.refundCancellation')}</a></li>
             </ul>
           </div>
           </div>
@@ -120,7 +122,7 @@ const Footer = () => {
         <div className="border-t border-[#EEEEEE]">
           <div className="max-w-7xl mx-auto px-8 py-4">
             <p className="text-sm text-[#4F4F4F] text-center">
-              © 2025 Ormeet. All rights reserved.
+              {t('footer.copyright')}
             </p>
           </div>
         </div>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 const Newsletter = () => {
+  const t = useTranslations("landing.newsletter");
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -17,11 +19,10 @@ const Newsletter = () => {
         {/* Left: Heading + Description */}
         <div className="max-w-lg">
           <h2 className="text-xl md:text-2xl font-bold text-black mb-2">
-            Be the first to know. never miss an event again!
+            {t("title")}
           </h2>
           <p className="text-sm text-muted leading-relaxed">
-            Get exclusive updates, early bird access, and handpicked events — delivered
-            straight to your inbox.
+            {t("description")}
           </p>
         </div>
 
@@ -32,15 +33,15 @@ const Newsletter = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="w-full lg:w-[340px] h-12 pl-5 pr-14 text-sm font-medium text-black placeholder-input-gray placeholder:font-normal bg-transparent border-none outline-none"
+              placeholder={t("placeholder")}
+              className="w-full lg:w-[340px] h-12 ps-5 pe-14 text-sm font-medium text-black placeholder-input-gray placeholder:font-normal bg-transparent border-none outline-none"
               required
             />
             <button
               type="submit"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark hover:shadow-lg transition-all duration-200 cursor-pointer"
+              className="absolute end-1.5 top-1/2 -translate-y-1/2 w-9 h-9 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark hover:shadow-lg transition-all duration-200 cursor-pointer"
               style={{ boxShadow: '0 2px 8px rgba(255, 64, 0, 0.2)' }}
-              aria-label="Keep Me Updated"
+              aria-label={t("buttonAria")}
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path d="M4 10L10 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

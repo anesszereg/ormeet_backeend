@@ -1,17 +1,22 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { CaliforniaEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import { usePagination } from "@/hooks/usePagination";
 import PaginationControls from "@/components/ui/PaginationControls";
 
-const californiaEvents: CaliforniaEvent[] = [
-  { id: 1, image: "/images/landingPage/event-myticket-7.png", title: "Laugh Out Loud Live!", date: "Nov 3", venue: "The Spotlight Theatre", price: "$53.99", badge: null, badgeColor: null },
-  { id: 2, image: "/images/landingPage/event-myticket-8.png", title: "Colors of Modernity", date: "Jan 10", venue: "Grandview Art Gallery", price: "$49.99", badge: "Trending", badgeColor: "green" },
-  { id: 3, image: "/images/landingPage/event-myticket-2.jpg", title: "Taste of the Valley", date: "Oct 18", venue: "Greenleaf Pavilion", price: "$65.99", badge: null, badgeColor: null },
-  { id: 4, image: "/images/landingPage/event-myticket-3.jpg", title: "Sunset Acoustic Sessions", date: "Dec 5", venue: "Bayview Terrace", price: "$39.99", badge: "Almost full", badgeColor: "red" },
-  { id: 5, image: "/images/landingPage/event-myticket-6.jpg", title: "Neon Nights DJ Party", date: "Feb 14", venue: "Skyline Lounge", price: "$59.99", badge: null, badgeColor: null },
+type CaliforniaItem = Omit<CaliforniaEvent, "badge"> & {
+  badgeKey: "trending" | "almostFull" | null;
+};
+
+const californiaEvents: CaliforniaItem[] = [
+  { id: 1, image: "/images/landingPage/event-myticket-7.png", title: "Laugh Out Loud Live!", date: "Nov 3", venue: "The Spotlight Theatre", price: "$53.99", badgeKey: null, badgeColor: null },
+  { id: 2, image: "/images/landingPage/event-myticket-8.png", title: "Colors of Modernity", date: "Jan 10", venue: "Grandview Art Gallery", price: "$49.99", badgeKey: "trending", badgeColor: "green" },
+  { id: 3, image: "/images/landingPage/event-myticket-2.jpg", title: "Taste of the Valley", date: "Oct 18", venue: "Greenleaf Pavilion", price: "$65.99", badgeKey: null, badgeColor: null },
+  { id: 4, image: "/images/landingPage/event-myticket-3.jpg", title: "Sunset Acoustic Sessions", date: "Dec 5", venue: "Bayview Terrace", price: "$39.99", badgeKey: "almostFull", badgeColor: "red" },
+  { id: 5, image: "/images/landingPage/event-myticket-6.jpg", title: "Neon Nights DJ Party", date: "Feb 14", venue: "Skyline Lounge", price: "$59.99", badgeKey: null, badgeColor: null },
 ];
 
 const CARDS_PER_PAGE = 3;
@@ -22,6 +27,7 @@ interface EventsInCaliforniaProps {
 }
 
 const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaProps) => {
+  const t = useTranslations("landing.city");
   const totalPages = Math.ceil(californiaEvents.length / CARDS_PER_PAGE);
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
@@ -32,7 +38,7 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          Events in <span className="font-bold">{selectedCity}</span>
+          {t("headingPrefix")} <span className="font-bold">{selectedCity}</span>
         </h2>
         <PaginationControls
           page={page}
@@ -70,8 +76,10 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
               {event.date} • {event.venue}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-semibold text-black">from {event.price}</span>
-              {event.badge && (
+              <span className="text-sm font-semibold text-black">
+                {t("fromPrice", { price: event.price })}
+              </span>
+              {event.badgeKey && (
                 <span
                   className={`text-xs font-medium px-2 py-1 rounded ${
                     event.badgeColor === "green"
@@ -79,7 +87,7 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
                       : "text-primary bg-primary-light"
                   }`}
                 >
-                  {event.badge}
+                  {t(`badges.${event.badgeKey}`)}
                 </span>
               )}
             </div>

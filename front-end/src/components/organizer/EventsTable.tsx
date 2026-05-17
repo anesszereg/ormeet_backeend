@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import organizerService, { Event as ApiEvent } from '../../services/organizerService';
 import eventService from '../../services/eventService';
 import { useAuth } from '../../context/AuthContext';
@@ -54,11 +55,14 @@ interface EventsTableProps {
   onDuplicateEvent?: (event: FullEventData) => void;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTableProps) => {
+  const { t, i18n } = useTranslation('organizer');
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'ongoing' | 'upcoming' | 'past' | 'drafts'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState('Newest First');
+  const [sortOption, setSortOption] = useState<string>(t('events.sortOptions.newest'));
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
@@ -131,10 +135,10 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             name: event.title,
             image: event.images?.[0] || '',
             images: event.images || [],
-            date: new Date(event.startAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            date: new Date(event.startAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
             dateRange: [new Date(event.startAt), new Date(event.endAt)] as [Date | null, Date | null],
-            startTime: new Date(event.startAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-            endTime: new Date(event.endAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+            startTime: new Date(event.startAt).toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
+            endTime: new Date(event.endAt).toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
             location: event.locationType === 'online' ? 'Online Event' : 'TBA',
             country: '',
             state: '',
@@ -361,14 +365,14 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
     }
 
     return (
-      <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
+      <div className="absolute end-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={handleMonthSelect}
             className="text-xs text-primary hover:text-primary-dark font-medium transition-colors cursor-pointer"
           >
-            Select Month
+                {t('events.calendar.selectMonth')}
           </button>
           {(selectedStartDate || selectedEndDate) && (
             <button
@@ -378,7 +382,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               }}
               className="text-xs text-gray hover:text-black font-medium transition-colors cursor-pointer"
             >
-              Clear
+              {t('events.calendar.clear')}
             </button>
           )}
         </div>
@@ -406,7 +410,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
 
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 mb-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {[t('createEvent.calendar.sun'), t('createEvent.calendar.mon'), t('createEvent.calendar.tue'), t('createEvent.calendar.wed'), t('createEvent.calendar.thu'), t('createEvent.calendar.fri'), t('createEvent.calendar.sat')].map(day => (
             <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray">
               {day}
             </div>
@@ -425,16 +429,16 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
     <div className="w-full">
       {/* Header with Create Event Button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">Events</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('events.title')}</h1>
         
         {/* Create Event Button - Exact Figma styling */}
         <button
           onClick={onCreateEvent}
-          className="relative flex items-center gap-2 pl-11 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
+          className="relative flex items-center gap-2 ps-11 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
           style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
         >
-          <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
-          <span>Create Event</span>
+          <img src={CreateEventIcon} alt="Create" className="absolute start-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
+          <span>{t('events.createEvent')}</span>
         </button>
       </div>
 
@@ -446,9 +450,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             activeFilter === 'all' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          All Events
+          {t('events.tabs.all')}
           {activeFilter === 'all' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -457,9 +461,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             activeFilter === 'ongoing' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Ongoing Events
+          {t('events.tabs.ongoing')}
           {activeFilter === 'ongoing' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -468,9 +472,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             activeFilter === 'upcoming' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Upcoming Events
+          {t('events.tabs.upcoming')}
           {activeFilter === 'upcoming' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -479,9 +483,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             activeFilter === 'past' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Past Events
+          {t('events.tabs.past')}
           {activeFilter === 'past' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -490,9 +494,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             activeFilter === 'drafts' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Drafts
+          {t('events.tabs.drafts')}
           {activeFilter === 'drafts' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
       </div>
@@ -500,7 +504,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
       {/* Event Count and Search/Filter Controls */}
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
         <h2 className="text-sm sm:text-base font-semibold text-black">
-          {filteredEvents.length} Events
+          {t('events.eventCount', { count: filteredEvents.length })}
         </h2>
 
         {/* Search and Filters */}
@@ -509,15 +513,15 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           <div className="relative flex-1 sm:flex-none">
             <input
               type="text"
-              placeholder="Search Events"
+              placeholder={t('events.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-[160px] lg:w-[187px] h-[38px] pl-4 pr-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
+              className="w-full sm:w-[160px] lg:w-[187px] h-[38px] ps-4 pe-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
             />
             <img 
               src={SearchIcon} 
               alt="Search" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
             />
           </div>
 
@@ -528,9 +532,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 setIsSortOpen(!isSortOpen);
                 setIsDatePickerOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
             >
-              <img src={NewestIcon} alt="Sort" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={NewestIcon} alt="Sort" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">{sortOption}</span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -538,15 +542,15 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             </button>
             
             {isSortOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
+              <div className="absolute end-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
+                {[t('events.sortOptions.newest'), t('events.sortOptions.oldest'), t('events.sortOptions.az')].map((option) => (
                   <button
                     key={option}
                     onClick={() => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                    className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-primary-light text-primary font-medium'
                         : 'text-gray hover:bg-secondary-light'
@@ -566,15 +570,15 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 setIsDatePickerOpen(!isDatePickerOpen);
                 setIsSortOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
             >
-              <img src={AllDateIcon} alt="Date" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={AllDateIcon} alt="Date" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">
                 {selectedStartDate && selectedEndDate
                   ? `${selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${selectedEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                   : selectedStartDate
                   ? selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : 'All Date'}
+                  : t('events.dateFilter')}
               </span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -590,11 +594,11 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
       <div className="bg-white border border-light-gray rounded-xl overflow-hidden">
         {/* Table Header - Hidden on mobile */}
         <div className="hidden md:grid grid-cols-12 gap-4 px-4 lg:px-6 py-4 bg-secondary-light border-b border-light-gray">
-          <div className="col-span-4 text-xs lg:text-sm font-semibold text-gray">Event Name</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Date</div>
-          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">Location</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Status</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray text-right">Sold</div>
+          <div className="col-span-4 text-xs lg:text-sm font-semibold text-gray">{t('events.table.headers.eventName')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('events.table.headers.date')}</div>
+          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">{t('events.table.headers.location')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('events.table.headers.status')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray text-end">{t('events.table.headers.sold')}</div>
         </div>
 
         {/* Table Body */}
@@ -602,7 +606,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-sm text-gray">Loading events...</p>
+              <p className="text-sm text-gray">{t('events.loading')}</p>
             </div>
           ) : currentEvents.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 bg-white border border-light-gray ">
@@ -611,18 +615,18 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-black mb-2">No events found</h3>
+          <h3 className="text-lg font-semibold text-black mb-2">{t('events.empty.title')}</h3>
           <p className="text-sm text-gray mb-4">
-            {searchQuery ? 'Try adjusting your search or filters' : 'Create your first event to get started'}
+            {searchQuery ? t('events.empty.descriptionSearch') : t('events.empty.descriptionNoEvents')}
           </p>
           {!searchQuery && (
             <button
               onClick={onCreateEvent}
-              className="relative flex items-center gap-2 pl-9 pr-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
+              className="relative flex items-center gap-2 ps-9 pe-4 py-1.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
               style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
             >
-              <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
-              <span>Create Event</span>
+              <img src={CreateEventIcon} alt="Create" className="absolute start-1 top-1/2 -translate-y-1/2 w-[22px] h-[22px]" />
+              <span>{t('events.empty.createButton')}</span>
             </button>
           )}
         </div>
@@ -655,26 +659,26 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               </div>
 
               {/* Mobile: Date, Location, Status, Sold in a row */}
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:hidden pl-13 text-xs">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:hidden ps-13 text-xs">
                 <span className="text-gray">{event.date}</span>
                 <span className="text-gray truncate max-w-[150px]">{event.location}</span>
                 <div className="inline-flex items-center gap-1">
                   {event.status === 'ongoing' && (
                     <>
                       <img src={OngoingIcon} alt="Ongoing" className="w-3 h-3" />
-                      <span className="font-medium text-[#3B82F6]">Ongoing</span>
+                      <span className="font-medium text-[#3B82F6]">{t('events.table.status.ongoing')}</span>
                     </>
                   )}
                   {event.status === 'upcoming' && (
                     <>
                       <img src={UpcomingIcon} alt="Upcoming" className="w-3 h-3" />
-                      <span className="font-medium text-[#F59E0B]">Upcoming</span>
+                      <span className="font-medium text-[#F59E0B]">{t('events.table.status.upcoming')}</span>
                     </>
                   )}
                   {event.status === 'completed' && (
                     <>
                       <img src={CompletedIcon} alt="Completed" className="w-3 h-3" />
-                      <span className="font-medium text-[#10B981]">Completed</span>
+                      <span className="font-medium text-[#10B981]">{t('events.table.status.completed')}</span>
                     </>
                   )}
                 </div>
@@ -696,19 +700,19 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                 {event.status === 'ongoing' && (
                   <div className="inline-flex items-center gap-2">
                     <img src={OngoingIcon} alt="Ongoing" className="w-4 h-4" />
-                    <span className="text-xs lg:text-sm font-medium text-[#3B82F6]">Ongoing</span>
+                    <span className="text-xs lg:text-sm font-medium text-[#3B82F6]">{t('events.table.status.ongoing')}</span>
                   </div>
                 )}
                 {event.status === 'upcoming' && (
                   <div className="inline-flex items-center gap-2">
                     <img src={UpcomingIcon} alt="Upcoming" className="w-4 h-4" />
-                    <span className="text-xs lg:text-sm font-medium text-[#F59E0B]">Upcoming</span>
+                    <span className="text-xs lg:text-sm font-medium text-[#F59E0B]">{t('events.table.status.upcoming')}</span>
                   </div>
                 )}
                 {event.status === 'completed' && (
                   <div className="inline-flex items-center gap-2">
                     <img src={CompletedIcon} alt="Completed" className="w-4 h-4" />
-                    <span className="text-xs lg:text-sm font-medium text-[#10B981]">Completed</span>
+                    <span className="text-xs lg:text-sm font-medium text-[#10B981]">{t('events.table.status.completed')}</span>
                   </div>
                 )}
               </div>
@@ -727,7 +731,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
       {filteredEvents.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
           <p className="text-xs sm:text-sm text-gray order-2 sm:order-1">
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredEvents.length)} of {filteredEvents.length} Events
+            {t('events.pagination.showing', { start: startIndex + 1, end: Math.min(endIndex, filteredEvents.length), total: filteredEvents.length })}
           </p>
           
           <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
@@ -826,7 +830,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                   setIsEventDetailsOpen(false);
                   setCurrentImageIndex(0);
                 }}
-                className="absolute top-4 right-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+                className="absolute top-4 end-4 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
               >
                 <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -837,7 +841,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {selectedEvent.images.length > 1 && currentImageIndex > 0 && (
                 <button
                   onClick={() => setCurrentImageIndex(prev => prev - 1)}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+                  className="absolute start-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -849,7 +853,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {selectedEvent.images.length > 1 && currentImageIndex < selectedEvent.images.length - 1 && (
                 <button
                   onClick={() => setCurrentImageIndex(prev => prev + 1)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
+                  className="absolute end-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 hover:bg-white rounded-full flex items-center justify-center transition-colors shadow-lg z-10"
                 >
                   <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -859,7 +863,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               
               {/* Image Counter */}
               {selectedEvent.images.length > 1 && (
-                <div className="absolute bottom-4 right-4 px-3 py-1.5 bg-black/60 text-white text-xs font-medium rounded-full">
+                <div className="absolute bottom-4 end-4 px-3 py-1.5 bg-black/60 text-white text-xs font-medium rounded-full">
                   {currentImageIndex + 1} / {selectedEvent.images.length}
                 </div>
               )}
@@ -883,24 +887,24 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     {selectedEvent.status === 'ongoing' && (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded-full">
                         <img src={OngoingIcon} alt="Ongoing" className="w-3.5 h-3.5 brightness-0 invert" />
-                        Ongoing
+                        {t('events.table.status.ongoing')}
                       </span>
                     )}
                     {selectedEvent.status === 'upcoming' && (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-500 text-white text-xs font-medium rounded-full">
                         <img src={UpcomingIcon} alt="Upcoming" className="w-3.5 h-3.5 brightness-0 invert" />
-                        Upcoming
+                        {t('events.table.status.upcoming')}
                       </span>
                     )}
                     {selectedEvent.status === 'completed' && (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-500 text-white text-xs font-medium rounded-full">
                         <img src={CompletedIcon} alt="Completed" className="w-3.5 h-3.5 brightness-0 invert" />
-                        Completed
+                        {t('events.table.status.completed')}
                       </span>
                     )}
                     {selectedEvent.status === 'draft' && (
                       <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-500 text-white text-xs font-medium rounded-full">
-                        Draft
+                        {t('events.table.status.draft')}
                       </span>
                     )}
                   </div>
@@ -916,7 +920,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-gray">Date</p>
+                    <p className="text-sm text-gray">{t('events.modal.date')}</p>
                     <p className="text-sm font-medium text-black">{selectedEvent.date}</p>
                   </div>
                 </div>
@@ -927,7 +931,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-gray">Time</p>
+                    <p className="text-sm text-gray">{t('events.modal.time')}</p>
                     <p className="text-sm font-medium text-black">{selectedEvent.startTime} - {selectedEvent.endTime}</p>
                   </div>
                 </div>
@@ -939,7 +943,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-gray">Location</p>
+                    <p className="text-sm text-gray">{t('events.modal.locationLabel')}</p>
                     <p className="text-sm font-medium text-black">{selectedEvent.location}</p>
                   </div>
                 </div>
@@ -947,17 +951,17 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
 
               {/* Description */}
               <div className="mb-6 pb-6 border-b border-light-gray">
-                <h3 className="text-lg font-semibold text-black mb-3">About This Event</h3>
+                <h3 className="text-lg font-semibold text-black mb-3">{t('events.modal.aboutEvent')}</h3>
                 <p className="text-sm text-gray leading-relaxed">{selectedEvent.description}</p>
               </div>
 
               {/* Address */}
               <div className="mb-6 pb-6 border-b border-light-gray">
-                <h3 className="text-lg font-semibold text-black mb-3">Venue</h3>
+                <h3 className="text-lg font-semibold text-black mb-3">{t('events.modal.venue')}</h3>
                 <p className="text-sm text-gray">{selectedEvent.mapAddress}</p>
                 {selectedEvent.onlineLink && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray">Online Link:</p>
+                    <p className="text-sm text-gray">{t('events.modal.onlineLink')}</p>
                     <a href={selectedEvent.onlineLink} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
                       {selectedEvent.onlineLink}
                     </a>
@@ -968,17 +972,17 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {/* Tickets */}
               {selectedEvent.tickets.length > 0 && (
                 <div className="mb-6 pb-6 border-b border-light-gray">
-                  <h3 className="text-lg font-semibold text-black mb-3">Tickets</h3>
+                  <h3 className="text-lg font-semibold text-black mb-3">{t('events.modal.tickets')}</h3>
                   <div className="space-y-3">
                     {selectedEvent.tickets.map((ticket) => (
                       <div key={ticket.id} className="flex items-center justify-between p-4 bg-secondary-light rounded-lg">
                         <div>
                           <p className="text-sm font-medium text-black">{ticket.type}</p>
-                          <p className="text-xs text-gray">Quantity: {ticket.quantity}</p>
+                          <p className="text-xs text-gray">{t('events.modal.quantity', { quantity: ticket.quantity })}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-sm font-semibold text-primary">
-                            {ticket.priceType === 'free' ? 'Free' : `$${ticket.price}`}
+                            {ticket.priceType === 'free' ? t('events.ticketStatus.free') : `$${ticket.price}`}
                           </p>
                         </div>
                       </div>
@@ -990,7 +994,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
               {/* FAQs */}
               {selectedEvent.faqs.length > 0 && (
                 <div className="mb-6 pb-6 border-b border-light-gray">
-                  <h3 className="text-lg font-semibold text-black mb-3">FAQ</h3>
+                  <h3 className="text-lg font-semibold text-black mb-3">{t('events.modal.faq')}</h3>
                   <div className="space-y-4">
                     {selectedEvent.faqs.map((faq) => (
                       <div key={faq.id}>
@@ -1013,20 +1017,20 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     return (
                       <>
                         <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-semibold text-black">Tickets Sold</h3>
-                          <div className="text-right">
+                          <h3 className="text-lg font-semibold text-black">{t('events.modal.ticketsSold')}</h3>
+                          <div className="text-end">
                             <p className="text-2xl font-bold text-primary">{soldCount}</p>
-                            <p className="text-sm text-gray">of {totalCapacity}</p>
+                            <p className="text-sm text-gray">{t('events.modal.of', { total: totalCapacity })}</p>
                           </div>
                         </div>
                         <div className="relative h-2 bg-white rounded-full overflow-hidden">
                           <div 
-                            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
+                            className="absolute inset-y-0 start-0 bg-gradient-to-r from-primary to-[#FF6B35] rounded-full transition-all duration-500"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
                         <p className="text-xs text-gray mt-2">
-                          {percentage}% capacity
+                          {t('events.modal.capacity', { percentage })}
                         </p>
                       </>
                     );
@@ -1041,9 +1045,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     setEventToDelete(selectedEvent);
                     setIsDeleteConfirmOpen(true);
                   }}
-                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap"
+                  className="ps-5 pe-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap"
                 >
-                  Delete
+                  {t('events.modal.actions.delete')}
                 </button>
                 <button
                   onClick={() => {
@@ -1052,9 +1056,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                       onEditEvent(selectedEvent);
                     }
                   }}
-                  className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
+                  className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
                 >
-                  Edit Event
+                  {t('events.modal.actions.edit')}
                 </button>
                 <button
                   onClick={() => {
@@ -1063,9 +1067,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                       onDuplicateEvent(selectedEvent);
                     }
                   }}
-                  className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
+                  className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
                 >
-                  Duplicate Event
+                  {t('events.modal.actions.duplicate')}
                 </button>
                 <button
                   onClick={async () => {
@@ -1083,9 +1087,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                     }
                   }}
                   disabled={isSendingReminders}
-                  className="pl-5 pr-5 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-all whitespace-nowrap disabled:opacity-50"
+                  className="ps-5 pe-5 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary/90 transition-all whitespace-nowrap disabled:opacity-50"
                 >
-                  {isSendingReminders ? 'Sending...' : 'Send Reminders'}
+                  {isSendingReminders ? t('events.modal.actions.sending') : t('events.modal.actions.sendReminders')}
                 </button>
               </div>
               {reminderMessage && (
@@ -1109,9 +1113,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             <div className="p-6">
               {!showDeleteSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Delete Event</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('events.deleteModal.title')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to delete <span className="font-semibold text-black">"{eventToDelete.name}"</span>? This action cannot be undone.
+                    {t('events.deleteModal.description', { eventName: eventToDelete.name })}
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -1123,14 +1127,14 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                       disabled={isDeleting}
                       className="px-5 py-2 border border-gray-300 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                     >
-                      Cancel
+                      {t('events.deleteModal.cancel')}
                     </button>
                     <button
                       onClick={handleDeleteEvent}
                       disabled={isDeleting}
                       className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                     >
-                      {isDeleting ? 'Deleting...' : 'Delete Event'}
+                      {isDeleting ? t('events.deleteModal.deleting') : t('events.deleteModal.delete')}
                     </button>
                   </div>
                 </>
@@ -1141,7 +1145,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <p className="text-lg font-semibold text-black">Event deleted successfully</p>
+                  <p className="text-lg font-semibold text-black">{t('events.deleteModal.success')}</p>
                 </div>
               )}
             </div>

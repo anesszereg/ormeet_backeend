@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import authService from '../services/authService';
 import { useAuth } from '../context/AuthContext';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
 const VerifyEmail = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -18,7 +21,7 @@ const VerifyEmail = () => {
   useEffect(() => {
     const verifyEmail = async () => {
       if (!token) {
-        setError('Invalid or missing verification token');
+        setError(t('verifyEmail.error.invalidToken'));
         setIsLoading(false);
         return;
       }
@@ -46,10 +49,13 @@ const VerifyEmail = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col md:flex-row h-screen w-full">
+        <div className="fixed top-4 end-4 z-50">
+          <LanguageSwitcher />
+        </div>
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
           <div className="w-full max-w-[460px] flex flex-col gap-6 items-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF4000]"></div>
-            <p className="text-lg text-[#4F4F4F]">Verifying your email...</p>
+            <p className="text-lg text-[#4F4F4F]">{t('verifyEmail.loading')}</p>
           </div>
         </div>
         <div className="hidden md:flex flex-1 relative overflow-hidden bg-gradient-to-br from-[#667eea] to-[#764ba2]">
@@ -62,6 +68,9 @@ const VerifyEmail = () => {
   if (success) {
     return (
       <div className="flex flex-col md:flex-row h-screen w-full">
+        <div className="fixed top-4 end-4 z-50">
+          <LanguageSwitcher />
+        </div>
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
           <div className="w-full max-w-[460px] flex flex-col gap-6">
             <div>
@@ -69,8 +78,8 @@ const VerifyEmail = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <h1 className="text-2xl sm:text-[28px] font-bold text-black">Email verified!</h1>
-              <p className="text-sm text-[#4F4F4F] leading-relaxed">Your email has been successfully verified.</p>
+              <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('verifyEmail.success.title')}</h1>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('verifyEmail.success.subtitle')}</p>
             </div>
 
             <div className="flex flex-col items-center gap-4 p-8 bg-[#EBF6EE] border border-[#34A853] rounded-xl text-center">
@@ -78,7 +87,7 @@ const VerifyEmail = () => {
                 <circle cx="24" cy="24" r="24" fill="#34A853" opacity="0.1"/>
                 <path d="M16 24l6 6 10-12" stroke="#34A853" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <p className="text-sm text-[#4F4F4F] leading-relaxed">Redirecting to login...</p>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('verifyEmail.success.redirecting')}</p>
             </div>
           </div>
         </div>
@@ -92,6 +101,9 @@ const VerifyEmail = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="fixed top-4 end-4 z-50">
+        <LanguageSwitcher />
+      </div>
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
         <div className="w-full max-w-[460px] flex flex-col gap-6">
           <div>
@@ -99,8 +111,8 @@ const VerifyEmail = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Verification failed</h1>
-            <p className="text-sm text-[#4F4F4F] leading-relaxed">We couldn't verify your email address.</p>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('verifyEmail.error.title')}</h1>
+            <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('verifyEmail.error.subtitle')}</p>
           </div>
 
           <div className="px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
@@ -112,10 +124,10 @@ const VerifyEmail = () => {
               href="/login" 
               className="block w-full px-6 py-3.5 bg-[#FF4000] text-white text-center border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 no-underline"
             >
-              Back to Login
+              {t('verifyEmail.backToLogin')}
             </a>
             <p className="text-center text-sm text-[#4F4F4F]">
-              Need a new verification link? <a href="/resend-verification" className="text-[#FF4000] font-medium hover:opacity-80 transition-opacity">Resend email</a>
+              {t('verifyEmail.resendPrompt')} <a href="/resend-verification" className="text-[#FF4000] font-medium hover:opacity-80 transition-opacity">{t('verifyEmail.resendLink')}</a>
             </p>
           </div>
         </div>

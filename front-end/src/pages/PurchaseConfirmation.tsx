@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import orderService, { CreateOrderDto, Order } from '../services/orderService';
 import eventService from '../services/eventService';
@@ -41,7 +42,10 @@ interface LocationState {
   total: number;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const PurchaseConfirmation: React.FC = () => {
+  const { t, i18n } = useTranslation('attendee');
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -125,7 +129,7 @@ const PurchaseConfirmation: React.FC = () => {
               id: e.id,
               image: e.images?.[0] || EventImageFallback,
               title: e.title,
-              date: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              date: startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
               venue: e.venue?.name || '',
               price: e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free',
             };
@@ -151,7 +155,7 @@ const PurchaseConfirmation: React.FC = () => {
         <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex flex-col items-center justify-center py-20 gap-4">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
-          <p className="text-[#4F4F4F] text-sm">Processing your order...</p>
+          <p className="text-[#4F4F4F] text-sm">{t('purchaseConfirmation.processing')}</p>
         </div>
       </div>
     );
@@ -165,9 +169,9 @@ const PurchaseConfirmation: React.FC = () => {
           <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 7v8M14 19v2" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"/></svg>
           </div>
-          <h2 className="text-xl font-bold text-black mb-2">Order Failed</h2>
+          <h2 className="text-xl font-bold text-black mb-2">{t('purchaseConfirmation.error.title')}</h2>
           <p className="text-red-500 mb-6">{error}</p>
-          <button onClick={() => navigate(-1)} className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors">Go Back</button>
+          <button onClick={() => navigate(-1)} className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors">{t('purchaseConfirmation.error.goBack')}</button>
         </div>
       </div>
     );
@@ -205,12 +209,12 @@ const PurchaseConfirmation: React.FC = () => {
 
         {/* Thank You Message */}
         <h1 className="text-2xl font-bold text-black text-center mb-2">
-          Thank You for Your Purchase!
+          {t('purchaseConfirmation.title')}
         </h1>
         
         <div className="flex items-center justify-center gap-2 mb-2">
           <p className="text-base text-[#4F4F4F] text-center">
-            Your tickets are confirmed and sent to {orderEmail}
+            {t('purchaseConfirmation.ticketsConfirmed')} {orderEmail}
           </p>
           <button className="text-[#4F4F4F] hover:text-[#FF4000] transition-colors cursor-pointer">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -226,17 +230,17 @@ const PurchaseConfirmation: React.FC = () => {
         </div>
 
         <p className="text-base text-[#4F4F4F] text-center mb-6">
-          Your order ID <span className="font-semibold text-black">{orderId}</span>
+          {t('purchaseConfirmation.orderId')} <span className="font-semibold text-black">{orderId}</span>
         </p>
 
         {/* Go to My Tickets Button */}
         <div className="flex justify-center mb-10">
           <button 
             onClick={() => navigate('/dashboard-attendee')}
-            className="relative flex items-center justify-between pl-6 pr-1.5 py-1.5 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors cursor-pointer min-w-[220px]"
+            className="relative flex items-center justify-between ps-6 pe-1.5 py-1.5 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors cursor-pointer min-w-[220px]"
           >
-            <span className="text-sm">Go to My Tickets</span>
-            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center ml-4">
+            <span className="text-sm">{t('purchaseConfirmation.goToMyTickets')}</span>
+            <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center ms-4">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                 <path 
                   d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" 
@@ -255,7 +259,7 @@ const PurchaseConfirmation: React.FC = () => {
           {/* You are going to */}
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold text-black">You are going to</span>
+              <span className="text-sm font-semibold text-black">{t('purchaseConfirmation.youAreGoingTo')}</span>
               <div className="flex-1 h-px bg-[#EEEEEE]"></div>
             </div>
             
@@ -282,7 +286,7 @@ const PurchaseConfirmation: React.FC = () => {
           {/* Your tickets */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold text-black">Your tickets</span>
+              <span className="text-sm font-semibold text-black">{t('purchaseConfirmation.yourTickets')}</span>
               <div className="flex-1 h-px bg-[#EEEEEE]"></div>
             </div>
             
@@ -291,7 +295,7 @@ const PurchaseConfirmation: React.FC = () => {
                 <div key={index}>
                   <p className="text-sm text-[#757575]">{ticket.name}</p>
                   <p className="text-sm font-semibold text-black">
-                    {ticket.quantity} {ticket.quantity === 1 ? 'Ticket' : 'Tickets'}
+                    {t('purchaseConfirmation.ticket', { count: ticket.quantity })}
                   </p>
                 </div>
               ))}
@@ -301,7 +305,7 @@ const PurchaseConfirmation: React.FC = () => {
 
         {/* You might also enjoy */}
         <div>
-          <h2 className="text-lg font-bold text-black mb-4">You might also enjoy</h2>
+          <h2 className="text-lg font-bold text-black mb-4">{t('purchaseConfirmation.youMightEnjoy')}</h2>
           
           <div className="space-y-4">
             {displayedRecommended.map((event) => (
@@ -325,7 +329,7 @@ const PurchaseConfirmation: React.FC = () => {
                     <span>{event.venue}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-black">from {event.price}</span>
+                    <span className="text-sm font-semibold text-black">{t('purchaseConfirmation.fromPrice')} {event.price}</span>
                     {event.badge && (
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         event.badgeColor === 'orange' 
@@ -347,10 +351,10 @@ const PurchaseConfirmation: React.FC = () => {
           <div className="flex justify-center mt-8">
             <button 
               onClick={() => setShowAllEvents(true)}
-              className="relative flex items-center justify-between pl-6 pr-1.5 py-1.5 bg-black text-white rounded-full hover:bg-[#333333] transition-colors cursor-pointer min-w-[180px]"
+              className="relative flex items-center justify-between ps-6 pe-1.5 py-1.5 bg-black text-white rounded-full hover:bg-[#333333] transition-colors cursor-pointer min-w-[180px]"
             >
-              <span className="text-sm font-medium">Load More</span>
-              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center ml-4">
+              <span className="text-sm font-medium">{t('purchaseConfirmation.loadMore')}</span>
+              <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center ms-4">
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
                   <path 
                     d="M8 3V13M8 13L4 9M8 13L12 9" 

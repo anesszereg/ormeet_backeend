@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "browseEvents": "Browse events",
+    "hostEvents": "Host events",
+    "support": "Support",
+    "login": "Log In",
+    "signup": "Sign up",
+    "logout": "Log out"
+  },
+  "cta": {
+    "getStarted": "Get started",
+    "learnMore": "Learn more",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "continue": "Continue",
+    "back": "Back"
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "description": "Ormeet connects people through unforgettable events — from live concerts to workshops. Discover and book nearby experiences, or host your own with ease. Whether you're attending or organizing, Ormeet makes events simple, exciting, and effortlessly accessible.",
+    "browseEvents": {
+      "title": "Browse Events",
+      "music": "Music",
+      "sports": "Sports",
+      "business": "Business",
+      "fitness": "Fitness",
+      "nightlife": "Nightlife",
+      "holiday": "Holiday",
+      "dating": "Dating",
+      "festival": "Festival"
+    },
+    "hostEvents": {
+      "title": "Host Events",
+      "createEvents": "Create Events",
+      "features": "Features",
+      "pricing": "Pricing"
+    },
+    "support": {
+      "title": "Support",
+      "helpCenter": "Help center",
+      "findTickets": "Find your tickets",
+      "contactOrganizer": "Contact event organizer"
+    },
+    "company": {
+      "title": "Company",
+      "aboutUs": "About us",
+      "contactUs": "Contact us",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Legal",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "cookiePolicy": "Cookie Policy",
+      "refundCancellation": "Refund & Cancellation"
+    },
+    "copyright": "© 2025 Ormeet. All rights reserved."
+  },
+  "confirmDialog": {
+    "defaultConfirm": "OK",
+    "defaultCancel": "Cancel"
+  },
+  "phoneInput": {
+    "searchPlaceholder": "Search country...",
+    "noCountriesFound": "No countries found"
+  },
+  "sidebar": {
+    "title": "Your Dashboard",
+    "searchPlaceholder": "Search",
+    "expandAria": "Expand sidebar",
+    "collapseAria": "Collapse sidebar",
+    "myTickets": "My tickets",
+    "favoriteEvents": "Favorite events",
+    "following": "Following",
+    "accountSettings": "Account settings",
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "attendees": "Attendees",
+    "orders": "Orders",
+    "workspace": "Workspace",
+    "addWorkspaceAria": "Add workspace"
+  },
+  "header": {
+    "toggleMenuAria": "Toggle menu",
+    "searchLocationPlaceholder": "Search location",
+    "searchEventPlaceholder": "Event type",
+    "needAssistance": "Need Assistance?"
+  },
+  "userMenu": {
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "attendeeDashboard": "Attendee Dashboard",
+    "organizerDashboard": "Organizer Dashboard",
+    "becomeOrganizer": "Become an Organizer",
+    "myTickets": "My Tickets",
+    "settings": "Settings",
+    "helpSupport": "Help / Support",
+    "verified": "Verified"
+  }
+}

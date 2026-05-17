@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Country {
   name: string;
@@ -16,6 +17,7 @@ interface PhoneInputProps {
 }
 
 const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone number', className = '' }: PhoneInputProps) => {
+  const { t } = useTranslation('common');
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -140,12 +142,12 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
         
         {/* Dropdown */}
         {showDropdown && (
-          <div className="absolute top-full left-0 mt-1 w-80 bg-white border border-[#EEEEEE] rounded-lg shadow-lg z-50">
+          <div className="absolute top-full start-0 mt-1 w-80 bg-white border border-[#EEEEEE] rounded-lg shadow-lg z-50">
             {/* Search */}
             <div className="p-3 border-b border-[#EEEEEE]">
               <input
                 type="text"
-                placeholder="Search country..."
+                placeholder={t('phoneInput.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10"
@@ -160,7 +162,7 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
                     key={country.code}
                     type="button"
                     onClick={() => handleCountrySelect(country)}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#FFF4F3] text-left transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#FFF4F3] text-start transition-colors ${
                       selectedCountry?.code === country.code ? 'bg-[#FFF4F3]' : ''
                     }`}
                   >
@@ -171,7 +173,7 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
                 ))
               ) : (
                 <div className="px-4 py-8 text-center text-sm text-[#757575]">
-                  No countries found
+                  {t('phoneInput.noCountriesFound')}
                 </div>
               )}
             </div>

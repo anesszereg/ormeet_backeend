@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Event {
   id: string;
@@ -23,6 +24,7 @@ interface AddAttendeeModalProps {
 const TICKET_TYPES = ['General', 'VIP', 'Early Bird'];
 
 const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeModalProps) => {
+  const { t } = useTranslation(['organizer', 'common']);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -81,7 +83,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
 
   const handleEmailBlur = () => {
     if (email.trim() && !validateEmail(email)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('organizer:addAttendee.validation.emailInvalid'));
     }
   };
 
@@ -90,7 +92,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
   const handleConfirm = () => {
     if (!isFormValid) {
       if (email.trim() && !validateEmail(email)) {
-        setEmailError('Please enter a valid email address');
+        setEmailError(t('organizer:addAttendee.validation.emailInvalid'));
       }
       return;
     }
@@ -127,50 +129,50 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
           {!showSuccess ? (
             <>
               <h2 className="text-xl font-bold text-black mb-3">
-                Add Attendee
+                {t('organizer:addAttendee.title')}
               </h2>
               
               <p className="text-sm text-gray mb-6">
-                Fill in the details to add a new attendee to an event.
+                {t('organizer:addAttendee.description')}
               </p>
 
               <div className="space-y-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    First Name <span className="text-red-500">*</span>
+                    {t('organizer:addAttendee.fields.firstName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Enter first name"
+                    placeholder={t('organizer:addAttendee.fields.firstNamePlaceholder')}
                     className="w-full px-4 py-3 bg-white border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    Last Name <span className="text-red-500">*</span>
+                    {t('organizer:addAttendee.fields.lastName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Enter last name"
+                    placeholder={t('organizer:addAttendee.fields.lastNamePlaceholder')}
                     className="w-full px-4 py-3 bg-white border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    Email <span className="text-red-500">*</span>
+                    {t('organizer:addAttendee.fields.email')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => handleEmailChange(e.target.value)}
                     onBlur={handleEmailBlur}
-                    placeholder="Enter email address"
+                    placeholder={t('organizer:addAttendee.fields.emailPlaceholder')}
                     className={`w-full px-4 py-3 bg-white border rounded-lg text-sm text-black placeholder:text-input-gray hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all ${
                       emailError ? 'border-red-500' : 'border-light-gray'
                     }`}
@@ -182,7 +184,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
 
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    Event <span className="text-red-500">*</span>
+                    {t('organizer:addAttendee.fields.event')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative" ref={eventDropdownRef}>
                 <button
@@ -204,7 +206,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                 </button>
                 
                 {isEventDropdownOpen && (
-                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-48 overflow-y-auto">
+                  <div className="absolute bottom-full start-0 end-0 mb-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-48 overflow-y-auto">
                     {events.map((event) => (
                       <button
                         key={event.id}
@@ -212,7 +214,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                           setSelectedEvent(event.id);
                           setIsEventDropdownOpen(false);
                         }}
-                        className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                        className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                           selectedEvent === event.id
                             ? 'bg-primary-light text-primary font-medium'
                             : 'text-gray hover:bg-secondary-light'
@@ -228,7 +230,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
 
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    Ticket Type <span className="text-red-500">*</span>
+                    {t('organizer:addAttendee.fields.ticketType')} <span className="text-red-500">*</span>
                   </label>
                   <div className="relative" ref={ticketDropdownRef}>
                 <button
@@ -250,7 +252,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                 </button>
                 
                 {isTicketDropdownOpen && (
-                  <div className="absolute bottom-full left-0 right-0 mb-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-48 overflow-y-auto">
+                  <div className="absolute bottom-full start-0 end-0 mb-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-48 overflow-y-auto">
                     {TICKET_TYPES.map((type) => (
                       <button
                         key={type}
@@ -258,7 +260,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                           setSelectedTicketType(type);
                           setIsTicketDropdownOpen(false);
                         }}
-                        className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                        className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                           selectedTicketType === type
                             ? 'bg-primary-light text-primary font-medium'
                             : 'text-gray hover:bg-secondary-light'
@@ -278,7 +280,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                   onClick={onClose}
                   className="flex-1 px-4 py-2.5 bg-white border border-light-gray text-gray hover:text-black hover:border-gray-400 font-medium text-sm rounded-full transition-all cursor-pointer"
                 >
-                  Cancel
+                  {t('common:cta.cancel')}
                 </button>
                 <button
                   onClick={handleConfirm}
@@ -286,7 +288,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                   className="flex-1 px-4 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
                   style={{ boxShadow: !isFormValid ? 'none' : '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Confirm
+                  {t('organizer:addAttendee.confirm')}
                 </button>
               </div>
             </>
@@ -295,7 +297,7 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
               <svg className="w-16 h-16 mb-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-lg font-semibold text-black">Attendee added successfully</p>
+              <p className="text-lg font-semibold text-black">{t('organizer:addAttendee.success')}</p>
             </div>
           )}
         </div>

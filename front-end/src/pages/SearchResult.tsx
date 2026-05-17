@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SearchResultNavbar from '../components/SearchResultNavbar';
 import EventCard from '../components/EventCard';
 import EventListCard from '../components/EventListCard';
@@ -29,7 +30,10 @@ interface MappedEvent {
   description: string;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const SearchResult = () => {
+  const { t, i18n } = useTranslation('attendee');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('Oran');
@@ -59,7 +63,7 @@ const SearchResult = () => {
             id: e.id,
             image: e.images?.[0] || EventImageFallback,
             title: e.title,
-            date: startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            date: startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
             venue: e.venue?.name || '',
             price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
             description: e.shortDescription || '',
@@ -117,6 +121,16 @@ const SearchResult = () => {
   }, [events, searchCategory, searchLocation, selectedCategories, priceRange, selectedLocation]);
 
   const categories = ['Music', 'Sports', 'Business', 'Arts', 'Food & Drink', 'Health', 'Technology', 'Fashion'];
+  const timeFilterOptions = [
+    { key: 'Today', label: t('searchResult.filters.timeOptions.today') },
+    { key: 'This Weekend', label: t('searchResult.filters.timeOptions.thisWeekend') },
+    { key: 'This Week', label: t('searchResult.filters.timeOptions.thisWeek') },
+    { key: 'This Month', label: t('searchResult.filters.timeOptions.thisMonth') },
+  ];
+  const organizerOptions = [
+    { key: 'Events by Organizers You Follow', label: t('searchResult.filters.organizerOptions.following') },
+    { key: 'Events by All Organizers', label: t('searchResult.filters.organizerOptions.all') },
+  ];
   const displayedCategories = showAllCategories ? categories : categories.slice(0, 4);
 
   const toggleCategory = (category: string) => {
@@ -134,11 +148,11 @@ const SearchResult = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Filter Panel */}
         {isFilterOpen && (
-          <div className="w-[227px] bg-white border-r border-[#EEEEEE] overflow-y-auto shrink-0">
+          <div className="w-[227px] bg-white border-e border-[#EEEEEE] overflow-y-auto shrink-0">
             <div className="p-5">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base font-semibold text-black">Filters</h2>
+                <h2 className="text-base font-semibold text-black">{t('searchResult.filters.title')}</h2>
                 <button onClick={() => setIsFilterOpen(false)} className="hover:opacity-70 transition-opacity cursor-pointer">
                   <img src={CancelIcon} alt="Close" className="w-6 h-6" />
                 </button>
@@ -148,7 +162,7 @@ const SearchResult = () => {
               <div className="mb-6">
                 <label className="flex items-center gap-2 text-sm font-medium text-black mb-3">
                   <img src={LocationIcon} alt="Location" className="w-5 h-5" />
-                  Location
+                  {t('searchResult.filters.locationLabel')}
                 </label>
                 <div className="relative">
                   <select 
@@ -160,7 +174,7 @@ const SearchResult = () => {
                     <option>Algiers</option>
                     <option>Constantine</option>
                   </select>
-                  <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4F4F4F] pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
@@ -168,11 +182,11 @@ const SearchResult = () => {
 
               {/* Categories Filter */}
               <div className="mb-6">
-                <label className="text-sm font-medium text-black mb-3 block">Categories</label>
+                <label className="text-sm font-medium text-black mb-3 block">{t('searchResult.filters.categoriesLabel')}</label>
                 <div className="relative">
                   <input 
                     type="text"
-                    placeholder="e.g. Music, Sports, Business"
+                    placeholder={t('searchResult.filters.categoriesPlaceholder')}
                     className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all mb-3"
                   />
                 </div>
@@ -196,13 +210,13 @@ const SearchResult = () => {
                   className="flex items-center gap-1 text-xs font-medium text-[#FF4000] hover:opacity-80 transition-opacity cursor-pointer"
                 >
                   <img src={showAllCategories ? ShowLessIcon : ShowMoreIcon} alt="Toggle" className="w-4 h-4" />
-                  {showAllCategories ? 'Show Less' : 'Show More'}
+                  {showAllCategories ? t('searchResult.filters.showLess') : t('searchResult.filters.showMore')}
                 </button>
               </div>
 
               {/* Price Filter */}
               <div className="mb-6">
-                <label className="text-sm font-medium text-black mb-3 block">Price</label>
+                <label className="text-sm font-medium text-black mb-3 block">{t('searchResult.filters.priceLabel')}</label>
                 <style>{`
                   input[type="range"]::-webkit-slider-thumb {
                     appearance: none;
@@ -251,7 +265,7 @@ const SearchResult = () => {
                     value={priceRange.min}
                     onChange={(e) => setPriceRange({ ...priceRange, min: parseInt(e.target.value) })}
                     className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-                    placeholder="Minimum"
+                    placeholder={t('searchResult.filters.priceMin')}
                   />
                   <span className="text-[#BCBCBC]">-</span>
                   <input 
@@ -259,7 +273,7 @@ const SearchResult = () => {
                     value={priceRange.max}
                     onChange={(e) => setPriceRange({ ...priceRange, max: parseInt(e.target.value) })}
                     className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-                    placeholder="Maximum"
+                    placeholder={t('searchResult.filters.priceMax')}
                   />
                 </div>
               </div>
@@ -268,7 +282,7 @@ const SearchResult = () => {
               <div className="mb-6">
                 <label className="flex items-center gap-2 text-sm font-medium text-black mb-3">
                   <img src={DateIcon} alt="Date" className="w-5 h-5" />
-                  When
+                  {t('searchResult.filters.whenLabel')}
                 </label>
                 <input 
                   type="text"
@@ -277,16 +291,16 @@ const SearchResult = () => {
                   className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all mb-3"
                 />
                 <div className="space-y-2">
-                  {['Today', 'This Weekend', 'This Week', 'This Month'].map((option) => (
-                    <label key={option} className="flex items-center gap-2 cursor-pointer">
+                  {timeFilterOptions.map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-2 cursor-pointer">
                       <input 
                         type="radio" 
                         name="timeFilter"
-                        checked={selectedTimeFilter === option}
-                        onChange={() => setSelectedTimeFilter(option)}
+                        checked={selectedTimeFilter === key}
+                        onChange={() => setSelectedTimeFilter(key)}
                         className="w-4 h-4 accent-[#FF4000] cursor-pointer"
                       />
-                      <span className="text-sm text-[#4F4F4F]">{option}</span>
+                      <span className="text-sm text-[#4F4F4F]">{label}</span>
                     </label>
                   ))}
                 </div>
@@ -294,18 +308,18 @@ const SearchResult = () => {
 
               {/* Organizers Filter */}
               <div className="mb-6">
-                <label className="text-sm font-medium text-black mb-3 block">Organizers</label>
+                <label className="text-sm font-medium text-black mb-3 block">{t('searchResult.filters.organizersLabel')}</label>
                 <div className="space-y-2">
-                  {['Events by Organizers You Follow', 'Events by All Organizers'].map((option) => (
-                    <label key={option} className="flex items-center gap-2 cursor-pointer">
+                  {organizerOptions.map(({ key, label }) => (
+                    <label key={key} className="flex items-center gap-2 cursor-pointer">
                       <input 
                         type="radio" 
                         name="organizer"
-                        checked={selectedOrganizer === option}
-                        onChange={() => setSelectedOrganizer(option)}
+                        checked={selectedOrganizer === key}
+                        onChange={() => setSelectedOrganizer(key)}
                         className="w-4 h-4 accent-[#FF4000] cursor-pointer"
                       />
-                      <span className="text-sm text-[#4F4F4F]">{option}</span>
+                      <span className="text-sm text-[#4F4F4F]">{label}</span>
                     </label>
                   ))}
                 </div>
@@ -320,7 +334,7 @@ const SearchResult = () => {
             {/* Header with results count and view controls */}
             <div className="flex items-center justify-between mb-7">
               <h1 className="text-xl md:text-lg font-semibold text-black">
-                {filteredEvents.length} Results {searchCategory && <span className="font-normal text-[#757575]">for {searchCategory}</span>}
+                {t('searchResult.resultsCount', { count: filteredEvents.length })} {searchCategory && <span className="font-normal text-[#757575]">{t('searchResult.resultsFor')} {searchCategory}</span>}
               </h1>
 
               {/* View controls */}
@@ -328,7 +342,7 @@ const SearchResult = () => {
                 {/* Filter button */}
                 <button 
                   onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  className="relative flex items-center gap-1 border border-[#EEEEEE] bg-white hover:bg-[#F8F8F8] transition-colors px-1 pr-3" 
+                  className="relative flex items-center gap-1 border border-[#EEEEEE] bg-white hover:bg-[#F8F8F8] transition-colors px-1 pe-3" 
                   style={{ borderRadius: '85.41px', height: '38px' }}
                 >
                   {/* Filter icon on the left */}
@@ -337,10 +351,10 @@ const SearchResult = () => {
                     alt="Filter" 
                     className="w-[30px] h-[30px]" 
                   />
-                  <span className="text-sm font-medium text-black">Filter</span>
+                  <span className="text-sm font-medium text-black">{t('searchResult.filterButton')}</span>
                   {/* Badge count */}
                   {(selectedCategories.length > 0) && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white text-xs rounded-full flex items-center justify-center">
+                    <span className="absolute -top-1 -end-1 w-5 h-5 bg-black text-white text-xs rounded-full flex items-center justify-center">
                       {selectedCategories.length}
                     </span>
                   )}
@@ -354,7 +368,7 @@ const SearchResult = () => {
                   >
                     <img 
                       src={ListIcon} 
-                      alt="List view" 
+                      alt={t('searchResult.viewMode.listAlt')} 
                       className="w-[30px] h-[30px] transition-opacity"
                       style={{ opacity: viewMode === 'list' ? '1' : '0.3' }}
                     />
@@ -365,7 +379,7 @@ const SearchResult = () => {
                   >
                     <img 
                       src={GridIcon} 
-                      alt="Grid view" 
+                      alt={t('searchResult.viewMode.gridAlt')} 
                       className="w-[30px] h-[30px] transition-opacity"
                       style={{ opacity: viewMode === 'grid' ? '1' : '0.3' }}
                     />
@@ -390,7 +404,7 @@ const SearchResult = () => {
                 </div>
               ) : filteredEvents.length === 0 ? (
                 <div className="col-span-full flex flex-col items-center justify-center py-20">
-                  <p className="text-[#757575] text-sm">No events found matching your criteria.</p>
+                  <p className="text-[#757575] text-sm">{t('searchResult.empty.message')}</p>
                   <button 
                     onClick={() => {
                       setSelectedCategories([]);
@@ -398,7 +412,7 @@ const SearchResult = () => {
                     }}
                     className="mt-4 px-4 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
                   >
-                    Clear Filters
+                    {t('searchResult.empty.clearFilters')}
                   </button>
                 </div>
               ) : filteredEvents.map((event) => (
@@ -468,11 +482,11 @@ const SearchResult = () => {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Event locations map"
+              title={t('searchResult.map.title')}
             />
 
             {/* Map controls overlay */}
-            <div className="absolute top-4 right-4 flex flex-col gap-2">
+            <div className="absolute top-4 end-4 flex flex-col gap-2">
               {/* Fullscreen button */}
               <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -505,7 +519,7 @@ const SearchResult = () => {
 
             {/* Event Map Card - Displayed when marker is clicked */}
             {selectedMapEvent && filteredEvents.some(e => e.id === selectedMapEvent.id) && (
-              <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50">
+              <div className="absolute top-20 start-1/2 -translate-x-1/2 z-50">
                 <EventMapCard
                   eventId={selectedMapEvent.id}
                   image={selectedMapEvent.image}
@@ -524,7 +538,7 @@ const SearchResult = () => {
             {filteredEvents[1] && (
               <button 
                 onClick={() => setSelectedMapEvent(filteredEvents[1])}
-                className="absolute top-20 left-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+                className="absolute top-20 start-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
                 {filteredEvents[1].price}
               </button>
@@ -532,7 +546,7 @@ const SearchResult = () => {
             {filteredEvents[5] && (
               <button 
                 onClick={() => setSelectedMapEvent(filteredEvents[5])}
-                className="absolute top-32 left-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+                className="absolute top-32 start-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
                 {filteredEvents[5].price}
               </button>
@@ -540,7 +554,7 @@ const SearchResult = () => {
             {filteredEvents[0] && (
               <button 
                 onClick={() => setSelectedMapEvent(filteredEvents[0])}
-                className="absolute bottom-32 right-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+                className="absolute bottom-32 end-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
                 {filteredEvents[0].price}
               </button>
@@ -548,7 +562,7 @@ const SearchResult = () => {
             {filteredEvents[4] && (
               <button 
                 onClick={() => setSelectedMapEvent(filteredEvents[4])}
-                className="absolute bottom-56 left-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
+                className="absolute bottom-56 start-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
                 {filteredEvents[4].price}
               </button>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import authService from '../../services/authService';
 import organizerService from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
@@ -40,6 +41,7 @@ interface Role {
 }
 
 const AccountSettingsOrganizer = () => {
+  const { t } = useTranslation('organizer');
   const { user, refreshUser } = useAuth();
   const [activeSection, setActiveSection] = useState('personal-info');
   const [isLoading, setIsLoading] = useState(false);
@@ -471,7 +473,7 @@ const AccountSettingsOrganizer = () => {
   // Handlers for Personal Info
   const handleProfileSave = async () => {
     if (!profileData.fullName.trim()) {
-      setProfileError('Full name is required');
+      setProfileError(t('accountSettings.personalInfo.validation.fullNameRequired'));
       return;
     }
     setProfileError('');
@@ -506,16 +508,16 @@ const AccountSettingsOrganizer = () => {
   
   const handleEmailSave = async () => {
     if (!emailData.newEmail.trim()) {
-      setEmailError('New email is required');
+      setEmailError(t('accountSettings.personalInfo.validation.newEmailRequired'));
       return;
     }
     if (!emailData.password.trim()) {
-      setEmailError('Password is required');
+      setEmailError(t('accountSettings.personalInfo.validation.passwordRequired'));
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailData.newEmail)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('accountSettings.personalInfo.validation.invalidEmail'));
       return;
     }
     setEmailError('');
@@ -539,11 +541,11 @@ const AccountSettingsOrganizer = () => {
   
   const handlePhoneSave = async () => {
     if (!phoneData.newPhone.trim()) {
-      setPhoneError('New phone number is required');
+      setPhoneError(t('accountSettings.personalInfo.validation.newPhoneRequired'));
       return;
     }
     if (!phoneData.password.trim()) {
-      setPhoneError('Password is required');
+      setPhoneError(t('accountSettings.personalInfo.validation.passwordRequired'));
       return;
     }
     setPhoneError('');
@@ -567,11 +569,11 @@ const AccountSettingsOrganizer = () => {
   
   const handleLocationSave = async () => {
     if (!locationData.country.trim()) {
-      setLocationError('Country is required');
+      setLocationError(t('accountSettings.personalInfo.validation.countryRequired'));
       return;
     }
     if (!locationData.city.trim()) {
-      setLocationError('City is required');
+      setLocationError(t('accountSettings.personalInfo.validation.cityRequired'));
       return;
     }
     setLocationError('');
@@ -648,7 +650,7 @@ const AccountSettingsOrganizer = () => {
       return;
     }
     if (!organizationData.name.trim()) {
-      setOrgSaveError('Organization name is required');
+      setOrgSaveError(t('accountSettings.organization.validation.nameRequired'));
       return;
     }
     setOrgSaveError('');
@@ -703,16 +705,16 @@ const AccountSettingsOrganizer = () => {
   const handleSendInvite = async () => {
     if (!user?.organizationId) return;
     if (!inviteTeamMemberData.email.trim()) {
-      setInviteError('Email address is required');
+      setInviteError(t('accountSettings.teamRoles.team.validation.emailRequired'));
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(inviteTeamMemberData.email)) {
-      setInviteError('Please enter a valid email address');
+      setInviteError(t('accountSettings.teamRoles.team.validation.invalidEmail'));
       return;
     }
     if (!inviteTeamMemberData.assignedRole) {
-      setInviteError('Please assign a role');
+      setInviteError(t('accountSettings.teamRoles.team.validation.roleRequired'));
       return;
     }
     setInviteError('');
@@ -811,19 +813,19 @@ const AccountSettingsOrganizer = () => {
   // Handlers for Login & Security
   const handlePasswordSave = async () => {
     if (!passwordData.currentPassword.trim()) {
-      setPasswordError('Current password is required');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.currentRequired'));
       return;
     }
     if (!passwordData.newPassword.trim()) {
-      setPasswordError('New password is required');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.newRequired'));
       return;
     }
     if (passwordData.newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.minLength'));
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.match'));
       return;
     }
     setPasswordError('');
@@ -848,19 +850,19 @@ const AccountSettingsOrganizer = () => {
   };
 
   const menuItems = [
-    { id: 'personal-info', label: 'Personal Info', icon: PersonalInfoIcon },
-    { id: 'about-organization', label: 'About Organization', icon: OrganizationIcon },
-    { id: 'team-roles', label: 'Team & Roles', icon: TeamRolesIcon },
-    { id: 'payment-payout', label: 'Payment & Payout', icon: PaymentIcon },
-    { id: 'email-preferences', label: 'Email preferences', icon: EmailIcon },
-    { id: 'login-security', label: 'Login & security', icon: SecurityIcon },
+    { id: 'personal-info', label: t('accountSettings.menu.personalInfo'), icon: PersonalInfoIcon },
+    { id: 'about-organization', label: t('accountSettings.menu.aboutOrganization'), icon: OrganizationIcon },
+    { id: 'team-roles', label: t('accountSettings.menu.teamRoles'), icon: TeamRolesIcon },
+    { id: 'payment-payout', label: t('accountSettings.menu.paymentPayout'), icon: PaymentIcon },
+    { id: 'email-preferences', label: t('accountSettings.menu.emailPreferences'), icon: EmailIcon },
+    { id: 'login-security', label: t('accountSettings.menu.loginSecurity'), icon: SecurityIcon },
   ];
 
   return (
     <div className="w-full">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold text-black mb-6">Account Settings</h1>
-      <p className="text-sm text-[#4F4F4F] mb-8">Manage your account preferences and organization settings.</p>
+      <h1 className="text-2xl font-bold text-black mb-6">{t('accountSettings.title')}</h1>
+      <p className="text-sm text-[#4F4F4F] mb-8">{t('accountSettings.subtitle')}</p>
 
       {/* Main Grid: Left Menu + Right Content */}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
@@ -899,13 +901,13 @@ const AccountSettingsOrganizer = () => {
               {/* Profile Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Profile</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.profile')}</h2>
                   <button 
                     onClick={() => setIsProfileModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
@@ -924,13 +926,13 @@ const AccountSettingsOrganizer = () => {
               {/* Email Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Email</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.email')}</h2>
                   <button 
                     onClick={() => setIsEmailModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
@@ -938,7 +940,7 @@ const AccountSettingsOrganizer = () => {
                   <p className="text-sm text-black">{emailData.currentEmail}</p>
                   <div className="flex items-center gap-1 px-2 py-1 bg-[#E8F5E9] rounded-full">
                     <img src={VerifiedIcon} alt="Verified" className="w-3 h-3" />
-                    <span className="text-xs font-medium text-[#2E7D32]">Verified</span>
+                    <span className="text-xs font-medium text-[#2E7D32]">{t('accountSettings.personalInfo.verified')}</span>
                   </div>
                 </div>
               </div>
@@ -946,20 +948,20 @@ const AccountSettingsOrganizer = () => {
               {/* Phone Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Phone</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.phone')}</h2>
                   <button 
                     onClick={() => setIsPhoneModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-black">{phoneData.currentPhone}</p>
                   <button className="text-sm font-medium text-[#FF4000] hover:underline cursor-pointer">
-                    Verify your phone
+                    {t('accountSettings.personalInfo.verifyPhone')}
                   </button>
                 </div>
               </div>
@@ -967,13 +969,13 @@ const AccountSettingsOrganizer = () => {
               {/* Location Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Location</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.location')}</h2>
                   <button 
                     onClick={() => setIsLocationModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
@@ -987,9 +989,9 @@ const AccountSettingsOrganizer = () => {
             <div className="space-y-6">
               {/* Organization Profile Section */}
               <div>
-                <h2 className="text-xl font-bold text-black mb-1">Organization Profile</h2>
+                <h2 className="text-xl font-bold text-black mb-1">{t('accountSettings.organization.title')}</h2>
                 <p className="text-sm text-gray mb-6">
-                  Tell attendees who you are. Add your brand details and build trust with your audience.
+                  {t('accountSettings.organization.subtitle')}
                 </p>
 
                 <div className="space-y-4">
@@ -1000,30 +1002,30 @@ const AccountSettingsOrganizer = () => {
                       {/* Organization Name */}
                       <div>
                         <label className="block text-sm font-medium text-black mb-2">
-                          Organization Name <span className="text-[#FF3425]">*</span>
+                          {t('accountSettings.organization.fields.name')} <span className="text-[#FF3425]">*</span>
                         </label>
                         <input
                           type="text"
                           value={organizationData.name}
                           onChange={(e) => handleOrganizationChange('name', e.target.value)}
                           className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                          placeholder="Enter organization name"
+                          placeholder={t('accountSettings.organization.fields.namePlaceholder')}
                         />
                       </div>
 
                       {/* Organization Type */}
                       <div className="relative" ref={orgTypeRef}>
                         <label className="block text-sm font-medium text-black mb-2">
-                          Organization Type
+                          {t('accountSettings.organization.fields.type')}
                         </label>
                         <button
                           type="button"
                           onClick={() => setIsOrgTypeDropdownOpen(!isOrgTypeDropdownOpen)}
-                          className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary transition-all border-light-gray ${
+                          className={`w-full px-4 py-2.5 border rounded-lg text-sm text-start flex items-center justify-between focus:outline-none focus:border-primary transition-all border-light-gray ${
                             organizationData.organizationType ? 'text-black' : 'text-[#9CA3AF]'
                           }`}
                         >
-                          {organizationData.organizationType || 'Select organization type'}
+                          {organizationData.organizationType || t('accountSettings.organization.fields.typePlaceholder')}
                           <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
@@ -1036,7 +1038,7 @@ const AccountSettingsOrganizer = () => {
                                 key={type}
                                 type="button"
                                 onClick={() => handleOrganizationTypeSelect(type)}
-                                className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                                className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                                   organizationData.organizationType === type
                                     ? 'bg-primary-light text-primary font-medium'
                                     : 'text-gray hover:bg-secondary-light'
@@ -1053,7 +1055,7 @@ const AccountSettingsOrganizer = () => {
                     {/* Right Column: Organization Logo (spans 2 rows) */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Organization Logo
+                        {t('accountSettings.organization.fields.logo')}
                       </label>
                       <div 
                         onClick={() => fileInputRef.current?.click()}
@@ -1069,10 +1071,10 @@ const AccountSettingsOrganizer = () => {
                           <>
                             <img src={UploadIcon} alt="Upload" className="w-6 h-6 mb-1.5" />
                             <p className="text-sm text-primary font-medium">
-                              <span className="font-semibold">Choose file</span> or Drop here
+                              {t('accountSettings.organization.fields.uploadHint')}
                             </p>
                             <p className="text-xs text-gray mt-0.5">
-                              PNG or JPG (400×400px, max 5MB)
+                              {t('accountSettings.organization.fields.uploadFormats')}
                             </p>
                           </>
                         )}
@@ -1090,14 +1092,14 @@ const AccountSettingsOrganizer = () => {
                   {/* Row 3: Address only */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Address
+                      {t('accountSettings.organization.fields.address')}
                     </label>
                     <input
                       type="text"
                       value={organizationData.address}
                       onChange={(e) => handleOrganizationChange('address', e.target.value)}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="Ex: Jolie vue, Kouba, Algeria"
+                      placeholder={t('accountSettings.organization.fields.addressPlaceholder')}
                     />
                   </div>
 
@@ -1106,28 +1108,28 @@ const AccountSettingsOrganizer = () => {
                     {/* Organization Email (Required) */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Organization Email <span className="text-[#FF3425]">*</span>
+                        {t('accountSettings.organization.fields.email')} <span className="text-[#FF3425]">*</span>
                       </label>
                       <input
                         type="email"
                         value={organizationData.email}
                         onChange={(e) => handleOrganizationChange('email', e.target.value)}
                         className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                        placeholder="Ex: contact@ormeet.com"
+                        placeholder={t('accountSettings.organization.fields.emailPlaceholder')}
                       />
                     </div>
 
                     {/* Contact Phone */}
                     <div>
                       <label className="block text-sm font-medium text-black mb-2">
-                        Contact Phone
+                        {t('accountSettings.organization.fields.phone')}
                       </label>
                       <input
                         type="tel"
                         value={organizationData.phone}
                         onChange={(e) => handleOrganizationChange('phone', e.target.value)}
                         className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                        placeholder="Add your organization phone number"
+                        placeholder={t('accountSettings.organization.fields.phonePlaceholder')}
                       />
                     </div>
                   </div>
@@ -1135,14 +1137,14 @@ const AccountSettingsOrganizer = () => {
                   {/* About Your Organization */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      About Your Organization
+                      {t('accountSettings.organization.fields.description')}
                     </label>
                     <textarea
                       value={organizationData.description}
                       onChange={(e) => handleOrganizationChange('description', e.target.value)}
                       rows={4}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all resize-none"
-                      placeholder="Write a short description about what kind of events you host and what attendees can expect."
+                      placeholder={t('accountSettings.organization.fields.descriptionPlaceholder')}
                     />
                   </div>
                 </div>
@@ -1150,65 +1152,65 @@ const AccountSettingsOrganizer = () => {
 
               {/* Social Media Links Section */}
               <div>
-                <h2 className="text-xl font-bold text-black mb-1">Social Media Links</h2>
+                <h2 className="text-xl font-bold text-black mb-1">{t('accountSettings.organization.socialMedia.title')}</h2>
                 <p className="text-sm text-gray mb-6">
-                  Connect your social accounts so attendees can find and follow you.
+                  {t('accountSettings.organization.socialMedia.subtitle')}
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Facebook */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Facebook
+                      {t('accountSettings.organization.socialMedia.facebook')}
                     </label>
                     <input
                       type="text"
                       value={organizationData.socialMedia.facebook}
                       onChange={(e) => handleOrganizationChange('socialMedia.facebook', e.target.value)}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="facebook.com/yourpage"
+                      placeholder={t('accountSettings.organization.socialMedia.facebookPlaceholder')}
                     />
                   </div>
 
                   {/* Instagram */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Instagram
+                      {t('accountSettings.organization.socialMedia.instagram')}
                     </label>
                     <input
                       type="text"
                       value={organizationData.socialMedia.instagram}
                       onChange={(e) => handleOrganizationChange('socialMedia.instagram', e.target.value)}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="@yourusername"
+                      placeholder={t('accountSettings.organization.socialMedia.instagramPlaceholder')}
                     />
                   </div>
 
                   {/* LinkedIn */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      LinkedIn
+                      {t('accountSettings.organization.socialMedia.linkedin')}
                     </label>
                     <input
                       type="text"
                       value={organizationData.socialMedia.linkedin}
                       onChange={(e) => handleOrganizationChange('socialMedia.linkedin', e.target.value)}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="linkedin.com/company/yourname"
+                      placeholder={t('accountSettings.organization.socialMedia.linkedinPlaceholder')}
                     />
                   </div>
 
                   {/* YouTube */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      YouTube
+                      {t('accountSettings.organization.socialMedia.youtube')}
                     </label>
                     <input
                       type="text"
                       value={organizationData.socialMedia.youtube}
                       onChange={(e) => handleOrganizationChange('socialMedia.youtube', e.target.value)}
                       className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="youtube.com/@yourchannel"
+                      placeholder={t('accountSettings.organization.socialMedia.youtubePlaceholder')}
                     />
                   </div>
                 </div>
@@ -1223,7 +1225,7 @@ const AccountSettingsOrganizer = () => {
               {orgSaveSuccess && (
                 <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
                   <img src={SuccessIcon} alt="Success" className="w-5 h-5" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  Organization saved successfully!
+                  {t('accountSettings.organization.success')}
                 </div>
               )}
 
@@ -1235,7 +1237,7 @@ const AccountSettingsOrganizer = () => {
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  {isLoading ? 'Saving...' : 'Save changes'}
+                  {isLoading ? t('accountSettings.organization.saving') : t('accountSettings.organization.saveChanges')}
                 </button>
               </div>
             </div>
@@ -1254,9 +1256,9 @@ const AccountSettingsOrganizer = () => {
                       : 'text-gray hover:text-black'
                   }`}
                 >
-                  Team Members
+                  {t('accountSettings.teamRoles.tabs.team')}
                   {activeTeamTab === 'team' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
+                    <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary"></div>
                   )}
                 </button>
                 <button
@@ -1267,9 +1269,9 @@ const AccountSettingsOrganizer = () => {
                       : 'text-gray hover:text-black'
                   }`}
                 >
-                  Roles
+                  {t('accountSettings.teamRoles.tabs.roles')}
                   {activeTeamTab === 'roles' && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"></div>
+                    <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary"></div>
                   )}
                 </button>
               </div>
@@ -1280,32 +1282,32 @@ const AccountSettingsOrganizer = () => {
                     <>
                       {/* Header with count, search and invite button */}
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                        <h2 className="text-lg font-semibold text-black">{filteredTeamMembers.length} Team Member{filteredTeamMembers.length !== 1 ? 's' : ''}</h2>
+                        <h2 className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.team.count', { count: filteredTeamMembers.length, plural: filteredTeamMembers.length !== 1 ? 's' : '' })}</h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                           {/* Search Input - Exact same as Events */}
                           <div className="relative flex-1 sm:flex-none">
                             <input
                               type="text"
-                              placeholder="Search team member"
+                              placeholder={t('accountSettings.teamRoles.team.searchPlaceholder')}
                               value={teamSearchQuery}
                               onChange={(e) => setTeamSearchQuery(e.target.value)}
-                              className="w-full sm:w-[160px] lg:w-[199px] h-[38px] pl-4 pr-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
+                              className="w-full sm:w-[160px] lg:w-[199px] h-[38px] ps-4 pe-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
                             />
                             <img 
                               src={SearchIcon} 
                               alt="Search" 
-                              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+                              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
                             />
                           </div>
 
                           {/* Invite Team Member Button - Exact same as Create Event */}
                           <button
                             onClick={() => setIsInviteTeamMemberPage(true)}
-                            className="relative flex items-center gap-2 pl-10 pr-5 h-[38px] bg-[#FF4000] hover:bg-[#E63900] text-white text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
+                            className="relative flex items-center gap-2 ps-10 pe-5 h-[38px] bg-[#FF4000] hover:bg-[#E63900] text-white text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
                             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                           >
-                            <img src={CreateEventIcon} alt="Invite" className="absolute left-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
-                            <span>Invite team member</span>
+                            <img src={CreateEventIcon} alt="Invite" className="absolute start-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
+                            <span>{t('accountSettings.teamRoles.team.inviteMember')}</span>
                           </button>
                         </div>
                       </div>
@@ -1314,16 +1316,16 @@ const AccountSettingsOrganizer = () => {
                   <div className="bg-white border border-light-gray rounded-xl overflow-hidden">
                     {/* Table Header */}
                     <div className="hidden lg:grid grid-cols-[2.5fr_3fr_2fr_1.5fr] gap-4 px-6 py-3 bg-secondary-light border-b border-light-gray">
-                      <div className="text-sm font-medium text-gray">Name</div>
-                      <div className="text-sm font-medium text-gray">Email</div>
-                      <div className="text-sm font-medium text-gray">Role</div>
-                      <div className="text-sm font-medium text-gray">Status</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.team.table.name')}</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.team.table.email')}</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.team.table.role')}</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.team.table.status')}</div>
                     </div>
 
                     {/* Table Body */}
                     <div className="divide-y divide-light-gray">
                       {filteredTeamMembers.length === 0 ? (
-                        <div className="px-6 py-12 text-center text-gray">No team members found</div>
+                        <div className="px-6 py-12 text-center text-gray">{t('accountSettings.teamRoles.team.empty')}</div>
                       ) : (
                         filteredTeamMembers.map((member) => (
                           <div 
@@ -1357,26 +1359,26 @@ const AccountSettingsOrganizer = () => {
                             
                             {/* Role */}
                             <div className="flex items-center min-w-0 overflow-hidden">
-                              <span className="lg:hidden text-xs text-gray mr-2 shrink-0">Role:</span>
+                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">Role:</span>
                               <span className="text-sm text-black truncate">{member.role}</span>
                             </div>
                             
                             {/* Status */}
                             <div className="flex items-center gap-2 min-w-0 overflow-hidden">
-                              <span className="lg:hidden text-xs text-gray mr-2 shrink-0">Status:</span>
+                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">Status:</span>
                               {member.status === 'active' ? (
                                 <>
                                   <svg className="w-4 h-4 text-success shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                   </svg>
-                                  <span className="text-sm text-success font-medium whitespace-nowrap">Active</span>
+                                  <span className="text-sm text-success font-medium whitespace-nowrap">{t('accountSettings.teamRoles.team.status.active')}</span>
                                 </>
                               ) : (
                                 <>
                                   <svg className="w-4 h-4 text-[#FBBC04] shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                                   </svg>
-                                  <span className="text-sm text-[#FBBC04] font-medium whitespace-nowrap">Pending</span>
+                                  <span className="text-sm text-[#FBBC04] font-medium whitespace-nowrap">{t('accountSettings.teamRoles.team.status.pending')}</span>
                                 </>
                               )}
                             </div>
@@ -1391,9 +1393,9 @@ const AccountSettingsOrganizer = () => {
                     <div className="bg-white border border-light-gray rounded-xl p-6">
                       {/* Header */}
                       <div className="mb-6">
-                        <h2 className="text-xl font-bold text-black mb-1">Add your team Member</h2>
+                        <h2 className="text-xl font-bold text-black mb-1">{t('accountSettings.teamRoles.team.invite.title')}</h2>
                         <p className="text-sm text-gray">
-                          Enter the email address of your team member, then choose what they can do by assigning a role.
+                          {t('accountSettings.teamRoles.team.invite.subtitle')}
                         </p>
                       </div>
 
@@ -1407,13 +1409,13 @@ const AccountSettingsOrganizer = () => {
                         {/* Email Address */}
                         <div>
                           <label className="block text-sm font-medium text-black mb-2">
-                            Email Address
+                            {t('accountSettings.teamRoles.team.invite.email')}
                           </label>
                           <input
                             type="email"
                             value={inviteTeamMemberData.email}
                             onChange={(e) => setInviteTeamMemberData({ ...inviteTeamMemberData, email: e.target.value })}
-                            placeholder="teammate@example.com"
+                            placeholder={t('accountSettings.teamRoles.team.invite.emailPlaceholder')}
                             className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                           />
                         </div>
@@ -1421,13 +1423,13 @@ const AccountSettingsOrganizer = () => {
                         {/* Invitation Code */}
                         <div>
                           <label className="block text-sm font-medium text-black mb-2">
-                            Invitation code
+                            {t('accountSettings.teamRoles.team.invite.invitationCode')}
                           </label>
                           <input
                             type="text"
                             value={inviteTeamMemberData.invitationCode}
                             onChange={(e) => setInviteTeamMemberData({ ...inviteTeamMemberData, invitationCode: e.target.value })}
-                            placeholder="Enter invitation code"
+                            placeholder={t('accountSettings.teamRoles.team.invite.invitationCodePlaceholder')}
                             className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                           />
                         </div>
@@ -1435,17 +1437,17 @@ const AccountSettingsOrganizer = () => {
                         {/* Assign Role - Matching Organization Type dropdown design */}
                         <div>
                           <label className="block text-sm font-medium text-black mb-2">
-                            Assign role
+                            {t('accountSettings.teamRoles.team.invite.role')}
                           </label>
                           <div className="relative" ref={roleDropdownRef}>
                             <button
                               type="button"
                               onClick={() => setIsRoleDropdownOpen(!isRoleDropdownOpen)}
-                              className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary transition-all border-light-gray ${
+                              className={`w-full px-4 py-2.5 border rounded-lg text-sm text-start flex items-center justify-between focus:outline-none focus:border-primary transition-all border-light-gray ${
                                 inviteTeamMemberData.assignedRole ? 'text-black' : 'text-[#9CA3AF]'
                               }`}
                             >
-                              {inviteTeamMemberData.assignedRole || 'Select a role'}
+                              {inviteTeamMemberData.assignedRole || t('accountSettings.teamRoles.team.invite.rolePlaceholder')}
                               <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
@@ -1458,7 +1460,7 @@ const AccountSettingsOrganizer = () => {
                                     key={role.id}
                                     type="button"
                                     onClick={() => handleRoleSelect(role.name)}
-                                    className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                                    className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                                       inviteTeamMemberData.assignedRole === role.name
                                         ? 'bg-primary-light text-primary font-medium'
                                         : 'text-gray hover:bg-secondary-light'
@@ -1477,16 +1479,16 @@ const AccountSettingsOrganizer = () => {
                       <div className="flex items-center justify-end gap-3 mt-6">
                         <button
                           onClick={handleCancelInvite}
-                          className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
+                          className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap"
                         >
-                          Cancel
+                          {t('accountSettings.teamRoles.team.invite.cancel')}
                         </button>
                         <button
                           onClick={handleSendInvite}
-                          className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap"
+                          className="ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap"
                           style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                         >
-                          Send Invite
+                          {t('accountSettings.teamRoles.team.invite.send')}
                         </button>
                       </div>
                     </div>
@@ -1500,32 +1502,32 @@ const AccountSettingsOrganizer = () => {
                     <>
                       {/* Header with count, search and create role button */}
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-                        <h2 className="text-lg font-semibold text-black">{filteredRoles.length} Role{filteredRoles.length !== 1 ? 's' : ''}</h2>
+                        <h2 className="text-lg font-semibold text-black">{filteredRoles.length} {filteredRoles.length !== 1 ? t('accountSettings.teamRoles.tabs.roles') : t('accountSettings.teamRoles.roles.form.titleCreate').replace('Create ', '')}</h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                           {/* Search Input - Exact same as Team Members */}
                           <div className="relative flex-1 sm:flex-none">
                             <input
                               type="text"
-                              placeholder="Search Roles"
+                              placeholder={t('accountSettings.teamRoles.roles.searchPlaceholder')}
                               value={rolesSearchQuery}
                               onChange={(e) => setRolesSearchQuery(e.target.value)}
-                              className="w-full sm:w-[160px] lg:w-[199px] h-[38px] pl-4 pr-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
+                              className="w-full sm:w-[160px] lg:w-[199px] h-[38px] ps-4 pe-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
                             />
                             <img 
                               src={SearchIcon} 
                               alt="Search" 
-                              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+                              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
                             />
                           </div>
 
                           {/* Create Role Button - Exact same as Invite Team Member */}
                           <button
                             onClick={() => setIsCreatingRole(true)}
-                            className="relative flex items-center gap-2 pl-10 pr-5 h-[38px] bg-[#FF4000] hover:bg-[#E63900] text-white text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
+                            className="relative flex items-center gap-2 ps-10 pe-5 h-[38px] bg-[#FF4000] hover:bg-[#E63900] text-white text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
                             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                           >
-                            <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px]" />
-                            <span>Create Role</span>
+                            <img src={CreateEventIcon} alt="Create" className="absolute start-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px]" />
+                            <span>{t('accountSettings.teamRoles.roles.createRole')}</span>
                           </button>
                         </div>
                       </div>
@@ -1534,15 +1536,15 @@ const AccountSettingsOrganizer = () => {
                       <div className="bg-white border border-light-gray rounded-xl overflow-visible">
                     {/* Table Header - Hidden on mobile */}
                     <div className="hidden lg:grid lg:grid-cols-[3fr_3fr_0.5fr] gap-4 px-6 py-4 bg-secondary-light border-b border-light-gray rounded-t-xl">
-                      <div className="text-sm font-medium text-gray">Roles</div>
-                      <div className="text-sm font-medium text-gray">Permissions</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.roles.table.role')}</div>
+                      <div className="text-sm font-medium text-gray">{t('accountSettings.teamRoles.roles.table.permissions')}</div>
                       <div className="text-sm font-medium text-gray"></div>
                     </div>
 
                     {/* Table Body */}
                     <div className="divide-y divide-light-gray overflow-visible">
                       {filteredRoles.length === 0 ? (
-                        <div className="px-6 py-12 text-center text-gray">No roles found</div>
+                        <div className="px-6 py-12 text-center text-gray">{t('accountSettings.teamRoles.roles.empty')}</div>
                       ) : (
                         filteredRoles.map((role) => (
                           <div key={role.id} className="grid grid-cols-1 lg:grid-cols-[3fr_3fr_0.5fr] gap-4 px-6 py-4 hover:bg-secondary-light transition-colors overflow-visible">
@@ -1568,10 +1570,10 @@ const AccountSettingsOrganizer = () => {
                               </button>
 
                               {openActionMenu === role.id && (
-                                <div className="absolute right-0 bottom-10 w-48 bg-white border border-light-gray rounded-lg shadow-xl py-1" style={{ zIndex: 9999 }}>
-                                  <button onClick={() => handleEditRole(role.id)} className="w-full px-4 py-2 text-left text-sm text-black hover:bg-secondary-light transition-colors">Edit Role</button>
-                                  <button className="w-full px-4 py-2 text-left text-sm text-black hover:bg-secondary-light transition-colors">View Details</button>
-                                  <button onClick={() => handleDuplicateRole(role.id)} className="w-full px-4 py-2 text-left text-sm text-black hover:bg-secondary-light transition-colors">Duplicate Role</button>
+                                <div className="absolute end-0 bottom-10 w-48 bg-white border border-light-gray rounded-lg shadow-xl py-1" style={{ zIndex: 9999 }}>
+                                  <button onClick={() => handleEditRole(role.id)} className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">{t('accountSettings.teamRoles.roles.actions.edit')}</button>
+                                  <button className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">View Details</button>
+                                  <button onClick={() => handleDuplicateRole(role.id)} className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">{t('accountSettings.teamRoles.roles.actions.duplicate')}</button>
                                   <div className="border-t border-light-gray my-1"></div>
                                   <button 
                                     onClick={() => {
@@ -1579,9 +1581,9 @@ const AccountSettingsOrganizer = () => {
                                       setIsDeleteRoleConfirmOpen(true);
                                       setOpenActionMenu(null);
                                     }}
-                                    className="w-full px-4 py-2 text-left text-sm text-[#FF3425] hover:bg-secondary-light transition-colors cursor-pointer"
+                                    className="w-full px-4 py-2 text-start text-sm text-[#FF3425] hover:bg-secondary-light transition-colors cursor-pointer"
                                   >
-                                    Delete Role
+                                    {t('accountSettings.teamRoles.roles.actions.delete')}
                                   </button>
                                 </div>
                               )}
@@ -1598,7 +1600,7 @@ const AccountSettingsOrganizer = () => {
                       {/* Header */}
                       <div className="mb-6">
                         <h2 className="text-xl font-bold text-black mb-1">
-                          {roleMode === 'edit' ? 'Edit Role' : 'Add a New Role'}
+                          {roleMode === 'edit' ? t('accountSettings.teamRoles.roles.form.titleEdit') : t('accountSettings.teamRoles.roles.form.titleCreate')}
                         </h2>
                         <p className="text-sm text-gray">
                           {roleMode === 'edit' ? 'Update role details and permissions' : 'Create a role and choose its permissions'}
@@ -1608,7 +1610,7 @@ const AccountSettingsOrganizer = () => {
                       {/* Role Name Input */}
                       <div className="mb-6">
                         <label className="block text-sm font-medium text-black mb-2">
-                          Role name
+                          {t('accountSettings.teamRoles.roles.form.roleName')}
                         </label>
                         <input
                           ref={roleTitleInputRef}
@@ -1624,7 +1626,7 @@ const AccountSettingsOrganizer = () => {
                       <div className="space-y-6">
                         {/* Events */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Events</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.events')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1640,7 +1642,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Delete events</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.deleteEvents')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1656,7 +1658,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Create and edit events</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.createAndEditEvents')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1672,14 +1674,14 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View events</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewEvents')}</span>
                             </label>
                           </div>
                         </div>
 
                         {/* Tickets & Pricing */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Tickets & Pricing</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.ticketsAndPricing')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1695,7 +1697,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View tickets</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewTickets')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1711,7 +1713,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Edit ticket types & pricing</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.editTicketTypesAndPricing')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1727,14 +1729,14 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Manage promo codes</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.managePromoCodes')}</span>
                             </label>
                           </div>
                         </div>
 
                         {/* Orders & Attendees */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Orders & Attendees</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.ordersAndAttendees')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1750,7 +1752,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View attendees</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewAttendees')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1766,7 +1768,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Export attendee data</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.exportAttendeeData')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1782,7 +1784,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Check-in attendees</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.checkInAttendees')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1798,14 +1800,14 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Edit attendee info</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.editAttendeeInfo')}</span>
                             </label>
                           </div>
                         </div>
 
                         {/* Reports & Analytics */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Reports & Analytics</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.reportsAndAnalytics')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1821,7 +1823,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View analytics dashboard</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewAnalyticsDashboard')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1837,14 +1839,14 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Download reports</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.downloadReports')}</span>
                             </label>
                           </div>
                         </div>
 
                         {/* Email & Notifications */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Email & Notifications</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.emailAndNotifications')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1860,7 +1862,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View scheduled messages</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewScheduledMessages')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1876,7 +1878,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Edit email templates</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.editEmailTemplates')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1892,14 +1894,14 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Send event reminders</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.sendEventReminders')}</span>
                             </label>
                           </div>
                         </div>
 
                         {/* Settings */}
                         <div>
-                          <h3 className="text-sm font-semibold text-black mb-3">Settings</h3>
+                          <h3 className="text-sm font-semibold text-black mb-3">{t('accountSettings.teamRoles.roles.form.permissions.settings')}</h3>
                           <div className="space-y-2">
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1915,7 +1917,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">View settings</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.viewSettings')}</span>
                             </label>
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
@@ -1931,7 +1933,7 @@ const AccountSettingsOrganizer = () => {
                                 className="w-4 h-4 rounded border-gray focus:ring-2 focus:ring-primary/20"
                                 style={{ accentColor: '#FF4000' }}
                               />
-                              <span className="text-sm text-black">Manage team access</span>
+                              <span className="text-sm text-black">{t('accountSettings.teamRoles.roles.form.permissions.manageTeamAccess')}</span>
                             </label>
                           </div>
                         </div>
@@ -1956,9 +1958,9 @@ const AccountSettingsOrganizer = () => {
                               }
                             });
                           }}
-                          className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
+                          className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                         >
-                          Cancel
+                          {t('accountSettings.teamRoles.roles.form.cancel')}
                         </button>
                         <button
                           type="button"
@@ -1969,7 +1971,7 @@ const AccountSettingsOrganizer = () => {
                               Object.values(category).some(permission => permission)
                             )
                           }
-                          className={`pl-5 pr-5 py-2 text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer ${
+                          className={`ps-5 pe-5 py-2 text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer ${
                             !roleFormData.roleName.trim() ||
                             !Object.values(roleFormData.permissions).some(category =>
                               Object.values(category).some(permission => permission)
@@ -1986,7 +1988,7 @@ const AccountSettingsOrganizer = () => {
                               : {}
                           }
                         >
-                          {roleMode === 'edit' ? 'Save changes' : 'Create Role'}
+                          {roleMode === 'edit' ? t('accountSettings.teamRoles.roles.form.saveChanges') : t('accountSettings.teamRoles.roles.form.create')}
                         </button>
                       </div>
                     </div>
@@ -2005,121 +2007,121 @@ const AccountSettingsOrganizer = () => {
           {activeSection === 'email-preferences' && (
             <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-2">Email preferences</h2>
-                <p className="text-sm text-[#4F4F4F]">Choose the emails you want to receive—stay informed, not overwhelmed.</p>
+                <h2 className="text-2xl font-bold text-black mb-2">{t('accountSettings.emailPreferences.title')}</h2>
+                <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.subtitle')}</p>
               </div>
               
               {/* Organizer Preferences */}
               <div className="space-y-6">
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Event Updates & Changes</h3>
-                    <p className="text-sm text-[#4F4F4F]">Get notified when attendees register or when event details are modified.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.eventUpdates.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.eventUpdates.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.eventUpdates}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, eventUpdates: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Ticket Sales Notifications</h3>
-                    <p className="text-sm text-[#4F4F4F]">Receive alerts when tickets are purchased for your events.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.ticketSales.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.ticketSales.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.ticketSales}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, ticketSales: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Attendee Messages</h3>
-                    <p className="text-sm text-[#4F4F4F]">Get notified when attendees send you messages or questions.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.attendeeMessages.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.attendeeMessages.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.attendeeMessages}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, attendeeMessages: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Payout Notifications</h3>
-                    <p className="text-sm text-[#4F4F4F]">Be informed about payment processing and payout status.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.payoutNotifications.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.payoutNotifications.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.payoutNotifications}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, payoutNotifications: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Platform Updates & Features</h3>
-                    <p className="text-sm text-[#4F4F4F]">Stay updated on new features and improvements to the platform.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.platformUpdates.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.platformUpdates.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.platformUpdates}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, platformUpdates: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Marketing Tips & Best Practices</h3>
-                    <p className="text-sm text-[#4F4F4F]">Receive tips on how to promote your events and increase attendance.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.marketingTips.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.marketingTips.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.marketingTips}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, marketingTips: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
                 
                 <div className="flex items-start justify-between py-4">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Newsletters & Success Stories</h3>
-                    <p className="text-sm text-[#4F4F4F]">Get inspired by other organizers and industry insights.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.newsletters.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.newsletters.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <label className="relative inline-flex items-center cursor-pointer ms-4">
                     <input
                       type="checkbox"
                       checked={emailPrefs.newsletters}
                       onChange={(e) => setEmailPrefs({ ...emailPrefs, newsletters: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
               </div>
@@ -2130,20 +2132,20 @@ const AccountSettingsOrganizer = () => {
           {activeSection === 'login-security' && (
             <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-2">Login & security</h2>
-                <p className="text-sm text-[#4F4F4F]">Set a unique password to protect your account</p>
+                <h2 className="text-2xl font-bold text-black mb-2">{t('accountSettings.loginSecurity.title')}</h2>
+                <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.subtitle')}</p>
               </div>
               
               {/* Password Section */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-semibold text-black">Password</h3>
+                  <h3 className="text-base font-semibold text-black">{t('accountSettings.loginSecurity.password.title')}</h3>
                   <button
                     onClick={() => setIsEditPasswordOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-[#F8F8F8] rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Change Password
+                    {t('accountSettings.loginSecurity.password.changePassword')}
                   </button>
                 </div>
                 <p className="text-sm text-black">••••••••</p>
@@ -2153,17 +2155,17 @@ const AccountSettingsOrganizer = () => {
               <div className="pt-6 border-t border-[#EEEEEE]">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Two-factor authentication</h3>
-                    <p className="text-sm text-[#4F4F4F]">Two-factor authentication adds extra security by requiring a second step to verify your identity during login.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-6">
+                  <label className="relative inline-flex items-center cursor-pointer ms-6">
                     <input
                       type="checkbox"
                       checked={twoFactorEnabled}
                       onChange={(e) => setTwoFactorEnabled(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
                   </label>
                 </div>
               </div>
@@ -2178,7 +2180,7 @@ const AccountSettingsOrganizer = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showProfileSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Profile</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
                 {profileError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {profileError}
@@ -2189,17 +2191,17 @@ const AccountSettingsOrganizer = () => {
             {!showProfileSuccess && (
               <div className="space-y-4">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Full Name</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.fullName')}</label>
                 <input
                   type="text"
                   value={profileData.fullName}
                   onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                  placeholder="Enter your full name"
+                  placeholder={t('accountSettings.personalInfo.modals.fullNamePlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Profile Photo</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.profilePhoto')}</label>
                 <div className="flex items-center gap-4">
                   <img src={profileData.profilePhoto} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-light-gray" />
                   <div className="flex-1">
@@ -2227,9 +2229,9 @@ const AccountSettingsOrganizer = () => {
                       <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
-                      <span>Choose file or Drop here</span>
+                      <span>{t('accountSettings.personalInfo.modals.uploadHint')}</span>
                     </label>
-                    <p className="text-xs text-gray mt-1.5">PNG or JPG (max 5MB)</p>
+                    <p className="text-xs text-gray mt-1.5">{t('accountSettings.personalInfo.modals.uploadFormats')}</p>
                   </div>
                 </div>
               </div>
@@ -2244,20 +2246,20 @@ const AccountSettingsOrganizer = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleProfileSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -2270,7 +2272,7 @@ const AccountSettingsOrganizer = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showEmailSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Email</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
                 {emailError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {emailError}
@@ -2281,7 +2283,7 @@ const AccountSettingsOrganizer = () => {
             {!showEmailSuccess && (
               <div className="space-y-4">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Current Email</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.currentEmail')}</label>
                 <input
                   type="email"
                   value={emailData.currentEmail}
@@ -2290,22 +2292,22 @@ const AccountSettingsOrganizer = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">New Email</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.newEmail')}</label>
                 <input
                   type="email"
                   value={emailData.newEmail}
                   onChange={(e) => setEmailData({ ...emailData, newEmail: e.target.value })}
-                  placeholder="Enter new email"
+                  placeholder={t('accountSettings.personalInfo.modals.newEmailPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Password</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.password')}</label>
                 <input
                   type="password"
                   value={emailData.password}
                   onChange={(e) => setEmailData({ ...emailData, password: e.target.value })}
-                  placeholder="Enter your password"
+                  placeholder={t('accountSettings.personalInfo.modals.passwordPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
@@ -2320,20 +2322,20 @@ const AccountSettingsOrganizer = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleEmailSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -2346,7 +2348,7 @@ const AccountSettingsOrganizer = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPhoneSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Phone</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
                 {phoneError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {phoneError}
@@ -2357,7 +2359,7 @@ const AccountSettingsOrganizer = () => {
             {!showPhoneSuccess && (
               <div className="space-y-4">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Current Phone</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.currentPhone')}</label>
                 <input
                   type="text"
                   value={phoneData.currentPhone}
@@ -2366,22 +2368,22 @@ const AccountSettingsOrganizer = () => {
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">New Phone Number</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.newPhone')}</label>
                 <input
                   type="tel"
                   value={phoneData.newPhone}
                   onChange={(e) => setPhoneData({ ...phoneData, newPhone: e.target.value })}
-                  placeholder="Enter new phone number"
+                  placeholder={t('accountSettings.personalInfo.modals.newPhonePlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Password</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.password')}</label>
                 <input
                   type="password"
                   value={phoneData.password}
                   onChange={(e) => setPhoneData({ ...phoneData, password: e.target.value })}
-                  placeholder="Enter your password"
+                  placeholder={t('accountSettings.personalInfo.modals.passwordPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
@@ -2396,20 +2398,20 @@ const AccountSettingsOrganizer = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handlePhoneSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -2422,7 +2424,7 @@ const AccountSettingsOrganizer = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showLocationSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Location</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
                 {locationError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {locationError}
@@ -2433,27 +2435,27 @@ const AccountSettingsOrganizer = () => {
             {!showLocationSuccess && (
               <div className="space-y-4">
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Country</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.country')}</label>
                 <input
                   type="text"
                   value={locationData.country}
                   onChange={(e) => setLocationData({ ...locationData, country: e.target.value })}
-                  placeholder="Enter country"
+                  placeholder={t('accountSettings.personalInfo.modals.countryPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">City</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.city')}</label>
                 <input
                   type="text"
                   value={locationData.city}
                   onChange={(e) => setLocationData({ ...locationData, city: e.target.value })}
-                  placeholder="Enter city"
+                  placeholder={t('accountSettings.personalInfo.modals.cityPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-black">Address</label>
+                <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.address')}</label>
                 <input
                   type="text"
                   value={locationData.address}
@@ -2473,20 +2475,20 @@ const AccountSettingsOrganizer = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleLocationSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -2499,7 +2501,7 @@ const AccountSettingsOrganizer = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPasswordSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Change Password</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
                 {passwordError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {passwordError}
@@ -2510,32 +2512,32 @@ const AccountSettingsOrganizer = () => {
             {!showPasswordSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Current Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.currentPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    placeholder="Enter current password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.currentPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">New Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.newPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="Enter new password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.newPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Confirm New Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.confirmPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    placeholder="Confirm new password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.confirmPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
@@ -2551,20 +2553,20 @@ const AccountSettingsOrganizer = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.loginSecurity.modals.changePassword.cancel')}
                 </button>
                 <button
                   onClick={handlePasswordSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.loginSecurity.modals.changePassword.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.loginSecurity.modals.changePassword.success')}</p>
               </div>
             )}
           </div>
@@ -2584,9 +2586,9 @@ const AccountSettingsOrganizer = () => {
             <div className="p-6">
               {!showDeleteRoleSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Confirm Deletion</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('accountSettings.teamRoles.roles.actions.confirmDelete')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to delete <span className="font-semibold text-black">{roleToDelete.name}</span> ?
+                    {t('accountSettings.teamRoles.roles.actions.deleteDescription')} <span className="font-semibold text-black">{roleToDelete.name}</span>
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -2597,7 +2599,7 @@ const AccountSettingsOrganizer = () => {
                       }}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('accountSettings.personalInfo.modals.cancel')}
                     </button>
                     <button
                       onClick={async () => {
@@ -2620,14 +2622,14 @@ const AccountSettingsOrganizer = () => {
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Confirm
+                      {t('accountSettings.teamRoles.memberDetails.confirm')}
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Role successfully deleted</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.roles.actions.deleteSuccess')}</p>
                 </div>
               )}
             </div>
@@ -2648,9 +2650,9 @@ const AccountSettingsOrganizer = () => {
             <div className="p-6">
               {!showRemoveMemberSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Confirm Deletion</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('accountSettings.teamRoles.roles.actions.confirmDelete')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to remove <span className="font-semibold text-black">{memberToRemove.name}</span> ?
+                    {t('accountSettings.teamRoles.roles.actions.deleteDescription')} <span className="font-semibold text-black">{memberToRemove.name}</span>
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -2661,7 +2663,7 @@ const AccountSettingsOrganizer = () => {
                       }}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('accountSettings.personalInfo.modals.cancel')}
                     </button>
                     <button
                       onClick={() => {
@@ -2676,14 +2678,14 @@ const AccountSettingsOrganizer = () => {
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Confirm
+                      {t('accountSettings.teamRoles.memberDetails.confirm')}
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Member successfully removed</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.team.invite.success')}</p>
                 </div>
               )}
             </div>
@@ -2713,7 +2715,7 @@ const AccountSettingsOrganizer = () => {
             {/* Back to Team Members Button - Styled like Create Event but without shadow and icon */}
             <button
               onClick={handleBackToTeamMembers}
-              className="flex items-center justify-center pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white text-sm font-medium rounded-full transition-all whitespace-nowrap mx-auto"
+              className="flex items-center justify-center ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white text-sm font-medium rounded-full transition-all whitespace-nowrap mx-auto"
             >
               Back to Team Members
             </button>
@@ -2820,13 +2822,13 @@ const AccountSettingsOrganizer = () => {
                         setIsRemoveMemberConfirmOpen(true);
                         setSelectedMember(null);
                       }}
-                      className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
+                      className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
                       Remove
                     </button>
                     <button
                       onClick={handleOpenChangeRole}
-                      className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                      className="ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
                       Change role
@@ -2865,12 +2867,12 @@ const AccountSettingsOrganizer = () => {
           >
             {!showChangeRoleSuccess && !showChangeRoleError ? (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-black mb-6">Change Role</h2>
+                <h2 className="text-xl font-bold text-black mb-6">{t('accountSettings.teamRoles.memberDetails.changeRole')}</h2>
 
                 {/* Current Role - Read Only */}
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-black mb-2">
-                    Current role
+                    {t('accountSettings.teamRoles.memberDetails.currentRole')}
                   </label>
                   <input
                     type="text"
@@ -2883,15 +2885,15 @@ const AccountSettingsOrganizer = () => {
                 {/* New Role - Dropdown */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-black mb-2">
-                    New role
+                    {t('accountSettings.teamRoles.memberDetails.newRole')}
                   </label>
                   <div className="relative" ref={newRoleDropdownRef}>
                     <button
                       onClick={() => setIsNewRoleDropdownOpen(!isNewRoleDropdownOpen)}
-                      className="w-full px-4 py-2 bg-white border border-light-gray rounded-lg text-sm text-left flex items-center justify-between hover:border-primary transition-all cursor-pointer"
+                      className="w-full px-4 py-2 bg-white border border-light-gray rounded-lg text-sm text-start flex items-center justify-between hover:border-primary transition-all cursor-pointer"
                     >
                       <span className={changeRoleData.newRole ? 'text-black' : 'text-input-gray'}>
-                        {changeRoleData.newRole || 'Select a role'}
+                        {changeRoleData.newRole || t('accountSettings.teamRoles.memberDetails.newRolePlaceholder')}
                       </span>
                       <svg 
                         className={`w-4 h-4 text-gray transition-transform ${isNewRoleDropdownOpen ? 'rotate-180' : ''}`} 
@@ -2909,7 +2911,7 @@ const AccountSettingsOrganizer = () => {
                           <button
                             key={role.id}
                             onClick={() => handleNewRoleSelect(role.name)}
-                            className="w-full px-4 py-2 text-sm text-left hover:bg-secondary-light transition-colors cursor-pointer text-black"
+                            className="w-full px-4 py-2 text-sm text-start hover:bg-secondary-light transition-colors cursor-pointer text-black"
                           >
                             {role.name}
                           </button>
@@ -2925,7 +2927,7 @@ const AccountSettingsOrganizer = () => {
                     onClick={handleCancelChangeRole}
                     className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                   >
-                    Cancel
+                    {t('accountSettings.teamRoles.memberDetails.cancel')}
                   </button>
                   <button
                     onClick={handleConfirmChangeRole}
@@ -2937,7 +2939,7 @@ const AccountSettingsOrganizer = () => {
                     }`}
                     style={changeRoleData.newRole ? { boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' } : {}}
                   >
-                    Confirm
+                    {t('accountSettings.teamRoles.memberDetails.confirm')}
                   </button>
                 </div>
               </div>
@@ -2950,7 +2952,7 @@ const AccountSettingsOrganizer = () => {
                     className="w-16 h-16 mb-4" 
                     style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} 
                   />
-                  <p className="text-lg font-semibold text-black">Role changed successfully</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.memberDetails.success')}</p>
                 </div>
               </div>
             ) : (

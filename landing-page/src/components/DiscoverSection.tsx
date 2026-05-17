@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 
 /* ------------------------------------------------------------------ */
@@ -24,14 +25,15 @@ const CITIES = [
 type City = (typeof CITIES)[number];
 
 const CATEGORIES = [
-  "All Categories",
-  "Music",
-  "Sports",
-  "Food & Drink",
-  "Art & Performance",
+  { key: "all", label: "All Categories" },
+  { key: "music", label: "Music" },
+  { key: "sports", label: "Sports" },
+  { key: "foodDrink", label: "Food & Drink" },
+  { key: "artPerformance", label: "Art & Performance" },
 ] as const;
 
-type Category = (typeof CATEGORIES)[number];
+type CategoryKey = (typeof CATEGORIES)[number]["key"];
+type Category = (typeof CATEGORIES)[number]["label"];
 
 interface DiscoverEvent {
   id: number;
@@ -97,8 +99,13 @@ interface DiscoverSectionProps {
 /* ------------------------------------------------------------------ */
 
 const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
+  const t = useTranslations("landing.discover");
   const [selectedCity, setSelectedCity] = useState<City>("California");
-  const [activeCategory, setActiveCategory] = useState<Category>("All Categories");
+  const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("all");
+  const activeCategory = useMemo<Category>(
+    () => CATEGORIES.find((c) => c.key === activeCategoryKey)!.label,
+    [activeCategoryKey]
+  );
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -143,7 +150,7 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
     <section className="w-full flex flex-col items-center pt-10 pb-6 bg-white">
       {/* Heading — city name is dynamic */}
       <h2 className="text-2xl md:text-3xl text-center text-black mb-8">
-        <span className="font-bold">Discover</span> events in{" "}
+        <span className="font-bold">{t("headingPrefix")}</span> {t("headingMiddle")}{" "}
         <span className="font-bold">{selectedCity}</span>
       </h2>
 
@@ -160,12 +167,12 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
             {/* Location icon — moved to far left, slightly larger */}
             <Image
               src="/svgs/landingPage/location.svg"
-              alt="Location"
+              alt={t("locationAlt")}
               width={38}
               height={38}
-              className="shrink-0 -ml-1"
+              className="shrink-0 -ms-1"
             />
-            <span className="text-sm font-medium text-black flex-1 text-left">
+            <span className="text-sm font-medium text-black flex-1 text-start">
               {selectedCity}
             </span>
             <svg
@@ -191,7 +198,7 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
           {isCityDropdownOpen && (
             <ul
               role="listbox"
-              className="absolute top-full left-0 mt-2 w-full bg-white border border-light-gray rounded-xl shadow-lg z-30 py-1 max-h-[280px] overflow-y-auto"
+              className="absolute top-full start-0 mt-2 w-full bg-white border border-light-gray rounded-xl shadow-lg z-30 py-1 max-h-[280px] overflow-y-auto"
             >
               {CITIES.map((city) => (
                 <li
@@ -219,15 +226,15 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
         <div className="flex items-center gap-2 flex-wrap">
           {CATEGORIES.map((category) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
+              key={category.key}
+              onClick={() => setActiveCategoryKey(category.key)}
               className={`px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200 cursor-pointer ${
-                activeCategory === category
+                activeCategoryKey === category.key
                   ? "bg-black text-white"
                   : "bg-white text-black border border-light-gray hover:bg-secondary-light"
               }`}
             >
-              {category}
+              {t(`categories.${category.key}`)}
             </button>
           ))}
         </div>
@@ -252,8 +259,8 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
                 {/* Category badge overlay */}
-                <span className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-black/60 text-white rounded-full backdrop-blur-sm">
-                  {event.category}
+                <span className="absolute top-3 start-3 px-3 py-1 text-xs font-medium bg-black/60 text-white rounded-full backdrop-blur-sm">
+                  {t(`categories.${CATEGORIES.find((c) => c.label === event.category)!.key}`)}
                 </span>
               </div>
 
@@ -265,7 +272,7 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
                 {event.date} • {event.venue}
               </p>
               <span className="text-sm font-semibold text-black">
-                from {event.price}
+                {t("fromPrice", { price: event.price })}
               </span>
             </div>
           ))}
@@ -274,7 +281,7 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
         {/* Empty state */}
         {filteredEvents.length === 0 && (
           <p className="text-center text-medium-gray py-12 text-sm">
-            No events found in this category.
+            {t("empty")}
           </p>
         )}
       </div>

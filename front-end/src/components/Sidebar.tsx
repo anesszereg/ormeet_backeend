@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import MyTicketIcon from '../assets/Svgs/sidbar/Myticket.svg';
 import FavouriteIcon from '../assets/Svgs/sidbar/favourite.svg';
 import FollowingIcon from '../assets/Svgs/sidbar/following.svg';
@@ -14,6 +15,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: SidebarProps) => {
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleCollapse = () => {
@@ -23,10 +25,10 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
   };
 
   const menuItems = [
-    { id: 'my-tickets', label: 'My tickets', icon: MyTicketIcon },
-    { id: 'favorite-events', label: 'Favorite events', icon: FavouriteIcon },
-    { id: 'following', label: 'Following', icon: FollowingIcon },
-    { id: 'account-settings', label: 'Account settings', icon: SettingsIcon },
+    { id: 'my-tickets', label: t('sidebar.myTickets'), icon: MyTicketIcon },
+    { id: 'favorite-events', label: t('sidebar.favoriteEvents'), icon: FavouriteIcon },
+    { id: 'following', label: t('sidebar.following'), icon: FollowingIcon },
+    { id: 'account-settings', label: t('sidebar.accountSettings'), icon: SettingsIcon },
   ];
 
   return (
@@ -39,12 +41,12 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
     >
       {/* Header section: "Your Dashboard" title + toggle button */}
       {/* Height: 64px to match navbar, padding for alignment and border spacing */}
-      <div className="h-16 pl-6 flex items-center justify-between border-b border-[#EEEEEE] ">
+      <div className="h-16 ps-6 flex items-center justify-between border-b border-[#EEEEEE] ">
         {/* Container for perfect vertical alignment */}
         <div className="flex items-center justify-between w-full">
           {/* Title: only visible when sidebar is expanded */}
           {!isCollapsed && (
-            <h2 className="text-base font-semibold text-black">Your Dashboard</h2>
+            <h2 className="text-base font-semibold text-black">{t('sidebar.title')}</h2>
           )}
 
           {/* Toggle button: switches between collapse/expand states */}
@@ -52,7 +54,7 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
           <button
             onClick={handleToggleCollapse}
             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EEEEEE] transition-all cursor-pointer"
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={isCollapsed ? t('sidebar.expandAria') : t('sidebar.collapseAria')}
           >
             {isCollapsed ? (
               // Circle arrow pointing right (expand)
@@ -80,13 +82,13 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
           /* Search input when expanded */
           <div className="relative">
             {/* Search icon: positioned at left side of input, 32x32px */}
-            <div className="absolute left-1 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="absolute start-1 top-1/2 -translate-y-1/2 pointer-events-none">
               <img src={RechercheIcon} alt="Search" className="w-8 h-8" />
             </div>
             <input
               type="text"
-              placeholder="Search"
-              className="w-full pl-10 pr-4 py-2 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
+              placeholder={t('sidebar.searchPlaceholder')}
+              className="w-full ps-10 pe-4 py-2 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
               style={{ borderRadius: '85.41px' }}
             />
           </div>
@@ -111,7 +113,7 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
                 {/* Active indicator: orange vertical bar on the left */}
                 {/* Size: W:4px H:24px, positioned at left edge */}
                 {activeTab === item.id && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#FF4000] rounded-r" />
+                  <div className="absolute start-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#FF4000] rounded-r" />
                 )}
 
                 {/* Icon: 20x20px, maintains original size when collapsed */}

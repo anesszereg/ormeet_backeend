@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import organizerService, { Attendee as ApiAttendee, Event as ApiEvent } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
@@ -37,9 +38,10 @@ interface Event {
 }
 
 const AttendeesTable = () => {
+  const { t } = useTranslation('organizer');
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState('Newest First');
+  const [sortOption, setSortOption] = useState<string>(t('attendees.sortOptions.newest'));
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -354,13 +356,13 @@ const AttendeesTable = () => {
     }
 
     return (
-      <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
+      <div className="absolute end-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={handleMonthSelect}
             className="text-xs text-primary hover:text-primary-dark font-medium transition-colors cursor-pointer"
           >
-            Select Month
+            {t('attendees.calendar.selectMonth')}
           </button>
           {(selectedStartDate || selectedEndDate) && (
             <button
@@ -370,7 +372,7 @@ const AttendeesTable = () => {
               }}
               className="text-xs text-gray hover:text-black font-medium transition-colors cursor-pointer"
             >
-              Clear
+              {t('attendees.calendar.clear')}
             </button>
           )}
         </div>
@@ -397,7 +399,7 @@ const AttendeesTable = () => {
         </div>
 
         <div className="grid grid-cols-7 gap-1 mb-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {[t('createEvent.calendar.sun'), t('createEvent.calendar.mon'), t('createEvent.calendar.tue'), t('createEvent.calendar.wed'), t('createEvent.calendar.thu'), t('createEvent.calendar.fri'), t('createEvent.calendar.sat')].map(day => (
             <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray">
               {day}
             </div>
@@ -414,45 +416,45 @@ const AttendeesTable = () => {
   return (
     <div className="w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">Attendees</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('attendees.title')}</h1>
         
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsExportModalOpen(true)}
-            className="relative flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+            className="relative flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
           >
-            <img src={ExportIcon} alt="Export" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-            <span>Export</span>
+            <img src={ExportIcon} alt="Export" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+            <span>{t('attendees.export')}</span>
           </button>
           <button
             onClick={() => setIsAddAttendeeModalOpen(true)}
-            className="relative flex items-center gap-2 pl-11 pr-5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+            className="relative flex items-center gap-2 ps-11 pe-5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
           >
-            <img src={CreateEventIcon} alt="Add" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-            <span>Add Attendee</span>
+            <img src={CreateEventIcon} alt="Add" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+            <span>{t('attendees.addAttendee')}</span>
           </button>
         </div>
       </div>
 
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
         <h2 className="text-sm sm:text-base font-semibold text-black">
-          {filteredAttendees.length} Attendees
+          {t('attendees.count', { count: filteredAttendees.length })}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <input
               type="text"
-              placeholder="Search by name or email"
+              placeholder={t('attendees.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-[190px] lg:w-[220px] h-[38px] pl-4 pr-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
+              className="w-full sm:w-[190px] lg:w-[220px] h-[38px] ps-4 pe-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
             />
             <img 
               src={SearchIcon} 
               alt="Search" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
             />
           </div>
 
@@ -463,9 +465,9 @@ const AttendeesTable = () => {
                 setIsDatePickerOpen(false);
                 setIsFilterOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[150px] lg:w-[160px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[150px] lg:w-[160px] h-[38px] rounded-full"
             >
-              <img src={NewestIcon} alt="Sort" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={NewestIcon} alt="Sort" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">{sortOption}</span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -473,15 +475,15 @@ const AttendeesTable = () => {
             </button>
             
             {isSortOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
+              <div className="absolute end-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
+                {[t('attendees.sortOptions.newest'), t('attendees.sortOptions.oldest'), t('attendees.sortOptions.az')].map((option) => (
                   <button
                     key={option}
                     onClick={() => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                    className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-primary-light text-primary font-medium'
                         : 'text-gray hover:bg-secondary-light'
@@ -501,15 +503,15 @@ const AttendeesTable = () => {
                 setIsSortOpen(false);
                 setIsFilterOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[145px] sm:w-[160px] lg:w-[175px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[145px] sm:w-[160px] lg:w-[175px] h-[38px] rounded-full"
             >
-              <img src={AllDateIcon} alt="Date" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={AllDateIcon} alt="Date" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">
                 {selectedStartDate && selectedEndDate
                   ? `${selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${selectedEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
                   : selectedStartDate
                   ? selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : 'All Date'}
+                  : t('attendees.dateFilter')}
               </span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -526,27 +528,27 @@ const AttendeesTable = () => {
                 setIsSortOpen(false);
                 setIsDatePickerOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[100px] sm:w-[110px] lg:w-[120px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[100px] sm:w-[110px] lg:w-[120px] h-[38px] rounded-full"
             >
               <img 
                 src={isFilterOpen ? FilterOnClickIcon : FilterIcon} 
                 alt="Filter" 
-                className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" 
+                className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" 
               />
-              <span className="text-sm font-medium text-gray truncate flex-1">Filter</span>
+              <span className="text-sm font-medium text-gray truncate flex-1">{t('attendees.filterButton')}</span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
             
             {isFilterOpen && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-lg border border-light-gray z-50">
+              <div className="absolute end-0 top-full mt-2 w-80 bg-white rounded-2xl shadow-lg border border-light-gray z-50">
                 <div className="p-4">
                   <div className="flex gap-8">
                     <div className="flex-1">
-                      <h3 className="text-sm font-semibold text-black mb-3">Ticket Type</h3>
+                      <h3 className="text-sm font-semibold text-black mb-3">{t('attendees.filter.ticketType')}</h3>
                       <div className="space-y-2">
-                      {['VIP', 'General', 'Early Bird'].map((type) => (
+                      {[t('attendees.filter.vip'), t('attendees.filter.general'), t('attendees.filter.earlyBird')].map((type) => (
                         <label key={type} className="flex items-center gap-2 cursor-pointer">
                           <input
                             type="checkbox"
@@ -562,11 +564,11 @@ const AttendeesTable = () => {
                     </div>
                     
                     <div className="flex-1">
-                      <h3 className="text-sm font-semibold text-black mb-3">Check-In Status</h3>
+                      <h3 className="text-sm font-semibold text-black mb-3">{t('attendees.filter.status')}</h3>
                       <div className="space-y-2">
                       {[
-                        { value: 'checked-in', label: 'Checked-in' },
-                        { value: 'not-checked-in', label: 'Not Checked-in' }
+                        { value: 'checked-in', label: t('attendees.filter.checkedIn') },
+                        { value: 'not-checked-in', label: t('attendees.filter.notCheckedIn') }
                       ].map((status) => (
                         <label key={status.value} className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -585,7 +587,7 @@ const AttendeesTable = () => {
 
                   <div className="mt-6 pt-4 border-t border-light-gray">
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-sm font-medium text-gray">Or by event</p>
+                      <p className="text-sm font-medium text-gray">{t('attendees.filter.byEvent')}</p>
                       <button
                         onClick={() => {
                           setIsEventModalOpen(true);
@@ -593,7 +595,7 @@ const AttendeesTable = () => {
                         }}
                         className="text-xs font-bold text-gray hover:text-primary transition-colors cursor-pointer"
                       >
-                        See all
+                        {t('attendees.filter.seeAll')}
                       </button>
                     </div>
                     {selectedEvent && (
@@ -619,13 +621,13 @@ const AttendeesTable = () => {
                       }}
                       className="text-sm text-gray hover:text-black transition-colors cursor-pointer"
                     >
-                      Clear all
+                      {t('attendees.filter.clearAll')}
                     </button>
                     <button
                       onClick={() => setIsFilterOpen(false)}
                       className="px-6 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
                     >
-                      Show {filteredAttendees.length} Attendees
+                      {t('attendees.filter.showAttendees', { count: filteredAttendees.length })}
                     </button>
                   </div>
                 </div>
@@ -637,18 +639,18 @@ const AttendeesTable = () => {
 
       <div className="bg-white border border-light-gray rounded-xl overflow-hidden">
         <div className="hidden md:grid grid-cols-12 gap-4 px-4 lg:px-6 py-4 bg-secondary-light border-b border-light-gray">
-          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">Attendee Name</div>
-          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">Email</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Event</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Ticket Type</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Status</div>
+          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">{t('attendees.table.headers.name')}</div>
+          <div className="col-span-3 text-xs lg:text-sm font-semibold text-gray">{t('attendees.table.headers.email')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('attendees.table.headers.event')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('attendees.table.headers.ticketType')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('attendees.table.headers.status')}</div>
         </div>
 
         <div className="divide-y divide-light-gray">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-sm text-gray">Loading attendees...</p>
+              <p className="text-sm text-gray">{t('attendees.loading')}</p>
             </div>
           ) : currentAttendees.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -657,9 +659,9 @@ const AttendeesTable = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">No attendees yet</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('attendees.empty.title')}</h3>
               <p className="text-sm text-gray-500 text-center max-w-sm">
-                Attendees will appear here when they check in to your events.
+                {t('attendees.empty.description')}
               </p>
             </div>
           ) : (
@@ -686,7 +688,7 @@ const AttendeesTable = () => {
                 <span className="text-sm font-medium text-black">{attendee.name}</span>
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:hidden pl-13 text-xs">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:hidden ps-13 text-xs">
                 <span className="text-gray">{attendee.email}</span>
                 <span className="text-gray">{attendee.eventName}</span>
                 <span className="font-semibold text-black">{attendee.ticketType}</span>
@@ -694,13 +696,13 @@ const AttendeesTable = () => {
                   {attendee.status === 'checked-in' && (
                     <>
                       <img src={CheckedInIcon} alt="Checked-in" className="w-3 h-3" />
-                      <span className="font-medium text-[#10B981]">Checked-in</span>
+                      <span className="font-medium text-[#10B981]">{t('attendees.table.status.checkedIn')}</span>
                     </>
                   )}
                   {attendee.status === 'not-checked-in' && (
                     <>
                       <img src={NotCheckedInIcon} alt="Not Checked-in" className="w-3 h-3" />
-                      <span className="font-medium text-[#EF4444]">Not Checked-in</span>
+                      <span className="font-medium text-[#EF4444]">{t('attendees.table.status.notCheckedIn')}</span>
                     </>
                   )}
                 </div>
@@ -722,13 +724,13 @@ const AttendeesTable = () => {
                 {attendee.status === 'checked-in' && (
                   <div className="inline-flex items-center gap-2">
                     <img src={CheckedInIcon} alt="Checked-in" className="w-4 h-4" />
-                    <span className="text-xs lg:text-sm font-medium text-[#10B981]">Checked-in</span>
+                    <span className="text-xs lg:text-sm font-medium text-[#10B981]">{t('attendees.table.status.checkedIn')}</span>
                   </div>
                 )}
                 {attendee.status === 'not-checked-in' && (
                   <div className="inline-flex items-center gap-2">
                     <img src={NotCheckedInIcon} alt="Not Checked-in" className="w-4 h-4" />
-                    <span className="text-xs lg:text-sm font-medium text-[#EF4444]">Not Checked-in</span>
+                    <span className="text-xs lg:text-sm font-medium text-[#EF4444]">{t('attendees.table.status.notCheckedIn')}</span>
                   </div>
                 )}
               </div>
@@ -741,7 +743,7 @@ const AttendeesTable = () => {
       {filteredAttendees.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
           <p className="text-xs sm:text-sm text-gray order-2 sm:order-1">
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredAttendees.length)} of {filteredAttendees.length} Attendees
+            {t('attendees.pagination.showing', { start: startIndex + 1, end: Math.min(endIndex, filteredAttendees.length), total: filteredAttendees.length })}
           </p>
           
           <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
@@ -818,7 +820,7 @@ const AttendeesTable = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <h2 className="text-xl font-bold text-black">Select Event</h2>
+              <h2 className="text-xl font-bold text-black">{t('attendees.modal.selectEvent')}</h2>
               <button 
                 onClick={() => setIsEventModalOpen(false)}
                 className="text-gray hover:text-black transition-colors cursor-pointer"
@@ -848,7 +850,7 @@ const AttendeesTable = () => {
                       className="w-16 h-16 rounded-lg object-cover shrink-0"
                     />
                     
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-start">
                       <h3 className="text-sm font-semibold text-black mb-1">{event.name}</h3>
                       <div className="flex items-center gap-3 text-xs text-gray">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-medium ${
@@ -859,7 +861,7 @@ const AttendeesTable = () => {
                         }`}>
                           {event.status.charAt(0).toUpperCase() + event.status.slice(1)}
                         </span>
-                        <span>Created: {event.createdDate}</span>
+                        <span>{t('attendees.modal.created', { date: event.createdDate })}</span>
                       </div>
                     </div>
 
@@ -890,7 +892,7 @@ const AttendeesTable = () => {
               <>
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <h2 className="text-xl font-bold text-black">Attendee Details</h2>
+              <h2 className="text-xl font-bold text-black">{t('attendees.detailsModal.title')}</h2>
               <button 
                 onClick={() => setSelectedAttendee(null)}
                 className="text-gray hover:text-black transition-colors cursor-pointer"
@@ -926,25 +928,25 @@ const AttendeesTable = () => {
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Email */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Email</p>
+                    <p className="text-xs text-gray mb-1">{t('attendees.detailsModal.email')}</p>
                     <p className="text-sm text-black">{selectedAttendee.email}</p>
                   </div>
 
                   {/* Registration Date */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Registration Date</p>
+                    <p className="text-xs text-gray mb-1">{t('attendees.detailsModal.registrationDate')}</p>
                     <p className="text-sm text-black">{selectedAttendee.registrationDate}</p>
                   </div>
 
                   {/* Event Name */}
                   <div className="sm:col-span-2">
-                    <p className="text-xs text-gray mb-1">Event</p>
+                    <p className="text-xs text-gray mb-1">{t('attendees.detailsModal.event')}</p>
                     <p className="text-sm font-medium text-black">{selectedAttendee.eventName}</p>
                   </div>
 
                   {/* Ticket Type */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Ticket Type</p>
+                    <p className="text-xs text-gray mb-1">{t('attendees.detailsModal.ticketType')}</p>
                     <span className="inline-block px-3 py-1 bg-secondary-light text-sm font-medium text-black rounded-full">
                       {selectedAttendee.ticketType}
                     </span>
@@ -952,16 +954,16 @@ const AttendeesTable = () => {
 
                   {/* Status */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Status</p>
+                    <p className="text-xs text-gray mb-1">{t('attendees.detailsModal.status')}</p>
                     {selectedAttendee.status === 'checked-in' ? (
                       <div className="inline-flex items-center gap-2">
                         <img src={CheckedInIcon} alt="Checked-in" className="w-4 h-4" />
-                        <span className="text-sm font-medium text-[#10B981]">Checked-in</span>
+                        <span className="text-sm font-medium text-[#10B981]">{t('attendees.table.status.checkedIn')}</span>
                       </div>
                     ) : (
                       <div className="inline-flex items-center gap-2">
                         <img src={NotCheckedInIcon} alt="Not Checked-in" className="w-4 h-4" />
-                        <span className="text-sm font-medium text-[#EF4444]">Not Checked-in</span>
+                        <span className="text-sm font-medium text-[#EF4444]">{t('attendees.table.status.notCheckedIn')}</span>
                       </div>
                     )}
                   </div>
@@ -974,9 +976,9 @@ const AttendeesTable = () => {
                   <button
                     onClick={() => handleCheckIn(selectedAttendee)}
                     disabled={isCheckingIn}
-                    className="pl-5 pr-5 py-2 bg-[#10B981] hover:bg-[#059669] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
+                    className="ps-5 pe-5 py-2 bg-[#10B981] hover:bg-[#059669] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                   >
-                    {isCheckingIn ? 'Checking in...' : 'Check In'}
+                    {isCheckingIn ? t('attendees.detailsModal.actions.checkingIn') : t('attendees.detailsModal.actions.checkIn')}
                   </button>
                 )}
                 <button
@@ -984,9 +986,9 @@ const AttendeesTable = () => {
                     setAttendeeToDelete(selectedAttendee);
                     setIsDeleteConfirmOpen(true);
                   }}
-                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
+                  className="ps-5 pe-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Delete
+                  {t('attendees.detailsModal.actions.delete')}
                 </button>
                 <button
                   onClick={() => {
@@ -996,10 +998,10 @@ const AttendeesTable = () => {
                       setSelectedAttendee(null);
                     }, 3000);
                   }}
-                  className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
+                  className="ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Resend Ticket
+                  {t('attendees.detailsModal.actions.resendTicket')}
                 </button>
               </div>
             </div>
@@ -1008,14 +1010,14 @@ const AttendeesTable = () => {
               <div className="p-6">
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Ticket resent successfully</p>
+                  <p className="text-lg font-semibold text-black">{t('attendees.resend.success')}</p>
                 </div>
               </div>
             ) : (
               <div className="p-6">
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={ErrorIcon} alt="Error" className="w-16 h-16 mb-4" />
-                  <p className="text-lg font-semibold text-black">Failed to resend ticket. Please try again</p>
+                  <p className="text-lg font-semibold text-black">{t('attendees.resend.error')}</p>
                 </div>
               </div>
             )}
@@ -1036,9 +1038,9 @@ const AttendeesTable = () => {
             <div className="p-6">
               {!showDeleteSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Confirm Deletion</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('attendees.deleteModal.title')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to delete <span className="font-semibold text-black">{attendeeToDelete.name}</span> ?
+                    {t('attendees.deleteModal.description', { attendeeName: attendeeToDelete.name })}
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -1049,7 +1051,7 @@ const AttendeesTable = () => {
                       }}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('attendees.deleteModal.cancel')}
                     </button>
                     <button
                       onClick={() => {
@@ -1065,14 +1067,14 @@ const AttendeesTable = () => {
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      Confirm
+                      {t('attendees.deleteModal.confirm')}
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Attendee successfully deleted</p>
+                  <p className="text-lg font-semibold text-black">{t('attendees.deleteModal.success')}</p>
                 </div>
               )}
             </div>
