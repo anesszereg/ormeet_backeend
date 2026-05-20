@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ReviewsModal from '../components/ReviewsModal';
@@ -76,7 +77,10 @@ interface TrendingEventItem {
   image: string;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const EventDetailsGlobal = () => {
+  const { t, i18n } = useTranslation('attendee');
   const navigate = useNavigate();
   const { eventId } = useParams();
   const { user } = useAuth();
@@ -122,8 +126,8 @@ const EventDetailsGlobal = () => {
         // Build event data
         const startDate = new Date(event.startAt);
         const endDate = new Date(event.endAt);
-        const dateStr = startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = `${startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} – ${endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        const dateStr = startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = `${startDate.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })} – ${endDate.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })}`;
         const lowestPrice = event.ticketTypes?.reduce((min, tt) => Math.min(min, Number(tt.price)), Infinity) ?? 0;
         const venueAddress = event.customLocation
           ? `${event.customLocation.address}, ${event.customLocation.city}, ${event.customLocation.state} ${event.customLocation.zipCode}, ${event.customLocation.country}`
@@ -167,7 +171,7 @@ const EventDetailsGlobal = () => {
           id: r.id || i + 1,
           name: r.user?.name || 'Anonymous',
           avatar: r.user?.profilePhoto || `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
-          date: new Date(r.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+          date: new Date(r.createdAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
           rating: r.rating,
           comment: r.comment || '',
         }));
@@ -245,7 +249,7 @@ const EventDetailsGlobal = () => {
     setCurrentImageIndex(index);
   };
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = [t('eventDetails.dateTime.calendarDays.jan', 'January'), t('eventDetails.dateTime.calendarDays.feb', 'February'), t('eventDetails.dateTime.calendarDays.mar', 'March'), t('eventDetails.dateTime.calendarDays.apr', 'April'), t('eventDetails.dateTime.calendarDays.may', 'May'), t('eventDetails.dateTime.calendarDays.jun', 'June'), t('eventDetails.dateTime.calendarDays.jul', 'July'), t('eventDetails.dateTime.calendarDays.aug', 'August'), t('eventDetails.dateTime.calendarDays.sep', 'September'), t('eventDetails.dateTime.calendarDays.oct', 'October'), t('eventDetails.dateTime.calendarDays.nov', 'November'), t('eventDetails.dateTime.calendarDays.dec', 'December')];
 
   const handlePrevMonth = () => {
     if (selectedMonth === 1) {
@@ -271,7 +275,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      alert('Please login to add events to favorites');
+      alert(t('eventDetails.actions.loginToFavorite'));
       return;
     }
     if (!eventId) return;
@@ -289,7 +293,7 @@ const EventDetailsGlobal = () => {
       }
     } catch (err: any) {
       console.error('❌ Failed to toggle favorite:', err);
-      alert(err.response?.data?.message || 'Failed to update favorites');
+      alert(err.response?.data?.message || t('eventDetails.alerts.favoriteFailed'));
     } finally {
       setIsTogglingFavorite(false);
     }
@@ -297,7 +301,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFollow = async () => {
     if (!user) {
-      alert('Please login to follow organizers');
+      alert(t('eventDetails.organizer.loginToFollow'));
       return;
     }
     if (!eventData?.organizerId) return;
@@ -317,7 +321,7 @@ const EventDetailsGlobal = () => {
       }
     } catch (err: any) {
       console.error('❌ Failed to toggle follow:', err);
-      alert(err.response?.data?.message || 'Failed to update following status');
+      alert(err.response?.data?.message || t('eventDetails.alerts.followFailed'));
     } finally {
       setIsTogglingFollow(false);
     }
@@ -386,8 +390,8 @@ const EventDetailsGlobal = () => {
       <div className="flex flex-col min-h-screen w-full bg-white">
         <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex flex-col items-center justify-center flex-1 py-20">
-          <p className="text-red-500 mb-4">{error || 'Event not found'}</p>
-          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
+          <p className="text-red-500 mb-4">{error || t('eventDetails.error.notFound')}</p>
+          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">{t('eventDetails.error.goBack')}</button>
         </div>
       </div>
     );
@@ -416,8 +420,8 @@ const EventDetailsGlobal = () => {
             {/* Previous Image Button */}
             <button
               onClick={handlePrevImage}
-              className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
-              aria-label="Previous image"
+              className="absolute start-4 md:start-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
+              aria-label={t('eventDetails.actions.prevImage')}
             >
               <img src={PastImageIcon} alt="Previous" className="w-full h-full" />
             </button>
@@ -425,14 +429,14 @@ const EventDetailsGlobal = () => {
             {/* Next Image Button */}
             <button
               onClick={handleNextImage}
-              className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
-              aria-label="Next image"
+              className="absolute end-4 md:end-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
+              aria-label={t('eventDetails.actions.nextImage')}
             >
               <img src={NextImageIcon} alt="Next" className="w-full h-full" />
             </button>
 
             {/* Image Dots Indicator */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <div className="absolute bottom-4 start-1/2 -translate-x-1/2 flex items-center gap-2">
               {images.map((_, index) => (
                 <button
                   key={index}
@@ -442,7 +446,7 @@ const EventDetailsGlobal = () => {
                       ? 'bg-white w-3 h-3'
                       : 'bg-white/60 hover:bg-white/80'
                   }`}
-                  aria-label={`Go to image ${index + 1}`}
+                  aria-label={t('eventDetails.actions.goToImage', { number: index + 1 })}
                 />
               ))}
             </div>
@@ -470,7 +474,7 @@ const EventDetailsGlobal = () => {
                 <div className="flex items-center gap-1.5">
                   <img src={StarIcon} alt="Rating" className="w-5 h-5" />
                   <span className="text-sm font-semibold text-black">{eventData.rating.toFixed(1)}</span>
-                  <span className="text-sm text-[#757575]">• {eventData.reviewCount} reviews</span>
+                  <span className="text-sm text-[#757575]">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
                 </div>
                 
                 {/* Views */}
@@ -479,7 +483,7 @@ const EventDetailsGlobal = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
-                  <span className="text-sm text-[#757575]">{eventData.views.toLocaleString()} views</span>
+                  <span className="text-sm text-[#757575]">{eventData.views.toLocaleString()} {t('eventDetails.stats.views')}</span>
                 </div>
                 
                 {/* Favorites */}
@@ -487,7 +491,7 @@ const EventDetailsGlobal = () => {
                   <svg className="w-5 h-5 text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
-                  <span className="text-sm text-[#757575]">{eventData.favorites.toLocaleString()} favorites</span>
+                  <span className="text-sm text-[#757575]">{eventData.favorites.toLocaleString()} {t('eventDetails.stats.favorites')}</span>
                 </div>
 
                 {/* Action Buttons */}
@@ -496,8 +500,8 @@ const EventDetailsGlobal = () => {
                     onClick={handleToggleFavorite}
                     disabled={!user || isTogglingFavorite}
                     className="hover:scale-105 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                    title={!user ? "Login to add to favorites" : (isFavorite ? "Remove from favorites" : "Add to favorites")}
+                    aria-label={isFavorite ? t('eventDetails.actions.removeFromFavorites') : t('eventDetails.actions.addToFavorites')}
+                    title={!user ? t('eventDetails.actions.loginToFavorite') : (isFavorite ? t('eventDetails.actions.removeFromFavorites') : t('eventDetails.actions.addToFavorites'))}
                   >
                     {isFavorite ? (
                       <svg className="w-[42px] h-[42px] text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
@@ -509,7 +513,7 @@ const EventDetailsGlobal = () => {
                   </button>
                   <button 
                     className="hover:scale-105 transition-transform cursor-pointer"
-                    aria-label="Share event"
+                    aria-label={t('eventDetails.actions.shareEvent')}
                   >
                     <img src={UploadIcon} alt="Share" className="w-[42px] h-[42px]" />
                   </button>
@@ -518,7 +522,7 @@ const EventDetailsGlobal = () => {
 
               {/* Date & Time Section */}
               <div className="mb-6">
-                <h2 className="text-base font-bold text-black mb-2">Date & Time</h2>
+                <h2 className="text-base font-bold text-black mb-2">{t('eventDetails.dateTime.sectionTitle')}</h2>
                 <p className="text-sm text-black">
                   {eventData.date} <span className="text-[#757575] mx-2">|</span> {eventData.time}
                 </p>
@@ -526,7 +530,7 @@ const EventDetailsGlobal = () => {
                   onClick={() => setShowDateTimeSection(!showDateTimeSection)}
                   className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
                 >
-                  {showDateTimeSection ? 'Close Calendar' : 'Change date'}
+                  {showDateTimeSection ? t('eventDetails.dateTime.closeCalendar') : t('eventDetails.dateTime.changeDate')}
                 </button>
 
                 {/* Inline Calendar Section */}
@@ -567,7 +571,7 @@ const EventDetailsGlobal = () => {
                         <div>
                           {/* Day Headers */}
                           <div className="grid grid-cols-7 gap-1 mb-2">
-                            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                            {[t('eventDetails.dateTime.calendarDays.sun'), t('eventDetails.dateTime.calendarDays.mon'), t('eventDetails.dateTime.calendarDays.tue'), t('eventDetails.dateTime.calendarDays.wed'), t('eventDetails.dateTime.calendarDays.thu'), t('eventDetails.dateTime.calendarDays.fri'), t('eventDetails.dateTime.calendarDays.sat')].map((day) => (
                               <div key={day} className="h-10 flex items-center justify-center text-xs font-medium text-[#757575]">
                                 {day}
                               </div>
@@ -585,10 +589,10 @@ const EventDetailsGlobal = () => {
                       <div>
                         <div className="bg-[#F8F8F8] rounded-xl p-4">
                           <h3 className="text-sm font-semibold text-black mb-2">
-                            {timeSlots.length} time{timeSlots.length !== 1 ? 's' : ''} available for {new Date(selectedYear, selectedMonth - 1, selectedDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            {t('eventDetails.dateTime.timeSlotsAvailable', { count: timeSlots.length, date: new Date(selectedYear, selectedMonth - 1, selectedDate).toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'short', month: 'short', day: 'numeric' }) })}
                           </h3>
                           <p className="text-xs text-[#757575] mb-4">
-                            {timeSlots.length > 0 ? 'Please select a suitable time for your event from the options below.' : 'No time slots available for this date.'}
+                            {timeSlots.length > 0 ? t('eventDetails.dateTime.selectTime') : t('eventDetails.dateTime.noTimeSlots')}
                           </p>
 
                           {/* Time Slot Options */}
@@ -597,7 +601,7 @@ const EventDetailsGlobal = () => {
                               <button
                                 key={slot}
                                 onClick={() => handleTimeSlotSelect(slot)}
-                                className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-left transition-colors ${
+                                className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-start transition-colors ${
                                   selectedTimeSlot === slot
                                     ? 'bg-white text-black border-2 border-[#FF4000]'
                                     : 'bg-white text-black hover:bg-[#EEEEEE]'
@@ -616,7 +620,7 @@ const EventDetailsGlobal = () => {
 
               {/* Location Section */}
               <div className="mb-6">
-                <h2 className="text-base font-bold text-black mb-2">Location</h2>
+                <h2 className="text-base font-bold text-black mb-2">{t('eventDetails.location.sectionTitle')}</h2>
                 <p className="text-sm text-black">
                   {eventData.venue} <span className="text-[#757575] mx-2">|</span> 
                   <span className="text-[#4F4F4F]">{eventData.address}</span>
@@ -625,7 +629,7 @@ const EventDetailsGlobal = () => {
                   onClick={() => setShowLocationSection(!showLocationSection)}
                   className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
                 >
-                  {showLocationSection ? 'Close map' : 'See on map'}
+                  {showLocationSection ? t('eventDetails.location.closeMap') : t('eventDetails.location.seeOnMap')}
                 </button>
 
                 {/* Inline Map Section */}
@@ -640,12 +644,12 @@ const EventDetailsGlobal = () => {
                         allowFullScreen
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"
-                        title="Event location map"
+                        title={t('eventDetails.location.mapTitle')}
                         className="absolute inset-0"
                       />
 
                       {/* Map Controls */}
-                      <div className="absolute top-4 right-4 flex flex-col gap-2">
+                      <div className="absolute top-4 end-4 flex flex-col gap-2">
                         {/* Fullscreen button */}
                         <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors">
                           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -682,17 +686,17 @@ const EventDetailsGlobal = () => {
 
               {/* Event Rules & Guidelines Section */}
               <div className="mb-6">
-                <h2 className="text-lg font-bold text-black mb-6">Event rules & guidelines</h2>
+                <h2 className="text-lg font-bold text-black mb-6">{t('eventDetails.guidelines.sectionTitle')}</h2>
 
                 {/* Age Requirement */}
                 {(eventData.ageLimit || eventData.guidelines?.ageRequirement) && (
                   <div className="flex gap-3 mb-5">
                     <img src={AgePlusIcon} alt="Age requirement" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-1">Age requirement:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-1">{t('eventDetails.guidelines.ageRequirement.label')}</h3>
                       <p className="text-sm text-[#4F4F4F]">
                         {eventData.guidelines?.ageRequirement || 
-                         (eventData.ageLimit ? `This event is for guests aged ${eventData.ageLimit} and over. Valid ID required at entry.` : 'No age restriction')}
+                         (eventData.ageLimit ? t('eventDetails.guidelines.ageRequirement.defaultText', { age: eventData.ageLimit }) : t('eventDetails.guidelines.ageRequirement.noRestriction'))}
                       </p>
                     </div>
                   </div>
@@ -703,11 +707,11 @@ const EventDetailsGlobal = () => {
                   <div className="flex gap-3 mb-5">
                     <img src={EntryPolicyIcon} alt="Entry policy" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-1">Entry policy:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-1">{t('eventDetails.guidelines.entryPolicy.label')}</h3>
                       <p className="text-sm text-[#4F4F4F]">
                         {eventData.guidelines.entryPolicy}
                         {eventData.allowReentry !== undefined && (
-                          <span> {eventData.allowReentry ? 'Re-entry is allowed.' : 'No re-entry is allowed after leaving the venue.'}</span>
+                          <span> {eventData.allowReentry ? t('eventDetails.guidelines.entryPolicy.reentryAllowed') : t('eventDetails.guidelines.entryPolicy.noReentry')}</span>
                         )}
                       </p>
                     </div>
@@ -719,7 +723,7 @@ const EventDetailsGlobal = () => {
                   <div className="flex gap-3 mb-5">
                     <img src={AccessibilityIcon} alt="Accessibility" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-1">Accessibility:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-1">{t('eventDetails.guidelines.accessibility.label')}</h3>
                       <p className="text-sm text-[#4F4F4F]">{eventData.guidelines.accessibleInfo}</p>
                     </div>
                   </div>
@@ -730,10 +734,10 @@ const EventDetailsGlobal = () => {
                   <div className="flex gap-3 mb-5">
                     <img src={RefundPolicyIcon} alt="Refund policy" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-1">Refund policy:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-1">{t('eventDetails.guidelines.refundPolicy.label')}</h3>
                       <p className="text-sm text-[#4F4F4F]">
                         {eventData.guidelines?.refundPolicy || 
-                         (eventData.refundsAllowed ? 'Refunds are available according to our refund policy.' : 'All ticket sales are final. Refunds are only issued if the event is canceled.')}
+                         (eventData.refundsAllowed ? t('eventDetails.guidelines.refundPolicy.refundsAvailable') : t('eventDetails.guidelines.refundPolicy.noRefunds'))}
                       </p>
                     </div>
                   </div>
@@ -744,7 +748,7 @@ const EventDetailsGlobal = () => {
                   <div className="flex gap-3 mb-5">
                     <img src={ProhibitedItemsIcon} alt="Prohibited items" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-2">Prohibited items:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-2">{t('eventDetails.guidelines.prohibitedItems.label')}</h3>
                       <ul className="space-y-2">
                         {eventData.guidelines.prohibitedItems.map((item, index) => (
                           <li key={index} className="flex items-start gap-2">
@@ -762,7 +766,7 @@ const EventDetailsGlobal = () => {
                   <div className="flex gap-3">
                     <img src={AllowedItemsIcon} alt="Allowed items" className="w-6 h-6 shrink-0" />
                     <div>
-                      <h3 className="text-sm font-semibold text-black mb-2">Allowed items:</h3>
+                      <h3 className="text-sm font-semibold text-black mb-2">{t('eventDetails.guidelines.allowedItems.label')}</h3>
                       <ul className="space-y-2">
                         {eventData.guidelines.allowedItems.map((item, index) => (
                           <li key={index} className="flex items-start gap-2">
@@ -778,7 +782,7 @@ const EventDetailsGlobal = () => {
 
               {/* Meet Your Organiser Section */}
               <div className="mb-8">
-                <h2 className="text-lg font-bold text-black mb-4">Meet your <span className="font-bold">organiser</span></h2>
+                <h2 className="text-lg font-bold text-black mb-4">{t('eventDetails.organizer.sectionTitle')} <span className="font-bold">{t('eventDetails.organizer.sectionTitleBold')}</span></h2>
                 
                 <div className="bg-[#F0F8F7] rounded-2xl p-6">
                   {/* Organizer Header */}
@@ -789,7 +793,7 @@ const EventDetailsGlobal = () => {
                         <div className="w-16 h-16 rounded-full bg-black flex items-center justify-center overflow-hidden">
                           <span className="text-2xl font-bold text-[#00D9FF]">P</span>
                         </div>
-                        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#FF4000] rounded-full flex items-center justify-center">
+                        <div className="absolute -bottom-1 -end-1 w-6 h-6 bg-[#FF4000] rounded-full flex items-center justify-center">
                           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                             <path d="M4.66675 7.00004L6.41675 8.75004L9.91675 5.25004" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
@@ -815,16 +819,16 @@ const EventDetailsGlobal = () => {
                             ? 'bg-white text-black border border-black hover:bg-[#F8F8F8]' 
                             : 'bg-black text-white hover:bg-[#333333]'
                         }`}
-                        title={!user ? "Login to follow organizer" : (isFollowing ? "Unfollow" : "Follow")}
+                        title={!user ? t('eventDetails.organizer.loginToFollow') : (isFollowing ? t('eventDetails.organizer.following') : t('eventDetails.organizer.follow'))}
                       >
-                        {isFollowing ? 'Following' : 'Follow'}
+                        {isFollowing ? t('eventDetails.organizer.following') : t('eventDetails.organizer.follow')}
                       </button>
                       {eventData.organizerEmail && (
                         <a 
                           href={`mailto:${eventData.organizerEmail}`}
                           className="px-6 py-2.5 bg-white text-black text-sm font-medium rounded-full border border-black hover:bg-[#F8F8F8] transition-colors"
                         >
-                          Contact
+                          {t('eventDetails.organizer.contact')}
                         </a>
                       )}
                     </div>
@@ -833,7 +837,7 @@ const EventDetailsGlobal = () => {
                   {/* Description */}
                   {eventData.organizerName && (
                     <p className="text-sm text-[#4F4F4F] mb-4 leading-relaxed">
-                      {eventData.organizerName} is organizing this event.
+                      {t('eventDetails.organizer.isOrganizing', { name: eventData.organizerName })}
                     </p>
                   )}
 
@@ -849,7 +853,7 @@ const EventDetailsGlobal = () => {
                     <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                   <span className="text-lg font-bold text-black">{eventData.rating.toFixed(1)}</span>
-                  <span className="text-base text-[#4F4F4F]">• {eventData.reviewCount} reviews</span>
+                  <span className="text-base text-[#4F4F4F]">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
                 </div>
 
                 {/* Reviews Grid */}
@@ -878,16 +882,16 @@ const EventDetailsGlobal = () => {
                     </div>
                   ))}
                   {allReviews.length === 0 && (
-                    <p className="text-sm text-[#757575] col-span-2">No reviews yet. Be the first to review this event!</p>
+                    <p className="text-sm text-[#757575] col-span-2">{t('eventDetails.reviews.noReviews')}</p>
                   )}
                 </div>
 
                 {/* View All Reviews Button */}
                 <button 
                   onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center justify-between gap-3 pl-6 pr-2 py-2 bg-white text-black text-base font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors group"
+                  className="flex items-center justify-between gap-3 ps-6 pe-2 py-2 bg-white text-black text-base font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors group"
                 >
-                  <span>View all reviews</span>
+                  <span>{t('eventDetails.reviews.viewAll')}</span>
                   <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center transition-colors">
                     <img src={AllReviewsIcon} alt="View all" className="w-9 h-9" />
                   </div>
@@ -897,7 +901,7 @@ const EventDetailsGlobal = () => {
               {/* Got Questions? We've Got Answers Section */}
               <div className="mt-12 mb-8">
                 <h2 className="text-xl text-black text-center mb-8">
-                  Got <span className="font-bold">Questions?</span> We've Got <span className="font-bold">Answers</span>
+                  {t('eventDetails.faq.sectionTitle')} <span className="font-bold">{t('eventDetails.faq.sectionTitleBold1')}</span> {t('eventDetails.faq.sectionTitleMid')} <span className="font-bold">{t('eventDetails.faq.sectionTitleBold2')}</span>
                 </h2>
                 
                 <div className="space-y-3">
@@ -905,22 +909,22 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 0 ? null : 0)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-start cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-black">Can I get a refund if I can't attend?</span>
+                      <span className="text-sm font-semibold text-black">{t('eventDetails.faq.items.0.question')}</span>
                       <svg 
                         width="16" 
                         height="16" 
                         viewBox="0 0 16 16" 
                         fill="none" 
-                        className={`shrink-0 ml-4 transition-transform ${openFaqIndex === 0 ? 'rotate-180' : ''}`}
+                        className={`shrink-0 ms-4 transition-transform ${openFaqIndex === 0 ? 'rotate-180' : ''}`}
                       >
                         <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {openFaqIndex === 0 && (
                       <div className="px-5 pb-4 pt-2 text-sm text-[#4F4F4F] leading-relaxed">
-                        Refunds are available up to 48 hours before the event starts. After this period, tickets are non-refundable. Please contact our support team for assistance.
+                        {t('eventDetails.faq.items.0.answer')}
                       </div>
                     )}
                   </div>
@@ -929,22 +933,22 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 1 ? null : 1)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-start cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-black">Will there be security at the event?</span>
+                      <span className="text-sm font-semibold text-black">{t('eventDetails.faq.items.1.question')}</span>
                       <svg 
                         width="16" 
                         height="16" 
                         viewBox="0 0 16 16" 
                         fill="none" 
-                        className={`shrink-0 ml-4 transition-transform ${openFaqIndex === 1 ? 'rotate-180' : ''}`}
+                        className={`shrink-0 ms-4 transition-transform ${openFaqIndex === 1 ? 'rotate-180' : ''}`}
                       >
                         <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {openFaqIndex === 1 && (
                       <div className="px-5 pb-4 pt-2 text-sm text-[#4F4F4F] leading-relaxed">
-                        Yes, professional security personnel will be present throughout the event to ensure everyone's safety. Bag checks will be conducted at entry points.
+                        {t('eventDetails.faq.items.1.answer')}
                       </div>
                     )}
                   </div>
@@ -953,22 +957,22 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 2 ? null : 2)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-start cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-black">Can I buy tickets at the door?</span>
+                      <span className="text-sm font-semibold text-black">{t('eventDetails.faq.items.2.question')}</span>
                       <svg 
                         width="16" 
                         height="16" 
                         viewBox="0 0 16 16" 
                         fill="none" 
-                        className={`shrink-0 ml-4 transition-transform ${openFaqIndex === 2 ? 'rotate-180' : ''}`}
+                        className={`shrink-0 ms-4 transition-transform ${openFaqIndex === 2 ? 'rotate-180' : ''}`}
                       >
                         <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {openFaqIndex === 2 && (
                       <div className="px-5 pb-4 pt-2 text-sm text-[#4F4F4F] leading-relaxed">
-                        Tickets may be available at the door subject to availability. However, we strongly recommend purchasing tickets online in advance to guarantee entry.
+                        {t('eventDetails.faq.items.2.answer')}
                       </div>
                     )}
                   </div>
@@ -977,22 +981,22 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 3 ? null : 3)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-start cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-black">Is there a lost and found service for lost items?</span>
+                      <span className="text-sm font-semibold text-black">{t('eventDetails.faq.items.3.question')}</span>
                       <svg 
                         width="16" 
                         height="16" 
                         viewBox="0 0 16 16" 
                         fill="none" 
-                        className={`shrink-0 ml-4 transition-transform ${openFaqIndex === 3 ? 'rotate-180' : ''}`}
+                        className={`shrink-0 ms-4 transition-transform ${openFaqIndex === 3 ? 'rotate-180' : ''}`}
                       >
                         <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {openFaqIndex === 3 && (
                       <div className="px-5 pb-4 pt-2 text-sm text-[#4F4F4F] leading-relaxed">
-                        Yes, we have a dedicated lost and found station at the venue. If you lose an item, please visit the information desk or contact us after the event.
+                        {t('eventDetails.faq.items.3.answer')}
                       </div>
                     )}
                   </div>
@@ -1001,22 +1005,22 @@ const EventDetailsGlobal = () => {
                   <div className="bg-[#F8F8F8] rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setOpenFaqIndex(openFaqIndex === 4 ? null : 4)}
-                      className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-[#F0F0F0] transition-colors"
+                      className="w-full flex items-center justify-between px-5 py-4 text-start cursor-pointer hover:bg-[#F0F0F0] transition-colors"
                     >
-                      <span className="text-sm font-semibold text-black">Are bags or backpacks allowed inside the venue?</span>
+                      <span className="text-sm font-semibold text-black">{t('eventDetails.faq.items.4.question')}</span>
                       <svg 
                         width="16" 
                         height="16" 
                         viewBox="0 0 16 16" 
                         fill="none" 
-                        className={`shrink-0 ml-4 transition-transform ${openFaqIndex === 4 ? 'rotate-180' : ''}`}
+                        className={`shrink-0 ms-4 transition-transform ${openFaqIndex === 4 ? 'rotate-180' : ''}`}
                       >
                         <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </button>
                     {openFaqIndex === 4 && (
                       <div className="px-5 pb-4 pt-2 text-sm text-[#4F4F4F] leading-relaxed">
-                        Small bags and purses are allowed but will be subject to security checks. Large backpacks and luggage are not permitted for safety reasons.
+                        {t('eventDetails.faq.items.4.answer')}
                       </div>
                     )}
                   </div>
@@ -1026,7 +1030,7 @@ const EventDetailsGlobal = () => {
               {/* More from Pulsewave Entertainment Section */}
               <div className="mt-12 mb-8">
                 <h2 className="text-xl text-black mb-6">
-                  More from <span className="font-bold">{eventData.organizerName || 'this organizer'}</span>
+                  {t('eventDetails.moreFromOrganizer')} <span className="font-bold">{eventData.organizerName || t('eventDetails.moreFromOrganizerFallback')}</span>
                 </h2>
                 
                 <div className="space-y-4">
@@ -1107,7 +1111,7 @@ const EventDetailsGlobal = () => {
               {/* Price and Badge Row */}
               <div className="flex items-center gap-4">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm text-[#757575]">From</span>
+                  <span className="text-sm text-[#757575]">{t('eventDetails.price.from')}</span>
                   <span className="text-2xl md:text-3xl font-bold text-black">{eventData.price}</span>
                 </div>
                 {eventData.badge && (
@@ -1122,7 +1126,7 @@ const EventDetailsGlobal = () => {
                 onClick={() => navigate(`/event/${eventId}/tickets`)}
                 className="w-full lg:w-auto px-10 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
               >
-                Get Tickets Now!
+                {t('eventDetails.getTickets')}
               </button>
             </div>
           </div>
@@ -1131,10 +1135,10 @@ const EventDetailsGlobal = () => {
           <div className="mt-16 mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl text-black">
-                <span className="font-bold">Trending</span> events in similar category
+                  <span className="font-bold">{t('eventDetails.trending.sectionTitle')}</span> {t('eventDetails.trending.sectionTitleSuffix')}
               </h2>
               <div className="flex items-center gap-3">
-                <span className="text-sm text-[#757575]">{trendingPage} of {totalPages}</span>
+                <span className="text-sm text-[#757575]">{trendingPage} {t('eventDetails.trending.paginationOf')} {totalPages}</span>
                 <div className="flex gap-2">
                   <button 
                     onClick={handleTrendingPrev}
@@ -1173,7 +1177,7 @@ const EventDetailsGlobal = () => {
                         alt={event.title} 
                         className="w-full h-[320px] object-cover transition-transform duration-300 group-hover:scale-110"
                       />
-                      <div className="absolute bottom-2 left-2 transition-transform duration-300 group-hover:scale-110">
+                      <div className="absolute bottom-2 start-2 transition-transform duration-300 group-hover:scale-110">
                         <span className="text-7xl font-bold text-black" style={{WebkitTextStroke: '3px white'}}>{displayNumber}</span>
                       </div>
                     </div>
@@ -1182,7 +1186,7 @@ const EventDetailsGlobal = () => {
                         {event.title}
                       </h3>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-black">from {event.price}</span>
+                        <span className="text-sm text-black">{t('eventDetails.trending.fromPrice')} {event.price}</span>
                         {event.badge && (
                           <span className={`text-xs font-medium px-2 py-1 rounded ${
                             event.badgeColor === 'blue' ? 'text-[#00A3FF] bg-[#E6F7FF]' : 'text-[#FF4000] bg-[#FFF4F3]'
@@ -1204,10 +1208,10 @@ const EventDetailsGlobal = () => {
               {/* Left Side - Title and Description */}
               <div className="flex-1">
                 <h2 className="text-2xl lg:text-3xl text-black mb-3 whitespace-nowrap">
-                  <span className="font-bold">Be the first to know,</span> never miss an event again!
+                  <span className="font-bold">{t('eventDetails.newsletter.title')}</span> {t('eventDetails.newsletter.titleSuffix')}
                 </h2>
                 <p className="text-sm text-[#757575]">
-                  Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.
+                  {t('eventDetails.newsletter.description')}
                 </p>
               </div>
 
@@ -1216,11 +1220,11 @@ const EventDetailsGlobal = () => {
                 <div className="relative flex items-center bg-white border border-[#EEEEEE] rounded-full overflow-hidden">
                   <input 
                     type="email" 
-                    placeholder="Enter your email" 
+                    placeholder={t('eventDetails.newsletter.emailPlaceholder')} 
                     className="flex-1 px-6 py-3 bg-transparent text-sm focus:outline-none"
                   />
-                  <button className="pl-6 pr-2 py-2.5 bg-[#FF4000] text-white font-bold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full m-1 flex items-center gap-4">
-                    <span>Keep Me Updated</span>
+                  <button className="ps-6 pe-2 py-2.5 bg-[#FF4000] text-white font-bold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full m-1 flex items-center gap-4">
+                    <span>{t('eventDetails.newsletter.ctaButton')}</span>
                     <img src={KeepMeUpdateIcon} alt="" className="w-9 h-9 shrink-0" />
                   </button>
                 </div>

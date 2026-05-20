@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
-import LangueIcon from '../assets/Svgs/navbar/langue.svg';
 import ProfileImage from '../assets/imges/photoProfil.jpg';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface EventDetailsNavbarProps {
   isLoggedIn?: boolean;
@@ -12,18 +13,12 @@ interface EventDetailsNavbarProps {
 const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
+  const { t } = useTranslation();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('EN');
-  
-  const languageMenuRef = useRef<HTMLDivElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (languageMenuRef.current && !languageMenuRef.current.contains(event.target as Node)) {
-        setIsLanguageMenuOpen(false);
-      }
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
         setIsProfileMenuOpen(false);
       }
@@ -32,11 +27,6 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleLanguageSelect = (language: string) => {
-    setSelectedLanguage(language);
-    setIsLanguageMenuOpen(false);
-  };
 
   const handleLogout = () => {
     logout();
@@ -58,37 +48,11 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
       <div className="flex items-center gap-3 lg:gap-4">
         {/* Need Assistance Button */}
         <button className="px-6 py-2 text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors text-sm font-semibold">
-          Need Assistance?
+          {t('header.needAssistance')}
         </button>
 
         {/* Language selector */}
-        <div className="relative" ref={languageMenuRef}>
-          <button
-            onClick={() => setIsLanguageMenuOpen(!isLanguageMenuOpen)}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <img src={LangueIcon} alt="Language" className="w-9 h-9" />
-            <span className="text-sm font-medium text-[#4F4F4F]">{selectedLanguage}</span>
-          </button>
-
-          {isLanguageMenuOpen && (
-            <div className="absolute right-0 top-full mt-2 w-24 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-1 z-50">
-              {['EN', 'FR', 'AR'].map((lang) => (
-                <button
-                  key={lang}
-                  onClick={() => handleLanguageSelect(lang)}
-                  className={`w-full px-4 py-2 text-left text-sm transition-colors ${
-                    selectedLanguage === lang
-                      ? 'bg-[#FFF4F3] text-[#FF4000] font-medium'
-                      : 'text-[#4F4F4F] hover:bg-[#F8F8F8]'
-                  }`}
-                >
-                  {lang}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <LanguageSwitcher />
 
         {/* Conditional: Profile icon with dropdown or Auth buttons */}
         {isLoggedIn && user ? (
@@ -102,7 +66,7 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
 
             {/* Profile Dropdown menu */}
             {isProfileMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-2 z-50">
+              <div className="absolute end-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-2 z-50">
                 {/* User Info Section */}
                 {user && (
                   <div className="px-4 py-3 border-b border-[#EEEEEE]">
@@ -113,7 +77,7 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                           <path d="M3 6l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        Verified
+                        {t('userMenu.verified')}
                       </span>
                     )}
                   </div>
@@ -122,32 +86,32 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
                   href="/profile"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
                 >
-                  Profile
+                  {t('userMenu.profile')}
                 </a>
                 <a
                   href="/dashboard-attendee"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
                 >
-                  My Tickets
+                  {t('userMenu.myTickets')}
                 </a>
                 <a
                   href="/settings"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
                 >
-                  Settings
+                  {t('userMenu.settings')}
                 </a>
                 <a
                   href="/help"
                   className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
                 >
-                  Help / Support
+                  {t('userMenu.helpSupport')}
                 </a>
                 <div className="border-t border-[#EEEEEE] my-1"></div>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors font-medium"
+                  className="w-full text-start px-4 py-2.5 text-sm text-[#FF4000] hover:bg-[#FFF4F3] transition-colors font-medium"
                 >
-                  Log out
+                  {t('nav.logout')}
                 </button>
               </div>
             )}
@@ -158,13 +122,13 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
               to="/login"
               className="px-6 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
             >
-              Log in
+              {t('nav.login')}
             </Link>
             <Link 
               to="/register"
               className="px-6 py-2 text-sm font-medium text-white bg-[#FF4000] rounded-full hover:bg-[#E63900] transition-colors"
             >
-              Sign up
+              {t('nav.signup')}
             </Link>
           </div>
         )}

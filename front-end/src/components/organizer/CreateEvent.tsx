@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import organizerService, { CreateEventDto } from '../../services/organizerService';
 import authService from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
@@ -94,6 +95,7 @@ const ticketTypes = [
 ];
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
+  const { t } = useTranslation('organizer');
   const { user, setUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -434,7 +436,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     }
 
     return (
-      <div className="absolute left-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
+      <div className="absolute start-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-3">
           <button
@@ -442,7 +444,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             onClick={handleMonthSelect}
             className="text-xs text-primary hover:text-primary-dark font-medium transition-colors"
           >
-            Select Month
+            {t('createEvent.calendar.selectMonth')}
           </button>
           {(formData.dateRange[0] || formData.dateRange[1]) && (
             <button
@@ -452,7 +454,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               }}
               className="text-xs text-gray hover:text-black font-medium transition-colors"
             >
-              Clear
+              {t('createEvent.calendar.clear')}
             </button>
           )}
         </div>
@@ -482,7 +484,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 mb-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {[t('createEvent.calendar.sun'), t('createEvent.calendar.mon'), t('createEvent.calendar.tue'), t('createEvent.calendar.wed'), t('createEvent.calendar.thu'), t('createEvent.calendar.fri'), t('createEvent.calendar.sat')].map(day => (
             <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray">
               {day}
             </div>
@@ -505,12 +507,12 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
     fileArray.forEach(file => {
       if (file.size > 10 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, eventImages: 'Each image size should not exceed 10MB' }));
+        setErrors(prev => ({ ...prev, eventImages: t('createEvent.validation.imageSizeError') }));
         return;
       }
 
       if (!['image/png', 'image/jpeg', 'image/jpg'].includes(file.type)) {
-        setErrors(prev => ({ ...prev, eventImages: 'Only PNG and JPG images are allowed' }));
+        setErrors(prev => ({ ...prev, eventImages: t('createEvent.validation.imageFormatError') }));
         return;
       }
 
@@ -573,21 +575,21 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof EventFormData, string>> = {};
     
-    if (!formData.title.trim()) newErrors.title = 'Event title is required';
-    if (!formData.category) newErrors.category = 'Please select a category';
-    if (!formData.eventType) newErrors.eventType = 'Please select an event type';
-    if (!formData.dateRange[0] || !formData.dateRange[1]) newErrors.dateRange = 'Date range is required';
-    if (!formData.startTime) newErrors.startTime = 'Start time is required';
-    if (!formData.endTime) newErrors.endTime = 'End time is required';
+    if (!formData.title.trim()) newErrors.title = t('createEvent.validation.titleRequired');
+    if (!formData.category) newErrors.category = t('createEvent.validation.categoryRequired');
+    if (!formData.eventType) newErrors.eventType = t('createEvent.validation.eventTypeRequired');
+    if (!formData.dateRange[0] || !formData.dateRange[1]) newErrors.dateRange = t('createEvent.validation.dateRequired');
+    if (!formData.startTime) newErrors.startTime = t('createEvent.validation.startTimeRequired');
+    if (!formData.endTime) newErrors.endTime = t('createEvent.validation.endTimeRequired');
     
     if (formData.eventType === 'in-person' || formData.eventType === 'hybrid') {
-      if (!formData.country.trim()) newErrors.country = 'Country is required';
-      if (!formData.state.trim()) newErrors.state = 'State is required';
-      if (!formData.mapAddress.trim()) newErrors.mapAddress = 'Map address is required';
+      if (!formData.country.trim()) newErrors.country = t('createEvent.validation.countryRequired');
+      if (!formData.state.trim()) newErrors.state = t('createEvent.validation.stateRequired');
+      if (!formData.mapAddress.trim()) newErrors.mapAddress = t('createEvent.validation.mapAddressRequired');
     }
     
-    if (formData.eventImages.length === 0) newErrors.eventImages = 'At least one event image is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    if (formData.eventImages.length === 0) newErrors.eventImages = t('createEvent.validation.imagesRequired');
+    if (!formData.description.trim()) newErrors.description = t('createEvent.validation.descriptionRequired');
     
     // Validate tickets
     const newTicketErrors: Record<string, Partial<Record<keyof TicketData, string>>> = {};
@@ -596,20 +598,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     formData.tickets.forEach(ticket => {
       const ticketError: Partial<Record<keyof TicketData, string>> = {};
       if (!ticket.type.trim()) {
-        ticketError.type = 'Ticket type is required';
+        ticketError.type = t('createEvent.validation.ticketTypeRequired');
       } else {
         // Check for duplicate ticket types (case-insensitive)
         const normalizedType = ticket.type.trim().toLowerCase();
         const existingTicketId = ticketTypeNames.get(normalizedType);
         if (existingTicketId && existingTicketId !== ticket.id) {
-          ticketError.type = 'Duplicate ticket type. Each ticket type must be unique';
+          ticketError.type = t('createEvent.validation.duplicateTicketType');
         } else {
           ticketTypeNames.set(normalizedType, ticket.id);
         }
       }
-      if (!ticket.priceType) ticketError.priceType = 'Price type is required';
-      if (!ticket.quantity.trim()) ticketError.quantity = 'Quantity is required';
-      if (ticket.priceType === 'paid' && !ticket.price.trim()) ticketError.price = 'Price is required';
+      if (!ticket.priceType) ticketError.priceType = t('createEvent.validation.priceTypeRequired');
+      if (!ticket.quantity.trim()) ticketError.quantity = t('createEvent.validation.quantityRequired');
+      if (ticket.priceType === 'paid' && !ticket.price.trim()) ticketError.price = t('createEvent.validation.priceRequired');
       
       if (Object.keys(ticketError).length > 0) {
         newTicketErrors[ticket.id] = ticketError;
@@ -620,8 +622,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     const newFaqErrors: Record<string, Partial<Record<keyof FAQData, string>>> = {};
     formData.faqs.forEach(faq => {
       const faqError: Partial<Record<keyof FAQData, string>> = {};
-      if (!faq.question.trim()) faqError.question = 'Question is required';
-      if (!faq.answer.trim()) faqError.answer = 'Answer is required';
+      if (!faq.question.trim()) faqError.question = t('createEvent.validation.faqQuestionRequired');
+      if (!faq.answer.trim()) faqError.answer = t('createEvent.validation.faqAnswerRequired');
       
       if (Object.keys(faqError).length > 0) {
         newFaqErrors[faq.id] = faqError;
@@ -810,13 +812,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <span className="text-sm font-medium">
-              {source === 'dashboard' ? 'Back to Dashboard' : 'Back to Events'}
+              {source === 'dashboard' ? t('createEvent.backToDashboard') : t('createEvent.backToEvents')}
             </span>
           </button>
         )}
-        <h1 className="text-2xl font-bold text-black mb-2">{mode === 'edit' ? 'Edit Event' : 'Create Event'}</h1>
+        <h1 className="text-2xl font-bold text-black mb-2">{t('createEvent.pageTitle', { mode: mode === 'edit' ? 'Edit' : 'Create' })}</h1>
         <p className="text-sm text-gray">
-          Fill in the essential information to {mode === 'edit' ? 'update' : 'create'} your event quickly
+          {t('createEvent.pageSubtitle', { mode: mode === 'edit' ? 'update' : 'create' })}
         </p>
       </div>
 
@@ -824,20 +826,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       <form className="space-y-6">
         {/* 1. Essential Information */}
         <div className="bg-white border border-light-gray rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-black mb-4">Essential Information</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">{t('createEvent.steps.essentialInfo')}</h2>
           
           <div className="space-y-4">
             {/* Event Title */}
             <div>
               <label className="block text-sm font-medium text-black mb-2">
-                Event Title <span className="text-[#FF3425]">*</span>
+                {t('createEvent.form.eventTitle')} <span className="text-[#FF3425]">*</span>
               </label>
               <input
                 type="text"
                 name="title"
                 value={formData.title}
                 onChange={handleInputChange}
-                placeholder="Enter your event title"
+                placeholder={t('createEvent.form.eventTitlePlaceholder')}
                 className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
                   errors.title ? 'border-[#FF3425]' : 'border-light-gray'
                 }`}
@@ -852,7 +854,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {/* Event Category */}
               <div className="relative" ref={categoryRef}>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Event Category <span className="text-[#FF3425]">*</span>
+                  {t('createEvent.form.eventCategory')} <span className="text-[#FF3425]">*</span>
                 </label>
                 <button
                   type="button"
@@ -860,11 +862,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     closeAllDropdowns();
                     setIsCategoryDropdownOpen(!isCategoryDropdownOpen);
                   }}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
+                  className={`w-full px-4 py-2.5 border rounded-lg text-sm text-start flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
                     errors.category ? 'border-[#FF3425]' : 'border-light-gray'
                   } ${formData.category ? 'text-black' : 'text-[#9CA3AF]'}`}
                 >
-                  {formData.category || 'Select a category'}
+                  {formData.category || t('createEvent.form.eventCategoryPlaceholder')}
                   <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -879,7 +881,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           key={category}
                           type="button"
                           onClick={() => handleCategorySelect(category)}
-                          className={`w-full px-4 py-2 text-left text-sm transition-colors flex items-center justify-between ${
+                          className={`w-full px-4 py-2 text-start text-sm transition-colors flex items-center justify-between ${
                             formData.category === category
                               ? 'bg-primary-light text-primary font-medium'
                               : 'text-gray hover:bg-secondary-light'
@@ -887,8 +889,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         >
                           <span>{category}</span>
                           {isCustom && (
-                            <span className="text-[10px] uppercase tracking-wide text-primary/70 ml-2">
-                              custom
+                            <span className="text-[10px] uppercase tracking-wide text-primary/70 ms-2">
+                              {t('createEvent.form.customBadge', { defaultValue: 'custom' })}
                             </span>
                           )}
                         </button>
@@ -913,7 +915,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                                 setNewCustomCategory('');
                               }
                             }}
-                            placeholder="e.g. Open-mic night"
+                            placeholder={t('createEvent.form.customCategoryPlaceholder', { defaultValue: 'e.g. Open-mic night' })}
                             className="flex-1 px-3 py-1.5 text-sm border border-light-gray rounded-md focus:outline-none focus:border-primary"
                           />
                           <button
@@ -922,7 +924,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                             disabled={!newCustomCategory.trim()}
                             className="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-md disabled:opacity-50 hover:bg-primary/90"
                           >
-                            Add
+                            {t('createEvent.form.add', { defaultValue: 'Add' })}
                           </button>
                           <button
                             type="button"
@@ -932,19 +934,19 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                             }}
                             className="px-2 py-1.5 text-xs text-gray hover:text-black"
                           >
-                            Cancel
+                            {t('createEvent.form.cancel', { defaultValue: 'Cancel' })}
                           </button>
                         </div>
                       ) : (
                         <button
                           type="button"
                           onClick={() => setIsAddingCategory(true)}
-                          className="w-full px-4 py-2 text-left text-sm text-primary font-medium hover:bg-primary-light transition-colors flex items-center gap-2"
+                          className="w-full px-4 py-2 text-start text-sm text-primary font-medium hover:bg-primary-light transition-colors flex items-center gap-2"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                           </svg>
-                          Add custom category
+                          {t('createEvent.form.addCustomCategory', { defaultValue: 'Add custom category' })}
                         </button>
                       )}
                     </div>
@@ -958,7 +960,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {/* Event Type */}
               <div className="relative" ref={eventTypeRef}>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Event Type <span className="text-[#FF3425]">*</span>
+                  {t('createEvent.form.eventType')} <span className="text-[#FF3425]">*</span>
                 </label>
                 <button
                   type="button"
@@ -966,11 +968,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     closeAllDropdowns();
                     setIsEventTypeDropdownOpen(!isEventTypeDropdownOpen);
                   }}
-                  className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
+                  className={`w-full px-4 py-2.5 border rounded-lg text-sm text-start flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
                     errors.eventType ? 'border-[#FF3425]' : 'border-light-gray'
                   } ${formData.eventType ? 'text-black' : 'text-[#9CA3AF]'}`}
                 >
-                  {formData.eventType === 'in-person' ? 'In-person' : formData.eventType === 'online' ? 'Remote' : formData.eventType === 'hybrid' ? 'Hybrid' : 'Select event type'}
+                  {formData.eventType === 'in-person' ? t('createEvent.form.eventTypeInPerson') : formData.eventType === 'online' ? t('createEvent.form.eventTypeRemote') : formData.eventType === 'hybrid' ? t('createEvent.form.eventTypeHybrid') : t('createEvent.form.eventTypePlaceholder')}
                   <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -981,35 +983,35 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     <button
                       type="button"
                       onClick={() => handleEventTypeSelect('in-person')}
-                      className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                      className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                         formData.eventType === 'in-person'
                           ? 'bg-primary-light text-primary font-medium'
                           : 'text-gray hover:bg-secondary-light'
                       }`}
                     >
-                      In-person
+                      {t('createEvent.form.eventTypeInPerson')}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleEventTypeSelect('hybrid')}
-                      className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                      className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                         formData.eventType === 'hybrid'
                           ? 'bg-primary-light text-primary font-medium'
                           : 'text-gray hover:bg-secondary-light'
                       }`}
                     >
-                      Hybrid
+                      {t('createEvent.form.eventTypeHybrid')}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleEventTypeSelect('online')}
-                      className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                      className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                         formData.eventType === 'online'
                           ? 'bg-primary-light text-primary font-medium'
                           : 'text-gray hover:bg-secondary-light'
                       }`}
                     >
-                      Remote
+                      {t('createEvent.form.eventTypeRemote')}
                     </button>
                   </div>
                 )}
@@ -1022,13 +1024,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             {/* Short Description */}
             <div>
               <label className="block text-sm font-medium text-black mb-2">
-                Description <span className="text-[#FF3425]">*</span>
+                {t('createEvent.form.description')} <span className="text-[#FF3425]">*</span>
               </label>
               <textarea
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Tell attendees what your event is about..."
+                placeholder={t('createEvent.form.descriptionPlaceholder')}
                 rows={3}
                 className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all resize-none ${
                   errors.description ? 'border-[#FF3425]' : 'border-light-gray'
@@ -1043,7 +1045,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
         {/* 2. Date & Location */}
         <div className="bg-white border border-light-gray rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-black mb-4">Date & Location</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">{t('createEvent.steps.dateLocation')}</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-start">
             {/* Left Column - Form Fields */}
@@ -1051,7 +1053,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {/* Date Range Picker */}
               <div className="relative" ref={datePickerRef}>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Event Date <span className="text-[#FF3425]">*</span>
+                  {t('createEvent.form.eventDate')} <span className="text-[#FF3425]">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -1062,7 +1064,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         ? `${formData.dateRange[0].toLocaleDateString('en-US')} - ${formData.dateRange[1].toLocaleDateString('en-US')}`
                         : ''
                     }
-                    placeholder="MM/DD/YYYY"
+                    placeholder={t('createEvent.form.eventDatePlaceholder')}
                     onClick={() => {
                       closeAllDropdowns();
                       setShowDatePicker(!showDatePicker);
@@ -1074,7 +1076,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   <img 
                     src={CalendarIcon}
                     alt="Calendar"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-[30px] h-[30px] cursor-pointer"
+                    className="absolute end-3 top-1/2 -translate-y-1/2 w-[30px] h-[30px] cursor-pointer"
                     onClick={() => {
                       closeAllDropdowns();
                       setShowDatePicker(!showDatePicker);
@@ -1091,13 +1093,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             <div className="grid grid-cols-2 gap-4">
               <div className="relative" ref={startTimeRef}>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Start Time <span className="text-[#FF3425]">*</span>
+                  {t('createEvent.form.startTime')} <span className="text-[#FF3425]">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     readOnly
-                    value={formData.startTime || 'Select time'}
+                    value={formData.startTime || t('createEvent.form.startTimePlaceholder')}
                     onClick={() => {
                       closeAllDropdowns();
                       setShowStartTimePicker(!showStartTimePicker);
@@ -1107,7 +1109,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     } ${!formData.startTime ? 'text-[#9CA3AF]' : 'text-black'}`}
                   />
                   <svg 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray pointer-events-none" 
+                    className="absolute end-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray pointer-events-none" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -1134,13 +1136,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
               <div className="relative" ref={endTimeRef}>
                 <label className="block text-sm font-medium text-black mb-2">
-                  End Time <span className="text-[#FF3425]">*</span>
+                  {t('createEvent.form.endTime')} <span className="text-[#FF3425]">*</span>
                 </label>
                 <div className="relative">
                   <input
                     type="text"
                     readOnly
-                    value={formData.endTime || 'Select time'}
+                    value={formData.endTime || t('createEvent.form.endTimePlaceholder')}
                     onClick={() => {
                       closeAllDropdowns();
                       setShowEndTimePicker(!showEndTimePicker);
@@ -1150,7 +1152,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     } ${!formData.endTime ? 'text-[#9CA3AF]' : 'text-black'}`}
                   />
                   <svg 
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray pointer-events-none" 
+                    className="absolute end-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray pointer-events-none" 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -1181,14 +1183,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Country <span className="text-[#FF3425]">*</span>
+                      {t('createEvent.form.country')} <span className="text-[#FF3425]">*</span>
                     </label>
                     <input
                       type="text"
                       name="country"
                       value={formData.country}
                       onChange={handleInputChange}
-                      placeholder="Select country"
+                      placeholder={t('createEvent.form.countryPlaceholder')}
                       className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
                         errors.country ? 'border-[#FF3425]' : 'border-light-gray'
                       }`}
@@ -1199,14 +1201,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      State <span className="text-[#FF3425]">*</span>
+                      {t('createEvent.form.state')} <span className="text-[#FF3425]">*</span>
                     </label>
                     <input
                       type="text"
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      placeholder="Select state"
+                      placeholder={t('createEvent.form.statePlaceholder')}
                       className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
                         errors.state ? 'border-[#FF3425]' : 'border-light-gray'
                       }`}
@@ -1222,14 +1224,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {(formData.eventType === 'in-person' || formData.eventType === 'hybrid') && (
                 <div>
                   <label className="block text-sm font-medium text-black mb-2">
-                    Map Address <span className="text-[#FF3425]">*</span>
+                    {t('createEvent.form.mapAddress')} <span className="text-[#FF3425]">*</span>
                   </label>
                   <input
                     type="text"
                     name="mapAddress"
                     value={formData.mapAddress}
                     onChange={handleInputChange}
-                    placeholder="Enter the complete venue address"
+                    placeholder={t('createEvent.form.mapAddressPlaceholder')}
                     className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
                       errors.mapAddress ? 'border-[#FF3425]' : 'border-light-gray'
                     }`}
@@ -1243,14 +1245,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {/* Online Link (optional - available for all event types) */}
               <div>
                 <label className="block text-sm font-medium text-black mb-2">
-                  Online Link <span className="text-[#9CA3AF] text-xs">(Optional)</span>
+                  {t('createEvent.form.onlineLink')} <span className="text-[#9CA3AF] text-xs">{t('createEvent.form.onlineLinkOptional')}</span>
                 </label>
                 <input
                   type="text"
                   name="onlineLink"
                   value={formData.onlineLink}
                   onChange={handleInputChange}
-                  placeholder="https://zoom.us/j/..."
+                  placeholder={t('createEvent.form.onlineLinkPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all"
                 />
               </div>
@@ -1260,7 +1262,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             {(formData.eventType === 'in-person' || formData.eventType === 'hybrid') && (
               <div className="flex flex-col h-full">
                 <label className="block text-sm font-medium text-black mb-2">
-                  Map Preview
+                  {t('createEvent.form.mapPreview')}
                 </label>
                 <div className="flex-1 border border-light-gray rounded-lg overflow-hidden relative">
                   {/* Google Map iframe - Interactive, centered on Algeria */}
@@ -1287,12 +1289,12 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         {/* 3. Event Images */}
         <div className="bg-white border border-light-gray rounded-xl p-5">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold text-black mb-1">Event Images</h2>
+            <h2 className="text-lg font-semibold text-black mb-1">{t('createEvent.steps.images')}</h2>
             <p className="text-sm text-gray">
-              <svg className="w-4 h-4 inline-block mr-1 text-primary" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-4 h-4 inline-block me-1 text-primary" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
-              The first image will be used as the event cover on Ormeet
+              {t('createEvent.form.imagesInfo')}
             </p>
           </div>
           
@@ -1313,11 +1315,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
               </svg>
               <p className="text-sm mb-1">
-                <span className="text-primary font-semibold">Click to upload</span>
-                <span className="text-gray"> or drag and drop</span>
+                <span className="text-primary font-semibold">{t('createEvent.form.uploadZone.click')}</span>
+                <span className="text-gray">{t('createEvent.form.uploadZone.dragDrop')}</span>
               </p>
               <p className="text-xs text-gray">
-                PNG or JPG (max 10MB per image)
+                {t('createEvent.form.uploadZone.formats')}
               </p>
             </div>
             
@@ -1345,8 +1347,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     >
                       {/* Cover Badge */}
                       {index === 0 && (
-                        <div className="absolute top-2 left-2 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
-                          Cover
+                        <div className="absolute top-2 start-2 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
+                          {t('createEvent.form.coverBadge')}
                         </div>
                       )}
                       
@@ -1401,7 +1403,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                       </div>
                       
                       {/* Image Number */}
-                      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
+                      <div className="absolute bottom-2 end-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
                         {index + 1}
                       </div>
                     </div>
@@ -1414,14 +1416,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
         {/* 4. Tickets & Pricing */}
         <div className="bg-white border border-light-gray rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-black mb-4">Tickets & Pricing</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">{t('createEvent.steps.tickets')}</h2>
           
           <div className="space-y-4">
             {formData.tickets.map((ticket, index) => (
               <div key={ticket.id} className="border border-light-gray rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-black">
-                    Ticket {index + 1}
+                    {t('createEvent.form.ticketLabel', { number: index + 1 })}
                   </h3>
                   {formData.tickets.length > 1 && (
                     <button
@@ -1450,11 +1452,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 {/* Line 1: Custom Ticket Type Input */}
                 <div className="mb-3 max-w-sm">
                   <label className="block text-sm font-medium text-black mb-2">
-                    Ticket Type <span className="text-[#FF3425]">*</span>
+                    {t('createEvent.form.ticketType')} <span className="text-[#FF3425]">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g., VIP, General Admission, Early Bird"
+                    placeholder={t('createEvent.form.ticketTypePlaceholder')}
                     value={ticket.type}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -1479,7 +1481,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   {ticketErrors[ticket.id]?.type && (
                     <p className="mt-1 text-xs text-[#FF3425]">{ticketErrors[ticket.id].type}</p>
                   )}
-                  <p className="mt-1 text-xs text-[#757575]">Enter a custom ticket type name</p>
+                  <p className="mt-1 text-xs text-[#757575]">{t('createEvent.form.ticketTypeHint')}</p>
                 </div>
 
                 {/* Line 2: Price Type, Quantity, and Price */}
@@ -1487,7 +1489,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   {/* Price Type Select */}
                   <div className="relative">
                     <label className="block text-sm font-medium text-black mb-2">
-                      Price Type <span className="text-[#FF3425]">*</span>
+                      {t('createEvent.form.priceType')} <span className="text-[#FF3425]">*</span>
                     </label>
                     <button
                       type="button"
@@ -1495,11 +1497,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         closeAllDropdowns();
                         setOpenPriceTypeDropdown(openPriceTypeDropdown === ticket.id ? null : ticket.id);
                       }}
-                      className={`w-full px-4 py-2.5 border rounded-lg text-sm text-left flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
+                      className={`w-full px-4 py-2.5 border rounded-lg text-sm text-start flex items-center justify-between focus:outline-none focus:border-primary  transition-all ${
                         ticketErrors[ticket.id]?.priceType ? 'border-[#FF3425]' : 'border-light-gray'
                       } ${ticket.priceType ? 'text-black' : 'text-[#9CA3AF]'}`}
                     >
-                      {ticket.priceType === 'free' ? 'Free' : ticket.priceType === 'paid' ? 'Paid' : 'Select price type'}
+                      {ticket.priceType === 'free' ? t('createEvent.form.priceTypeFree') : ticket.priceType === 'paid' ? t('createEvent.form.priceTypePaid') : t('createEvent.form.priceTypePlaceholder')}
                       <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
@@ -1524,13 +1526,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                               }));
                             }
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                          className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                             ticket.priceType === 'free'
                               ? 'bg-primary-light text-primary font-medium'
                               : 'text-gray hover:bg-secondary-light'
                           }`}
                         >
-                          Free
+                          {t('createEvent.form.priceTypeFree')}
                         </button>
                         <button
                           type="button"
@@ -1549,13 +1551,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                               }));
                             }
                           }}
-                          className={`w-full px-4 py-2 text-left text-sm transition-colors ${
+                          className={`w-full px-4 py-2 text-start text-sm transition-colors ${
                             ticket.priceType === 'paid'
                               ? 'bg-primary-light text-primary font-medium'
                               : 'text-gray hover:bg-secondary-light'
                           }`}
                         >
-                          Paid
+                          {t('createEvent.form.priceTypePaid')}
                         </button>
                       </div>
                     )}
@@ -1567,7 +1569,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   {/* Ticket Quantity */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Quantity <span className="text-[#FF3425]">*</span>
+                      {t('createEvent.form.quantity')} <span className="text-[#FF3425]">*</span>
                     </label>
                     <input
                       type="number"
@@ -1600,7 +1602,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   {/* Ticket Price */}
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
-                      Price {ticket.priceType === 'paid' && <span className="text-[#FF3425]">*</span>}
+                      {t('createEvent.form.price')} {ticket.priceType === 'paid' && <span className="text-[#FF3425]">*</span>}
                     </label>
                     <input
                       type="number"
@@ -1658,7 +1660,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Add Another Ticket Type
+              {t('createEvent.form.addTicket')}
             </button>
           </div>
         </div>
@@ -1844,22 +1846,22 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               type="button"
               onClick={() => setIsPreviewModalOpen(true)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 pl-5 pr-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 ps-5 pe-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                 <path d="M10 3.33301C5.83333 3.33301 2.27499 5.73301 0.833328 9.16634C2.27499 12.5997 5.83333 14.9997 10 14.9997C14.1667 14.9997 17.725 12.5997 19.1667 9.16634C17.725 5.73301 14.1667 3.33301 10 3.33301Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Preview
+              {t('createEvent.actions.preview')}
             </button>
             {mode !== 'edit' && (
               <button
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={isSubmitting}
-                className="pl-5 pr-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? 'Saving...' : 'Save as Draft'}
+                {isSubmitting ? t('createEvent.actions.saving') : t('createEvent.actions.saveDraft')}
               </button>
             )}
           </div>
@@ -1867,10 +1869,10 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             type="button"
             onClick={mode === 'edit' ? onSaveChanges : handlePublish}
             disabled={isSubmitting}
-            className="pl-5 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            className="ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
           >
-            {isSubmitting ? 'Publishing...' : (mode === 'edit' ? 'Save changes' : 'Publish Event')}
+            {isSubmitting ? t('createEvent.actions.publishing') : (mode === 'edit' ? t('createEvent.actions.saveChanges') : t('createEvent.actions.publish'))}
           </button>
         </div>
       </form>

@@ -1,31 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import notificationService, { Notification, NotificationType } from '../services/notificationService';
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
-const TYPE_LABELS: Record<NotificationType, string> = {
-  [NotificationType.EVENT_CANCELLED]: 'Cancelled',
-  [NotificationType.EVENT_UPDATED]: 'Updated',
-  [NotificationType.EVENT_REMINDER]: 'Reminder',
-  [NotificationType.TICKET_PURCHASED]: 'Purchase',
-  [NotificationType.ORDER_CONFIRMED]: 'Confirmed',
-  [NotificationType.REFUND_PROCESSED]: 'Refund',
-};
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
 
-const formatTimestamp = (date: Date): string => {
+const formatTimestamp = (date: Date, t: TFunction, lang = 'en'): string => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffMinutes < 1) return 'Just now';
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffMinutes < 1) return t('notificationBell.timeAgo.justNow');
+  if (diffMinutes < 60) return t('notificationBell.timeAgo.minutesAgo', { count: diffMinutes });
+  if (diffHours < 24) return t('notificationBell.timeAgo.hoursAgo', { count: diffHours });
+  if (diffDays < 7) return t('notificationBell.timeAgo.daysAgo', { count: diffDays });
+  return date.toLocaleDateString(localeMap[lang] || 'en-US', { month: 'short', day: 'numeric' });
 };
 
 const NotificationBell = () => {
+  const { t, i18n } = useTranslation('attendee');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,7 +80,7 @@ const NotificationBell = () => {
       <button
         onClick={handleToggle}
         className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-all cursor-pointer"
-        aria-label="Notifications"
+        aria-label={t('notificationBell.ariaLabel')}
       >
         <svg className="w-[21px] h-[21px] text-[#4F4F4F]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
@@ -92,7 +88,7 @@ const NotificationBell = () => {
 
         {/* Badge */}
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-[#FF4000] text-white text-[10px] font-bold rounded-full leading-none">
+          <span className="absolute top-0 end-0 min-w-[18px] h-[18px] px-1 flex items-center justify-center bg-[#FF4000] text-white text-[10px] font-bold rounded-full leading-none">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -101,12 +97,12 @@ const NotificationBell = () => {
       {/* Notification Panel */}
       {isOpen && (
         <div
-          className="absolute right-0 top-full mt-2 w-[370px] bg-white rounded-xl z-50 overflow-hidden border border-[#EEEEEE]"
+          className="absolute end-0 top-full mt-2 w-[370px] bg-white rounded-xl z-50 overflow-hidden border border-[#EEEEEE]"
           style={{ boxShadow: '0 8px 30px rgba(0, 0, 0, 0.10)' }}
         >
           {/* Header */}
           <div className="px-5 py-3.5 border-b border-[#EEEEEE]">
-            <h3 className="text-sm font-semibold text-black">Notifications</h3>
+            <h3 className="text-sm font-semibold text-black">{t('notificationBell.panelTitle')}</h3>
           </div>
 
           {/* Notification List */}
@@ -118,13 +114,14 @@ const NotificationBell = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                   </svg>
                 </div>
-                <p className="text-sm text-[#9CA3AF]">No notifications yet</p>
+                <p className="text-sm text-[#9CA3AF]">{t('notificationBell.empty')}</p>
               </div>
             ) : (
               notifications.map((notification, index) => {
                 const eventImage = notification.event?.images?.[0] || EventImageFallback;
                 const eventName = notification.event?.title || notification.title;
                 const timestamp = new Date(notification.createdAt);
+                const typeKey = notification.type as string;
                 
                 return (
                   <div
@@ -147,11 +144,11 @@ const NotificationBell = () => {
                           {eventName}
                         </p>
                         <span className="text-[11px] text-[#9CA3AF] whitespace-nowrap shrink-0">
-                          {formatTimestamp(timestamp)}
+                          {formatTimestamp(timestamp, t, i18n.language)}
                         </span>
                       </div>
                       <p className="text-[12px] text-[#757575] mt-0.5 line-clamp-2 leading-relaxed">
-                        <span className="font-medium text-[#4F4F4F]">{TYPE_LABELS[notification.type]}</span>
+                        <span className="font-medium text-[#4F4F4F]">{t(`notificationBell.typeLabels.${typeKey}`)}</span>
                         {' · '}
                         {notification.message}
                       </p>

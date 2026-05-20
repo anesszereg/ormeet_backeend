@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { CityCard } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import { usePagination } from "@/hooks/usePagination";
@@ -30,6 +31,7 @@ const allCityPages: CityCard[][] = [
 const TOTAL_PAGES = allCityPages.length;
 
 const BigCities = () => {
+  const t = useTranslations("landing.bigCities");
   const { page, handlePrev, handleNext } = usePagination({ totalPages: TOTAL_PAGES });
   const currentCities = allCityPages[page - 1];
 
@@ -39,16 +41,14 @@ const BigCities = () => {
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-10">
         {/* Left: Title */}
         <h2 className="text-3xl md:text-4xl text-black leading-tight max-w-md">
-          Big cities. bigger events.{" "}
-          <span className="font-bold">find yours.</span>
+          {t("titleStart")}{" "}
+          <span className="font-bold">{t("titleHighlight")}</span>
         </h2>
 
         {/* Right: Description + Pagination */}
         <div className="flex flex-col items-start lg:items-end gap-4">
-          <p className="text-sm md:text-base text-muted leading-relaxed max-w-md lg:text-right">
-            Where&apos;s the fun happening? Just pick a city and find
-            out! Discover events, meetups, and unforgettable
-            experiences.
+          <p className="text-sm md:text-base text-muted leading-relaxed max-w-md lg:text-end">
+            {t("description")}
           </p>
           <PaginationControls
             page={page}
@@ -81,13 +81,13 @@ const BigCities = () => {
             </div>
 
             {/* Price badge top-right */}
-            <div className="absolute top-3 right-3 bg-white border border-light-gray rounded-full px-3 py-1.5 flex items-center gap-1">
-              <span className="text-xs text-medium-gray">From</span>
+            <div className="absolute top-3 end-3 bg-white border border-light-gray rounded-full px-3 py-1.5 flex items-center gap-1">
+              <span className="text-xs text-medium-gray">{t("from")}</span>
               <span className="text-sm font-bold text-black">{city.price}</span>
             </div>
 
             {/* Bottom row: City name + Arrow */}
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+            <div className="absolute bottom-4 start-4 end-4 flex items-center justify-between">
               <span className="text-white text-lg font-semibold">
                 {city.name}
               </span>

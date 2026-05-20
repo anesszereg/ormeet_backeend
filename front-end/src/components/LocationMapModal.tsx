@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 interface LocationMapModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -6,6 +8,7 @@ interface LocationMapModalProps {
 }
 
 const LocationMapModal = ({ isOpen, onClose, venue, address }: LocationMapModalProps) => {
+  const { t } = useTranslation('attendee');
   if (!isOpen) return null;
 
   return (
@@ -13,12 +16,12 @@ const LocationMapModal = ({ isOpen, onClose, venue, address }: LocationMapModalP
       <div className="bg-white rounded-2xl w-full max-w-[660px] max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-[#EEEEEE]">
-          <h2 className="text-lg font-bold text-black mb-2">Location</h2>
+          <h2 className="text-lg font-bold text-black mb-2">{t('locationMapModal.title')}</h2>
           <p className="text-sm text-black mb-1">
             {venue} <span className="text-[#757575] mx-2">|</span> {address}
           </p>
           <button onClick={onClose} className="text-sm font-medium text-[#FF4000] hover:underline">
-            Close map
+            {t('locationMapModal.closeMap')}
           </button>
         </div>
 
@@ -32,12 +35,12 @@ const LocationMapModal = ({ isOpen, onClose, venue, address }: LocationMapModalP
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
-            title="Event location map"
+            title={t('locationMapModal.mapTitle')}
             className="absolute inset-0"
           />
 
           {/* Map Controls */}
-          <div className="absolute top-4 right-4 flex flex-col gap-2">
+          <div className="absolute top-4 end-4 flex flex-col gap-2">
             {/* Fullscreen button */}
             <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

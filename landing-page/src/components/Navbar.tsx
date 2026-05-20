@@ -1,16 +1,24 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations, useLocale } from "next-intl";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // Main app URL - update this for production
 const MAIN_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173';
 
 const Navbar = () => {
+  const t = useTranslations("common.nav");
+  const locale = useLocale();
+  const home = `/${locale}`;
+
   return (
     <nav className="w-full px-6 md:px-10 lg:px-16 xl:px-20 py-4 flex items-center justify-between bg-white">
       {/* Left: Logo + Nav Links */}
       <div className="flex items-center gap-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 cursor-pointer">
+        <Link href={home} className="flex items-center gap-2 cursor-pointer">
           <Image
             src="/svgs/Logo.svg"
             alt="Ormeet Logo"
@@ -27,13 +35,13 @@ const Navbar = () => {
             href={`${MAIN_APP_URL}/host-events`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
-            Host events
+            {t("hostEvents")}
           </a>
           <a
             href={`${MAIN_APP_URL}/support`}
             className="text-sm font-medium text-black hover:text-primary transition-colors"
           >
-            Support
+            {t("support")}
           </a>
         </div>
       </div>
@@ -41,57 +49,14 @@ const Navbar = () => {
       {/* Right: Language + Auth Buttons */}
       <div className="flex items-center gap-4">
         {/* Language Selector */}
-        <button className="hidden md:flex items-center gap-1.5 text-sm font-medium text-black hover:text-primary transition-colors cursor-pointer">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx="10"
-              cy="10"
-              r="9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <ellipse
-              cx="10"
-              cy="10"
-              rx="4"
-              ry="9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            />
-            <path
-              d="M1 10H19"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M3 5.5H17"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M3 14.5H17"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
-          <span>EN</span>
-        </button>
+        <LanguageSwitcher />
 
         {/* Log In Button */}
         <a
           href={`${MAIN_APP_URL}/onboarding-choice`}
           className="px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
         >
-          Log In
+          {t("login")}
         </a>
 
         {/* Sign Up Button */}
@@ -99,7 +64,7 @@ const Navbar = () => {
           href={`${MAIN_APP_URL}/onboarding-choice`}
           className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-full hover:bg-primary-dark transition-colors"
         >
-          Sign up
+          {t("signup")}
         </a>
       </div>
     </nav>

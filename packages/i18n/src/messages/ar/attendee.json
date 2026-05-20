@@ -1,0 +1,596 @@
+{
+  "searchResult": {
+    "resultsCount": "{{count}} Results",
+    "resultsFor": "for",
+    "filterButton": "Filter",
+    "filters": {
+      "title": "Filters",
+      "locationLabel": "Location",
+      "categoriesLabel": "Categories",
+      "categoriesPlaceholder": "e.g. Music, Sports, Business",
+      "showMore": "Show More",
+      "showLess": "Show Less",
+      "priceLabel": "Price",
+      "priceMin": "Minimum",
+      "priceMax": "Maximum",
+      "whenLabel": "When",
+      "timeOptions": {
+        "today": "Today",
+        "thisWeekend": "This Weekend",
+        "thisWeek": "This Week",
+        "thisMonth": "This Month"
+      },
+      "organizersLabel": "Organizers",
+      "organizerOptions": {
+        "following": "Events by Organizers You Follow",
+        "all": "Events by All Organizers"
+      }
+    },
+    "viewMode": {
+      "listAlt": "List view",
+      "gridAlt": "Grid view"
+    },
+    "empty": {
+      "message": "No events found matching your criteria.",
+      "clearFilters": "Clear Filters"
+    },
+    "map": {
+      "title": "Event locations map"
+    }
+  },
+  "eventDetails": {
+    "dateTime": {
+      "sectionTitle": "Date & Time",
+      "changeDate": "Change date",
+      "closeCalendar": "Close Calendar",
+      "calendarDays": {
+        "sun": "Sun",
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat"
+      },
+      "timeSlotsAvailable_one": "{{count}} time available for {{date}}",
+      "timeSlotsAvailable_other": "{{count}} times available for {{date}}",
+      "selectTime": "Please select a suitable time for your event from the options below.",
+      "noTimeSlots": "No time slots available for this date."
+    },
+    "location": {
+      "sectionTitle": "Location",
+      "seeOnMap": "See on map",
+      "closeMap": "Close map",
+      "mapTitle": "Event location map"
+    },
+    "stats": {
+      "reviews": "reviews",
+      "views": "views",
+      "favorites": "favorites"
+    },
+    "actions": {
+      "addToFavorites": "Add to favorites",
+      "removeFromFavorites": "Remove from favorites",
+      "loginToFavorite": "Login to add to favorites",
+      "shareEvent": "Share event",
+      "prevImage": "Previous image",
+      "nextImage": "Next image",
+      "goToImage": "Go to image {{number}}"
+    },
+    "alerts": {
+      "favoriteFailed": "Failed to update favorites",
+      "followFailed": "Failed to update following status"
+    },
+    "guidelines": {
+      "sectionTitle": "Event rules & guidelines",
+      "ageRequirement": {
+        "label": "Age requirement:",
+        "defaultText": "This event is for guests aged {{age}} and over. Valid ID required at entry.",
+        "noRestriction": "No age restriction"
+      },
+      "entryPolicy": {
+        "label": "Entry policy:",
+        "reentryAllowed": "Re-entry is allowed.",
+        "noReentry": "No re-entry is allowed after leaving the venue."
+      },
+      "accessibility": {
+        "label": "Accessibility:"
+      },
+      "refundPolicy": {
+        "label": "Refund policy:",
+        "refundsAvailable": "Refunds are available according to our refund policy.",
+        "noRefunds": "All ticket sales are final. Refunds are only issued if the event is canceled."
+      },
+      "prohibitedItems": {
+        "label": "Prohibited items:"
+      },
+      "allowedItems": {
+        "label": "Allowed items:"
+      }
+    },
+    "organizer": {
+      "sectionTitle": "Meet your",
+      "sectionTitleBold": "organiser",
+      "follow": "Follow",
+      "following": "Following",
+      "contact": "Contact",
+      "loginToFollow": "Login to follow organizer",
+      "isOrganizing": "{{name}} is organizing this event."
+    },
+    "reviews": {
+      "noReviews": "No reviews yet. Be the first to review this event!",
+      "viewAll": "View all reviews"
+    },
+    "faq": {
+      "sectionTitle": "Got",
+      "sectionTitleBold1": "Questions?",
+      "sectionTitleMid": "We've Got",
+      "sectionTitleBold2": "Answers",
+      "items": [
+        {
+          "question": "Can I get a refund if I can't attend?",
+          "answer": "Refunds are available up to 48 hours before the event starts. After this period, tickets are non-refundable. Please contact our support team for assistance."
+        },
+        {
+          "question": "Will there be security at the event?",
+          "answer": "Yes, professional security personnel will be present throughout the event to ensure everyone's safety. Bag checks will be conducted at entry points."
+        },
+        {
+          "question": "Can I buy tickets at the door?",
+          "answer": "Tickets may be available at the door subject to availability. However, we strongly recommend purchasing tickets online in advance to guarantee entry."
+        },
+        {
+          "question": "Is there a lost and found service for lost items?",
+          "answer": "Yes, we have a dedicated lost and found station at the venue. If you lose an item, please visit the information desk or contact us after the event."
+        },
+        {
+          "question": "Are bags or backpacks allowed inside the venue?",
+          "answer": "Small bags and purses are allowed but will be subject to security checks. Large backpacks and luggage are not permitted for safety reasons."
+        }
+      ]
+    },
+    "moreFromOrganizer": "More from",
+    "moreFromOrganizerFallback": "this organizer",
+    "trending": {
+      "sectionTitle": "Trending",
+      "sectionTitleSuffix": "events in similar category",
+      "paginationOf": "of",
+      "fromPrice": "from"
+    },
+    "newsletter": {
+      "title": "Be the first to know,",
+      "titleSuffix": "never miss an event again!",
+      "description": "Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.",
+      "emailPlaceholder": "Enter your email",
+      "ctaButton": "Keep Me Updated"
+    },
+    "price": {
+      "from": "From"
+    },
+    "getTickets": "Get Tickets Now!",
+    "error": {
+      "notFound": "Event not found",
+      "goBack": "Go Back"
+    }
+  },
+  "ticketList": {
+    "goBack": "Go Back",
+    "orderSummary": {
+      "title": "Order Summary",
+      "serviceCharge": "Service charge",
+      "total": "Total"
+    },
+    "badges": {
+      "soldOut": "Sold out",
+      "onlyFewLeft": "Only few left",
+      "almostFull": "Almost full"
+    },
+    "error": {
+      "goBack": "Go Back"
+    }
+  },
+
+  "purchaseConfirmation": {
+    "processing": "Processing your order...",
+    "error": {
+      "title": "Order Failed",
+      "goBack": "Go Back"
+    },
+    "title": "Thank You for Your Purchase!",
+    "ticketsConfirmed": "Your tickets are confirmed and sent to",
+    "orderId": "Your order ID",
+    "goToMyTickets": "Go to My Tickets",
+    "youAreGoingTo": "You are going to",
+    "yourTickets": "Your tickets",
+    "ticket_one": "Ticket",
+    "ticket_other": "Tickets",
+    "youMightEnjoy": "You might also enjoy",
+    "fromPrice": "from",
+    "loadMore": "Load More"
+  },
+
+  "profile": {
+    "roleOrganizer": "Organizer",
+    "roleAttendee": "Attendee",
+    "editProfile": "Edit Profile",
+    "personalInfo": "Personal Information",
+    "fullName": "Full Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "Add your phone number",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself",
+    "saveChanges": "Save Changes",
+    "accountSettings": "Account Settings",
+    "changePassword": "Change Password",
+    "privacySettings": "Privacy Settings",
+    "notificationPreferences": "Notification Preferences",
+    "photoAlt": "Profile"
+  },
+
+  "support": {
+    "title": "Support Center",
+    "subtitle": "Need help? We're here for you!",
+    "contactUs": "Contact Us",
+    "emailSupport": {
+      "label": "Email Support"
+    },
+    "liveChat": {
+      "label": "Live Chat",
+      "hours": "Available Mon-Fri, 9AM-5PM PST"
+    },
+    "phoneSupport": {
+      "label": "Phone Support"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "cancelOrder": {
+        "question": "How do I cancel my order?",
+        "answer": "You can cancel your order from the My Tickets section in your dashboard. Click on the event and select \"Cancel Order\". Refunds are subject to the event's refund policy."
+      },
+      "findTickets": {
+        "question": "Where can I find my tickets?",
+        "answer": "Your tickets are available in the Dashboard under \"My Tickets\". You'll also receive them via email after purchase."
+      },
+      "contactOrganizer": {
+        "question": "How do I contact an event organizer?",
+        "answer": "On the event details page, scroll down to the \"Meet your organiser\" section where you'll find contact information."
+      }
+    },
+    "goBack": "Go Back"
+  },
+
+  "unauthorized": {
+    "title": "Access Denied",
+    "description": "You don't have permission to access this page. Please contact an administrator if you believe this is an error.",
+    "goToDashboard": "Go to Dashboard"
+  },
+
+  "hostEvents": {
+    "title": "Host Your Events with",
+    "titleBrand": "Ormeet",
+    "subtitle": "Create unforgettable experiences. Manage everything from ticket sales to attendee engagement in one powerful platform.",
+    "features": {
+      "ticketManagement": {
+        "title": "Easy Ticket Management",
+        "description": "Create multiple ticket types, set pricing, and manage inventory with our intuitive ticketing system."
+      },
+      "analytics": {
+        "title": "Real-time Analytics",
+        "description": "Track ticket sales, revenue, and attendee engagement with comprehensive analytics and insights."
+      },
+      "attendeeManagement": {
+        "title": "Attendee Management",
+        "description": "Check-in attendees with QR codes, send updates, and manage your guest list effortlessly."
+      }
+    },
+    "whyOrmeet": "Why Choose Ormeet?",
+    "benefits": {
+      "lowFees": {
+        "title": "Low Platform Fees",
+        "description": "Keep more of your revenue with our competitive pricing"
+      },
+      "securePayments": {
+        "title": "Secure Payments",
+        "description": "Fast, secure payment processing with multiple options"
+      },
+      "marketingTools": {
+        "title": "Marketing Tools",
+        "description": "Promote your events with built-in marketing features"
+      },
+      "support": {
+        "title": "24/7 Support",
+        "description": "Get help whenever you need it from our dedicated team"
+      }
+    },
+    "getStarted": "Get Started as an Organizer",
+    "alreadyOrganizer": "Already an organizer?",
+    "signIn": "Sign In",
+    "alertMessage": "Failed to upgrade account. Please try again."
+  },
+
+  "myTickets": {
+    "title": "My Tickets",
+    "tabs": {
+      "upcoming": "Upcoming",
+      "past": "Past",
+      "cancelled": "Cancelled"
+    },
+    "ticketCount_one": "{{count}} Ticket",
+    "ticketCount_other": "{{count}} Tickets",
+    "searchPlaceholder": "Search Tickets",
+    "sort": {
+      "newestFirst": "Newest First",
+      "oldestFirst": "Oldest First",
+      "az": "A-Z"
+    },
+    "ticketBadge_one": "{{count}} Ticket",
+    "ticketBadge_other": "{{count}} Tickets",
+    "empty": {
+      "title": "No tickets found",
+      "upcoming": "You don't have any upcoming events.",
+      "past": "You don't have any past events.",
+      "cancelled": "You don't have any cancelled events."
+    }
+  },
+
+  "favoriteEvents": {
+    "title": "Favourite Events",
+    "removeFromFavorites": "Remove from favorites",
+    "viewDetails": "View Details",
+    "browseEvents": "Browse Events",
+    "empty": {
+      "title": "No Favorite Events Yet",
+      "description": "Start adding events to your favorites to see them here!"
+    }
+  },
+
+  "following": {
+    "title": "Organisers you follow",
+    "visitWebsite": "Visit Website →",
+    "unfollow": "Unfollow",
+    "browseEvents": "Browse Events",
+    "empty": {
+      "title": "Not Following Anyone Yet",
+      "description": "Start following organizers to stay updated with their latest events!"
+    }
+  },
+
+  "eventCard": {
+    "fromPrice": "from"
+  },
+
+  "eventListCard": {
+    "fromPrice": "from"
+  },
+
+  "eventMapCard": {
+    "fromPrice": "from",
+    "closeAria": "Close"
+  },
+
+  "locationMapModal": {
+    "title": "Location",
+    "closeMap": "Close map",
+    "mapTitle": "Event location map"
+  },
+
+  "reviewsModal": {
+    "title": "All Reviews",
+    "reviewCount": "({{count}} reviews)"
+  },
+
+  "notificationBell": {
+    "ariaLabel": "Notifications",
+    "panelTitle": "Notifications",
+    "empty": "No notifications yet",
+    "typeLabels": {
+      "EVENT_CANCELLED": "Cancelled",
+      "EVENT_UPDATED": "Updated",
+      "EVENT_REMINDER": "Reminder",
+      "TICKET_PURCHASED": "Purchase",
+      "ORDER_CONFIRMED": "Confirmed",
+      "REFUND_PROCESSED": "Refund"
+    },
+    "timeAgo": {
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
+    }
+  },
+
+  "onboardingInterests": {
+    "logoAlt": "Ormeet Logo",
+    "welcomeTitle": "Welcome to Ormeet!",
+    "subtitle": "Let's get to know you!",
+    "question": "What kind of events excite you?",
+    "saving": "Saving...",
+    "finishLogin": "Finish & Login",
+    "errorFallback": "Failed to save interests. Please try again.",
+    "error": {
+      "selectCategory": "Please select at least one category"
+    },
+    "categories": {
+      "music": "Music",
+      "fitness": "Fitness",
+      "sports": "Sports",
+      "tech": "Tech",
+      "nightlife": "Nightlife",
+      "dating": "Dating",
+      "holiday": "Holiday"
+    }
+  },
+
+  "accountSettings": {
+    "pageTitle": "Personal Info",
+    "pageSubtitle": "Verify your personal info to enhance your experience.",
+    "menu": {
+      "personalInfo": "Personal Info",
+      "paymentMethods": "Payment Methods",
+      "emailPreferences": "Email preferences",
+      "loginSecurity": "Login & security"
+    },
+    "personalInfo": {
+      "profile": "Profile",
+      "email": "Email",
+      "phone": "Phone",
+      "location": "Location",
+      "edit": "Edit",
+      "verified": "Verified",
+      "verifyPhone": "Verify your phone",
+      "modals": {
+        "editProfile": "Edit Profile",
+        "editEmail": "Edit Email",
+        "editPhone": "Edit Phone",
+        "editLocation": "Edit Location",
+        "fullName": "Full Name",
+        "fullNamePlaceholder": "Enter your full name",
+        "profilePhotoAlt": "Profile",
+        "profilePhoto": "Profile Photo",
+        "uploadHint": "Choose file or Drop here",
+        "uploadFormats": "PNG or JPG (max 5MB)",
+        "currentEmail": "Current Email",
+        "newEmail": "New Email",
+        "newEmailPlaceholder": "Enter new email",
+        "currentPhone": "Current Phone",
+        "newPhone": "New Phone Number",
+        "newPhonePlaceholder": "Enter new phone number",
+        "country": "Country",
+        "countryPlaceholder": "Enter country",
+        "city": "City",
+        "cityPlaceholder": "Enter city",
+        "address": "Address",
+        "addressPlaceholder": "Enter address (optional)",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "saveChanges": "Save changes",
+        "cancel": "Cancel",
+        "success": "Changes saved successfully"
+      },
+      "validation": {
+        "fullNameRequired": "Full name is required",
+        "newEmailRequired": "New email is required",
+        "passwordRequired": "Password is required",
+        "invalidEmail": "Please enter a valid email address",
+        "newPhoneRequired": "New phone number is required",
+        "countryRequired": "Country is required",
+        "cityRequired": "City is required"
+      }
+    },
+    "paymentMethods": {
+      "empty": {
+        "title": "Add your preferred payment method",
+        "description": "Securely save a payment method to make ticket purchases quick and easy. You can update it anytime.",
+        "addButton": "Add Payment Method"
+      },
+      "savedCards": "Saved Cards",
+      "addMore": "Add more",
+      "addPaymentTitle": "Add Payment method",
+      "addPaymentSubtitle": "Add your card to enjoy smooth and hassle-free booking.",
+      "cardNumber": "Card Number",
+      "cardNumberPlaceholder": "0000    0000    0000    0000",
+      "expireMonth": "Expire Month",
+      "expireYear": "Expire Year",
+      "cvv": "CVV",
+      "cvvPlaceholder": "Enter CVV",
+      "saveCard": "Save Card",
+      "goBackAlt": "Go Back"
+    },
+    "emailPreferences": {
+      "title": "Email preferences",
+      "subtitle": "Choose the emails you want to receive—stay informed, not overwhelmed.",
+      "options": {
+        "ticketConfirmations": {
+          "title": "Ticket Confirmations",
+          "description": "Get a confirmation email after purchasing tickets."
+        },
+        "eventReminders": {
+          "title": "Event Reminders",
+          "description": "Receive reminders before your event starts."
+        },
+        "eventUpdates": {
+          "title": "Event Updates & Cancellations",
+          "description": "Be notified if any changes are made to your registered events."
+        },
+        "newEvents": {
+          "title": "New Events in My Area",
+          "description": "Get emails about trending or upcoming events near you."
+        },
+        "specialOffers": {
+          "title": "Special Offers & Discounts",
+          "description": "Receive exclusive ticket offers, early bird pricing, and promotions."
+        },
+        "newsletters": {
+          "title": "Newsletters & Platform Updates",
+          "description": "Stay in the loop with Ormeet tips, stories, and announcements."
+        },
+        "surveys": {
+          "title": "Surveys & Feedback Requests",
+          "description": "Help us improve by sharing your experience after events."
+        }
+      }
+    },
+    "loginSecurity": {
+      "title": "Login & security",
+      "subtitle": "Set a unique password to protect your account",
+      "password": "Password",
+      "changePassword": "Change Password",
+      "twoFactor": {
+        "title": "Two-factor authentication",
+        "description": "Two-factor authentication adds extra security by requiring a second step to verify your identity during login."
+      },
+      "modals": {
+        "changePassword": {
+          "title": "Change Password",
+          "currentPassword": "Current Password",
+          "currentPasswordPlaceholder": "Enter current password",
+          "newPassword": "New Password",
+          "newPasswordPlaceholder": "Enter new password",
+          "confirmPassword": "Confirm New Password",
+          "confirmPasswordPlaceholder": "Confirm new password",
+          "saveChanges": "Save changes",
+          "cancel": "Cancel",
+          "success": "Changes saved successfully",
+          "validation": {
+            "currentRequired": "Current password is required",
+            "newRequired": "New password is required",
+            "minLength": "Password must be at least 8 characters",
+            "match": "Passwords do not match"
+          }
+        }
+      }
+    }
+  },
+
+  "eventDetailsComponent": {
+    "goBack": "Go Back",
+    "dateTime": "Date & Time",
+    "venue": "Venue",
+    "allTickets": "All Tickets",
+    "ticketType": "Ticket Type",
+    "status": "Status",
+    "attendeeName": "Attendee Name",
+    "ticketNumber": "Ticket Number",
+    "ticketId": "Ticket ID",
+    "showDetails": "Show Details",
+    "showLess": "Show Less",
+    "qrInfo": "Use the QR code below to check in at the event",
+    "downloadTicket": "Download Ticket",
+    "cancelOrder": "Cancel Order",
+    "cancelling": "Cancelling...",
+    "refundPolicy": "Refund Policy",
+    "refundDays": "{{days}} days before event",
+    "eventOrganizer": "Event Organizer",
+    "contactOrganizer": "Contact Organizer",
+    "more": "More",
+    "orderId": "Order ID #{{id}}",
+    "purchasedOn": "Purchased on {{date}}",
+    "cancelDialog": {
+      "title": "Cancel Order",
+      "message": "Are you sure you want to cancel this order? This action cannot be undone.",
+      "confirm": "Yes, Cancel Order",
+      "cancel": "Keep Order"
+    }
+  }
+}

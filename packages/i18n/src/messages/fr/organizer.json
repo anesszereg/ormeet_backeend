@@ -1,0 +1,880 @@
+{
+  "createEvent": {
+    "pageTitle": "{{mode}} un événement",
+    "pageSubtitle": "Renseignez les informations essentielles pour {{mode}} votre événement rapidement",
+    "backToDashboard": "Retour au tableau de bord",
+    "backToEvents": "Retour aux événements",
+    "faqQuestionRequired": "La question est requise",
+    "faqAnswerRequired": "La réponse est requise",
+    "steps": {
+      "essentialInfo": "Informations essentielles",
+      "dateLocation": "Date et lieu",
+      "images": "Images de l'événement",
+      "tickets": "Billetterie et tarifs"
+    },
+    "form": {
+      "eventTitle": "Titre de l'événement",
+      "eventTitlePlaceholder": "Saisissez le titre de votre événement",
+      "eventCategory": "Catégorie",
+      "eventCategoryPlaceholder": "Choisissez une catégorie",
+      "eventType": "Type d'événement",
+      "eventTypePlaceholder": "Choisissez le type",
+      "eventTypeInPerson": "Sur place",
+      "eventTypeHybrid": "Hybride",
+      "eventTypeRemote": "À distance",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez votre événement aux participants…",
+      "eventDate": "Date de l'événement",
+      "eventDatePlaceholder": "JJ/MM/AAAA",
+      "startTime": "Heure de début",
+      "startTimePlaceholder": "Choisir une heure",
+      "endTime": "Heure de fin",
+      "endTimePlaceholder": "Choisir une heure",
+      "country": "Pays",
+      "countryPlaceholder": "Choisissez un pays",
+      "state": "Wilaya / Région",
+      "statePlaceholder": "Choisissez votre wilaya",
+      "mapAddress": "Adresse",
+      "mapAddressPlaceholder": "Saisissez l'adresse complète du lieu",
+      "onlineLink": "Lien en ligne",
+      "onlineLinkPlaceholder": "https://zoom.us/j/…",
+      "onlineLinkOptional": "(Facultatif)",
+      "mapPreview": "Aperçu de la carte",
+      "imagesInfo": "La première image sera utilisée comme couverture de l'événement sur Ormeet",
+      "uploadZone": {
+        "click": "Cliquez pour téléverser",
+        "dragDrop": " ou glissez-déposez",
+        "formats": "PNG ou JPG (max 10 Mo par image)"
+      },
+      "coverBadge": "Couverture",
+      "moveLeft": "Déplacer à gauche",
+      "moveRight": "Déplacer à droite",
+      "deleteImage": "Supprimer l'image",
+      "ticketLabel": "Billet {{number}}",
+      "ticketType": "Type de billet",
+      "ticketTypePlaceholder": "ex. : VIP, Entrée standard, Early Bird",
+      "ticketTypeHint": "Saisissez un nom de type de billet personnalisé",
+      "priceType": "Type de tarif",
+      "priceTypePlaceholder": "Choisissez le type de tarif",
+      "priceTypeFree": "Gratuit",
+      "priceTypePaid": "Payant",
+      "quantity": "Quantité",
+      "quantityPlaceholder": "0",
+      "price": "Prix",
+      "pricePlaceholder": "0,00",
+      "addTicket": "Ajouter un autre billet",
+      "removeTicket": "Supprimer le billet"
+    },
+    "validation": {
+      "titleRequired": "Le titre de l'événement est requis",
+      "categoryRequired": "Veuillez choisir une catégorie",
+      "eventTypeRequired": "Veuillez choisir le type d'événement",
+      "dateRequired": "La plage de dates est requise",
+      "startTimeRequired": "L'heure de début est requise",
+      "endTimeRequired": "L'heure de fin est requise",
+      "countryRequired": "Le pays est requis",
+      "stateRequired": "La wilaya est requise",
+      "mapAddressRequired": "L'adresse est requise",
+      "imagesRequired": "Au moins une image est requise",
+      "descriptionRequired": "La description est requise",
+      "ticketTypeRequired": "Le type de billet est requis",
+      "duplicateTicketType": "Type de billet en doublon. Chaque type doit être unique",
+      "priceTypeRequired": "Le type de tarif est requis",
+      "quantityRequired": "La quantité est requise",
+      "priceRequired": "Le prix est requis",
+      "imageSizeError": "Chaque image ne doit pas dépasser 10 Mo",
+      "imageFormatError": "Seules les images PNG et JPG sont acceptées",
+      "faqQuestionRequired": "Question is required",
+      "faqAnswerRequired": "Answer is required"
+    },
+    "actions": {
+      "saveDraft": "Enregistrer le brouillon",
+      "publish": "Publier l'événement",
+      "saveChanges": "Enregistrer",
+      "preview": "Aperçu",
+      "creating": "Création…",
+      "saving": "Enregistrement…",
+      "publishing": "Publication…"
+    },
+    "calendar": {
+      "selectMonth": "Choisir un mois",
+      "clear": "Effacer",
+      "sun": "Dim",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam"
+    },
+    "categories": {
+      "Music": "Musique",
+      "Tech": "Tech",
+      "Business": "Business",
+      "Art": "Art",
+      "Sport": "Sport",
+      "Food & Drink": "Restauration",
+      "Health & Wellness": "Santé et bien-être",
+      "Education": "Éducation",
+      "Community": "Communauté",
+      "Other": "Autre"
+    }
+  },
+
+  "dashboard": {
+    "title": "Tableau de bord",
+    "createEvent": "Créer un événement",
+    "stats": {
+      "totalOrders": "Commandes totales",
+      "totalReturns": "Remboursements totaux",
+      "totalRevenue": "Revenus totaux",
+      "fromLastWeek": "Vs semaine dernière",
+      "fromLastMonth": "Vs mois dernier",
+      "fromLastYear": "Vs année dernière"
+    },
+    "topSelling": {
+      "title": "Billets les plus vendus",
+      "period": {
+        "weekly": "Hebdomadaire",
+        "monthly": "Mensuel",
+        "yearly": "Annuel"
+      },
+      "table": {
+        "ticketType": "Type de billet",
+        "sold": "Vendus",
+        "conversion": "Conversion",
+        "totalSales": "% du total",
+        "trend": "{{period}}",
+        "up": "Hausse",
+        "down": "Baisse",
+        "noChange": "Stable"
+      }
+    },
+    "recentActivities": {
+      "title": "Activités récentes",
+      "seeAll": "Tout voir",
+      "empty": {
+        "title": "Aucune activité récente",
+        "description": "Les activités s'afficheront ici lors des commandes"
+      },
+      "actions": {
+        "purchased": "a acheté des billets pour",
+        "ordered": "a passé une commande pour"
+      }
+    },
+    "alerts": {
+      "important": "Alertes importantes",
+      "actionRequired": "Action requise",
+      "noAlerts": "Aucune alerte pour le moment",
+      "noActions": "Aucune action requise"
+    },
+    "modal": {
+      "allActivities": "Toutes les activités"
+    },
+    "loading": "Chargement des données…",
+    "error": "Échec du chargement des données"
+  },
+
+  "events": {
+    "title": "Événements",
+    "createEvent": "Créer un événement",
+    "tabs": {
+      "all": "Tous les événements",
+      "ongoing": "En cours",
+      "upcoming": "À venir",
+      "past": "Passés",
+      "drafts": "Brouillons"
+    },
+    "searchPlaceholder": "Rechercher un événement",
+    "sortOptions": {
+      "newest": "Plus récents d'abord",
+      "oldest": "Plus anciens d'abord",
+      "az": "A-Z"
+    },
+    "dateFilter": "Toutes les dates",
+    "eventCount": "{{count}} événements",
+    "table": {
+      "headers": {
+        "eventName": "Nom de l'événement",
+        "date": "Date",
+        "location": "Lieu",
+        "status": "Statut",
+        "sold": "Vendus"
+      },
+      "status": {
+        "ongoing": "En cours",
+        "upcoming": "À venir",
+        "completed": "Terminé",
+        "draft": "Brouillon"
+      }
+    },
+    "empty": {
+      "title": "Aucun événement",
+      "descriptionSearch": "Essayez d'ajuster votre recherche ou vos filtres",
+      "descriptionNoEvents": "Créez votre premier événement pour commencer",
+      "createButton": "Créer un événement"
+    },
+    "loading": "Chargement des événements…",
+    "pagination": {
+      "showing": "Affichage {{start}}-{{end}} sur {{total}} événements"
+    },
+    "modal": {
+      "aboutEvent": "À propos de l'événement",
+      "venue": "Lieu",
+      "tickets": "Billets",
+      "ticketsSold": "Billets vendus",
+      "capacity": "{{percentage}} % de la capacité",
+      "faq": "FAQ",
+      "actions": {
+        "delete": "Supprimer",
+        "edit": "Modifier l'événement",
+        "duplicate": "Dupliquer l'événement",
+        "sendReminders": "Envoyer des rappels",
+        "sending": "Envoi…"
+      }
+    },
+    "deleteModal": {
+      "title": "Supprimer l'événement",
+      "description": "Êtes-vous sûr de vouloir supprimer « {{eventName}} » ? Cette action est irréversible.",
+      "cancel": "Annuler",
+      "delete": "Supprimer l'événement",
+      "deleting": "Suppression…",
+      "success": "Événement supprimé avec succès"
+    },
+    "calendar": {
+      "selectMonth": "Choisir un mois",
+      "clear": "Effacer"
+    },
+    "ticketStatus": {
+      "free": "Gratuit",
+      "price": "{{price}} DZD"
+    }
+  },
+
+  "attendees": {
+    "title": "Participants",
+    "export": "Exporter",
+    "addAttendee": "Ajouter un participant",
+    "count": "{{count}} participants",
+    "searchPlaceholder": "Rechercher par nom ou e-mail",
+    "sortOptions": {
+      "newest": "Plus récents d'abord",
+      "oldest": "Plus anciens d'abord",
+      "az": "A-Z"
+    },
+    "dateFilter": "Toutes les dates",
+    "filterButton": "Filtrer",
+    "filter": {
+      "ticketType": "Type de billet",
+      "status": "Statut de check-in",
+      "vip": "VIP",
+      "general": "Général",
+      "earlyBird": "Early Bird",
+      "checkedIn": "Enregistré",
+      "notCheckedIn": "Non enregistré",
+      "byEvent": "Ou par événement",
+      "seeAll": "Tout voir",
+      "clearAll": "Tout effacer",
+      "showAttendees": "Afficher {{count}} participants"
+    },
+    "table": {
+      "headers": {
+        "name": "Nom du participant",
+        "email": "E-mail",
+        "event": "Événement",
+        "ticketType": "Type de billet",
+        "status": "Statut"
+      },
+      "status": {
+        "checkedIn": "Enregistré",
+        "notCheckedIn": "Non enregistré"
+      }
+    },
+    "empty": {
+      "title": "Aucun participant",
+      "description": "Les participants apparaîtront ici lorsqu'ils s'enregistreront à vos événements."
+    },
+    "loading": "Chargement des participants…",
+    "pagination": {
+      "showing": "Affichage {{start}}-{{end}} sur {{total}} participants"
+    },
+    "modal": {
+      "selectEvent": "Choisir un événement",
+      "created": "Créé le : {{date}}"
+    },
+    "detailsModal": {
+      "title": "Détails du participant",
+      "email": "E-mail",
+      "registrationDate": "Date d'inscription",
+      "event": "Événement",
+      "ticketType": "Type de billet",
+      "status": "Statut",
+      "actions": {
+        "checkIn": "Enregistrer",
+        "checkingIn": "Enregistrement…",
+        "delete": "Supprimer",
+        "resendTicket": "Renvoyer le billet"
+      }
+    },
+    "deleteModal": {
+      "title": "Confirmer la suppression",
+      "description": "Êtes-vous sûr de vouloir supprimer {{attendeeName}} ?",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "success": "Participant supprimé avec succès"
+    },
+    "resend": {
+      "success": "Billet renvoyé avec succès",
+      "error": "Échec du renvoi du billet. Veuillez réessayer"
+    },
+    "calendar": {
+      "selectMonth": "Choisir un mois",
+      "clear": "Effacer"
+    }
+  },
+
+  "orders": {
+    "title": "Commandes",
+    "export": "Exporter",
+    "stats": {
+      "totalOrders": "Commandes totales",
+      "totalReturns": "Remboursements totaux",
+      "totalRevenue": "Revenus totaux",
+      "fromLastMonth": "Vs mois dernier"
+    },
+    "tabs": {
+      "all": "Toutes les commandes",
+      "active": "Actives",
+      "draft": "Brouillon",
+      "inTransit": "En cours",
+      "completed": "Terminées",
+      "cancelled": "Annulées"
+    },
+    "searchPlaceholder": "Rechercher une commande",
+    "sortOptions": {
+      "newest": "Plus récents d'abord",
+      "oldest": "Plus anciens d'abord",
+      "az": "A-Z"
+    },
+    "dateFilter": "Toutes les dates",
+    "orderCount": "{{count}} commandes",
+    "table": {
+      "headers": {
+        "eventName": "Nom de l'événement",
+        "buyer": "Acheteur",
+        "ticketType": "Type de billet",
+        "qty": "Qté",
+        "totalPrice": "Prix total",
+        "payment": "Paiement",
+        "orderDate": "Date de commande"
+      },
+      "payment": {
+        "paid": "Payé",
+        "pending": "En attente",
+        "failed": "Échoué"
+      }
+    },
+    "empty": {
+      "title": "Aucune commande",
+      "description": "Les commandes apparaîtront ici lorsque les clients achèteront des billets."
+    },
+    "loading": "Chargement des commandes…",
+    "pagination": {
+      "showing": "Affichage {{start}}-{{end}} sur {{total}} commandes"
+    },
+    "detailsModal": {
+      "title": "Détails de la commande",
+      "orderId": "Numéro de commande",
+      "orderDate": "Date de commande",
+      "event": "Événement",
+      "quantity": "Quantité",
+      "ticketType": "Type de billet",
+      "totalPrice": "Prix total",
+      "paymentStatus": "Statut du paiement",
+      "orderStatus": "Statut de la commande",
+      "actions": {
+        "refund": "Rembourser",
+        "cancel": "Annuler la commande",
+        "delete": "Supprimer"
+      }
+    },
+    "deleteModal": {
+      "title": "Confirmer la suppression",
+      "description": "Êtes-vous sûr de vouloir supprimer la commande {{orderId}} ?",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "deleting": "Suppression…",
+      "success": "Commande supprimée avec succès"
+    },
+    "calendar": {
+      "selectMonth": "Choisir un mois",
+      "clear": "Effacer"
+    },
+    "errors": {
+      "loadFailed": "Failed to load orders",
+      "deleteFailed": "Failed to delete order",
+      "refundFailed": "Failed to refund order",
+      "cancelFailed": "Failed to cancel order"
+    }
+  },
+  "accountSettings": {
+    "title": "Paramètres du compte",
+    "subtitle": "Gérez vos préférences et les paramètres de votre organisation.",
+    "menu": {
+      "personalInfo": "Informations personnelles",
+      "aboutOrganization": "À propos de l'organisation",
+      "teamRoles": "Équipe et rôles",
+      "paymentPayout": "Paiements et virements",
+      "emailPreferences": "Préférences e-mail",
+      "loginSecurity": "Connexion et sécurité"
+    },
+    "personalInfo": {
+      "profile": "Profil",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "location": "Localisation",
+      "edit": "Modifier",
+      "verified": "Vérifié",
+      "verifyPhone": "Vérifier votre téléphone",
+      "modals": {
+        "editProfile": "Modifier le profil",
+        "editEmail": "Modifier l'e-mail",
+        "editPhone": "Modifier le téléphone",
+        "editLocation": "Modifier la localisation",
+        "fullName": "Nom complet",
+        "fullNamePlaceholder": "Saisissez votre nom complet",
+        "currentEmail": "E-mail actuel",
+        "newEmail": "Nouvel e-mail",
+        "newEmailPlaceholder": "Saisissez le nouvel e-mail",
+        "currentPhone": "Téléphone actuel",
+        "newPhone": "Nouveau numéro",
+        "newPhonePlaceholder": "Saisissez le nouveau numéro",
+        "country": "Pays",
+        "countryPlaceholder": "Saisissez votre pays",
+        "city": "Ville",
+        "cityPlaceholder": "Saisissez votre ville",
+        "address": "Adresse",
+        "password": "Mot de passe",
+        "passwordPlaceholder": "Saisissez votre mot de passe",
+        "profilePhoto": "Photo de profil",
+        "uploadHint": "Choisissez un fichier ou déposez-le ici",
+        "uploadFormats": "PNG ou JPG (max 5 Mo)",
+        "saveChanges": "Enregistrer",
+        "cancel": "Annuler",
+        "success": "Modifications enregistrées avec succès"
+      },
+      "validation": {
+        "fullNameRequired": "Le nom complet est requis",
+        "newEmailRequired": "Le nouvel e-mail est requis",
+        "passwordRequired": "Le mot de passe est requis",
+        "invalidEmail": "Veuillez saisir une adresse e-mail valide",
+        "newPhoneRequired": "Le nouveau numéro est requis",
+        "countryRequired": "Le pays est requis",
+        "cityRequired": "La ville est requise"
+      }
+    },
+    "organization": {
+      "title": "Profil de l'organisation",
+      "subtitle": "Présentez-vous aux participants. Ajoutez les informations de votre marque et bâtissez la confiance avec votre audience.",
+      "fields": {
+        "name": "Nom de l'organisation",
+        "namePlaceholder": "Saisissez le nom de l'organisation",
+        "type": "Type d'organisation",
+        "typePlaceholder": "Choisissez le type d'organisation",
+        "types": {
+          "company": "Entreprise",
+          "association": "Association",
+          "agency": "Agence",
+          "individual": "Particulier",
+          "other": "Autre"
+        },
+        "logo": "Logo de l'organisation",
+        "uploadHint": "Choisissez un fichier ou déposez-le ici",
+        "uploadFormats": "PNG ou JPG (400×400 px, max 5 Mo)",
+        "address": "Adresse",
+        "addressPlaceholder": "Ex. : Jolie vue, Kouba, Alger",
+        "email": "E-mail de l'organisation",
+        "emailPlaceholder": "Ex. : contact@ormeet.com",
+        "phone": "Téléphone de contact",
+        "phonePlaceholder": "Ajoutez le numéro de votre organisation",
+        "description": "À propos de votre organisation",
+        "descriptionPlaceholder": "Rédigez une courte description du type d'événements que vous organisez et de ce que les participants peuvent attendre."
+      },
+      "socialMedia": {
+        "title": "Réseaux sociaux",
+        "subtitle": "Connectez vos comptes pour permettre aux participants de vous suivre.",
+        "facebook": "Facebook",
+        "facebookPlaceholder": "facebook.com/votrepage",
+        "instagram": "Instagram",
+        "instagramPlaceholder": "@votrecompte",
+        "linkedin": "LinkedIn",
+        "linkedinPlaceholder": "linkedin.com/company/votrenom",
+        "youtube": "YouTube",
+        "youtubePlaceholder": "youtube.com/@votrechaine"
+      },
+      "validation": {
+        "nameRequired": "Le nom de l'organisation est requis",
+        "logoSizeError": "La taille du fichier ne doit pas dépasser 5 Mo"
+      },
+      "saveChanges": "Enregistrer",
+      "saving": "Enregistrement…",
+      "success": "Organisation enregistrée avec succès !"
+    },
+    "teamRoles": {
+      "tabs": {
+        "team": "Membres de l'équipe",
+        "roles": "Rôles"
+      },
+      "team": {
+        "count": "{{count}} membre{{plural}}",
+        "searchPlaceholder": "Rechercher un membre",
+        "inviteMember": "Inviter un membre",
+        "table": {
+          "name": "Nom",
+          "email": "E-mail",
+          "role": "Rôle",
+          "status": "Statut"
+        },
+        "status": {
+          "active": "Actif",
+          "pending": "En attente"
+        },
+        "empty": "Aucun membre trouvé",
+        "invite": {
+          "title": "Ajouter un membre à votre équipe",
+          "subtitle": "Saisissez l'adresse e-mail du membre de votre équipe, puis attribuez-lui un rôle qui définira ses permissions.",
+          "email": "Adresse e-mail",
+          "emailPlaceholder": "collegue@exemple.com",
+          "invitationCode": "Code d'invitation",
+          "invitationCodePlaceholder": "Saisissez le code d'invitation",
+          "role": "Attribuer un rôle",
+          "rolePlaceholder": "Choisissez un rôle",
+          "send": "Envoyer l'invitation",
+          "cancel": "Annuler",
+          "success": "Invitation envoyée avec succès"
+        },
+        "validation": {
+          "emailRequired": "L'adresse e-mail est requise",
+          "invalidEmail": "Veuillez saisir une adresse e-mail valide",
+          "roleRequired": "Veuillez attribuer un rôle"
+        }
+      },
+      "roles": {
+        "searchPlaceholder": "Rechercher un rôle",
+        "createRole": "Créer un rôle",
+        "table": {
+          "role": "Rôle",
+          "permissions": "Permissions"
+        },
+        "empty": "Aucun rôle personnalisé",
+        "duplicateWarning": "Un rôle avec ce nom existe déjà. Veuillez choisir un autre nom.",
+        "form": {
+          "titleCreate": "Créer un rôle",
+          "titleEdit": "Modifier le rôle",
+          "titleDuplicate": "Dupliquer le rôle",
+          "roleName": "Nom du rôle",
+          "roleNamePlaceholder": "Saisissez le nom du rôle",
+          "permissions": {
+            "events": "Événements",
+            "deleteEvents": "Supprimer des événements",
+            "createAndEditEvents": "Créer et modifier des événements",
+            "viewEvents": "Voir les événements",
+            "ticketsAndPricing": "Billetterie et tarifs",
+            "viewTickets": "Voir les billets",
+            "editTicketTypesAndPricing": "Modifier les types de billets et tarifs",
+            "managePromoCodes": "Gérer les codes promo",
+            "ordersAndAttendees": "Commandes et participants",
+            "viewAttendees": "Voir les participants",
+            "exportAttendeeData": "Exporter les données des participants",
+            "checkInAttendees": "Enregistrer les participants",
+            "editAttendeeInfo": "Modifier les infos des participants",
+            "reportsAndAnalytics": "Rapports et analyses",
+            "viewAnalyticsDashboard": "Voir les statistiques",
+            "downloadReports": "Télécharger les rapports",
+            "emailAndNotifications": "E-mails et notifications",
+            "viewScheduledMessages": "Voir les messages programmés",
+            "editEmailTemplates": "Modifier les modèles d'e-mail",
+            "sendEventReminders": "Envoyer des rappels d'événements",
+            "settings": "Paramètres",
+            "viewSettings": "Voir les paramètres",
+            "manageTeamAccess": "Gérer les accès de l'équipe"
+          },
+          "create": "Créer le rôle",
+          "saveChanges": "Enregistrer",
+          "cancel": "Annuler"
+        },
+        "actions": {
+          "edit": "Modifier",
+          "duplicate": "Dupliquer",
+          "delete": "Supprimer",
+          "confirmDelete": "Confirmer la suppression",
+          "deleteDescription": "Êtes-vous sûr de vouloir supprimer ce rôle ?",
+          "deleteSuccess": "Rôle supprimé avec succès"
+        }
+      },
+      "memberDetails": {
+        "changeRole": "Changer de rôle",
+        "currentRole": "Rôle actuel",
+        "newRole": "Nouveau rôle",
+        "newRolePlaceholder": "Choisissez un rôle",
+        "cancel": "Annuler",
+        "confirm": "Confirmer",
+        "success": "Rôle modifié avec succès",
+        "error": "Échec du changement de rôle"
+      }
+    },
+    "emailPreferences": {
+      "title": "Préférences e-mail",
+      "subtitle": "Choisissez les e-mails que vous souhaitez recevoir — restez informé sans être submergé.",
+      "options": {
+        "eventUpdates": {
+          "title": "Mises à jour d'événements",
+          "description": "Soyez notifié lors des inscriptions ou des modifications de vos événements."
+        },
+        "ticketSales": {
+          "title": "Notifications de ventes",
+          "description": "Recevez des alertes lorsque des billets sont vendus pour vos événements."
+        },
+        "attendeeMessages": {
+          "title": "Messages des participants",
+          "description": "Soyez notifié lorsque des participants vous envoient des messages ou des questions."
+        },
+        "payoutNotifications": {
+          "title": "Notifications de virements",
+          "description": "Soyez informé du traitement des paiements et du statut de vos virements."
+        },
+        "platformUpdates": {
+          "title": "Mises à jour de la plateforme",
+          "description": "Restez informé des nouvelles fonctionnalités et améliorations de la plateforme."
+        },
+        "marketingTips": {
+          "title": "Conseils marketing",
+          "description": "Recevez des conseils pour promouvoir vos événements et augmenter votre audience."
+        },
+        "newsletters": {
+          "title": "Newsletters et témoignages",
+          "description": "Inspirez-vous des autres organisateurs et des tendances du secteur."
+        }
+      }
+    },
+    "loginSecurity": {
+      "title": "Connexion et sécurité",
+      "subtitle": "Définissez un mot de passe unique pour protéger votre compte",
+      "password": {
+        "title": "Mot de passe",
+        "changePassword": "Changer le mot de passe"
+      },
+      "twoFactor": {
+        "title": "Authentification à deux facteurs",
+        "description": "L'authentification à deux facteurs ajoute une sécurité supplémentaire en exigeant une seconde étape de vérification lors de la connexion."
+      },
+      "modals": {
+        "changePassword": {
+          "title": "Changer le mot de passe",
+          "currentPassword": "Mot de passe actuel",
+          "currentPasswordPlaceholder": "Saisissez le mot de passe actuel",
+          "newPassword": "Nouveau mot de passe",
+          "newPasswordPlaceholder": "Saisissez le nouveau mot de passe",
+          "confirmPassword": "Confirmer le mot de passe",
+          "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+          "saveChanges": "Enregistrer",
+          "cancel": "Annuler",
+          "success": "Modifications enregistrées avec succès",
+          "validation": {
+            "currentRequired": "Le mot de passe actuel est requis",
+            "newRequired": "Le nouveau mot de passe est requis",
+            "minLength": "Le mot de passe doit contenir au moins 8 caractères",
+            "match": "Les mots de passe ne correspondent pas"
+          }
+        }
+      }
+    }
+  },
+
+  "onboarding": {
+    "brandInfo": {
+      "title": "Bienvenue sur Ormeet !",
+      "subtitle": "Parlez-nous de votre marque ou de vous-même",
+      "fields": {
+        "organisationName": "Nom de l'organisation",
+        "organisationPlaceholder": "Saisissez le nom de votre organisation",
+        "eventTypes": "Quels types d'événements organisez-vous ?",
+        "eventsPerYear": "Combien d'événements prévoyez-vous l'année prochaine ?",
+        "eventsPerYearPlaceholder": "Nombre d'événements",
+        "eventsPerYearOptions": {
+          "1-5": "1 à 5 événements",
+          "6-10": "6 à 10 événements",
+          "11-20": "11 à 20 événements",
+          "21-50": "21 à 50 événements",
+          "50+": "Plus de 50 événements"
+        },
+        "averageAttendees": "Nombre moyen de participants par événement",
+        "averageAttendeesPlaceholder": "Nombre de participants",
+        "averageAttendeesOptions": {
+          "1-50": "1 à 50 participants",
+          "51-100": "51 à 100 participants",
+          "101-250": "101 à 250 participants",
+          "251-500": "251 à 500 participants",
+          "500-1000": "500 à 1000 participants",
+          "1000+": "Plus de 1000 participants"
+        }
+      },
+      "eventTypesList": [
+        "Concerts live",
+        "Soirées et nightlife",
+        "Soirées DJ",
+        "Expositions d'art",
+        "Fitness",
+        "Vacances",
+        "Rencontres",
+        "Webinaires",
+        "Conférences",
+        "Restauration",
+        "Famille et enfants",
+        "Gaming et tech",
+        "Business et finance"
+      ],
+      "submit": "Terminer et se connecter",
+      "saving": "Enregistrement…",
+      "errorFallback": "Failed to save brand info. Please try again."
+    }
+  },
+
+  "bankAccount": {
+    "sectionTitle": "Compte bancaire",
+    "sectionSubtitle": "Gérez le compte bancaire qui recevra les paiements de vos événements",
+    "empty": {
+      "title": "Aucun compte bancaire",
+      "description": "Vous devez ajouter un compte bancaire pour recevoir les paiements de vos événements.",
+      "addButton": "Ajouter un compte bancaire",
+      "adminOnly": "Seul l'administrateur peut ajouter un compte bancaire"
+    },
+    "card": {
+      "accountHolderName": "Titulaire du compte",
+      "bankName": "Nom de la banque",
+      "country": "Pays",
+      "iban": "IBAN",
+      "statusVerified": "Vérifié",
+      "statusPending": "En attente de vérification",
+      "deleteButton": "Supprimer",
+      "deleteTitle": "Supprimer le compte bancaire",
+      "editButton": "Modifier le compte bancaire"
+    },
+    "modal": {
+      "titleAdd": "Ajouter un compte bancaire",
+      "titleEdit": "Modifier le compte bancaire",
+      "fields": {
+        "accountHolderName": "Titulaire du compte",
+        "accountHolderNamePlaceholder": "Nom du titulaire",
+        "bankName": "Nom de la banque",
+        "bankNamePlaceholder": "Nom de votre banque",
+        "country": "Pays",
+        "countryPlaceholder": "Votre pays",
+        "iban": "IBAN",
+        "ibanPlaceholder": "Saisissez votre IBAN (ex. : DZ580000000000000000000000)",
+        "swiftBic": "Code SWIFT / BIC",
+        "swiftBicPlaceholder": "Saisissez le code SWIFT/BIC (ex. : BNALDZALXXX)"
+      },
+      "validation": {
+        "accountHolderRequired": "Le nom du titulaire est requis",
+        "bankNameRequired": "Le nom de la banque est requis",
+        "countryRequired": "Le pays est requis",
+        "ibanRequired": "L'IBAN est requis",
+        "swiftRequired": "Le code SWIFT/BIC est requis",
+        "ibanInvalid": "Format d'IBAN invalide",
+        "swiftInvalid": "Code SWIFT/BIC invalide"
+      },
+      "saveChanges": "Enregistrer",
+      "success": "Compte bancaire enregistré avec succès",
+      "error": "L'action a échoué. Veuillez réessayer"
+    },
+    "deleteModal": {
+      "title": "Confirmer la suppression",
+      "description": "Êtes-vous sûr de vouloir supprimer ce compte bancaire ?",
+      "confirm": "Confirmer",
+      "success": "Compte bancaire supprimé avec succès"
+    }
+  },
+
+  "export": {
+    "title": "Exporter les données",
+    "description": "Sélectionnez l'événement dont vous souhaitez exporter les données.",
+    "selectEventLabel": "Choisir un événement",
+    "allEvents": "Tous les événements",
+    "confirm": "Confirmer"
+  },
+
+  "addAttendee": {
+    "title": "Ajouter un participant",
+    "description": "Renseignez les informations pour ajouter un nouveau participant à un événement.",
+    "fields": {
+      "firstName": "Prénom",
+      "firstNamePlaceholder": "Saisissez le prénom",
+      "lastName": "Nom",
+      "lastNamePlaceholder": "Saisissez le nom",
+      "email": "E-mail",
+      "emailPlaceholder": "Saisissez l'adresse e-mail",
+      "event": "Événement",
+      "ticketType": "Type de billet"
+    },
+    "validation": {
+      "emailInvalid": "Veuillez saisir une adresse e-mail valide"
+    },
+    "confirm": "Confirmer",
+    "success": "Participant ajouté avec succès"
+  },
+
+  "eventPreview": {
+    "modalTitle": "Aperçu de l'événement",
+    "modalSubtitle": "Voici comment votre événement apparaîtra aux participants",
+    "closeAria": "Fermer l'aperçu",
+    "prevImageAria": "Image précédente",
+    "nextImageAria": "Image suivante",
+    "goToImageAria": "Aller à l'image {{number}}",
+    "addToFavoritesAria": "Ajouter aux favoris",
+    "shareEventAria": "Partager l'événement",
+    "ratingNew": "Nouveau",
+    "noReviews": "Aucun avis pour le moment",
+    "untitledEvent": "Événement sans titre",
+    "noDescription": "Aucune description fournie",
+    "dateTime": "Date et heure",
+    "dateNotSet": "Date non définie",
+    "location": "Lieu",
+    "locationNotSet": "Lieu non défini",
+    "seeOnMap": "Voir sur la carte",
+    "closeMap": "Fermer la carte",
+    "mapTitle": "Carte du lieu de l'événement",
+    "onlineAccess": "Accès en ligne",
+    "category": "Catégorie",
+    "availableTickets": "Billets disponibles",
+    "ticketQuantityAvailable": "{{quantity}} disponibles",
+    "ticketQuantityNotSet": "Quantité non définie",
+    "ticketFree": "Gratuit",
+    "faqTitle": "Des questions ? Nous avons les réponses",
+    "fromPrice": "À partir de",
+    "getTickets": "Réserver maintenant !",
+    "visibilityPublic": "Événement public",
+    "visibilityPrivate": "Événement privé"
+  },
+
+  "timePicker": {
+    "selectTimeLabel": "CHOISIR L'HEURE"
+  },
+
+  "dateTimeModal": {
+    "title": "Date et heure",
+    "closeCalendar": "Fermer le calendrier",
+    "days": {
+      "sun": "Dim",
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam"
+    },
+    "timesAvailable_one": "{{count}} créneau disponible le {{date}}",
+    "timesAvailable_other": "{{count}} créneaux disponibles le {{date}}",
+    "selectTimeSubtitle": "Choisissez un créneau qui vous convient parmi les options ci-dessous."
+  }
+}

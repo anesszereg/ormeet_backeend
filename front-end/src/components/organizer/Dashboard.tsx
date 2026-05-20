@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import organizerService, { Event, Order } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
 import CreateEventIcon from '../../assets/Svgs/organiser/dashboard/Events/createEvent.svg';
@@ -34,7 +35,10 @@ interface DashboardStats {
   revenueChange: number;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const Dashboard = ({ onCreateEvent }: DashboardProps) => {
+  const { t, i18n } = useTranslation(['organizer', 'common']);
   const { user } = useAuth();
   const [selectedPeriod, setSelectedPeriod] = useState('Weekly');
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
@@ -113,7 +117,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         setStats(calculatedStats);
       } catch (err) {
         console.error('❌ [Dashboard] Failed to fetch dashboard data:', err);
-        setError('Failed to load dashboard data');
+        setError(t('dashboard:error'));
       } finally {
         setIsLoading(false);
       }
@@ -131,13 +135,18 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
       organizerPhoto: order.user?.profilePhoto || undefined,
       action: order.status === 'paid' ? 'purchased tickets for' : 'placed an order for',
       eventName: event?.title || 'an event',
-      time: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      time: new Date(order.createdAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' })
     };
   });
 
   const displayedActivities = recentActivities.slice(0, 3);
 
-  const periods = ['Weekly', 'Monthly', 'Yearly'];
+  const periods = ['weekly', 'monthly', 'yearly'];
+  const periodLabels: Record<string, string> = {
+    weekly: t('dashboard:topSelling.period.weekly'),
+    monthly: t('dashboard:topSelling.period.monthly'),
+    yearly: t('dashboard:topSelling.period.yearly'),
+  };
 
   // Generate ticket data from real orders
   const getTicketData = () => {
@@ -179,12 +188,12 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
 
   const getFromLastLabel = () => {
     switch (selectedPeriod) {
-      case 'Monthly':
-        return 'From Last Month';
-      case 'Yearly':
-        return 'From Last Year';
+      case 'monthly':
+        return t('dashboard:stats.fromLastMonth');
+      case 'yearly':
+        return t('dashboard:stats.fromLastYear');
       default:
-        return 'From Last Week';
+        return t('dashboard:stats.fromLastWeek');
     }
   };
 
@@ -220,16 +229,16 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
     <div className="w-full">
       {/* Header with Create Event Button */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('dashboard:title')}</h1>
         
         {/* Create Event Button - Exact same as Events tab */}
         <button
           onClick={onCreateEvent}
-          className="relative flex items-center gap-2 pl-11 pr-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
+          className="relative flex items-center gap-2 ps-11 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm sm:text-base rounded-full transition-all cursor-pointer whitespace-nowrap"
           style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
         >
-          <img src={CreateEventIcon} alt="Create" className="absolute left-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
-          <span>Create Event</span>
+          <img src={CreateEventIcon} alt={t('dashboard:createEvent')} className="absolute start-1 top-1/2 -translate-y-1/2 w-[26px] h-[26px] sm:w-[30px] sm:h-[30px]" />
+          <span>{t('dashboard:createEvent')}</span>
         </button>
       </div>
 
@@ -239,21 +248,21 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Orders</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('dashboard:stats.totalOrders')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : stats.totalOrders.toLocaleString()}
               </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
-              <img src={stats.ordersChange >= 0 ? UpIcon : DownIcon} alt="Trend" className="w-full h-full object-contain" />
+              <img src={stats.ordersChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={stats.ordersChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt="Change" className="w-3 h-3" />
+            <img src={stats.ordersChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt={t('common:aria.change')} className="w-3 h-3" />
             <span className={`text-xs lg:text-sm font-medium ${stats.ordersChange >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
               {Math.abs(stats.ordersChange)}%
             </span>
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{getFromLastLabel()}</span>
           </div>
         </div>
 
@@ -261,21 +270,21 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Returns</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('dashboard:stats.totalReturns')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : stats.totalReturns.toLocaleString()}
               </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
-              <img src={stats.returnsChange >= 0 ? UpIcon : DownIcon} alt="Trend" className="w-full h-full object-contain" />
+              <img src={stats.returnsChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={stats.returnsChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt="Change" className="w-3 h-3" />
+            <img src={stats.returnsChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt={t('common:aria.change')} className="w-3 h-3" />
             <span className={`text-xs lg:text-sm font-medium ${stats.returnsChange >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
               {Math.abs(stats.returnsChange)}%
             </span>
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{getFromLastLabel()}</span>
           </div>
         </div>
 
@@ -283,21 +292,21 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Revenue</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('dashboard:stats.totalRevenue')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : `$${stats.totalRevenue.toLocaleString()}`}
               </h3>
             </div>
             <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
-              <img src={stats.revenueChange >= 0 ? UpIcon : DownIcon} alt="Trend" className="w-full h-full object-contain" />
+              <img src={stats.revenueChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <img src={stats.revenueChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt="Change" className="w-3 h-3" />
+            <img src={stats.revenueChange >= 0 ? ArrowUpIcon : ArrowDownIcon} alt={t('common:aria.change')} className="w-3 h-3" />
             <span className={`text-xs lg:text-sm font-medium ${stats.revenueChange >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
               {Math.abs(stats.revenueChange)}%
             </span>
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{getFromLastLabel()}</span>
           </div>
         </div>
       </div>
@@ -308,7 +317,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         <div className="lg:col-span-2 bg-white border border-light-gray rounded-xl p-6 flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-black">Top Selling Ticket Categories</h2>
+            <h2 className="text-lg font-bold text-black">{t('dashboard:topSelling.title')}</h2>
             <div className="flex items-center gap-3">
               {/* Period Dropdown */}
               <div className="relative" ref={periodRef}>
@@ -317,8 +326,8 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                   onClick={() => setIsPeriodDropdownOpen(!isPeriodDropdownOpen)}
                   className="px-3 py-1 text-sm text-black border border-light-gray rounded-xl focus:outline-none focus:border-primary transition-all flex items-center justify-between min-w-[100px] cursor-pointer"
                 >
-                  {selectedPeriod}
-                  <svg className="w-4 h-4 text-gray ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {periodLabels[selectedPeriod] || selectedPeriod}
+                  <svg className="w-4 h-4 text-gray ms-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -330,13 +339,13 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                         key={period}
                         type="button"
                         onClick={() => handlePeriodSelect(period)}
-                        className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                        className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                           selectedPeriod === period
                             ? 'bg-primary-light text-primary font-medium'
                             : 'text-gray hover:bg-secondary-light'
                         }`}
                       >
-                        {period}
+                        {periodLabels[period] || period}
                       </button>
                     ))}
                   </div>
@@ -350,11 +359,11 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-light-gray">
-                  <th className="text-left text-xs font-medium text-gray pb-3" style={{ width: '25%' }}>Ticket Type</th>
-                  <th className="text-left text-xs font-medium text-gray pb-3" style={{ width: '15%' }}>Sold</th>
-                  <th className="text-left text-xs font-medium text-gray pb-3" style={{ width: '18%' }}>Conversion</th>
-                  <th className="text-left text-xs font-medium text-gray pb-3" style={{ width: '17%' }}>Total Sales %</th>
-                  <th className="text-left text-xs font-medium text-gray pb-3" style={{ width: '25%' }}>{getFromLastLabel()}</th>
+                  <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '25%' }}>{t('dashboard:topSelling.table.ticketType')}</th>
+                  <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '15%' }}>{t('dashboard:topSelling.table.sold')}</th>
+                  <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '18%' }}>{t('dashboard:topSelling.table.conversion')}</th>
+                  <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '17%' }}>{t('dashboard:topSelling.table.totalSales')}</th>
+                  <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '25%' }}>{getFromLastLabel()}</th>
                 </tr>
               </thead>
               <tbody>
@@ -368,23 +377,23 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                       <div className="flex items-center gap-1">
                         {ticket.trend === 'up' && (
                           <>
-                            <img src={UpTrendIcon} alt="Up" className="w-3 h-3" />
+                            <img src={UpTrendIcon} alt={t('dashboard:topSelling.table.up')} className="w-3 h-3" />
                             <span className="text-sm font-medium text-[#10B981]">{ticket.change}</span>
-                            <span className="text-sm text-gray">Up</span>
+                            <span className="text-sm text-gray">{t('dashboard:topSelling.table.up')}</span>
                           </>
                         )}
                         {ticket.trend === 'down' && (
                           <>
-                            <img src={DownTrendIcon} alt="Down" className="w-3 h-3" />
+                            <img src={DownTrendIcon} alt={t('dashboard:topSelling.table.down')} className="w-3 h-3" />
                             <span className="text-sm font-medium text-[#EF4444]">{ticket.change}</span>
-                            <span className="text-sm text-gray">Down</span>
+                            <span className="text-sm text-gray">{t('dashboard:topSelling.table.down')}</span>
                           </>
                         )}
                         {ticket.trend === 'nochange' && (
                           <>
-                            <img src={NoChangeIcon} alt="No change" className="w-3 h-3" />
+                            <img src={NoChangeIcon} alt={t('dashboard:topSelling.table.noChange')} className="w-3 h-3" />
                             <span className="text-sm font-medium text-[#003a97]">{ticket.change}</span>
-                            <span className="text-sm text-gray">No Change</span>
+                            <span className="text-sm text-gray">{t('dashboard:topSelling.table.noChange')}</span>
                           </>
                         )}
                       </div>
@@ -398,12 +407,12 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
           {/* Recent Activities Section */}
           <div className="mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-black">Recent Activities</h2>
+              <h2 className="text-lg font-bold text-black">{t('dashboard:recentActivities.title')}</h2>
               <button 
                 onClick={() => setIsActivitiesModalOpen(true)}
                 className="text-[#FF4000] text-xs font-medium hover:text-[#E63900] transition-colors cursor-pointer"
               >
-                See All
+                {t('dashboard:recentActivities.seeAll')}
               </button>
             </div>
 
@@ -416,8 +425,8 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <p className="text-sm font-medium text-gray-600">No recent activities</p>
-                  <p className="text-xs text-gray-400 mt-1">Activities will appear here when orders are placed</p>
+                  <p className="text-sm font-medium text-gray-600">{t('dashboard:recentActivities.empty.title')}</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('dashboard:recentActivities.empty.description')}</p>
                 </div>
               ) : (
                 displayedActivities.map((activity, index) => (
@@ -465,14 +474,14 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#FF4000] rounded-full"></div>
-                <h3 className="text-sm font-bold text-black">Important Alerts</h3>
+                <h3 className="text-sm font-bold text-black">{t('dashboard:alerts.important')}</h3>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
-              <p className="text-xs text-gray">No alerts at the moment</p>
+              <p className="text-xs text-gray">{t('dashboard:alerts.noAlerts')}</p>
             </div>
           </div>
 
@@ -481,14 +490,14 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-[#FBBC04] rounded-full"></div>
-                <h3 className="text-sm font-bold text-black">Action Required</h3>
+                <h3 className="text-sm font-bold text-black">{t('dashboard:alerts.actionRequired')}</h3>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <svg className="w-8 h-8 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
-              <p className="text-xs text-gray">No actions required</p>
+              <p className="text-xs text-gray">{t('dashboard:alerts.noActions')}</p>
             </div>
           </div>
         </div>
@@ -500,7 +509,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <h2 className="text-xl font-bold text-black">All Activities</h2>
+              <h2 className="text-xl font-bold text-black">{t('dashboard:modal.allActivities')}</h2>
               <button 
                 onClick={() => setIsActivitiesModalOpen(false)}
                 className="text-gray hover:text-black transition-colors cursor-pointer"

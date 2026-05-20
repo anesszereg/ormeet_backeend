@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 import MusicIcon from '../assets/Svgs/music.svg';
@@ -18,6 +20,7 @@ import BusinessColorIcon from '../assets/Svgs/business color.svg';
 type UserType = 'attend' | 'organize' | null;
 
 const OnboardingChoice = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<UserType>(null);
 
@@ -39,6 +42,9 @@ const OnboardingChoice = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="fixed top-4 end-4 z-50">
+        <LanguageSwitcher />
+      </div>
       {/* Left Side - Form */}
       <div className="flex-1 flex items-start justify-center p-4 sm:p-6 md:p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-[520px] flex flex-col gap-4 sm:gap-6 py-6 sm:py-8 md:py-4">
@@ -49,7 +55,7 @@ const OnboardingChoice = () => {
 
           {/* Welcome Text */}
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Welcome to Ormeet!</h1>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('onboardingChoice.title')}</h1>
             
             {/* Progress Bar */}
             <div className="flex gap-2">
@@ -61,7 +67,7 @@ const OnboardingChoice = () => {
           {/* Instruction Text */}
           <div>
             <h2 className="text-lg sm:text-xl text-[#4F4F4F]">
-              Tell us how you'd like to use Ormeet.
+              {t('onboardingChoice.subtitle')}
             </h2>
           </div>
 
@@ -70,7 +76,7 @@ const OnboardingChoice = () => {
             {/* Attend Events Card */}
             <button
               onClick={() => handleSelection('attend')}
-              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left cursor-pointer ${
+              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-start cursor-pointer ${
                 selectedType === 'attend'
                   ? 'border-[#FF4000] bg-[#FFF4F3]'
                   : 'border-[#EEEEEE] bg-white hover:border-[#CCCCCC]'
@@ -80,11 +86,11 @@ const OnboardingChoice = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-base sm:text-lg font-semibold text-black">
-                      I want to <span className="font-bold">attend</span> events
+                      {t('onboardingChoice.attendCard.prefix')}<span className="font-bold">{t('onboardingChoice.attendCard.keyword')}</span>{t('onboardingChoice.attendCard.suffix')}
                     </span>
                   </div>
                   <p className="text-sm text-[#4F4F4F]">
-                    Find and book events you'll love.
+                    {t('onboardingChoice.attendCard.description')}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -121,7 +127,7 @@ const OnboardingChoice = () => {
             {/* Organize Events Card */}
             <button
               onClick={() => handleSelection('organize')}
-              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-left cursor-pointer ${
+              className={`w-full p-5 sm:p-6 rounded-2xl border-2 transition-all text-start cursor-pointer ${
                 selectedType === 'organize'
                   ? 'border-[#FF4000] bg-[#FFF4F3]'
                   : 'border-[#EEEEEE] bg-white hover:border-[#CCCCCC]'
@@ -131,11 +137,11 @@ const OnboardingChoice = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-base sm:text-lg font-semibold text-black">
-                      I want to <span className="font-bold">organize</span> events
+                      {t('onboardingChoice.organizeCard.prefix')}<span className="font-bold">{t('onboardingChoice.organizeCard.keyword')}</span>{t('onboardingChoice.organizeCard.suffix')}
                     </span>
                   </div>
                   <p className="text-sm text-[#4F4F4F]">
-                    Create, manage, and sell tickets for your events.
+                    {t('onboardingChoice.organizeCard.description')}
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -176,7 +182,7 @@ const OnboardingChoice = () => {
             disabled={!selectedType}
             className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2 cursor-pointer"
           >
-            Let's get started
+            {t('onboardingChoice.continueButton')}
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
               <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>

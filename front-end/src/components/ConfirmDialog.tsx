@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -17,10 +18,13 @@ const ConfirmDialog = ({
   message,
   onConfirm,
   onCancel,
-  confirmText = 'OK',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   confirmButtonClass = 'bg-[#7DD3FC] hover:bg-[#5BC0EB]',
 }: ConfirmDialogProps) => {
+  const { t } = useTranslation('common');
+  const resolvedConfirmText = confirmText ?? t('confirmDialog.defaultConfirm');
+  const resolvedCancelText = cancelText ?? t('confirmDialog.defaultCancel');
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -60,13 +64,13 @@ const ConfirmDialog = ({
             onClick={onCancel}
             className="px-8 py-3 bg-white text-black font-semibold rounded-full border-2 border-[#EEEEEE] hover:bg-[#F8F8F8] transition-colors"
           >
-            {cancelText}
+            {resolvedCancelText}
           </button>
           <button
             onClick={onConfirm}
             className="px-8 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
       </div>

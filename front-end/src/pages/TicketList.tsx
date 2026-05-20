@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ticketTypeService, { TicketType as ApiTicketType } from '../services/ticketTypeService';
@@ -47,13 +48,16 @@ const getIconForType = (type: string): string => {
 
 const getBadge = (available: number, quantityTotal: number): { badge?: string; badgeColor?: string } => {
   const ratio = available / quantityTotal;
-  if (available === 0) return { badge: 'Sold out', badgeColor: 'orange' };
-  if (ratio <= 0.1) return { badge: 'Only few left', badgeColor: 'orange' };
-  if (ratio <= 0.25) return { badge: 'Almost full', badgeColor: 'blue' };
+  if (available === 0) return { badge: 'soldOut', badgeColor: 'orange' };
+  if (ratio <= 0.1) return { badge: 'onlyFewLeft', badgeColor: 'orange' };
+  if (ratio <= 0.25) return { badge: 'almostFull', badgeColor: 'blue' };
   return {};
 };
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const TicketList: React.FC = () => {
+  const { t, i18n } = useTranslation('attendee');
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
   const { user } = useAuth();
@@ -100,8 +104,8 @@ const TicketList: React.FC = () => {
         // Map event info
         const startDate = new Date(event.startAt);
         const endDate = new Date(event.endAt);
-        const dateStr = startDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        const timeStr = `${startDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} - ${endDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+        const dateStr = startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const timeStr = `${startDate.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })} - ${endDate.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })}`;
 
         setEventInfo({
           id: event.id,
@@ -184,7 +188,7 @@ const TicketList: React.FC = () => {
         <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">Go Back</button>
+          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">{t('ticketList.error.goBack')}</button>
         </div>
       </div>
     );
@@ -205,7 +209,7 @@ const TicketList: React.FC = () => {
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span className="font-medium">Go Back</span>
+          <span className="font-medium">{t('ticketList.goBack')}</span>
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -237,7 +241,7 @@ const TicketList: React.FC = () => {
                                 ? 'text-[#FF4000] bg-[#FFF4F3]' 
                                 : 'text-[#00A3FF] bg-[#E6F7FF]'
                             }`}>
-                              {ticket.badge}
+                              {t(`ticketList.badges.${ticket.badge}`)}
                             </span>
                           )}
                         </div>
@@ -318,7 +322,7 @@ const TicketList: React.FC = () => {
               </div>
 
               {/* Order Summary */}
-              <h3 className="text-lg font-bold text-black mb-4">Order Summary</h3>
+              <h3 className="text-lg font-bold text-black mb-4">{t('ticketList.orderSummary.title')}</h3>
 
               <div className="space-y-3 mb-4">
                 {getOrderSummaryItems().map((ticket) => (
@@ -332,7 +336,7 @@ const TicketList: React.FC = () => {
                   </div>
                 ))}
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-[#4F4F4F]">Service charge</span>
+                  <span className="text-sm text-[#4F4F4F]">{t('ticketList.orderSummary.serviceCharge')}</span>
                   <span className="text-sm font-semibold text-black">${serviceCharge.toFixed(2)}</span>
                 </div>
               </div>
@@ -342,7 +346,7 @@ const TicketList: React.FC = () => {
 
               <div className="pt-4 border-t border-[#EEEEEE] mb-6">
                 <div className="flex justify-between items-center">
-                  <span className="text-base font-bold text-black">Total</span>
+                  <span className="text-base font-bold text-black">{t('ticketList.orderSummary.total')}</span>
                   <span className="text-xl font-bold text-black">${calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
@@ -353,7 +357,7 @@ const TicketList: React.FC = () => {
                 className="w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
                 disabled={getOrderSummaryItems().length === 0}
               >
-                Continue
+                {t('common:cta.continue')}
               </button>
             </div>
           </div>

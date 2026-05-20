@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "title": "Ormeet — Trouvez votre prochain événement",
+    "description": "Découvrez concerts, workshops, meetups, festivals et réservez vos billets en quelques secondes."
+  },
+  "hero": {
+    "title": "<b>Trouvez</b>. <b>Réservez</b>. <b>Vivez</b>.",
+    "subtitle": "Concerts, workshops, meetups et bien plus — votre prochain événement n'est qu'à une recherche."
+  },
+  "search": {
+    "whereLabel": "Lieu",
+    "wherePlaceholder": "Rechercher un lieu",
+    "whatLabel": "Événement",
+    "whatPlaceholder": "Rechercher un événement",
+    "buttonAria": "Rechercher",
+    "locationAlt": "Lieu"
+  },
+  "carousel": {
+    "previousAria": "Événement précédent",
+    "nextAria": "Événement suivant"
+  },
+  "discover": {
+    "headingPrefix": "Découvrez",
+    "headingMiddle": "les événements à",
+    "locationAlt": "Lieu",
+    "fromPrice": "à partir de {price}",
+    "empty": "Aucun événement trouvé dans cette catégorie.",
+    "categories": {
+      "all": "Toutes les catégories",
+      "music": "Musique",
+      "sports": "Sport",
+      "foodDrink": "Restauration",
+      "artPerformance": "Art & spectacle"
+    }
+  },
+  "trending": {
+    "titlePrefix": "Événements",
+    "titleSuffix": "populaires",
+    "fromPrice": "à partir de {price}",
+    "badges": {
+      "almostFull": "Bientôt complet",
+      "salesEndSoon": "Fin des ventes",
+      "onlyFewLeft": "Derniers billets"
+    }
+  },
+  "city": {
+    "headingPrefix": "Événements à",
+    "fromPrice": "à partir de {price}",
+    "badges": {
+      "trending": "Tendance",
+      "almostFull": "Bientôt complet"
+    }
+  },
+  "vibe": {
+    "titleStart": "Trouvez des événements qui vous",
+    "titleHighlight": "ressemblent",
+    "description": "Parcourez les événements par catégorie et trouvez ce qui vous plaît — musique, fitness, gastronomie, business, art… Ormeet a quelque chose pour chacun.",
+    "categories": {
+      "fitness": "Fitness",
+      "music": "Musique",
+      "dating": "Rencontres",
+      "nightlife": "Nightlife",
+      "holiday": "Vacances",
+      "foodDrink": "Restauration",
+      "art": "Art",
+      "sports": "Sport",
+      "business": "Business",
+      "wellness": "Bien-être",
+      "comedy": "Humour",
+      "theater": "Théâtre",
+      "outdoor": "Plein air",
+      "tech": "Tech",
+      "fashion": "Mode"
+    }
+  },
+  "bigCities": {
+    "titleStart": "Grandes villes, grands événements.",
+    "titleHighlight": "Trouvez les vôtres.",
+    "description": "Où est-ce que ça bouge ? Choisissez votre ville et découvrez événements, meetups et expériences inoubliables.",
+    "from": "À partir de"
+  },
+  "testimonials": {
+    "subtitle": "Plus de 5000 utilisateurs satisfaits",
+    "titleLoved": "Adoré",
+    "titleByAttendees": "par les participants.",
+    "titleTrusted": "Approuvé",
+    "titleByOrganizers": "par les organisateurs."
+  },
+  "newsletter": {
+    "title": "Soyez les premiers informés. Ne ratez plus aucun événement !",
+    "description": "Recevez les nouveautés exclusives, l'accès en avant-première et une sélection d'événements directement dans votre boîte mail.",
+    "placeholder": "Votre adresse e-mail",
+    "buttonAria": "Me tenir informé"
+  },
+  "footer": {
+    "description": "Ormeet connecte les passionnés à travers des événements inoubliables — des concerts live aux workshops. Découvrez et réservez des expériences près de chez vous, ou organisez les vôtres facilement. Que vous participiez ou organisiez, Ormeet rend les événements simples et accessibles.",
+    "browseEvents": "Parcourir les événements",
+    "hostEvents": "Organiser",
+    "support": "Aide",
+    "company": "Entreprise",
+    "legal": "Mentions légales",
+    "categories": {
+      "music": "Musique",
+      "sports": "Sport",
+      "business": "Business",
+      "fitness": "Fitness",
+      "nightlife": "Nightlife",
+      "holiday": "Vacances",
+      "dating": "Rencontres",
+      "festival": "Festival"
+    },
+    "host": {
+      "createEvents": "Créer un événement",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs"
+    },
+    "supportLinks": {
+      "helpCenter": "Centre d'aide",
+      "findTickets": "Retrouver mes billets",
+      "contactOrganizer": "Contacter l'organisateur"
+    },
+    "companyLinks": {
+      "about": "À propos",
+      "contact": "Nous contacter",
+      "blog": "Blog"
+    },
+    "legalLinks": {
+      "terms": "Conditions d'utilisation",
+      "privacy": "Politique de confidentialité",
+      "cookies": "Politique des cookies",
+      "refund": "Remboursement et annulation"
+    },
+    "copyright": "© {year} Ormeet. Tous droits réservés.",
+    "logoAlt": "Ormeet"
+  },
+  "languageSwitcher": {
+    "label": "Changer de langue"
+  }
+}

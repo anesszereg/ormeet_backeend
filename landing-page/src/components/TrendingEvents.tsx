@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
@@ -19,6 +20,7 @@ interface TrendingEventsProps {
 }
 
 const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
+  const t = useTranslations("landing.trending");
   if (!hasLoaded) return null;
   if (events.length === 0) return null;
 
@@ -32,7 +34,7 @@ const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          <span className="font-bold">Trending</span> events
+          <span className="font-bold">{t("titlePrefix")}</span> {t("titleSuffix")}
         </h2>
         <PaginationControls
           page={page}
@@ -64,7 +66,7 @@ const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                   />
                 </div>
-                <div className="absolute bottom-2 left-2 transition-transform duration-300 group-hover:scale-110">
+                <div className="absolute bottom-2 start-2 transition-transform duration-300 group-hover:scale-110">
                   <span
                     className="text-7xl font-bold text-black"
                     style={{ WebkitTextStroke: "3px white" }}
@@ -81,7 +83,9 @@ const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
                 </h3>
                 <div className="flex items-center gap-2 flex-wrap">
                   {event.price && (
-                    <span className="text-sm text-black">from {event.price}</span>
+                    <span className="text-sm text-black">
+                      {t("fromPrice", { price: event.price })}
+                    </span>
                   )}
                 </div>
                 {event.category && (

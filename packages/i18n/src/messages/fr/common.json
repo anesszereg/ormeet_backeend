@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "browseEvents": "Parcourir les événements",
+    "hostEvents": "Organiser",
+    "support": "Aide",
+    "login": "Se connecter",
+    "signup": "S'inscrire",
+    "logout": "Se déconnecter"
+  },
+  "cta": {
+    "getStarted": "Commencer",
+    "learnMore": "En savoir plus",
+    "submit": "Envoyer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "continue": "Continuer",
+    "back": "Retour"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "description": "Ormeet rassemble les passionnés à travers des événements inoubliables — des concerts live aux workshops. Découvrez et réservez des expériences près de chez vous, ou organisez les vôtres facilement. Que vous participiez ou organisiez, Ormeet rend les événements simples, accessibles et excitants.",
+    "browseEvents": {
+      "title": "Parcourir les événements",
+      "music": "Musique",
+      "sports": "Sport",
+      "business": "Business",
+      "fitness": "Fitness",
+      "nightlife": "Nightlife",
+      "holiday": "Vacances",
+      "dating": "Rencontres",
+      "festival": "Festival"
+    },
+    "hostEvents": {
+      "title": "Organiser un événement",
+      "createEvents": "Créer un événement",
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs"
+    },
+    "support": {
+      "title": "Aide",
+      "helpCenter": "Centre d'aide",
+      "findTickets": "Retrouver mes billets",
+      "contactOrganizer": "Contacter l'organisateur"
+    },
+    "company": {
+      "title": "Entreprise",
+      "aboutUs": "À propos",
+      "contactUs": "Nous contacter",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Mentions légales",
+      "termsOfService": "Conditions d'utilisation",
+      "privacyPolicy": "Politique de confidentialité",
+      "cookiePolicy": "Politique des cookies",
+      "refundCancellation": "Remboursement et annulation"
+    },
+    "copyright": "© 2025 Ormeet. Tous droits réservés."
+  },
+  "confirmDialog": {
+    "defaultConfirm": "OK",
+    "defaultCancel": "Annuler"
+  },
+  "phoneInput": {
+    "searchPlaceholder": "Rechercher un pays…",
+    "noCountriesFound": "Aucun pays trouvé"
+  },
+  "sidebar": {
+    "title": "Menu",
+    "searchPlaceholder": "Rechercher",
+    "expandAria": "Développer la barre latérale",
+    "collapseAria": "Réduire la barre latérale",
+    "myTickets": "Mes billets",
+    "favoriteEvents": "Mes favoris",
+    "following": "Suivis",
+    "accountSettings": "Paramètres du compte",
+    "dashboard": "Tableau de bord",
+    "events": "Événements",
+    "attendees": "Participants",
+    "orders": "Commandes",
+    "workspace": "Espace de travail",
+    "addWorkspaceAria": "Ajouter un espace de travail"
+  },
+  "header": {
+    "toggleMenuAria": "Ouvrir le menu",
+    "searchLocationPlaceholder": "Rechercher un lieu",
+    "searchEventPlaceholder": "Rechercher un événement",
+    "needAssistance": "Besoin d'aide ?"
+  },
+  "userMenu": {
+    "profile": "Profil",
+    "dashboard": "Tableau de bord",
+    "attendeeDashboard": "Espace participant",
+    "organizerDashboard": "Espace organisateur",
+    "becomeOrganizer": "Devenir organisateur",
+    "myTickets": "Mes billets",
+    "settings": "Paramètres",
+    "helpSupport": "Aide",
+    "verified": "Vérifié"
+  }
+}

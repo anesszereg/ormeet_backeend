@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface Review {
   id: number | string;
@@ -16,6 +17,7 @@ interface ReviewsModalProps {
 }
 
 const ReviewsModal = ({ isOpen, onClose, reviews }: ReviewsModalProps) => {
+  const { t } = useTranslation('attendee');
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,8 +75,8 @@ const ReviewsModal = ({ isOpen, onClose, reviews }: ReviewsModalProps) => {
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            <h2 className="text-xl font-bold text-black">All Reviews</h2>
-            <span className="text-base text-[#4F4F4F]">({reviews.length} reviews)</span>
+            <h2 className="text-xl font-bold text-black">{t('reviewsModal.title')}</h2>
+            <span className="text-base text-[#4F4F4F]">{t('reviewsModal.reviewCount', { count: reviews.length })}</span>
           </div>
           <button 
             onClick={onClose}

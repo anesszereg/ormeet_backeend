@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface EventListCardProps {
   image: string;
@@ -23,6 +24,7 @@ const EventListCard = ({
   description,
   eventId
 }: EventListCardProps) => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -59,7 +61,7 @@ const EventListCard = ({
 
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-1">
-            <span className="text-xs text-[#757575]">from</span>
+            <span className="text-xs text-[#757575]">{t('eventListCard.fromPrice')}</span>
             <span className="text-base font-semibold text-black">{price}</span>
           </div>
           {badge && (

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
@@ -50,6 +51,7 @@ const eventCategories: EventCategory[] = [
 ];
 
 const OnboardingInterests = () => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
   const { refreshUser, user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('music');
@@ -90,7 +92,7 @@ const OnboardingInterests = () => {
     e.preventDefault();
     
     if (!selectedCategory) {
-      setError('Please select at least one category');
+      setError(t('onboardingInterests.error.selectCategory'));
       return;
     }
 
@@ -114,7 +116,7 @@ const OnboardingInterests = () => {
         navigate('/dashboard-attendee', { replace: true });
       }
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to save interests. Please try again.';
+      const errorMessage = err.response?.data?.message || err.message || t('onboardingInterests.errorFallback');
       setError(errorMessage);
       console.error('Failed to save interests:', err);
     } finally {
@@ -132,12 +134,12 @@ const OnboardingInterests = () => {
         <div className="w-full max-w-[520px] flex flex-col gap-4 sm:gap-6 py-6 sm:py-8 md:py-4">
           {/* Logo */}
           <div>
-            <img src={Logo} alt="Ormeet Logo" className="w-7 h-[38px]" />
+            <img src={Logo} alt={t('onboardingInterests.logoAlt')} className="w-7 h-[38px]" />
           </div>
 
           {/* Welcome Text */}
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Welcome to Ormeet!</h1>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('onboardingInterests.welcomeTitle')}</h1>
             
             {/* Progress Bar */}
             <div className="flex gap-2">
@@ -151,10 +153,10 @@ const OnboardingInterests = () => {
           {/* Instruction Text */}
           <div className="flex flex-col gap-3">
             <h2 className="text-lg sm:text-xl font-semibold text-black">
-              Let's get to know you!
+              {t('onboardingInterests.subtitle')}
             </h2>
             <p className="text-sm font-medium text-black">
-              What kind of events excite you?
+              {t('onboardingInterests.question')}
             </p>
           </div>
 
@@ -248,7 +250,7 @@ const OnboardingInterests = () => {
               disabled={!selectedCategory || isLoading}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
             >
-              {isLoading ? 'Saving...' : 'Finish & Login'}
+              {isLoading ? t('onboardingInterests.saving') : t('onboardingInterests.finishLogin')}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

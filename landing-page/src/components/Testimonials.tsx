@@ -2,6 +2,7 @@
 
 import { useId } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { Testimonial } from "@/types";
 import { usePagination } from "@/hooks/usePagination";
 import PaginationControls from "@/components/ui/PaginationControls";
@@ -219,6 +220,7 @@ const TestimonialCard = ({ t }: { t: Testimonial }) => (
 );
 
 const Testimonials = () => {
+  const t = useTranslations("landing.testimonials");
   const { page, handlePrev, handleNext } = usePagination({ totalPages: TOTAL_PAGES });
   const currentTestimonials = allTestimonialPages[page - 1];
   const topRow = currentTestimonials.slice(0, 3);
@@ -243,13 +245,13 @@ const Testimonials = () => {
 
         {/* Subtitle */}
         <span className="text-xs font-semibold tracking-widest text-muted uppercase mb-4">
-          5000+ Happy Ormeet Users
+          {t("subtitle")}
         </span>
 
         {/* Title */}
         <h2 className="text-3xl md:text-4xl text-center text-black leading-tight">
-          <span className="font-bold">Loved</span> by attendees.{" "}
-          <span className="font-bold">trusted</span> by organizers.
+          <span className="font-bold">{t("titleLoved")}</span> {t("titleByAttendees")}{" "}
+          <span className="font-bold">{t("titleTrusted")}</span> {t("titleByOrganizers")}
         </h2>
       </div>
 

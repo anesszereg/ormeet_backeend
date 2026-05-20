@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import userPreferencesService, { Organization } from '../services/userPreferencesService';
 import OrganizerLogo from '../assets/imges/logoFollowing/images (1).png';
 
 const Following = () => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
   const [following, setFollowing] = useState<Organization[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +41,7 @@ const Following = () => {
   if (isLoading) {
     return (
       <div className="w-full">
-        <h1 className="text-2xl font-bold text-black mb-6">Organisers you follow</h1>
+        <h1 className="text-2xl font-bold text-black mb-6">{t('following.title')}</h1>
         <div className="flex items-center justify-center py-20">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
         </div>
@@ -50,7 +52,7 @@ const Following = () => {
   if (error) {
     return (
       <div className="w-full">
-        <h1 className="text-2xl font-bold text-black mb-6">Organisers you follow</h1>
+        <h1 className="text-2xl font-bold text-black mb-6">{t('following.title')}</h1>
         <div className="flex flex-col items-center justify-center py-20">
           <p className="text-red-500 mb-4">{error}</p>
         </div>
@@ -60,7 +62,7 @@ const Following = () => {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold text-black mb-6">Organisers you follow</h1>
+      <h1 className="text-2xl font-bold text-black mb-6">{t('following.title')}</h1>
 
       {following.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
@@ -69,15 +71,15 @@ const Following = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-black mb-3">Not Following Anyone Yet</h2>
+          <h2 className="text-2xl font-bold text-black mb-3">{t('following.empty.title')}</h2>
           <p className="text-base text-[#4F4F4F] text-center max-w-md mb-6">
-            Start following organizers to stay updated with their latest events!
+            {t('following.empty.description')}
           </p>
           <button
             onClick={() => navigate('/browse-events')}
             className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
           >
-            Browse Events
+            {t('following.browseEvents')}
           </button>
         </div>
       ) : (
@@ -103,7 +105,7 @@ const Following = () => {
                   rel="noopener noreferrer"
                   className="text-sm text-[#FF4000] hover:underline mb-4 block"
                 >
-                  Visit Website →
+                  {t('following.visitWebsite')}
                 </a>
               )}
 
@@ -111,7 +113,7 @@ const Following = () => {
                 onClick={() => handleUnfollow(org.id)}
                 className="w-full py-2.5 border-2 border-[#FF4000] text-[#FF4000] font-semibold rounded-full hover:bg-[#FFF4F3] transition-colors"
               >
-                Unfollow
+                {t('following.unfollow')}
               </button>
             </div>
           ))}

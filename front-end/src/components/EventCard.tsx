@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface EventCardProps {
   image: string;
@@ -12,6 +13,7 @@ interface EventCardProps {
 }
 
 const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CAF50', eventId }: EventCardProps) => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -41,7 +43,7 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-1">
-            <span className="text-sm md:text-xs text-[#757575]">from</span>
+            <span className="text-sm md:text-xs text-[#757575]">{t('eventCard.fromPrice')}</span>
             <span className="text-lg md:text-base font-semibold text-black">{price}</span>
           </div>
           {badge && (

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
@@ -25,6 +26,7 @@ const EventsInCalifornia = ({
   hasLoaded,
   selectedCity = "California",
 }: EventsInCaliforniaProps) => {
+  const t = useTranslations("landing.city");
   // Filter to events whose city/venue matches the selected city.
   // If no match, show every event (still real data).
   const filtered = useMemo(() => {
@@ -50,7 +52,7 @@ const EventsInCalifornia = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          Events in <span className="font-bold">{selectedCity}</span>
+          {t("headingPrefix")} <span className="font-bold">{selectedCity}</span>
         </h2>
         <PaginationControls
           page={page}
@@ -89,7 +91,9 @@ const EventsInCalifornia = ({
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               {event.price && (
-                <span className="text-sm font-semibold text-black">from {event.price}</span>
+                <span className="text-sm font-semibold text-black">
+                  {t("fromPrice", { price: event.price })}
+                </span>
               )}
               {event.category && (
                 <span className="text-xs font-medium px-2 py-1 rounded text-primary bg-primary-light">

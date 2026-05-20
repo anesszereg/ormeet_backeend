@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import jsPDF from 'jspdf';
 import orderService from '../services/orderService';
 import ConfirmDialog from './ConfirmDialog';
@@ -56,6 +57,7 @@ const EventDetails = ({
   organizerLogo,
   onGoBack,
 }: EventDetailsProps) => {
+  const { t } = useTranslation('attendee');
   const [expandedTickets, setExpandedTickets] = useState<Set<string>>(new Set());
   const [currentQRIndex, setCurrentQRIndex] = useState(0);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -173,8 +175,8 @@ const EventDetails = ({
         onClick={onGoBack}
         className="flex items-center gap-2 mb-6 text-sm font-medium text-[#4F4F4F] hover:text-[#FF4000] transition-colors cursor-pointer"
       >
-        <img src={GoBackIcon} alt="Go Back" className="w-6 h-6" />
-        <span>Go Back</span>
+        <img src={GoBackIcon} alt={t('eventDetailsComponent.goBack')} className="w-6 h-6" />
+        <span>{t('eventDetailsComponent.goBack')}</span>
       </button>
 
       {/* Main Content Grid: Left (Event Info) + Right (QR Code) */}
@@ -199,7 +201,7 @@ const EventDetails = ({
               {/* Date & Time */}
               <div className="flex items-start gap-3 mb-3">
                 <div className="text-sm text-[#4F4F4F]">
-                  <p className="font-semibold text-black">Date & Time</p>
+                  <p className="font-semibold text-black">{t('eventDetailsComponent.dateTime')}</p>
                   <p>{eventDate} | {eventTime}</p>
                 </div>
               </div>
@@ -207,7 +209,7 @@ const EventDetails = ({
               {/* Venue & Location */}
               <div className="flex items-start gap-3">
                 <div className="text-sm text-[#4F4F4F]">
-                  <p className="font-semibold text-black">Venue</p>
+                  <p className="font-semibold text-black">{t('eventDetailsComponent.venue')}</p>
                   <p>{eventVenue} | {eventLocation}</p>
                 </div>
               </div>
@@ -216,7 +218,7 @@ const EventDetails = ({
 
           {/* All Tickets Section */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-lg font-bold text-black mb-4">All Tickets</h2>
+            <h2 className="text-lg font-bold text-black mb-4">{t('eventDetailsComponent.allTickets')}</h2>
 
             {/* Tickets List */}
             <div className="space-y-3">
@@ -244,11 +246,11 @@ const EventDetails = ({
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
                           <span className="text-sm text-[#4F4F4F]">
-                            Ticket Type: <span className="font-medium text-black">{ticket.ticketType}</span>
+                            {t('eventDetailsComponent.ticketType')}: <span className="font-medium text-black">{ticket.ticketType}</span>
                           </span>
                           <span className="text-[#BCBCBC]">•</span>
                           <span className="text-sm text-[#4F4F4F]">
-                            Status: <span className={`font-medium ${ticket.status === 'Not Scanned' ? 'text-[#FF4000]' : 'text-green-600'}`}>
+                            {t('eventDetailsComponent.status')}: <span className={`font-medium ${ticket.status === 'Not Scanned' ? 'text-[#FF4000]' : 'text-green-600'}`}>
                               {ticket.status}
                             </span>
                           </span>
@@ -263,7 +265,7 @@ const EventDetails = ({
                     >
                       <img
                         src={expandedTickets.has(ticket.id) ? ShowLessIcon : ShowDetailsIcon}
-                        alt={expandedTickets.has(ticket.id) ? 'Show Less' : 'Show Details'}
+                        alt={expandedTickets.has(ticket.id) ? t('eventDetailsComponent.showLess') : t('eventDetailsComponent.showDetails')}
                         className="w-6 h-6"
                       />
                     </button>
@@ -274,19 +276,19 @@ const EventDetails = ({
                     <div className="px-4 pb-4 pt-2 bg-[#FAFAFA] border-t border-[#EEEEEE]">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-xs text-[#4F4F4F] mb-1">Attendee Name</p>
+                          <p className="text-xs text-[#4F4F4F] mb-1">{t('eventDetailsComponent.attendeeName')}</p>
                           <p className="text-sm font-medium text-black">{ticket.attendeeName}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-[#4F4F4F] mb-1">Ticket Type</p>
+                          <p className="text-xs text-[#4F4F4F] mb-1">{t('eventDetailsComponent.ticketType')}</p>
                           <p className="text-sm font-medium text-black">{ticket.ticketType}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-[#4F4F4F] mb-1">Ticket Number</p>
+                          <p className="text-xs text-[#4F4F4F] mb-1">{t('eventDetailsComponent.ticketNumber')}</p>
                           <p className="text-sm font-medium text-black">{ticket.ticketNumber}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-[#4F4F4F] mb-1">Ticket ID</p>
+                          <p className="text-xs text-[#4F4F4F] mb-1">{t('eventDetailsComponent.ticketId')}</p>
                           <p className="text-sm font-medium text-black">{ticket.ticketId}</p>
                         </div>
                       </div>
@@ -307,7 +309,7 @@ const EventDetails = ({
             <div className="bg-[#E3F2FD] rounded-xl p-3 flex items-start gap-2 mb-6">
               <img src={InfoIcon} alt="Info" className="w-5 h-5 shrink-0 mt-0.5" />
               <p className="text-xs text-[#1976D2] leading-relaxed">
-                Use the QR code below to check in at the event
+                {t('eventDetailsComponent.qrInfo')}
               </p>
             </div>
 
@@ -370,14 +372,14 @@ const EventDetails = ({
                   onClick={handleDownloadTicket}
                   className="w-full py-3.5 bg-black text-white text-sm font-semibold rounded-full hover:bg-[#333] transition-colors cursor-pointer"
                 >
-                  Download Ticket
+                  {t('eventDetailsComponent.downloadTicket')}
                 </button>
                 <button 
                   onClick={() => setShowCancelDialog(true)}
                   disabled={isCancelling}
                   className="w-full py-3.5 bg-white text-black text-sm font-semibold rounded-full border border-black hover:bg-[#F8F8F8] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isCancelling ? 'Cancelling...' : 'Cancel Order'}
+                  {isCancelling ? t('eventDetailsComponent.cancelling') : t('eventDetailsComponent.cancelOrder')}
                 </button>
               </div>
             </div>
@@ -387,8 +389,8 @@ const EventDetails = ({
           <div className="bg-[#E3F2FD] rounded-2xl p-4 flex items-start gap-3">
             <img src={RefundPolicyIcon} alt="Refund Policy" className="w-10 h-10 shrink-0" />
             <div>
-              <h3 className="text-sm font-bold text-black mb-0.5">Refund Policy</h3>
-              <p className="text-xs text-[#4F4F4F]">{refundDays} days before event</p>
+              <h3 className="text-sm font-bold text-black mb-0.5">{t('eventDetailsComponent.refundPolicy')}</h3>
+              <p className="text-xs text-[#4F4F4F]">{t('eventDetailsComponent.refundDays', { days: refundDays })}</p>
             </div>
           </div>
 
@@ -397,16 +399,16 @@ const EventDetails = ({
             <div className="flex items-center gap-3 mb-4">
               <img src={organizerLogo} alt={organizerName} className="w-12 h-12 rounded-full object-cover" />
               <div className="flex-1">
-                <p className="text-xs text-[#4F4F4F] mb-0.5">Event Organizer</p>
+                <p className="text-xs text-[#4F4F4F] mb-0.5">{t('eventDetailsComponent.eventOrganizer')}</p>
                 <p className="text-sm font-bold text-black">{organizerName}</p>
               </div>
             </div>
             <div className="flex items-center justify-between">
               <button className="px-6 py-2 text-sm font-semibold text-black bg-white rounded-full border border-black hover:bg-[#F8F8F8] hover:border-[#FF4000] hover:text-[#FF4000] transition-colors cursor-pointer">
-                Contact Organizer
+                {t('eventDetailsComponent.contactOrganizer')}
               </button>
               <button className="flex items-center gap-1 text-sm font-semibold text-black hover:text-[#FF4000] transition-colors cursor-pointer">
-                More
+                {t('eventDetailsComponent.more')}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -417,8 +419,8 @@ const EventDetails = ({
           {/* Order Details */}
           <div className="bg-white rounded-2xl shadow-sm p-4">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-[#4F4F4F] font-medium">Order ID #{orderId}</span>
-              <span className="text-[#4F4F4F] font-medium">Purchased on {purchaseDate}</span>
+              <span className="text-[#4F4F4F] font-medium">{t('eventDetailsComponent.orderId', { id: orderId })}</span>
+              <span className="text-[#4F4F4F] font-medium">{t('eventDetailsComponent.purchasedOn', { date: purchaseDate })}</span>
             </div>
           </div>
         </div>
@@ -427,12 +429,12 @@ const EventDetails = ({
       {/* Cancel Order Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showCancelDialog}
-        title="Cancel Order"
-        message="Are you sure you want to cancel this order? This action cannot be undone."
+        title={t('eventDetailsComponent.cancelDialog.title')}
+        message={t('eventDetailsComponent.cancelDialog.message')}
         onConfirm={handleCancelOrder}
         onCancel={() => setShowCancelDialog(false)}
-        confirmText="Yes, Cancel Order"
-        cancelText="Keep Order"
+        confirmText={t('eventDetailsComponent.cancelDialog.confirm')}
+        cancelText={t('eventDetailsComponent.cancelDialog.cancel')}
       />
     </div>
   );

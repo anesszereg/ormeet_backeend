@@ -14,7 +14,7 @@ import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import { useLandingEvents } from "@/hooks/useLandingEvents";
 
-export default function Home() {
+export default function HomeContent() {
   const [selectedCity, setSelectedCity] = useState("California");
   // One backend call shared by every event-listing section below.
   const { events, isLoading, hasLoaded } = useLandingEvents();

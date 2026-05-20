@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
 const OAuthCallback = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { refreshUser } = useAuth();
@@ -60,7 +62,7 @@ const OAuthCallback = () => {
         }, 1000);
       } catch (err: any) {
         console.error('OAuth callback error:', err);
-        setError('Failed to complete authentication. Please try again.');
+        setError(t('oauthCallback.failed'));
         // Clear any partial auth state
         localStorage.removeItem('token');
         localStorage.removeItem('user');

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import PersonalInfoIcon from '../assets/Svgs/personalInfo.svg';
@@ -25,6 +26,7 @@ interface PaymentCard {
 }
 
 const AccountSettings = () => {
+  const { t } = useTranslation('attendee');
   const { user } = useAuth();
   const [activeSection, setActiveSection] = useState('personal-info');
   
@@ -105,7 +107,7 @@ const AccountSettings = () => {
   // Handlers for Personal Info
   const handleProfileSave = async () => {
     if (!profileData.fullName.trim()) {
-      setProfileError('Full name is required');
+      setProfileError(t('accountSettings.personalInfo.validation.fullNameRequired'));
       return;
     }
     
@@ -127,16 +129,16 @@ const AccountSettings = () => {
   
   const handleEmailSave = async () => {
     if (!emailData.newEmail.trim()) {
-      setEmailError('New email is required');
+      setEmailError(t('accountSettings.personalInfo.validation.newEmailRequired'));
       return;
     }
     if (!emailData.password.trim()) {
-      setEmailError('Password is required');
+      setEmailError(t('accountSettings.personalInfo.validation.passwordRequired'));
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailData.newEmail)) {
-      setEmailError('Please enter a valid email address');
+      setEmailError(t('accountSettings.personalInfo.validation.invalidEmail'));
       return;
     }
     
@@ -159,11 +161,11 @@ const AccountSettings = () => {
   
   const handlePhoneSave = async () => {
     if (!phoneData.newPhone.trim()) {
-      setPhoneError('New phone number is required');
+      setPhoneError(t('accountSettings.personalInfo.validation.newPhoneRequired'));
       return;
     }
     if (!phoneData.password.trim()) {
-      setPhoneError('Password is required');
+      setPhoneError(t('accountSettings.personalInfo.validation.passwordRequired'));
       return;
     }
     
@@ -186,11 +188,11 @@ const AccountSettings = () => {
   
   const handleLocationSave = async () => {
     if (!locationData.country.trim()) {
-      setLocationError('Country is required');
+      setLocationError(t('accountSettings.personalInfo.validation.countryRequired'));
       return;
     }
     if (!locationData.city.trim()) {
-      setLocationError('City is required');
+      setLocationError(t('accountSettings.personalInfo.validation.cityRequired'));
       return;
     }
     
@@ -253,19 +255,19 @@ const AccountSettings = () => {
   // Handlers for Login & Security
   const handlePasswordSave = async () => {
     if (!passwordData.currentPassword.trim()) {
-      setPasswordError('Current password is required');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.currentRequired'));
       return;
     }
     if (!passwordData.newPassword.trim()) {
-      setPasswordError('New password is required');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.newRequired'));
       return;
     }
     if (passwordData.newPassword.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.minLength'));
       return;
     }
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setPasswordError('Passwords do not match');
+      setPasswordError(t('accountSettings.loginSecurity.modals.changePassword.validation.match'));
       return;
     }
     
@@ -287,17 +289,17 @@ const AccountSettings = () => {
   };
 
   const menuItems = [
-    { id: 'personal-info', label: 'Personal Info', icon: PersonalInfoIcon },
-    { id: 'payment-methods', label: 'Payment Methods', icon: PaymentIcon },
-    { id: 'email-preferences', label: 'Email preferences', icon: EmailIcon },
-    { id: 'login-security', label: 'Login & security', icon: SecurityIcon },
+    { id: 'personal-info', label: t('accountSettings.menu.personalInfo'), icon: PersonalInfoIcon },
+    { id: 'payment-methods', label: t('accountSettings.menu.paymentMethods'), icon: PaymentIcon },
+    { id: 'email-preferences', label: t('accountSettings.menu.emailPreferences'), icon: EmailIcon },
+    { id: 'login-security', label: t('accountSettings.menu.loginSecurity'), icon: SecurityIcon },
   ];
 
   return (
     <div className="w-full">
       {/* Page Title */}
-      <h1 className="text-2xl font-bold text-black mb-6">Personal Info</h1>
-      <p className="text-sm text-[#4F4F4F] mb-8">Verify your personal info to enhance your experience.</p>
+      <h1 className="text-2xl font-bold text-black mb-6">{t('accountSettings.pageTitle')}</h1>
+      <p className="text-sm text-[#4F4F4F] mb-8">{t('accountSettings.pageSubtitle')}</p>
 
       {/* Main Grid: Left Menu + Right Content */}
       <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
@@ -336,20 +338,20 @@ const AccountSettings = () => {
               {/* Profile Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Profile</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.profile')}</h2>
                   <button 
                     onClick={() => setIsProfileModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <img
                     src={profileData.profilePhoto}
-                    alt="Profile"
+                    alt={t('accountSettings.personalInfo.modals.profilePhotoAlt')}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                   <div>
@@ -361,13 +363,13 @@ const AccountSettings = () => {
               {/* Email Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Email</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.email')}</h2>
                   <button 
                     onClick={() => setIsEmailModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
@@ -375,7 +377,7 @@ const AccountSettings = () => {
                   <p className="text-sm text-black">{emailData.currentEmail}</p>
                   <div className="flex items-center gap-1 px-2 py-1 bg-[#E8F5E9] rounded-full">
                     <img src={VerifiedIcon} alt="Verified" className="w-3 h-3" />
-                    <span className="text-xs font-medium text-[#2E7D32]">Verified</span>
+                    <span className="text-xs font-medium text-[#2E7D32]">{t('accountSettings.personalInfo.verified')}</span>
                   </div>
                 </div>
               </div>
@@ -383,20 +385,20 @@ const AccountSettings = () => {
               {/* Phone Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Phone</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.phone')}</h2>
                   <button 
                     onClick={() => setIsPhoneModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <p className="text-sm text-black">{phoneData.currentPhone}</p>
                   <button className="text-sm font-medium text-[#FF4000] hover:underline hover:opacity-80 cursor-pointer">
-                    Verify your phone
+                    {t('accountSettings.personalInfo.verifyPhone')}
                   </button>
                 </div>
               </div>
@@ -404,13 +406,13 @@ const AccountSettings = () => {
               {/* Location Card */}
               <div className="bg-white rounded-xl border border-[#EEEEEE] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-bold text-black">Location</h2>
+                  <h2 className="text-lg font-bold text-black">{t('accountSettings.personalInfo.location')}</h2>
                   <button 
                     onClick={() => setIsLocationModalOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Edit
+                    {t('accountSettings.personalInfo.edit')}
                   </button>
                 </div>
 
@@ -430,22 +432,22 @@ const AccountSettings = () => {
                       <div className="w-64 h-40 mb-6">
                         <img src={CardFirstImage} alt="Card" className="w-full h-full object-contain" />
                       </div>
-                      <h2 className="text-xl font-bold text-black mb-2">Add your preferred payment method</h2>
+                      <h2 className="text-xl font-bold text-black mb-2">{t('accountSettings.paymentMethods.empty.title')}</h2>
                       <p className="text-sm text-gray mb-6 text-center max-w-md">
-                        Securely save a payment method to make ticket purchases quick and easy. You can update it anytime.
+                        {t('accountSettings.paymentMethods.empty.description')}
                       </p>
                       <button
                         onClick={() => setShowAddCardForm(true)}
                         className="px-6 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer"
                         style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                       >
-                        Add Payment Method
+                        {t('accountSettings.paymentMethods.empty.addButton')}
                       </button>
                     </div>
                   ) : (
                     /* Saved Cards */
                     <div className="bg-white rounded-xl border border-light-gray p-6">
-                      <h2 className="text-lg font-bold text-black mb-6">Saved Cards</h2>
+                      <h2 className="text-lg font-bold text-black mb-6">{t('accountSettings.paymentMethods.savedCards')}</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {savedCards.map((card) => (
                           <div key={card.id} className="relative bg-gradient-to-br from-[#1a1a1a] to-[#2d2d2d] rounded-xl p-6 shadow-lg">
@@ -479,7 +481,7 @@ const AccountSettings = () => {
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                         </svg>
-                        Add more
+                        {t('accountSettings.paymentMethods.addMore')}
                       </button>
                     </div>
                   )}
@@ -492,28 +494,28 @@ const AccountSettings = () => {
                       onClick={() => setShowAddCardForm(false)}
                       className="p-2 hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                     >
-                      <img src={GoBackIcon} alt="Go Back" className="w-5 h-5" />
+                      <img src={GoBackIcon} alt={t('accountSettings.paymentMethods.goBackAlt')} className="w-5 h-5" />
                     </button>
                     <div>
-                      <h2 className="text-2xl font-bold text-black">Add Payment method</h2>
-                      <p className="text-sm text-gray">Add your card to enjoy smooth and hassle-free booking.</p>
+                      <h2 className="text-2xl font-bold text-black">{t('accountSettings.paymentMethods.addPaymentTitle')}</h2>
+                      <p className="text-sm text-gray">{t('accountSettings.paymentMethods.addPaymentSubtitle')}</p>
                     </div>
                   </div>
                   <div className="max-w-2xl">
                     <div className="space-y-4">
                       <div className="flex flex-col gap-2">
-                        <label className="text-sm font-medium text-black">Card Number</label>
+                        <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.cardNumber')}</label>
                         <input
                           type="text"
                           value={formatCardNumber(newCard.cardNumber)}
                           onChange={handleCardNumberChange}
-                          placeholder="0000    0000    0000    0000"
+                          placeholder={t('accountSettings.paymentMethods.cardNumberPlaceholder')}
                           className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                         />
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm font-medium text-black">Expire Month</label>
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.expireMonth')}</label>
                           <input
                             type="text"
                             value={newCard.expiryMonth}
@@ -528,7 +530,7 @@ const AccountSettings = () => {
                           />
                         </div>
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm font-medium text-black">Expire Year</label>
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.expireYear')}</label>
                           <input
                             type="text"
                             value={newCard.expiryYear}
@@ -543,7 +545,7 @@ const AccountSettings = () => {
                           />
                         </div>
                         <div className="flex flex-col gap-2">
-                          <label className="text-sm font-medium text-black">CVV</label>
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.cvv')}</label>
                           <input
                             type="text"
                             value={newCard.cvv}
@@ -553,7 +555,7 @@ const AccountSettings = () => {
                                 setNewCard({ ...newCard, cvv: value });
                               }
                             }}
-                            placeholder="Entre CVV"
+                            placeholder={t('accountSettings.paymentMethods.cvvPlaceholder')}
                             className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                           />
                         </div>
@@ -565,7 +567,7 @@ const AccountSettings = () => {
                         className="px-6 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer"
                         style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                       >
-                        Save Card
+                        {t('accountSettings.paymentMethods.saveCard')}
                       </button>
                     </div>
                   </div>
@@ -578,121 +580,121 @@ const AccountSettings = () => {
           {activeSection === 'email-preferences' && (
             <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-2">Email preferences</h2>
-                <p className="text-sm text-[#4F4F4F]">Choose the emails you want to receive—stay informed, not overwhelmed.</p>
+                <h2 className="text-2xl font-bold text-black mb-2">{t('accountSettings.emailPreferences.title')}</h2>
+                <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.subtitle')}</p>
               </div>
               
               {/* Attendees Preferences */}
               <div className="space-y-6">
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Ticket Confirmations</h3>
-                      <p className="text-sm text-[#4F4F4F]">Get a confirmation email after purchasing tickets.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.ticketConfirmations.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.ticketConfirmations.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.ticketConfirmations}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, ticketConfirmations: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Event Reminders</h3>
-                      <p className="text-sm text-[#4F4F4F]">Receive reminders before your event starts.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.eventReminders.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.eventReminders.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.eventReminders}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, eventReminders: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Event Updates & Cancellations</h3>
-                      <p className="text-sm text-[#4F4F4F]">Be notified if any changes are made to your registered events.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.eventUpdates.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.eventUpdates.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.eventUpdates}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, eventUpdates: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">New Events in My Area</h3>
-                      <p className="text-sm text-[#4F4F4F]">Get emails about trending or upcoming events near you.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.newEvents.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.newEvents.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.newEvents}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, newEvents: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Special Offers & Discounts</h3>
-                      <p className="text-sm text-[#4F4F4F]">Receive exclusive ticket offers, early bird pricing, and promotions.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.specialOffers.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.specialOffers.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.specialOffers}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, specialOffers: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4 border-b border-[#EEEEEE]">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Newsletters & Platform Updates</h3>
-                      <p className="text-sm text-[#4F4F4F]">Stay in the loop with Ormeet tips, stories, and announcements.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.newsletters.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.newsletters.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.newsletters}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, newsletters: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                   
                   <div className="flex items-start justify-between py-4">
                     <div className="flex-1">
-                      <h3 className="text-base font-semibold text-black mb-1">Surveys & Feedback Requests</h3>
-                      <p className="text-sm text-[#4F4F4F]">Help us improve by sharing your experience after events.</p>
+                      <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.emailPreferences.options.surveys.title')}</h3>
+                      <p className="text-sm text-[#4F4F4F]">{t('accountSettings.emailPreferences.options.surveys.description')}</p>
                     </div>
-                    <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <label className="relative inline-flex items-center cursor-pointer ms-4">
                       <input
                         type="checkbox"
                         checked={attendeePrefs.surveys}
                         onChange={(e) => setAttendeePrefs({ ...attendeePrefs, surveys: e.target.checked })}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                      <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                     </label>
                   </div>
                 </div>
@@ -703,20 +705,20 @@ const AccountSettings = () => {
           {activeSection === 'login-security' && (
             <div className="bg-white rounded-xl border border-[#EEEEEE] p-8">
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-black mb-2">Login & security</h2>
-                <p className="text-sm text-[#4F4F4F]">Set a unique password to protect your account</p>
+                <h2 className="text-2xl font-bold text-black mb-2">{t('accountSettings.loginSecurity.title')}</h2>
+                <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.subtitle')}</p>
               </div>
               
               {/* Password Section */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-base font-semibold text-black">Password</h3>
+                  <h3 className="text-base font-semibold text-black">{t('accountSettings.loginSecurity.password')}</h3>
                   <button
                     onClick={() => setIsEditPasswordOpen(true)}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-black hover:bg-secondary-light rounded-lg transition-colors cursor-pointer"
                   >
                     <img src={EditIcon} alt="Edit" className="w-5 h-5" />
-                    Change Password
+                    {t('accountSettings.loginSecurity.changePassword')}
                   </button>
                 </div>
                 <p className="text-sm text-black">••••••••</p>
@@ -726,17 +728,17 @@ const AccountSettings = () => {
               <div className="pt-6 border-t border-[#EEEEEE]">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">Two-factor authentication</h3>
-                    <p className="text-sm text-[#4F4F4F]">Two-factor authentication adds extra security by requiring a second step to verify your identity during login.</p>
+                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
+                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ml-6">
+                  <label className="relative inline-flex items-center cursor-pointer ms-6">
                     <input
                       type="checkbox"
                       checked={twoFactorEnabled}
                       onChange={(e) => setTwoFactorEnabled(e.target.checked)}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
+                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                   </label>
                 </div>
               </div>
@@ -751,7 +753,7 @@ const AccountSettings = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showProfileSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Profile</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
                 {profileError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {profileError}
@@ -762,17 +764,17 @@ const AccountSettings = () => {
             {!showProfileSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Full Name</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.fullName')}</label>
                   <input
                     type="text"
                     value={profileData.fullName}
                     onChange={(e) => setProfileData({ ...profileData, fullName: e.target.value })}
-                    placeholder="Enter your full name"
+                    placeholder={t('accountSettings.personalInfo.modals.fullNamePlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Profile Photo</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.profilePhoto')}</label>
                   <div className="flex items-center gap-4">
                     <img src={profileData.profilePhoto} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-light-gray" />
                     <div className="flex-1">
@@ -799,9 +801,9 @@ const AccountSettings = () => {
                         <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
-                        <span>Choose file or Drop here</span>
+                        <span>{t('accountSettings.personalInfo.modals.uploadHint')}</span>
                       </label>
-                      <p className="text-xs text-gray mt-1.5">PNG or JPG (max 5MB)</p>
+                      <p className="text-xs text-gray mt-1.5">{t('accountSettings.personalInfo.modals.uploadFormats')}</p>
                     </div>
                   </div>
                 </div>
@@ -816,20 +818,20 @@ const AccountSettings = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleProfileSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -842,7 +844,7 @@ const AccountSettings = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showEmailSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Email</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
                 {emailError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {emailError}
@@ -853,7 +855,7 @@ const AccountSettings = () => {
             {!showEmailSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Current Email</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.currentEmail')}</label>
                   <input
                     type="email"
                     value={emailData.currentEmail}
@@ -862,22 +864,22 @@ const AccountSettings = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">New Email</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.newEmail')}</label>
                   <input
                     type="email"
                     value={emailData.newEmail}
                     onChange={(e) => setEmailData({ ...emailData, newEmail: e.target.value })}
-                    placeholder="Enter new email"
+                    placeholder={t('accountSettings.personalInfo.modals.newEmailPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.password')}</label>
                   <input
                     type="password"
                     value={emailData.password}
                     onChange={(e) => setEmailData({ ...emailData, password: e.target.value })}
-                    placeholder="Enter your password"
+                    placeholder={t('accountSettings.personalInfo.modals.passwordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
@@ -892,20 +894,20 @@ const AccountSettings = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleEmailSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -918,7 +920,7 @@ const AccountSettings = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPhoneSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Phone</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
                 {phoneError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {phoneError}
@@ -929,7 +931,7 @@ const AccountSettings = () => {
             {!showPhoneSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Current Phone</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.currentPhone')}</label>
                   <input
                     type="text"
                     value={phoneData.currentPhone}
@@ -938,22 +940,22 @@ const AccountSettings = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">New Phone Number</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.newPhone')}</label>
                   <input
                     type="tel"
                     value={phoneData.newPhone}
                     onChange={(e) => setPhoneData({ ...phoneData, newPhone: e.target.value })}
-                    placeholder="Enter new phone number"
+                    placeholder={t('accountSettings.personalInfo.modals.newPhonePlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.password')}</label>
                   <input
                     type="password"
                     value={phoneData.password}
                     onChange={(e) => setPhoneData({ ...phoneData, password: e.target.value })}
-                    placeholder="Enter your password"
+                    placeholder={t('accountSettings.personalInfo.modals.passwordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
@@ -968,20 +970,20 @@ const AccountSettings = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handlePhoneSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -994,7 +996,7 @@ const AccountSettings = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showLocationSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Edit Location</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
                 {locationError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {locationError}
@@ -1005,32 +1007,32 @@ const AccountSettings = () => {
             {!showLocationSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Country</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.country')}</label>
                   <input
                     type="text"
                     value={locationData.country}
                     onChange={(e) => setLocationData({ ...locationData, country: e.target.value })}
-                    placeholder="Enter country"
+                    placeholder={t('accountSettings.personalInfo.modals.countryPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">City</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.city')}</label>
                   <input
                     type="text"
                     value={locationData.city}
                     onChange={(e) => setLocationData({ ...locationData, city: e.target.value })}
-                    placeholder="Enter city"
+                    placeholder={t('accountSettings.personalInfo.modals.cityPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Address</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.personalInfo.modals.address')}</label>
                   <input
                     type="text"
                     value={locationData.address}
                     onChange={(e) => setLocationData({ ...locationData, address: e.target.value })}
-                    placeholder="Enter address (optional)"
+                    placeholder={t('accountSettings.personalInfo.modals.addressPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
@@ -1045,20 +1047,20 @@ const AccountSettings = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.personalInfo.modals.cancel')}
                 </button>
                 <button
                   onClick={handleLocationSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.personalInfo.modals.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.personalInfo.modals.success')}</p>
               </div>
             )}
           </div>
@@ -1071,7 +1073,7 @@ const AccountSettings = () => {
           <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPasswordSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">Change Password</h2>
+                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
                 {passwordError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {passwordError}
@@ -1082,32 +1084,32 @@ const AccountSettings = () => {
             {!showPasswordSuccess && (
               <div className="space-y-4">
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Current Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.currentPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.currentPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                    placeholder="Enter current password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.currentPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">New Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.newPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.newPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                    placeholder="Enter new password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.newPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-medium text-black">Confirm New Password</label>
+                  <label className="text-sm font-medium text-black">{t('accountSettings.loginSecurity.modals.changePassword.confirmPassword')}</label>
                   <input
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    placeholder="Confirm new password"
+                    placeholder={t('accountSettings.loginSecurity.modals.changePassword.confirmPasswordPlaceholder')}
                     className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                   />
                 </div>
@@ -1123,20 +1125,20 @@ const AccountSettings = () => {
                   }}
                   className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Cancel
+                  {t('accountSettings.loginSecurity.modals.changePassword.cancel')}
                 </button>
                 <button
                   onClick={handlePasswordSave}
                   className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer"
                   style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  Save changes
+                  {t('accountSettings.loginSecurity.modals.changePassword.saveChanges')}
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-8">
                 <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                <p className="text-lg font-semibold text-black">Changes saved successfully</p>
+                <p className="text-lg font-semibold text-black">{t('accountSettings.loginSecurity.modals.changePassword.success')}</p>
               </div>
             )}
           </div>

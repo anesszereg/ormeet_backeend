@@ -1,9 +1,9 @@
 /**
  * Format date to readable string
  */
-export const formatDate = (date: string | Date): string => {
+export const formatDate = (date: string | Date, locale = 'en-US'): string => {
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', {
+  return d.toLocaleDateString(locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -13,9 +13,9 @@ export const formatDate = (date: string | Date): string => {
 /**
  * Format date and time
  */
-export const formatDateTime = (date: string | Date): string => {
+export const formatDateTime = (date: string | Date, locale = 'en-US'): string => {
   const d = new Date(date);
-  return d.toLocaleString('en-US', {
+  return d.toLocaleString(locale, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -27,8 +27,8 @@ export const formatDateTime = (date: string | Date): string => {
 /**
  * Format currency
  */
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
+export const formatCurrency = (amount: number, currency: string = 'USD', locale = 'en-US'): string => {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
   }).format(amount);
@@ -37,6 +37,6 @@ export const formatCurrency = (amount: number, currency: string = 'USD'): string
 /**
  * Format number with commas
  */
-export const formatNumber = (num: number): string => {
-  return new Intl.NumberFormat('en-US').format(num);
+export const formatNumber = (num: number, locale = 'en-US'): string => {
+  return new Intl.NumberFormat(locale).format(num);
 };

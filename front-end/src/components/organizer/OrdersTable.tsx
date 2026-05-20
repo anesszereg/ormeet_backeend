@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import organizerService, { Order as ApiOrder, Event as ApiEvent } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
@@ -34,11 +35,14 @@ interface OrdersTableProps {
   onCreateOrder?: () => void;
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
+  const { t, i18n } = useTranslation('organizer');
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'active' | 'draft' | 'in-transit' | 'completed' | 'cancelled'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortOption, setSortOption] = useState('Newest First');
+  const [sortOption, setSortOption] = useState<string>(t('orders.sortOptions.newest'));
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedStartDate, setSelectedStartDate] = useState<Date | null>(null);
@@ -117,7 +121,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               qty: order.items?.reduce((sum, item) => sum + item.quantity, 0) || 0,
               totalPrice: typeof order.amountTotal === 'string' ? parseFloat(order.amountTotal) : (order.amountTotal || 0),
               payment,
-              orderDate: new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              orderDate: new Date(order.createdAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
               ticketStatus: order.status === 'paid' ? 'sent' : 'not-sent',
               status,
             };
@@ -127,7 +131,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         setApiOrders(transformedOrders);
       } catch (err) {
         console.error('❌ [OrdersTable] Failed to fetch orders:', err);
-        setError('Failed to load orders');
+        setError(t('orders.errors.loadFailed'));
       } finally {
         setIsLoading(false);
       }
@@ -177,7 +181,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
       }, 2000);
     } catch (err) {
       console.error('❌ [OrdersTable] Failed to delete order:', err);
-      setError('Failed to delete order');
+      setError(t('orders.errors.deleteFailed'));
       setIsDeleteConfirmOpen(false);
     } finally {
       setIsDeleting(false);
@@ -197,7 +201,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
       setSelectedOrder(null);
     } catch (err) {
       console.error('❌ [OrdersTable] Failed to refund order:', err);
-      setError('Failed to refund order');
+      setError(t('orders.errors.refundFailed'));
     }
   };
 
@@ -214,7 +218,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
       setSelectedOrder(null);
     } catch (err) {
       console.error('❌ [OrdersTable] Failed to cancel order:', err);
-      setError('Failed to cancel order');
+      setError(t('orders.errors.cancelFailed'));
     }
   };
 
@@ -351,13 +355,13 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
     }
 
     return (
-      <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
+      <div className="absolute end-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={handleMonthSelect}
             className="text-xs text-primary hover:text-primary-dark font-medium transition-colors cursor-pointer"
           >
-            Select Month
+            {t('orders.calendar.selectMonth')}
           </button>
           {(selectedStartDate || selectedEndDate) && (
             <button
@@ -367,7 +371,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               }}
               className="text-xs text-gray hover:text-black font-medium transition-colors cursor-pointer"
             >
-              Clear
+              {t('orders.calendar.clear')}
             </button>
           )}
         </div>
@@ -394,7 +398,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         </div>
 
         <div className="grid grid-cols-7 gap-1 mb-1">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {[t('createEvent.calendar.sun'), t('createEvent.calendar.mon'), t('createEvent.calendar.tue'), t('createEvent.calendar.wed'), t('createEvent.calendar.thu'), t('createEvent.calendar.fri'), t('createEvent.calendar.sat')].map(day => (
             <div key={day} className="h-8 flex items-center justify-center text-xs font-medium text-gray">
               {day}
             </div>
@@ -411,14 +415,14 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   return (
     <div className="w-full">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-xl sm:text-2xl font-bold text-black">Orders</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-black">{t('orders.title')}</h1>
         
         <button
           onClick={() => setIsExportModalOpen(true)}
-          className="relative flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+          className="relative flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
         >
-          <img src={ExportIcon} alt="Export" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
-          <span>Export</span>
+          <img src={ExportIcon} alt="Export" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+          <span>{t('orders.export')}</span>
         </button>
       </div>
 
@@ -426,7 +430,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Orders</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('orders.stats.totalOrders')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : apiOrders.length.toLocaleString()}
               </h3>
@@ -436,14 +440,14 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{t('orders.stats.fromLastMonth')}</span>
           </div>
         </div>
 
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Returns</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('orders.stats.totalReturns')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : apiOrders.filter(o => o.status === 'cancelled').length.toLocaleString()}
               </h3>
@@ -453,14 +457,14 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{t('orders.stats.fromLastMonth')}</span>
           </div>
         </div>
 
         <div className="bg-white border border-light-gray rounded-xl p-4">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <p className="text-xs lg:text-sm text-gray mb-1">Total Revenue</p>
+              <p className="text-xs lg:text-sm text-gray mb-1">{t('orders.stats.totalRevenue')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
                 {isLoading ? '...' : `$${apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
               </h3>
@@ -470,7 +474,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-xs lg:text-sm text-gray ml-1">From last month</span>
+            <span className="text-xs lg:text-sm text-gray ms-1">{t('orders.stats.fromLastMonth')}</span>
           </div>
         </div>
       </div>
@@ -482,9 +486,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'all' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          All Orders
+          {t('orders.tabs.all')}
           {activeFilter === 'all' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -493,9 +497,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'active' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Active
+          {t('orders.tabs.active')}
           {activeFilter === 'active' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -504,9 +508,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'draft' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Draft
+          {t('orders.tabs.draft')}
           {activeFilter === 'draft' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -515,9 +519,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'in-transit' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          In transit
+          {t('orders.tabs.inTransit')}
           {activeFilter === 'in-transit' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -526,9 +530,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'completed' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Completed
+          {t('orders.tabs.completed')}
           {activeFilter === 'completed' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
         <button
@@ -537,31 +541,31 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             activeFilter === 'cancelled' ? 'text-primary' : 'text-gray hover:text-black'
           }`}
         >
-          Cancelled
+          {t('orders.tabs.cancelled')}
           {activeFilter === 'cancelled' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
+            <div className="absolute bottom-0 start-0 end-0 h-0.5 bg-primary" />
           )}
         </button>
       </div>
 
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
         <h2 className="text-sm sm:text-base font-semibold text-black">
-          {filteredOrders.length} Orders
+          {t('orders.orderCount', { count: filteredOrders.length })}
         </h2>
 
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full lg:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <input
               type="text"
-              placeholder="Search order"
+              placeholder={t('orders.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full sm:w-[160px] lg:w-[187px] h-[38px] pl-4 pr-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
+              className="w-full sm:w-[160px] lg:w-[187px] h-[38px] ps-4 pe-10 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all rounded-full"
             />
             <img 
               src={SearchIcon} 
               alt="Search" 
-              className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
+              className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 pointer-events-none" 
             />
           </div>
 
@@ -571,9 +575,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 setIsSortOpen(!isSortOpen);
                 setIsDatePickerOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
             >
-              <img src={NewestIcon} alt="Sort" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={NewestIcon} alt="Sort" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">{sortOption}</span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -581,15 +585,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             </button>
             
             {isSortOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
-                {['Newest First', 'Oldest First', 'A-Z'].map((option) => (
+              <div className="absolute end-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-50">
+                {[t('orders.sortOptions.newest'), t('orders.sortOptions.oldest'), t('orders.sortOptions.az')].map((option) => (
                   <button
                     key={option}
                     onClick={() => {
                       setSortOption(option);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer ${
+                    className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
                       sortOption === option
                         ? 'bg-primary-light text-primary font-medium'
                         : 'text-gray hover:bg-secondary-light'
@@ -608,15 +612,15 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 setIsDatePickerOpen(!isDatePickerOpen);
                 setIsSortOpen(false);
               }}
-              className="flex items-center gap-2 pl-11 pr-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
+              className="flex items-center gap-2 ps-11 pe-3 border border-light-gray bg-white cursor-pointer hover:border-primary transition-colors w-[140px] sm:w-[160px] lg:w-[187px] h-[38px] rounded-full"
             >
-              <img src={AllDateIcon} alt="Date" className="absolute left-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
+              <img src={AllDateIcon} alt="Date" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
               <span className="text-sm font-medium text-gray truncate flex-1">
                 {selectedStartDate && selectedEndDate
-                  ? `${selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${selectedEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+                  ? `${selectedStartDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' })} - ${selectedEndDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' })}`
                   : selectedStartDate
-                  ? selectedStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                  : 'All Date'}
+                  ? selectedStartDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  : t('orders.dateFilter')}
               </span>
               <svg className="w-4 h-4 text-gray shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -630,20 +634,20 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
 
       <div className="bg-white border border-light-gray rounded-xl overflow-hidden">
         <div className="hidden md:grid grid-cols-9 gap-1 px-2 lg:px-4 py-4 bg-secondary-light border-b border-light-gray">
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Event Name</div>
-          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">Buyer</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">Ticket Type</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">Qty</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">Total Price</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">Payment</div>
-          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">Order Date</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.eventName')}</div>
+          <div className="col-span-2 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.buyer')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.ticketType')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.qty')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.totalPrice')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.payment')}</div>
+          <div className="col-span-1 text-xs lg:text-sm font-semibold text-gray">{t('orders.table.headers.orderDate')}</div>
         </div>
 
         <div className="divide-y divide-light-gray">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-sm text-gray">Loading orders...</p>
+              <p className="text-sm text-gray">{t('orders.loading')}</p>
             </div>
           ) : currentOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 px-4">
@@ -652,9 +656,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">No orders yet</h3>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('orders.empty.title')}</h3>
               <p className="text-sm text-gray-500 text-center max-w-sm">
-                Orders will appear here when customers purchase tickets for your events.
+                {t('orders.empty.description')}
               </p>
             </div>
           ) : (
@@ -701,19 +705,19 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 {order.payment === 'paid' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#10B981]/10 text-[#10B981] text-xs font-medium rounded-full">
                     <img src={PaidIcon} alt="Paid" className="w-3 h-3" />
-                    Paid
+                    {t('orders.table.payment.paid')}
                   </span>
                 )}
                 {order.payment === 'pending' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#F59E0B]/10 text-[#F59E0B] text-xs font-medium rounded-full">
                     <img src={PendingIcon} alt="Pending" className="w-3 h-3" />
-                    Pending
+                    {t('orders.table.payment.pending')}
                   </span>
                 )}
                 {order.payment === 'failed' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#EF4444]/10 text-[#EF4444] text-xs font-medium rounded-full">
                     <img src={FailedIcon} alt="Failed" className="w-3 h-3" />
-                    Failed
+                    {t('orders.table.payment.failed')}
                   </span>
                 )}
               </div>
@@ -731,7 +735,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
       {filteredOrders.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
           <p className="text-xs sm:text-sm text-gray order-2 sm:order-1">
-            Showing {startIndex + 1}-{Math.min(endIndex, filteredOrders.length)} of {filteredOrders.length} Orders
+            {t('orders.pagination.showing', { start: startIndex + 1, end: Math.min(endIndex, filteredOrders.length), total: filteredOrders.length })}
           </p>
           
           <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
@@ -809,7 +813,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-light-gray">
-              <h2 className="text-xl font-bold text-black">Order Details</h2>
+              <h2 className="text-xl font-bold text-black">{t('orders.detailsModal.title')}</h2>
               <button 
                 onClick={() => setSelectedOrder(null)}
                 className="text-gray hover:text-black transition-colors cursor-pointer"
@@ -845,31 +849,31 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Order ID */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Order ID</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.orderId')}</p>
                     <p className="text-sm text-black font-medium">{selectedOrder.orderId}</p>
                   </div>
 
                   {/* Order Date */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Order Date</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.orderDate')}</p>
                     <p className="text-sm text-black">{selectedOrder.orderDate}</p>
                   </div>
 
                   {/* Event Name */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Event</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.event')}</p>
                     <p className="text-sm font-medium text-black">{selectedOrder.eventName}</p>
                   </div>
 
                   {/* Quantity */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Quantity</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.quantity')}</p>
                     <p className="text-sm text-black">{selectedOrder.qty}</p>
                   </div>
 
                   {/* Ticket Type */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Ticket Type</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.ticketType')}</p>
                     <span className="inline-block px-3 py-1 bg-secondary-light text-sm font-medium text-black rounded-full">
                       {selectedOrder.ticketType}
                     </span>
@@ -877,36 +881,36 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
 
                   {/* Total Price */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Total Price</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.totalPrice')}</p>
                     <p className="text-sm font-semibold text-black">${selectedOrder.totalPrice}</p>
                   </div>
 
                   {/* Payment Status */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Payment Status</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.paymentStatus')}</p>
                     {selectedOrder.payment === 'paid' && (
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#10B981]/10 text-[#10B981] text-xs font-medium rounded-full">
                         <img src={PaidIcon} alt="Paid" className="w-3 h-3" />
-                        Paid
+                        {t('orders.table.payment.paid')}
                       </span>
                     )}
                     {selectedOrder.payment === 'pending' && (
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#F59E0B]/10 text-[#F59E0B] text-xs font-medium rounded-full">
                         <img src={PendingIcon} alt="Pending" className="w-3 h-3" />
-                        Pending
+                        {t('orders.table.payment.pending')}
                       </span>
                     )}
                     {selectedOrder.payment === 'failed' && (
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#EF4444]/10 text-[#EF4444] text-xs font-medium rounded-full">
                         <img src={FailedIcon} alt="Failed" className="w-3 h-3" />
-                        Failed
+                        {t('orders.table.payment.failed')}
                       </span>
                     )}
                   </div>
 
                   {/* Order Status */}
                   <div>
-                    <p className="text-xs text-gray mb-1">Order Status</p>
+                    <p className="text-xs text-gray mb-1">{t('orders.detailsModal.orderStatus')}</p>
                     <span className="inline-block px-3 py-1 bg-secondary-light text-sm font-medium text-black rounded-full capitalize">
                       {selectedOrder.status}
                     </span>
@@ -919,17 +923,17 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 {selectedOrder.payment === 'paid' && selectedOrder.status !== 'completed' && (
                   <button
                     onClick={() => handleRefundOrder(selectedOrder.id)}
-                    className="pl-5 pr-5 py-2 border border-yellow-500 text-yellow-600 rounded-full text-sm font-medium hover:bg-yellow-50 transition-all whitespace-nowrap cursor-pointer"
+                    className="ps-5 pe-5 py-2 border border-yellow-500 text-yellow-600 rounded-full text-sm font-medium hover:bg-yellow-50 transition-all whitespace-nowrap cursor-pointer"
                   >
-                    Refund
+                    {t('orders.detailsModal.actions.refund')}
                   </button>
                 )}
                 {selectedOrder.status !== 'cancelled' && selectedOrder.status !== 'completed' && (
                   <button
                     onClick={() => handleCancelOrder(selectedOrder.id)}
-                    className="pl-5 pr-5 py-2 border border-gray-400 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 transition-all whitespace-nowrap cursor-pointer"
+                    className="ps-5 pe-5 py-2 border border-gray-400 text-gray-600 rounded-full text-sm font-medium hover:bg-gray-50 transition-all whitespace-nowrap cursor-pointer"
                   >
-                    Cancel Order
+                    {t('orders.detailsModal.actions.cancel')}
                   </button>
                 )}
                 <button
@@ -937,9 +941,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                     setOrderToDelete(selectedOrder);
                     setIsDeleteConfirmOpen(true);
                   }}
-                  className="pl-5 pr-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
+                  className="ps-5 pe-5 py-2 border border-red-500 text-red-500 rounded-full text-sm font-medium hover:bg-red-50 transition-all whitespace-nowrap cursor-pointer"
                 >
-                  Delete
+                  {t('orders.detailsModal.actions.delete')}
                 </button>
               </div>
             </div>
@@ -960,9 +964,9 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             <div className="p-6">
               {!showDeleteSuccess ? (
                 <>
-                  <h2 className="text-xl font-bold text-black mb-4">Confirm Deletion</h2>
+                  <h2 className="text-xl font-bold text-black mb-4">{t('orders.deleteModal.title')}</h2>
                   <p className="text-sm text-gray mb-6">
-                    Are you sure you want to delete order <span className="font-semibold text-black">{orderToDelete.orderId}</span> ?
+                    {t('orders.deleteModal.description', { orderId: orderToDelete.orderId })}
                   </p>
 
                   <div className="flex items-center justify-end gap-3">
@@ -973,7 +977,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                       }}
                       className="px-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap cursor-pointer"
                     >
-                      Cancel
+                      {t('orders.deleteModal.cancel')}
                     </button>
                     <button
                       onClick={handleDeleteOrder}
@@ -981,14 +985,14 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                       className="px-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap cursor-pointer disabled:opacity-50"
                       style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                     >
-                      {isDeleting ? 'Deleting...' : 'Confirm'}
+                      {isDeleting ? t('orders.deleteModal.deleting') : t('orders.deleteModal.confirm')}
                     </button>
                   </div>
                 </>
               ) : (
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Order successfully deleted</p>
+                  <p className="text-lg font-semibold text-black">{t('orders.deleteModal.success')}</p>
                 </div>
               )}
             </div>

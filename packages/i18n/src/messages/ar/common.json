@@ -1,0 +1,103 @@
+{
+  "nav": {
+    "browseEvents": "Browse events",
+    "hostEvents": "Host events",
+    "support": "Support",
+    "login": "Log In",
+    "signup": "Sign up",
+    "logout": "Log out"
+  },
+  "cta": {
+    "getStarted": "Get started",
+    "learnMore": "Learn more",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "continue": "Continue",
+    "back": "Back"
+  },
+  "footer": {
+    "rights": "جميع الحقوق محفوظة.",
+    "privacy": "سياسة الخصوصية",
+    "terms": "شروط الاستخدام",
+    "description": "Ormeet connects people through unforgettable events — from live concerts to workshops. Discover and book nearby experiences, or host your own with ease. Whether you're attending or organizing, Ormeet makes events simple, exciting, and effortlessly accessible.",
+    "browseEvents": {
+      "title": "Browse Events",
+      "music": "Music",
+      "sports": "Sports",
+      "business": "Business",
+      "fitness": "Fitness",
+      "nightlife": "Nightlife",
+      "holiday": "Holiday",
+      "dating": "Dating",
+      "festival": "Festival"
+    },
+    "hostEvents": {
+      "title": "Host Events",
+      "createEvents": "Create Events",
+      "features": "Features",
+      "pricing": "Pricing"
+    },
+    "support": {
+      "title": "Support",
+      "helpCenter": "Help center",
+      "findTickets": "Find your tickets",
+      "contactOrganizer": "Contact event organizer"
+    },
+    "company": {
+      "title": "Company",
+      "aboutUs": "About us",
+      "contactUs": "Contact us",
+      "blog": "Blog"
+    },
+    "legal": {
+      "title": "Legal",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "cookiePolicy": "Cookie Policy",
+      "refundCancellation": "Refund & Cancellation"
+    },
+    "copyright": "© 2025 Ormeet. All rights reserved."
+  },
+  "confirmDialog": {
+    "defaultConfirm": "OK",
+    "defaultCancel": "Cancel"
+  },
+  "phoneInput": {
+    "searchPlaceholder": "Search country...",
+    "noCountriesFound": "No countries found"
+  },
+  "sidebar": {
+    "title": "لوحة التحكم",
+    "searchPlaceholder": "بحث",
+    "expandAria": "توسيع الشريط الجانبي",
+    "collapseAria": "طي الشريط الجانبي",
+    "myTickets": "تذاكري",
+    "favoriteEvents": "الفعاليات المفضلة",
+    "following": "المتابَعون",
+    "accountSettings": "إعدادات الحساب",
+    "dashboard": "لوحة التحكم",
+    "events": "الفعاليات",
+    "attendees": "الحضور",
+    "orders": "الطلبات",
+    "workspace": "مساحة العمل",
+    "addWorkspaceAria": "إضافة مساحة عمل"
+  },
+  "header": {
+    "toggleMenuAria": "فتح القائمة",
+    "searchLocationPlaceholder": "البحث عن موقع",
+    "searchEventPlaceholder": "نوع الفعالية",
+    "needAssistance": "هل تحتاج مساعدة؟"
+  },
+  "userMenu": {
+    "profile": "الملف الشخصي",
+    "dashboard": "لوحة التحكم",
+    "attendeeDashboard": "لوحة الحضور",
+    "organizerDashboard": "لوحة المنظِّم",
+    "becomeOrganizer": "كن منظِّماً",
+    "myTickets": "تذاكري",
+    "settings": "الإعدادات",
+    "helpSupport": "المساعدة / الدعم",
+    "verified": "موثَّق"
+  }
+}

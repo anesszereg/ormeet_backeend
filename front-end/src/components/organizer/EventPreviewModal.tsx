@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import NextImageIcon from '../../assets/Svgs/eventDetails/nextImage.svg';
 import PastImageIcon from '../../assets/Svgs/eventDetails/pastImage.svg';
 import StarIcon from '../../assets/Svgs/eventDetails/star.svg';
@@ -37,7 +38,10 @@ interface EventPreviewModalProps {
   };
 }
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProps) => {
+  const { t, i18n } = useTranslation(['organizer', 'common']);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showLocationSection, setShowLocationSection] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
@@ -62,7 +66,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
 
   const formatDate = (date: Date | null) => {
     if (!date) return '';
-    return date.toLocaleDateString('en-US', { 
+    return date.toLocaleDateString(localeMap[i18n.language] || 'en-US', { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -85,7 +89,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
     return price < min ? price : min;
   }, Infinity);
 
-  const displayPrice = lowestPrice === Infinity ? 'Free' : `$${lowestPrice.toFixed(2)}`;
+  const displayPrice = lowestPrice === Infinity ? t('organizer:eventPreview.ticketFree') : `$${lowestPrice.toFixed(2)}`;
   const hasImages = eventData.eventImages.length > 0;
 
   return (
@@ -94,13 +98,13 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
         {/* Modal Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-light-gray bg-white sticky top-0 z-10">
           <div>
-            <h2 className="text-xl font-bold text-black">Event Preview</h2>
-            <p className="text-sm text-[#757575]">This is how your event will appear to attendees</p>
+            <h2 className="text-xl font-bold text-black">{t('organizer:eventPreview.modalTitle')}</h2>
+            <p className="text-sm text-[#757575]">{t('organizer:eventPreview.modalSubtitle')}</p>
           </div>
           <button
             onClick={onClose}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors"
-            aria-label="Close preview"
+            aria-label={t('organizer:eventPreview.closeAria')}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M18 6L6 18M6 6L18 18" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -126,8 +130,8 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                       {/* Previous Image Button */}
                       <button
                         onClick={handlePrevImage}
-                        className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
-                        aria-label="Previous image"
+                        className="absolute start-4 md:start-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
+                        aria-label={t('organizer:eventPreview.prevImageAria')}
                       >
                         <img src={PastImageIcon} alt="Previous" className="w-full h-full" />
                       </button>
@@ -135,14 +139,14 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                       {/* Next Image Button */}
                       <button
                         onClick={handleNextImage}
-                        className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
-                        aria-label="Next image"
+                        className="absolute end-4 md:end-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10"
+                        aria-label={t('organizer:eventPreview.nextImageAria')}
                       >
                         <img src={NextImageIcon} alt="Next" className="w-full h-full" />
                       </button>
 
                       {/* Image Dots Indicator */}
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                      <div className="absolute bottom-4 start-1/2 -translate-x-1/2 flex items-center gap-2">
                         {eventData.eventImages.map((_, index) => (
                           <button
                             key={index}
@@ -152,7 +156,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                                 ? 'bg-white w-3 h-3'
                                 : 'bg-white/60 hover:bg-white/80'
                             }`}
-                            aria-label={`Go to image ${index + 1}`}
+                            aria-label={t('organizer:eventPreview.goToImageAria', { number: index + 1 })}
                           />
                         ))}
                       </div>
@@ -169,12 +173,12 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                 <div className="flex-1">
                   {/* Title */}
                   <h1 className="text-2xl md:text-3xl font-bold text-black mb-3">
-                    {eventData.title || 'Untitled Event'}
+                    {eventData.title || t('organizer:eventPreview.untitledEvent')}
                   </h1>
 
                   {/* Description */}
                   <p className="text-sm md:text-base text-gray leading-relaxed mb-4 max-w-[650px]">
-                    {eventData.description || 'No description provided'}
+                    {eventData.description || t('organizer:eventPreview.noDescription')}
                   </p>
 
                   {/* Rating and Actions Row */}
@@ -182,21 +186,21 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                     {/* Rating Placeholder */}
                     <div className="flex items-center gap-1.5">
                       <img src={StarIcon} alt="Rating" className="w-5 h-5" />
-                      <span className="text-sm font-semibold text-black">New</span>
-                      <span className="text-sm text-[#757575]">• No reviews yet</span>
+                      <span className="text-sm font-semibold text-black">{t('organizer:eventPreview.ratingNew')}</span>
+                      <span className="text-sm text-[#757575]">• {t('organizer:eventPreview.noReviews')}</span>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="flex items-center gap-2">
                       <button 
                         className="hover:scale-105 transition-transform"
-                        aria-label="Add to favorites"
+                        aria-label={t('organizer:eventPreview.addToFavoritesAria')}
                       >
                         <img src={FavoriteIcon} alt="Favorite" className="w-[42px] h-[42px]" />
                       </button>
                       <button 
                         className="hover:scale-105 transition-transform"
-                        aria-label="Share event"
+                        aria-label={t('organizer:eventPreview.shareEventAria')}
                       >
                         <img src={UploadIcon} alt="Share" className="w-[42px] h-[42px]" />
                       </button>
@@ -205,7 +209,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
 
                   {/* Date & Time Section */}
                   <div className="mb-6">
-                    <h2 className="text-base font-bold text-black mb-2">Date & Time</h2>
+                    <h2 className="text-base font-bold text-black mb-2">{t('organizer:eventPreview.dateTime')}</h2>
                     {eventData.dateRange[0] && eventData.dateRange[1] ? (
                       <p className="text-sm text-black">
                         {formatDate(eventData.dateRange[0])} - {formatDate(eventData.dateRange[1])}
@@ -217,14 +221,14 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                         )}
                       </p>
                     ) : (
-                      <p className="text-sm text-[#757575]">Date not set</p>
+                      <p className="text-sm text-[#757575]">{t('organizer:eventPreview.dateNotSet')}</p>
                     )}
                   </div>
 
                   {/* Location Section */}
                   {(eventData.eventType === 'in-person' || eventData.eventType === 'hybrid') && (
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-black mb-2">Location</h2>
+                      <h2 className="text-base font-bold text-black mb-2">{t('organizer:eventPreview.location')}</h2>
                       {eventData.mapAddress ? (
                         <>
                           <p className="text-sm text-black">
@@ -240,7 +244,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                             onClick={() => setShowLocationSection(!showLocationSection)}
                             className="text-sm font-medium text-[#FF4000] hover:underline mt-2"
                           >
-                            {showLocationSection ? 'Close map' : 'See on map'}
+                            {showLocationSection ? t('organizer:eventPreview.closeMap') : t('organizer:eventPreview.seeOnMap')}
                           </button>
 
                           {/* Inline Map Section */}
@@ -255,7 +259,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                                   allowFullScreen
                                   loading="lazy"
                                   referrerPolicy="no-referrer-when-downgrade"
-                                  title="Event location map"
+                                  title={t('organizer:eventPreview.mapTitle')}
                                   className="absolute inset-0"
                                 />
                               </div>
@@ -263,7 +267,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                           )}
                         </>
                       ) : (
-                        <p className="text-sm text-[#757575]">Location not set</p>
+                        <p className="text-sm text-[#757575]">{t('organizer:eventPreview.locationNotSet')}</p>
                       )}
                     </div>
                   )}
@@ -271,7 +275,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                   {/* Online Link Section */}
                   {(eventData.eventType === 'online' || eventData.eventType === 'hybrid') && eventData.onlineLink && (
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-black mb-2">Online Access</h2>
+                      <h2 className="text-base font-bold text-black mb-2">{t('organizer:eventPreview.onlineAccess')}</h2>
                       <a 
                         href={eventData.onlineLink}
                         target="_blank"
@@ -286,7 +290,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                   {/* Category Section */}
                   {eventData.category && (
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-black mb-2">Category</h2>
+                      <h2 className="text-base font-bold text-black mb-2">{t('organizer:eventPreview.category')}</h2>
                       <span className="inline-block px-3 py-1.5 bg-[#F5F5F5] text-sm text-black rounded-full">
                         {eventData.category}
                       </span>
@@ -296,19 +300,19 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                   {/* Tickets Section */}
                   {eventData.tickets.length > 0 && (
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-black mb-3">Available Tickets</h2>
+                      <h2 className="text-base font-bold text-black mb-3">{t('organizer:eventPreview.availableTickets')}</h2>
                       <div className="space-y-3">
                         {eventData.tickets.map((ticket) => (
                           <div key={ticket.id} className="flex items-center justify-between p-4 bg-secondary-light rounded-lg">
                             <div>
                               <h3 className="text-sm font-semibold text-black">{ticket.type}</h3>
                               <p className="text-xs text-[#757575] mt-1">
-                                {ticket.quantity ? `${ticket.quantity} available` : 'Quantity not set'}
+                                {ticket.quantity ? t('organizer:eventPreview.ticketQuantityAvailable', { quantity: ticket.quantity }) : t('organizer:eventPreview.ticketQuantityNotSet')}
                               </p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-end">
                               <p className="text-base font-bold text-black">
-                                {ticket.priceType === 'free' ? 'Free' : `$${parseFloat(ticket.price || '0').toFixed(2)}`}
+                                {ticket.priceType === 'free' ? t('organizer:eventPreview.ticketFree') : `$${parseFloat(ticket.price || '0').toFixed(2)}`}
                               </p>
                             </div>
                           </div>
@@ -320,15 +324,13 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                   {/* FAQ Section */}
                   {eventData.faqs.length > 0 && (
                     <div className="mb-6">
-                      <h2 className="text-base font-bold text-black mb-4">
-                        Got <span className="font-bold">Questions?</span> We've Got <span className="font-bold">Answers</span>
-                      </h2>
+                      <h2 className="text-base font-bold text-black mb-4">{t('organizer:eventPreview.faqTitle')}</h2>
                       <div className="space-y-3">
                         {eventData.faqs.map((faq, index) => (
                           <div key={faq.id} className="bg-secondary-light rounded-lg overflow-hidden">
                             <button 
                               onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
-                              className="w-full flex items-center justify-between px-5 py-4 text-left"
+                              className="w-full flex items-center justify-between px-5 py-4 text-start"
                             >
                               <span className="text-sm font-semibold text-black">{faq.question}</span>
                               <svg 
@@ -336,7 +338,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                                 height="16" 
                                 viewBox="0 0 16 16" 
                                 fill="none" 
-                                className={`shrink-0 ml-4 transition-transform ${openFaqIndex === index ? 'rotate-180' : ''}`}
+                                className={`shrink-0 ms-4 transition-transform ${openFaqIndex === index ? 'rotate-180' : ''}`}
                               >
                                 <path d="M4 6L8 10L12 6" stroke="#666666" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
@@ -357,7 +359,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                 <div className="lg:w-[280px] flex flex-col items-start lg:items-end gap-4 lg:sticky lg:top-6 lg:self-start">
                   {/* Price Display */}
                   <div className="flex items-baseline gap-1">
-                    <span className="text-sm text-[#757575]">From</span>
+                    <span className="text-sm text-[#757575]">{t('organizer:eventPreview.fromPrice')}</span>
                     <span className="text-2xl md:text-3xl font-bold text-black">{displayPrice}</span>
                   </div>
 
@@ -365,7 +367,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                   <button 
                     className="w-full lg:w-auto px-10 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors text-base"
                   >
-                    Get Tickets Now!
+                    {t('organizer:eventPreview.getTickets')}
                   </button>
 
                   {/* Visibility Badge */}
@@ -375,7 +377,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                         ? 'bg-[#E6F7FF] text-[#00A3FF]' 
                         : 'bg-primary-light text-primary'
                     }`}>
-                      {eventData.visibility === 'public' ? 'Public Event' : 'Private Event'}
+                      {eventData.visibility === 'public' ? t('organizer:eventPreview.visibilityPublic') : t('organizer:eventPreview.visibilityPrivate')}
                     </span>
                   </div>
                 </div>

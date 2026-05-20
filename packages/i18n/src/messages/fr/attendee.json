@@ -1,0 +1,599 @@
+{
+  "searchResult": {
+    "resultsCount": "{{count}} résultats",
+    "resultsFor": "pour",
+    "filterButton": "Filtrer",
+    "filters": {
+      "title": "Filtres",
+      "locationLabel": "Lieu",
+      "categoriesLabel": "Catégories",
+      "categoriesPlaceholder": "ex. Musique, Sport, Business",
+      "showMore": "Voir plus",
+      "showLess": "Voir moins",
+      "priceLabel": "Prix",
+      "priceMin": "Minimum",
+      "priceMax": "Maximum",
+      "whenLabel": "Quand",
+      "timeOptions": {
+        "today": "Aujourd'hui",
+        "thisWeekend": "Ce week-end",
+        "thisWeek": "Cette semaine",
+        "thisMonth": "Ce mois-ci"
+      },
+      "organizersLabel": "Organisateurs",
+      "organizerOptions": {
+        "following": "Événements des organisateurs suivis",
+        "all": "Tous les organisateurs"
+      }
+    },
+    "viewMode": {
+      "listAlt": "Vue liste",
+      "gridAlt": "Vue grille"
+    },
+    "empty": {
+      "message": "Aucun événement ne correspond à vos critères.",
+      "clearFilters": "Effacer les filtres"
+    },
+    "map": {
+      "title": "Carte des événements"
+    }
+  },
+  "eventDetails": {
+    "dateTime": {
+      "sectionTitle": "Date et heure",
+      "changeDate": "Changer la date",
+      "closeCalendar": "Fermer le calendrier",
+      "calendarDays": {
+        "sun": "Dim",
+        "mon": "Lun",
+        "tue": "Mar",
+        "wed": "Mer",
+        "thu": "Jeu",
+        "fri": "Ven",
+        "sat": "Sam"
+      },
+      "alerts": {
+  "favoriteFailed": "Échec de la mise à jour des favoris",
+  "followFailed": "Échec de la mise à jour de l'abonnement"
+   },
+      "timeSlotsAvailable_one": "{{count}} créneau disponible le {{date}}",
+      "timeSlotsAvailable_other": "{{count}} créneaux disponibles le {{date}}",
+      "selectTime": "Choisissez un créneau qui vous convient parmi les options ci-dessous.",
+      "noTimeSlots": "Aucun créneau disponible pour cette date."
+    },
+    "location": {
+      "sectionTitle": "Lieu",
+      "seeOnMap": "Voir sur la carte",
+      "closeMap": "Fermer la carte",
+      "mapTitle": "Carte du lieu de l'événement"
+    },
+    "stats": {
+      "reviews": "avis",
+      "views": "vues",
+      "favorites": "favoris"
+    },
+    "actions": {
+      "addToFavorites": "Ajouter aux favoris",
+      "removeFromFavorites": "Retirer des favoris",
+      "loginToFavorite": "Connectez-vous pour ajouter aux favoris",
+      "shareEvent": "Partager l'événement",
+      "prevImage": "Image précédente",
+      "nextImage": "Image suivante",
+      "goToImage": "Aller à l'image {{number}}"
+    },
+    "alerts": {
+      "favoriteFailed": "Failed to update favorites",
+      "followFailed": "Failed to update following status"
+    },
+    "guidelines": {
+      "sectionTitle": "Règles et consignes",
+      "ageRequirement": {
+        "label": "Âge requis :",
+        "defaultText": "Événement réservé aux personnes de {{age}} ans et plus. Pièce d'identité valide exigée à l'entrée.",
+        "noRestriction": "Aucune restriction d'âge"
+      },
+      "entryPolicy": {
+        "label": "Politique d'entrée :",
+        "reentryAllowed": "Les sorties et retours sont autorisés.",
+        "noReentry": "Aucun retour autorisé après être sorti du lieu."
+      },
+      "accessibility": {
+        "label": "Accessibilité :"
+      },
+      "refundPolicy": {
+        "label": "Politique de remboursement :",
+        "refundsAvailable": "Remboursements possibles selon notre politique de remboursement.",
+        "noRefunds": "Toutes les ventes sont définitives. Remboursement uniquement en cas d'annulation de l'événement."
+      },
+      "prohibitedItems": {
+        "label": "Objets interdits :"
+      },
+      "allowedItems": {
+        "label": "Objets autorisés :"
+      }
+    },
+    "organizer": {
+      "sectionTitle": "Découvrez votre",
+      "sectionTitleBold": "organisateur",
+      "follow": "Suivre",
+      "following": "Suivi",
+      "contact": "Contacter",
+      "loginToFollow": "Connectez-vous pour suivre l'organisateur",
+      "isOrganizing": "{{name}} organise cet événement."
+    },
+    "reviews": {
+      "noReviews": "Aucun avis pour le moment. Soyez le premier à donner votre avis !",
+      "viewAll": "Voir tous les avis"
+    },
+    "faq": {
+      "sectionTitle": "Des",
+      "sectionTitleBold1": "questions ?",
+      "sectionTitleMid": "Nous avons les",
+      "sectionTitleBold2": "réponses",
+      "items": [
+        {
+          "question": "Puis-je être remboursé si je ne peux pas venir ?",
+          "answer": "Les remboursements sont possibles jusqu'à 48 heures avant le début de l'événement. Passé ce délai, les billets ne sont plus remboursables. Contactez notre support pour toute assistance."
+        },
+        {
+          "question": "Y aura-t-il de la sécurité sur place ?",
+          "answer": "Oui, du personnel de sécurité professionnel sera présent tout au long de l'événement pour assurer la sécurité de tous. Des fouilles de sacs seront effectuées aux entrées."
+        },
+        {
+          "question": "Puis-je acheter des billets sur place ?",
+          "answer": "Des billets peuvent être disponibles sur place selon les places restantes. Nous recommandons fortement l'achat en ligne à l'avance pour garantir votre entrée."
+        },
+        {
+          "question": "Existe-t-il un service d'objets trouvés ?",
+          "answer": "Oui, un point objets trouvés est disponible sur place. En cas de perte, rendez-vous au point d'information ou contactez-nous après l'événement."
+        },
+        {
+          "question": "Les sacs et sacs à dos sont-ils autorisés ?",
+          "answer": "Les petits sacs et sacs à main sont autorisés mais feront l'objet de contrôles de sécurité. Les grands sacs à dos et bagages ne sont pas admis pour des raisons de sécurité."
+        }
+      ]
+    },
+    "moreFromOrganizer": "Plus de",
+    "moreFromOrganizerFallback": "cet organisateur",
+    "trending": {
+      "sectionTitle": "Événements",
+      "sectionTitleSuffix": "populaires dans la même catégorie",
+      "paginationOf": "sur",
+      "fromPrice": "à partir de"
+    },
+    "newsletter": {
+      "title": "Soyez les premiers informés,",
+      "titleSuffix": "ne ratez plus aucun événement !",
+      "description": "Recevez les nouveautés exclusives, l'accès en avant-première et une sélection d'événements directement dans votre boîte mail.",
+      "emailPlaceholder": "Votre adresse e-mail",
+      "ctaButton": "Me tenir informé"
+    },
+    "price": {
+      "from": "À partir de"
+    },
+    "getTickets": "Réserver maintenant !",
+    "error": {
+      "notFound": "Événement introuvable",
+      "goBack": "Retour"
+    }
+  },
+  "ticketList": {
+    "goBack": "Retour",
+    "orderSummary": {
+      "title": "Récapitulatif",
+      "serviceCharge": "Frais de service",
+      "total": "Total"
+    },
+    "badges": {
+      "soldOut": "Complet",
+      "onlyFewLeft": "Derniers billets",
+      "almostFull": "Bientôt complet"
+    },
+    "error": {
+      "goBack": "Retour"
+    }
+  },
+
+  "purchaseConfirmation": {
+    "processing": "Traitement de votre commande…",
+    "error": {
+      "title": "Commande échouée",
+      "goBack": "Retour"
+    },
+    "title": "Merci pour votre achat !",
+    "ticketsConfirmed": "Vos billets sont confirmés et envoyés à",
+    "orderId": "Numéro de commande",
+    "goToMyTickets": "Voir mes billets",
+    "youAreGoingTo": "Vous allez à",
+    "yourTickets": "Vos billets",
+    "ticket_one": "Billet",
+    "ticket_other": "Billets",
+    "youMightEnjoy": "Vous pourriez aussi aimer",
+    "fromPrice": "à partir de",
+    "loadMore": "Voir plus"
+  },
+
+  "profile": {
+    "roleOrganizer": "Organisateur",
+    "roleAttendee": "Participant",
+    "editProfile": "Modifier le profil",
+    "personalInfo": "Informations personnelles",
+    "fullName": "Nom complet",
+    "emailAddress": "Adresse e-mail",
+    "phoneNumber": "Numéro de téléphone",
+    "phonePlaceholder": "Ajoutez votre numéro de téléphone",
+    "bio": "Bio",
+    "bioPlaceholder": "Parlez-nous de vous",
+    "saveChanges": "Enregistrer les modifications",
+    "accountSettings": "Paramètres du compte",
+    "changePassword": "Changer le mot de passe",
+    "privacySettings": "Confidentialité",
+    "notificationPreferences": "Préférences de notification",
+    "photoAlt": "Photo de profil"
+  },
+
+  "support": {
+    "title": "Centre d'aide",
+    "subtitle": "Besoin d'aide ? Nous sommes là pour vous !",
+    "contactUs": "Nous contacter",
+    "emailSupport": {
+      "label": "Support par e-mail"
+    },
+    "liveChat": {
+      "label": "Chat en direct",
+      "hours": "Disponible du lundi au vendredi, 9h-17h"
+    },
+    "phoneSupport": {
+      "label": "Support par téléphone"
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "cancelOrder": {
+        "question": "Comment annuler ma commande ?",
+        "answer": "Vous pouvez annuler votre commande depuis la section Mes billets dans votre tableau de bord. Cliquez sur l'événement et sélectionnez « Annuler la commande ». Les remboursements dépendent de la politique de remboursement de l'événement."
+      },
+      "findTickets": {
+        "question": "Où trouver mes billets ?",
+        "answer": "Vos billets sont disponibles dans le tableau de bord, section « Mes billets ». Vous les recevez également par e-mail après l'achat."
+      },
+      "contactOrganizer": {
+        "question": "Comment contacter l'organisateur d'un événement ?",
+        "answer": "Sur la page de l'événement, descendez jusqu'à la section « Découvrez votre organisateur » pour trouver ses coordonnées."
+      }
+    },
+    "goBack": "Retour"
+  },
+
+  "unauthorized": {
+    "title": "Accès refusé",
+    "description": "Vous n'avez pas l'autorisation d'accéder à cette page. Contactez un administrateur si vous pensez qu'il s'agit d'une erreur.",
+    "goToDashboard": "Aller au tableau de bord"
+  },
+
+  "hostEvents": {
+    "title": "Organisez vos événements avec",
+    "titleBrand": "Ormeet",
+    "subtitle": "Créez des expériences inoubliables. Gérez la billetterie, vos participants et bien plus, le tout sur une plateforme puissante.",
+    "features": {
+      "ticketManagement": {
+        "title": "Billetterie simplifiée",
+        "description": "Créez plusieurs types de billets, définissez vos tarifs et gérez votre stock avec un outil intuitif."
+      },
+      "analytics": {
+        "title": "Statistiques en temps réel",
+        "description": "Suivez vos ventes, vos revenus et l'engagement de vos participants grâce à des analyses détaillées."
+      },
+      "attendeeManagement": {
+        "title": "Gestion des participants",
+        "description": "Scannez les billets par QR code, envoyez des notifications et gérez votre liste d'invités sans effort."
+      }
+    },
+    "whyOrmeet": "Pourquoi choisir Ormeet ?",
+    "benefits": {
+      "lowFees": {
+        "title": "Frais réduits",
+        "description": "Gardez une plus grande part de vos revenus grâce à nos tarifs compétitifs"
+      },
+      "securePayments": {
+        "title": "Paiements sécurisés",
+        "description": "Paiements rapides et sécurisés, avec plusieurs moyens disponibles"
+      },
+      "marketingTools": {
+        "title": "Outils marketing",
+        "description": "Faites la promotion de vos événements avec nos outils intégrés"
+      },
+      "support": {
+        "title": "Support 24/7",
+        "description": "Notre équipe est disponible quand vous en avez besoin"
+      }
+    },
+    "getStarted": "Devenir organisateur",
+    "alreadyOrganizer": "Déjà organisateur ?",
+    "signIn": "Se connecter",
+    "alertMessage": "Échec de la mise à niveau du compte. Veuillez réessayer."
+  },
+
+  "myTickets": {
+    "title": "Mes billets",
+    "tabs": {
+      "upcoming": "À venir",
+      "past": "Passés",
+      "cancelled": "Annulés"
+    },
+    "ticketCount_one": "{{count}} billet",
+    "ticketCount_other": "{{count}} billets",
+    "searchPlaceholder": "Rechercher un billet",
+    "sort": {
+      "newestFirst": "Plus récents d'abord",
+      "oldestFirst": "Plus anciens d'abord",
+      "az": "A-Z"
+    },
+    "ticketBadge_one": "{{count}} billet",
+    "ticketBadge_other": "{{count}} billets",
+    "empty": {
+      "title": "Aucun billet trouvé",
+      "upcoming": "Vous n'avez aucun événement à venir.",
+      "past": "Vous n'avez aucun événement passé.",
+      "cancelled": "Vous n'avez aucun événement annulé."
+    }
+  },
+
+  "favoriteEvents": {
+    "title": "Mes favoris",
+    "removeFromFavorites": "Retirer des favoris",
+    "viewDetails": "Voir les détails",
+    "browseEvents": "Parcourir les événements",
+    "empty": {
+      "title": "Aucun favori pour le moment",
+      "description": "Ajoutez des événements à vos favoris pour les retrouver ici !"
+    }
+  },
+
+  "following": {
+    "title": "Organisateurs suivis",
+    "visitWebsite": "Visiter le site →",
+    "unfollow": "Ne plus suivre",
+    "browseEvents": "Parcourir les événements",
+    "empty": {
+      "title": "Vous ne suivez personne",
+      "description": "Suivez des organisateurs pour rester informé de leurs prochains événements !"
+    }
+  },
+
+  "eventCard": {
+    "fromPrice": "à partir de"
+  },
+
+  "eventListCard": {
+    "fromPrice": "à partir de"
+  },
+
+  "eventMapCard": {
+    "fromPrice": "à partir de",
+    "closeAria": "Fermer"
+  },
+
+  "locationMapModal": {
+    "title": "Lieu",
+    "closeMap": "Fermer la carte",
+    "mapTitle": "Carte du lieu de l'événement"
+  },
+
+  "reviewsModal": {
+    "title": "Tous les avis",
+    "reviewCount": "({{count}} avis)"
+  },
+  "onboardingInterests": {
+    "logoAlt": "Logo Ormeet",
+    "welcomeTitle": "Bienvenue sur Ormeet !",
+    "subtitle": "Apprenons à vous connaître !",
+    "question": "Quels types d'événements vous passionnent ?",
+    "saving": "Enregistrement…",
+    "finishLogin": "Terminer et se connecter",
+    "errorFallback": "Échec de l'enregistrement des intérêts. Veuillez réessayer.",
+    "error": {
+      "selectCategory": "Veuillez sélectionner au moins une catégorie"
+    },
+    "categories": {
+      "music": "Musique",
+      "fitness": "Fitness",
+      "sports": "Sport",
+      "tech": "Tech",
+      "nightlife": "Nightlife",
+      "dating": "Rencontres",
+      "holiday": "Vacances"
+    }
+  },
+
+  "accountSettings": {
+    "pageTitle": "Informations personnelles",
+    "pageSubtitle": "Vérifiez vos informations personnelles pour améliorer votre expérience.",
+    "menu": {
+      "personalInfo": "Informations personnelles",
+      "paymentMethods": "Moyens de paiement",
+      "emailPreferences": "Préférences e-mail",
+      "loginSecurity": "Connexion et sécurité"
+    },
+    "personalInfo": {
+      "profile": "Profil",
+      "email": "E-mail",
+      "phone": "Téléphone",
+      "location": "Localisation",
+      "edit": "Modifier",
+      "verified": "Vérifié",
+      "verifyPhone": "Vérifier votre téléphone",
+      "modals": {
+        "editProfile": "Modifier le profil",
+        "editEmail": "Modifier l'e-mail",
+        "editPhone": "Modifier le téléphone",
+        "editLocation": "Modifier la localisation",
+        "fullName": "Nom complet",
+        "fullNamePlaceholder": "Saisissez votre nom complet",
+        "profilePhotoAlt": "Photo de profil",
+        "profilePhoto": "Photo de profil",
+        "uploadHint": "Choisissez un fichier ou déposez-le ici",
+        "uploadFormats": "PNG ou JPG (max 5 Mo)",
+        "currentEmail": "E-mail actuel",
+        "newEmail": "Nouvel e-mail",
+        "newEmailPlaceholder": "Saisissez le nouvel e-mail",
+        "currentPhone": "Téléphone actuel",
+        "newPhone": "Nouveau numéro",
+        "newPhonePlaceholder": "Saisissez le nouveau numéro",
+        "country": "Pays",
+        "countryPlaceholder": "Saisissez votre pays",
+        "city": "Ville",
+        "cityPlaceholder": "Saisissez votre ville",
+        "address": "Adresse",
+        "addressPlaceholder": "Saisissez votre adresse (facultatif)",
+        "password": "Mot de passe",
+        "passwordPlaceholder": "Saisissez votre mot de passe",
+        "saveChanges": "Enregistrer",
+        "cancel": "Annuler",
+        "success": "Modifications enregistrées avec succès"
+      },
+      "validation": {
+        "fullNameRequired": "Le nom complet est requis",
+        "newEmailRequired": "Le nouvel e-mail est requis",
+        "passwordRequired": "Le mot de passe est requis",
+        "invalidEmail": "Veuillez saisir une adresse e-mail valide",
+        "newPhoneRequired": "Le nouveau numéro est requis",
+        "countryRequired": "Le pays est requis",
+        "cityRequired": "La ville est requise"
+      }
+    },
+    "paymentMethods": {
+      "empty": {
+        "title": "Ajoutez votre moyen de paiement préféré",
+        "description": "Enregistrez un moyen de paiement en toute sécurité pour réserver vos billets rapidement. Vous pouvez le modifier à tout moment.",
+        "addButton": "Ajouter un moyen de paiement"
+      },
+      "savedCards": "Cartes enregistrées",
+      "addMore": "Ajouter",
+      "addPaymentTitle": "Ajouter un moyen de paiement",
+      "addPaymentSubtitle": "Ajoutez votre carte pour profiter d'une expérience de réservation fluide.",
+      "cardNumber": "Numéro de carte",
+      "cardNumberPlaceholder": "0000    0000    0000    0000",
+      "expireMonth": "Mois d'expiration",
+      "expireYear": "Année d'expiration",
+      "cvv": "CVV",
+      "cvvPlaceholder": "Saisissez le CVV",
+      "saveCard": "Enregistrer la carte",
+      "goBackAlt": "Retour"
+    },
+    "emailPreferences": {
+      "title": "Préférences e-mail",
+      "subtitle": "Choisissez les e-mails que vous souhaitez recevoir — restez informé sans être submergé.",
+      "options": {
+        "ticketConfirmations": {
+          "title": "Confirmations de billets",
+          "description": "Recevez un e-mail de confirmation après chaque achat de billet."
+        },
+        "eventReminders": {
+          "title": "Rappels d'événements",
+          "description": "Recevez des rappels avant le début de vos événements."
+        },
+        "eventUpdates": {
+          "title": "Mises à jour et annulations",
+          "description": "Soyez notifié de tout changement concernant vos événements."
+        },
+        "newEvents": {
+          "title": "Nouveaux événements près de chez vous",
+          "description": "Recevez des e-mails sur les événements populaires ou à venir dans votre région."
+        },
+        "specialOffers": {
+          "title": "Offres spéciales et réductions",
+          "description": "Profitez d'offres exclusives, de tarifs early bird et de promotions."
+        },
+        "newsletters": {
+          "title": "Newsletters et nouveautés",
+          "description": "Restez informé des actualités, conseils et annonces d'Ormeet."
+        },
+        "surveys": {
+          "title": "Sondages et retours",
+          "description": "Aidez-nous à nous améliorer en partageant votre expérience après les événements."
+        }
+      }
+    },
+    "loginSecurity": {
+      "title": "Connexion et sécurité",
+      "subtitle": "Définissez un mot de passe unique pour protéger votre compte",
+      "password": "Mot de passe",
+      "changePassword": "Changer le mot de passe",
+      "twoFactor": {
+        "title": "Authentification à deux facteurs",
+        "description": "L'authentification à deux facteurs ajoute une sécurité supplémentaire en exigeant une seconde étape de vérification lors de la connexion."
+      },
+      "modals": {
+        "changePassword": {
+          "title": "Changer le mot de passe",
+          "currentPassword": "Mot de passe actuel",
+          "currentPasswordPlaceholder": "Saisissez le mot de passe actuel",
+          "newPassword": "Nouveau mot de passe",
+          "newPasswordPlaceholder": "Saisissez le nouveau mot de passe",
+          "confirmPassword": "Confirmer le mot de passe",
+          "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+          "saveChanges": "Enregistrer",
+          "cancel": "Annuler",
+          "success": "Modifications enregistrées avec succès",
+          "validation": {
+            "currentRequired": "Le mot de passe actuel est requis",
+            "newRequired": "Le nouveau mot de passe est requis",
+            "minLength": "Le mot de passe doit contenir au moins 8 caractères",
+            "match": "Les mots de passe ne correspondent pas"
+          }
+        }
+      }
+    }
+  },
+
+  "eventDetailsComponent": {
+    "goBack": "Retour",
+    "dateTime": "Date et heure",
+    "venue": "Lieu",
+    "allTickets": "Tous les billets",
+    "ticketType": "Type de billet",
+    "status": "Statut",
+    "attendeeName": "Nom du participant",
+    "ticketNumber": "Numéro de billet",
+    "ticketId": "ID du billet",
+    "showDetails": "Voir les détails",
+    "showLess": "Réduire",
+    "qrInfo": "Utilisez le QR code ci-dessous pour vous enregistrer à l'événement",
+    "downloadTicket": "Télécharger le billet",
+    "cancelOrder": "Annuler la commande",
+    "cancelling": "Annulation…",
+    "refundPolicy": "Politique de remboursement",
+    "refundDays": "{{days}} jours avant l'événement",
+    "eventOrganizer": "Organisateur",
+    "contactOrganizer": "Contacter l'organisateur",
+    "more": "Plus",
+    "orderId": "Commande n° {{id}}",
+    "purchasedOn": "Acheté le {{date}}",
+    "cancelDialog": {
+      "title": "Annuler la commande",
+      "message": "Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.",
+      "confirm": "Oui, annuler",
+      "cancel": "Conserver la commande"
+    }
+  },
+
+  "notificationBell": {
+    "ariaLabel": "Notifications",
+    "panelTitle": "Notifications",
+    "empty": "Aucune notification pour le moment",
+    "typeLabels": {
+      "EVENT_CANCELLED": "Annulé",
+      "EVENT_UPDATED": "Mise à jour",
+      "EVENT_REMINDER": "Rappel",
+      "TICKET_PURCHASED": "Achat",
+      "ORDER_CONFIRMED": "Confirmé",
+      "REFUND_PROCESSED": "Remboursement"
+    },
+    "timeAgo": {
+      "justNow": "À l'instant",
+      "minutesAgo": "Il y a {{count}} min",
+      "hoursAgo": "Il y a {{count}} h",
+      "daysAgo": "Il y a {{count}} j"
+    }
+  }
+}

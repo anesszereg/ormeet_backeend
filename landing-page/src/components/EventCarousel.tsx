@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 
@@ -44,6 +45,7 @@ interface EventCarouselProps {
 }
 
 const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
+  const t = useTranslations("landing.carousel");
   // While the fetch is in flight, show evergreen marketing imagery so
   // the hero area never looks empty.
   const list = events.length >= 3
@@ -90,7 +92,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
         {/* Previous (Left) Card */}
         <div
           onClick={handlePrev}
-          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -ml-10 md:-ml-6 lg:-ml-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -ms-10 md:-ms-6 lg:-ms-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
           style={{ willChange: 'transform, opacity' }}
         >
           <Image
@@ -101,7 +103,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
             sizes="240px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-4 start-4 end-4">
             <h3 className="text-white text-sm font-semibold leading-tight truncate">
               {prev.title}
             </h3>
@@ -114,12 +116,12 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
         {/* Navigation Arrow — Left */}
         <button
           onClick={handlePrev}
-          className="absolute left-[120px] md:left-[165px] lg:left-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
-          aria-label="Previous event"
+          className="absolute start-[120px] md:start-[165px] lg:start-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
+          aria-label={t("previousAria")}
         >
           <Image
             src="/svgs/landingPage/pastEvent.svg"
-            alt="Previous"
+            alt={t("previousAria")}
             width={50}
             height={50}
           />
@@ -140,7 +142,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/5 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6">
+          <div className="absolute bottom-6 start-6 end-6">
             <h3 className="text-white text-lg md:text-xl font-semibold leading-tight">
               {current.title}
             </h3>
@@ -153,12 +155,12 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
         {/* Navigation Arrow — Right */}
         <button
           onClick={handleNext}
-          className="absolute right-[120px] md:right-[165px] lg:right-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
-          aria-label="Next event"
+          className="absolute end-[120px] md:end-[165px] lg:end-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
+          aria-label={t("nextAria")}
         >
           <Image
             src="/svgs/landingPage/nextEvent.svg"
-            alt="Next"
+            alt={t("nextAria")}
             width={50}
             height={50}
           />
@@ -167,7 +169,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
         {/* Next (Right) Card */}
         <div
           onClick={handleNext}
-          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -mr-10 md:-mr-6 lg:-mr-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
+          className="relative shrink-0 w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px] rounded-2xl overflow-hidden -me-10 md:-me-6 lg:-me-2 cursor-pointer transition-all duration-300 ease-out hover:scale-[1.03] opacity-70 hover:opacity-90"
           style={{ willChange: 'transform, opacity' }}
         >
           <Image
@@ -178,7 +180,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
             sizes="240px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-          <div className="absolute bottom-4 left-4 right-4">
+          <div className="absolute bottom-4 start-4 end-4">
             <h3 className="text-white text-sm font-semibold leading-tight truncate">
               {next.title}
             </h3>

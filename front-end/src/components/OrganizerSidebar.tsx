@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from "react-icons/bs";
 import DashboardIcon from '../assets/Svgs/organiser/dashboard/dashboard.svg';
 import EventIcon from '../assets/Svgs/organiser/dashboard/event.svg';
@@ -15,6 +16,7 @@ interface OrganizerSidebarProps {
 }
 
 const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChange }: OrganizerSidebarProps) => {
+  const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleToggleCollapse = () => {
@@ -24,11 +26,11 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
   };
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: DashboardIcon },
-    { id: 'events', label: 'Events', icon: EventIcon },
-    { id: 'attendees', label: 'Attendees', icon: AttendeesIcon },
-    { id: 'orders', label: 'Orders', icon: OrdersIcon },
-    { id: 'account-settings', label: 'Account Settings', icon: AccountSettingsIcon },
+    { id: 'dashboard', label: t('sidebar.dashboard'), icon: DashboardIcon },
+    { id: 'events', label: t('sidebar.events'), icon: EventIcon },
+    { id: 'attendees', label: t('sidebar.attendees'), icon: AttendeesIcon },
+    { id: 'orders', label: t('sidebar.orders'), icon: OrdersIcon },
+    { id: 'account-settings', label: t('sidebar.accountSettings'), icon: AccountSettingsIcon },
   ];
 
   return (
@@ -36,16 +38,16 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
       className={`${isCollapsed ? 'w-20' : 'w-60'} min-h-full bg-secondary-light flex flex-col transition-all duration-300 ease-in-out`}
     >
       {/* Header section */}
-      <div className="h-16 pl-6 flex items-center justify-between border-b border-light-gray">
+      <div className="h-16 ps-6 flex items-center justify-between border-b border-light-gray">
         <div className="flex items-center justify-between w-full">
           {!isCollapsed && (
-            <h2 className="text-base font-semibold text-black">Your Dashboard</h2>
+            <h2 className="text-base font-semibold text-black">{t('sidebar.title')}</h2>
           )}
 
           <button
             onClick={handleToggleCollapse}
             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-light-gray transition-all cursor-pointer"
-            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            aria-label={isCollapsed ? t('sidebar.expandAria') : t('sidebar.collapseAria')}
           >
             {isCollapsed ? (
               <BsFillArrowRightCircleFill size={24} />
@@ -69,15 +71,15 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
           </button>
         ) : (
           <div className="relative">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+            <div className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none">
               <svg className="w-5 h-5 text-input-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
             <input
               type="text"
-              placeholder="Search"
-              className="w-full pl-10 pr-4 py-2 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
+              placeholder={t('sidebar.searchPlaceholder')}
+              className="w-full ps-10 pe-4 py-2 bg-white border border-light-gray text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
               style={{ borderRadius: '85.41px' }}
             />
           </div>
@@ -98,7 +100,7 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
                 }`}
               >
                 {activeTab === item.id && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r" />
+                  <div className="absolute start-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r" />
                 )}
 
                 <img src={item.icon} alt={item.label} className="w-5 h-5 shrink-0" />
@@ -122,12 +124,12 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
             {!isCollapsed && (
               <div className="flex items-center gap-2">
                 <img src={WorkspaceIcon} alt="Workspace" className="w-5 h-5" />
-                <span className="text-sm font-medium text-dark-gray">Workspace</span>
+                <span className="text-sm font-medium text-dark-gray">{t('sidebar.workspace')}</span>
               </div>
             )}
             <button
               className={`${isCollapsed ? 'w-full flex justify-center' : ''} shrink-0 cursor-pointer hover:opacity-80 transition-opacity`}
-              aria-label="Add workspace"
+              aria-label={t('sidebar.addWorkspaceAria')}
             >
               <img src={AddIcon} alt="Add" className="w-8 h-8" />
             </button>

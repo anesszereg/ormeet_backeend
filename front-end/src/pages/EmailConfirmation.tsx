@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import authService from '../services/authService';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
 const EmailConfirmation = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -72,7 +75,7 @@ const EmailConfirmation = () => {
         type: verificationType,
         purpose: 'email_verification',
       });
-      alert('Verification code sent successfully!');
+      alert(t('emailConfirmation.codeSent'));
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to resend code. Please try again.';
       setError(errorMessage);
@@ -85,7 +88,7 @@ const EmailConfirmation = () => {
     const verificationCode = code.join('');
     
     if (verificationCode.length !== 6) {
-      setError('Please enter a valid 6-digit code');
+      setError(t('emailConfirmation.errors.invalidCode'));
       return;
     }
 
@@ -122,6 +125,9 @@ const EmailConfirmation = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="fixed top-4 end-4 z-50">
+        <LanguageSwitcher />
+      </div>
       {/* Left Side - Form */}
       <div className="flex-1 flex items-start justify-center p-4 sm:p-6 md:p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-[460px] flex flex-col gap-4 sm:gap-6 py-6 sm:py-8 md:py-4">
@@ -132,7 +138,7 @@ const EmailConfirmation = () => {
 
           {/* Welcome Text */}
           <div className="flex flex-col gap-4">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Welcome to Ormeet!</h1>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('emailConfirmation.title')}</h1>
             
             {/* Progress Bar */}
             <div className="flex gap-2">
@@ -145,20 +151,20 @@ const EmailConfirmation = () => {
           {/* Instruction Text */}
           <div>
             <h2 className="text-xl sm:text-2xl font-semibold text-black mb-2">
-              Let's make sure it's really you
+              {t('emailConfirmation.instruction')}
             </h2>
           </div>
 
           {/* Email/Phone Display */}
           <div className="flex items-center gap-2 text-sm">
             <span className="text-[#4F4F4F]">
-              We've sent a 6-digit code to{' '}
-              <span className="font-semibold text-black">{identifier || 'your email/phone'}</span>
+              {t('emailConfirmation.codeSentTo')}{' '}
+              <span className="font-semibold text-black">{identifier || t('emailConfirmation.fallbackContact')}</span>
             </span>
             <button
               type="button"
               className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded-full bg-black text-white hover:bg-[#333] transition-colors"
-              aria-label="Edit email"
+              aria-label={t('emailConfirmation.editAria')}
             >
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="w-3 h-3">
                 <path d="M7 2L10 5L4 11H1V8L7 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
@@ -195,13 +201,13 @@ const EmailConfirmation = () => {
 
             {/* Resend Link */}
             <div className="text-sm text-[#4F4F4F]">
-              Code not received?{' '}
+              {t('emailConfirmation.codeNotReceived')}{' '}
               <button
                 type="button"
                 onClick={handleResend}
                 className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity underline-offset-2"
               >
-                Click to resend
+                {t('emailConfirmation.resendLink')}
               </button>
             </div>
 
@@ -211,7 +217,7 @@ const EmailConfirmation = () => {
               disabled={code.some((digit) => !digit) || isLoading}
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
             >
-              {isLoading ? 'Verifying...' : 'Verify & Continue'}
+              {isLoading ? t('emailConfirmation.submitting') : t('emailConfirmation.submitButton')}
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>

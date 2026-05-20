@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
 const Unauthorized = () => {
+  const { t } = useTranslation('attendee');
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
 
@@ -40,18 +42,18 @@ const Unauthorized = () => {
         </div>
         
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Access Denied
+          {t('unauthorized.title')}
         </h1>
         
         <p className="text-gray-600 mb-8">
-          You don't have permission to access this page. Please contact an administrator if you believe this is an error.
+          {t('unauthorized.description')}
         </p>
         
         <button
           onClick={handleGoBack}
           className="inline-flex items-center px-6 py-3 bg-[#FF4000] text-white font-medium rounded-full hover:bg-[#E63900] transition-colors"
         >
-          Go to Dashboard
+          {t('unauthorized.goToDashboard')}
         </button>
       </div>
     </div>

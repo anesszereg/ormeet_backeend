@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
 const Register = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -80,18 +83,18 @@ const Register = () => {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('register.errors.passwordMismatch'));
       return;
     }
 
     if (!acceptTerms) {
-      setError('Please accept the terms and conditions');
+      setError(t('register.errors.acceptTerms'));
       return;
     }
 
     const passwordValidationErrors = validatePassword(formData.password);
     if (passwordValidationErrors.length > 0) {
-      setError('Password does not meet requirements: ' + passwordValidationErrors.join(', '));
+      setError(t('register.errors.passwordRequirements') + passwordValidationErrors.join(', '));
       return;
     }
 
@@ -135,6 +138,9 @@ const Register = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="fixed top-4 end-4 z-50">
+        <LanguageSwitcher />
+      </div>
       {/* Success Popup */}
       {showSuccess && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -145,15 +151,15 @@ const Register = () => {
                   <path d="M10 16l4 4 8-8" stroke="#22C55E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-black">Check your email!</h2>
+              <h2 className="text-2xl font-bold text-black">{t('register.success.title')}</h2>
               <p className="text-[#4F4F4F] text-sm leading-relaxed">
-                We've sent a verification link to <strong>{formData.email}</strong>. Please check your inbox and click the link to verify your email before logging in.
+                {t('register.success.description', { email: formData.email })}
               </p>
               <button
                 onClick={() => navigate('/login')}
                 className="w-full px-6 py-3.5 bg-[#FF4000] text-white text-base font-semibold rounded-lg hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md mt-2 cursor-pointer"
               >
-                Go to Login
+                {t('register.success.goToLogin')}
               </button>
             </div>
           </div>
@@ -170,8 +176,8 @@ const Register = () => {
 
           {/* Welcome Text */}
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Create your account</h1>
-            <p className="text-sm text-[#4F4F4F] leading-relaxed">Join Ormeet to discover, attend, or host amazing events.</p>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('register.title')}</h1>
+            <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('register.subtitle')}</p>
           </div>
 
           {/* Error Message */}
@@ -185,12 +191,12 @@ const Register = () => {
           <form onSubmit={handleRegister} className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="firstName" className="text-sm font-medium text-black">First name <span className="text-[#FF4000]">*</span></label>
+                <label htmlFor="firstName" className="text-sm font-medium text-black">{t('register.fields.firstNameLabel')} <span className="text-[#FF4000]">*</span></label>
                 <input
                   type="text"
                   id="firstName"
                   name="firstName"
-                  placeholder="Enter your first name"
+                  placeholder={t('register.fields.firstNamePlaceholder')}
                   value={formData.firstName}
                   onChange={handleChange}
                   required
@@ -198,12 +204,12 @@ const Register = () => {
                 />
               </div>
               <div className="flex-1 flex flex-col gap-2">
-                <label htmlFor="familyName" className="text-sm font-medium text-black">Family name <span className="text-[#FF4000]">*</span></label>
+                <label htmlFor="familyName" className="text-sm font-medium text-black">{t('register.fields.familyNameLabel')} <span className="text-[#FF4000]">*</span></label>
                 <input
                   type="text"
                   id="familyName"
                   name="familyName"
-                  placeholder="Enter your family name"
+                  placeholder={t('register.fields.familyNamePlaceholder')}
                   value={formData.familyName}
                   onChange={handleChange}
                   required
@@ -213,12 +219,12 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="email" className="text-sm font-medium text-black">Email <span className="text-[#FF4000]">*</span></label>
+              <label htmlFor="email" className="text-sm font-medium text-black">{t('register.fields.emailLabel')} <span className="text-[#FF4000]">*</span></label>
               <input
                 type="email"
                 id="email"
                 name="email"
-                placeholder="Enter your email"
+                placeholder={t('register.fields.emailPlaceholder')}
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -227,22 +233,22 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="phone" className="text-sm font-medium text-black">Phone number <span className="text-[#FF4000]">*</span></label>
+              <label htmlFor="phone" className="text-sm font-medium text-black">{t('register.fields.phoneLabel')} <span className="text-[#FF4000]">*</span></label>
               <PhoneInput
                 value={formData.phone}
                 onChange={handlePhoneChange}
                 required
-                placeholder="Phone number"
+                placeholder={t('register.fields.phoneLabel')}
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-sm font-medium text-black">Password <span className="text-[#FF4000]">*</span></label>
+              <label htmlFor="password" className="text-sm font-medium text-black">{t('register.fields.passwordLabel')} <span className="text-[#FF4000]">*</span></label>
               <input
                 type="password"
                 id="password"
                 name="password"
-                placeholder="Create a password"
+                placeholder={t('register.fields.passwordPlaceholder')}
                 value={formData.password}
                 onChange={handleChange}
                 onFocus={() => setShowPasswordRequirements(true)}
@@ -253,27 +259,27 @@ const Register = () => {
               />
               {(showPasswordRequirements || passwordErrors.length > 0) && formData.password && (
                 <div className="px-3 py-2 bg-gray-50 rounded-lg text-xs space-y-1">
-                  <p className="font-medium text-gray-700 mb-1">Password must contain:</p>
+                  <p className="font-medium text-gray-700 mb-1">{t('register.passwordRequirements.title')}</p>
                   <div className="space-y-0.5">
                     <div className={`flex items-center gap-1.5 ${formData.password.length >= 8 ? 'text-green-600' : 'text-gray-500'}`}>
                       <span>{formData.password.length >= 8 ? '✓' : '○'}</span>
-                      <span>At least 8 characters</span>
+                      <span>{t('register.passwordRequirements.minChars')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 ${/[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
                       <span>{/[A-Z]/.test(formData.password) ? '✓' : '○'}</span>
-                      <span>One uppercase letter</span>
+                      <span>{t('register.passwordRequirements.uppercase')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 ${/[a-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
                       <span>{/[a-z]/.test(formData.password) ? '✓' : '○'}</span>
-                      <span>One lowercase letter</span>
+                      <span>{t('register.passwordRequirements.lowercase')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 ${/[0-9]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
                       <span>{/[0-9]/.test(formData.password) ? '✓' : '○'}</span>
-                      <span>One number</span>
+                      <span>{t('register.passwordRequirements.number')}</span>
                     </div>
                     <div className={`flex items-center gap-1.5 ${/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
                       <span>{/[!@#$%^&*(),.?":{}|<>]/.test(formData.password) ? '✓' : '○'}</span>
-                      <span>One special character (!@#$%^&*...)</span>
+                      <span>{t('register.passwordRequirements.special')}</span>
                     </div>
                   </div>
                 </div>
@@ -281,12 +287,12 @@ const Register = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">Confirm Password <span className="text-[#FF4000]">*</span></label>
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">{t('register.fields.confirmPasswordLabel')} <span className="text-[#FF4000]">*</span></label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
-                placeholder="Confirm your password"
+                placeholder={t('register.fields.confirmPasswordPlaceholder')}
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
@@ -302,7 +308,7 @@ const Register = () => {
                   onChange={(e) => setAcceptTerms(e.target.checked)}
                   className="w-[18px] h-[18px] mt-0.5 cursor-pointer accent-[#FF4000]"
                 />
-                <span>I accept the <a href="/terms" className="text-[#FF4000] font-medium hover:underline">Terms and Conditions</a></span>
+                <span>{t('register.terms.prefix')} <a href="/terms" className="text-[#FF4000] font-medium hover:underline">{t('register.terms.link')}</a></span>
               </label>
             </div>
 
@@ -311,14 +317,14 @@ const Register = () => {
               disabled={isLoading}
               className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
-              {isLoading ? 'Creating account...' : 'Create account'}
+              {isLoading ? t('register.submitting') : t('register.submitButton')}
             </button>
           </form>
 
           {/* Divider */}
           <div className="flex items-center text-[#4F4F4F] text-sm">
             <div className="flex-1 h-px bg-[#EEEEEE]"></div>
-            <span className="px-4">Or sign up with</span>
+            <span className="px-4">{t('register.orSignUpWith')}</span>
             <div className="flex-1 h-px bg-[#EEEEEE]"></div>
           </div>
 
@@ -331,20 +337,20 @@ const Register = () => {
                 <path d="M3.99 10c0-.69.12-1.35.32-1.97V5.51H1.07A9.973 9.973 0 000 10c0 1.61.39 3.14 1.07 4.49l3.24-2.52c-.2-.62-.32-1.28-.32-1.97z" fill="#FBBC05"/>
                 <path d="M10 3.88c1.88 0 3.13.81 3.85 1.48l2.84-2.76C14.96.99 12.7 0 10 0 6.09 0 2.72 2.25 1.07 5.51l3.24 2.52C5.12 5.62 7.36 3.88 10 3.88z" fill="#EA4335"/>
               </svg>
-              Google
+              {t('register.oauth.google')}
             </button>
             <button type="button" className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-[1.5px] border-[#EEEEEE] rounded-lg bg-white text-sm font-medium text-[#4F4F4F] transition-all hover:border-[#434343] hover:bg-[#F8F8F8] cursor-pointer" onClick={handleFacebookSignup}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="#1877F2" className="w-5 h-5">
                 <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V10h2.54V7.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V10h2.773l-.443 2.89h-2.33v6.988C16.343 19.128 20 14.991 20 10z"/>
               </svg>
-              Facebook
+              {t('register.oauth.facebook')}
             </button>
           </div>
 
           {/* Login Link */}
           <div className="text-center">
             <p className="text-sm text-[#4F4F4F]">
-              Already have an account? <a href="/login" className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">Log in</a>
+              {t('register.alreadyHaveAccount')} <a href="/login" className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('register.loginLink')}</a>
             </p>
           </div>
         </div>

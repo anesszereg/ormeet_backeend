@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import authService from '../services/authService';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
 const ResetPassword = () => {
+  const { t } = useTranslation('auth');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -17,7 +20,7 @@ const ResetPassword = () => {
 
   useEffect(() => {
     if (!token) {
-      setError('Invalid or missing reset token');
+      setError(t('resetPassword.errors.invalidToken'));
     }
   }, [token]);
 
@@ -26,17 +29,17 @@ const ResetPassword = () => {
     setError('');
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('resetPassword.errors.passwordMismatch'));
       return;
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('resetPassword.errors.passwordTooShort'));
       return;
     }
 
     if (!token) {
-      setError('Invalid or missing reset token');
+      setError(t('resetPassword.errors.invalidToken'));
       return;
     }
 
@@ -60,6 +63,9 @@ const ResetPassword = () => {
   if (success) {
     return (
       <div className="flex flex-col md:flex-row h-screen w-full">
+        <div className="fixed top-4 end-4 z-50">
+          <LanguageSwitcher />
+        </div>
         <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
           <div className="w-full max-w-[460px] flex flex-col gap-6">
             <div>
@@ -67,8 +73,8 @@ const ResetPassword = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <h1 className="text-2xl sm:text-[28px] font-bold text-black">Password reset successful!</h1>
-              <p className="text-sm text-[#4F4F4F] leading-relaxed">Your password has been successfully reset.</p>
+              <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('resetPassword.success.title')}</h1>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('resetPassword.success.subtitle')}</p>
             </div>
 
             <div className="flex flex-col items-center gap-4 p-8 bg-[#EBF6EE] border border-[#34A853] rounded-xl text-center">
@@ -76,7 +82,7 @@ const ResetPassword = () => {
                 <circle cx="24" cy="24" r="24" fill="#34A853" opacity="0.1"/>
                 <path d="M16 24l6 6 10-12" stroke="#34A853" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              <p className="text-sm text-[#4F4F4F] leading-relaxed">Redirecting to login page...</p>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('resetPassword.success.redirecting')}</p>
             </div>
           </div>
         </div>
@@ -90,6 +96,9 @@ const ResetPassword = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-full">
+      <div className="fixed top-4 end-4 z-50">
+        <LanguageSwitcher />
+      </div>
       <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-white">
         <div className="w-full max-w-[460px] flex flex-col gap-6">
           <div>
@@ -97,8 +106,8 @@ const ResetPassword = () => {
           </div>
 
           <div className="flex flex-col gap-2">
-            <h1 className="text-2xl sm:text-[28px] font-bold text-black">Reset your password</h1>
-            <p className="text-sm text-[#4F4F4F] leading-relaxed">Enter your new password below.</p>
+            <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('resetPassword.title')}</h1>
+            <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('resetPassword.subtitle')}</p>
           </div>
 
           {error && (
@@ -109,11 +118,11 @@ const ResetPassword = () => {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-sm font-medium text-black">New Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-black">{t('resetPassword.fields.newPasswordLabel')}</label>
               <input
                 type="password"
                 id="password"
-                placeholder="Enter your new password"
+                placeholder={t('resetPassword.fields.newPasswordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -123,11 +132,11 @@ const ResetPassword = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">Confirm New Password</label>
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-black">{t('resetPassword.fields.confirmPasswordLabel')}</label>
               <input
                 type="password"
                 id="confirmPassword"
-                placeholder="Confirm your new password"
+                placeholder={t('resetPassword.fields.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
@@ -141,13 +150,13 @@ const ResetPassword = () => {
               disabled={isLoading}
               className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
             >
-              {isLoading ? 'Resetting...' : 'Reset Password'}
+              {isLoading ? t('resetPassword.submitting') : t('resetPassword.submitButton')}
             </button>
           </form>
 
           <div className="text-center">
             <a href="/login" className="text-sm text-[#FF4000] font-medium hover:opacity-80 transition-opacity">
-              Back to Login
+              {t('resetPassword.backToLogin')}
             </a>
           </div>
         </div>
