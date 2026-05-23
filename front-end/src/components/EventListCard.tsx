@@ -50,7 +50,7 @@ const EventListCard = ({
             {title}
           </h3>
           <p className="text-sm text-[#757575] mb-2">
-            {date} • {venue}
+            <bdi>{date}</bdi> • {venue}
           </p>
           {description && (
             <p className="text-sm text-[#757575] line-clamp-2">
@@ -62,7 +62,7 @@ const EventListCard = ({
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#757575]">{t('eventListCard.fromPrice')}</span>
-            <span className="text-base font-semibold text-black">{price}</span>
+            <span className="text-base font-semibold text-black"><bdi>{price}</bdi></span>
           </div>
           {badge && (
             <span 

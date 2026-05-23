@@ -244,7 +244,7 @@ const Testimonials = () => {
         </div>
 
         {/* Subtitle */}
-        <span className="text-xs font-semibold tracking-widest text-muted uppercase mb-4">
+        <span className="text-xs font-semibold tracking-widest rtl:tracking-normal text-muted uppercase mb-4">
           {t("subtitle")}
         </span>
 

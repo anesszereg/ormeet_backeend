@@ -85,7 +85,7 @@ const TrendingEvents = () => {
                 </h3>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm text-black">
-                    {t("fromPrice", { price: event.price })}
+                    {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
                   </span>
                 </div>
                 {event.badgeKey && (

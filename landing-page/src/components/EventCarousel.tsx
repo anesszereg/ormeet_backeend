@@ -96,7 +96,7 @@ const EventCarousel = () => {
               {prev.title}
             </h3>
             <p className="text-white/70 text-xs mt-1">
-              {prev.date} &bull; {prev.venue}
+              <bdi>{prev.date}</bdi> &bull; {prev.venue}
             </p>
           </div>
         </div>
@@ -107,12 +107,14 @@ const EventCarousel = () => {
           className="absolute start-[120px] md:start-[165px] lg:start-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
           aria-label={t("previousAria")}
         >
-          <Image
-            src="/svgs/landingPage/pastEvent.svg"
-            alt={t("previousAria")}
-            width={50}
-            height={50}
-          />
+          <span className="rtl:scale-x-[-1] block">
+            <Image
+              src="/svgs/landingPage/pastEvent.svg"
+              alt={t("previousAria")}
+              width={50}
+              height={50}
+            />
+          </span>
         </button>
 
         {/* Center (Active) Card - Clickable */}
@@ -135,7 +137,7 @@ const EventCarousel = () => {
               {current.title}
             </h3>
             <p className="text-white/80 text-sm mt-1">
-              {current.date} &bull; {current.venue}
+              <bdi>{current.date}</bdi> &bull; {current.venue}
             </p>
           </div>
         </div>
@@ -146,12 +148,14 @@ const EventCarousel = () => {
           className="absolute end-[120px] md:end-[165px] lg:end-[210px] z-20 cursor-pointer hover:scale-110 transition-transform"
           aria-label={t("nextAria")}
         >
-          <Image
-            src="/svgs/landingPage/nextEvent.svg"
-            alt={t("nextAria")}
-            width={50}
-            height={50}
-          />
+          <span className="rtl:scale-x-[-1] block">
+            <Image
+              src="/svgs/landingPage/nextEvent.svg"
+              alt={t("nextAria")}
+              width={50}
+              height={50}
+            />
+          </span>
         </button>
 
         {/* Next (Right) Card */}
@@ -173,7 +177,7 @@ const EventCarousel = () => {
               {next.title}
             </h3>
             <p className="text-white/70 text-xs mt-1">
-              {next.date} &bull; {next.venue}
+              <bdi>{next.date}</bdi> &bull; {next.venue}
             </p>
           </div>
         </div>

@@ -90,7 +90,7 @@ export function LanguageSwitcher() {
             strokeLinecap="round"
           />
         </svg>
-        <span className="uppercase">{currentLocale}</span>
+        <span className="uppercase rtl:normal-case">{currentLocale}</span>
       </button>
       {open && (
         <div

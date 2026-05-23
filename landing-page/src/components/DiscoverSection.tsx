@@ -269,10 +269,10 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
                 {event.title}
               </h3>
               <p className="text-sm text-medium-gray mb-1.5">
-                {event.date} • {event.venue}
+                <bdi>{event.date}</bdi> • {event.venue}
               </p>
               <span className="text-sm font-semibold text-black">
-                {t("fromPrice", { price: event.price })}
+                {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
               </span>
             </div>
           ))}

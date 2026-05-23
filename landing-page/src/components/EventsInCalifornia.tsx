@@ -73,11 +73,11 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
               {event.title}
             </h3>
             <p className="text-sm text-medium-gray mb-1.5">
-              {event.date} • {event.venue}
+              <bdi>{event.date}</bdi> • {event.venue}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold text-black">
-                {t("fromPrice", { price: event.price })}
+                {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
               </span>
               {event.badgeKey && (
                 <span
