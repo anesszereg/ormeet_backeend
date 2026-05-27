@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { CaliforniaEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import { usePagination } from "@/hooks/usePagination";
@@ -12,11 +12,11 @@ type CaliforniaItem = Omit<CaliforniaEvent, "badge"> & {
 };
 
 const californiaEvents: CaliforniaItem[] = [
-  { id: 1, image: "/images/landingPage/event-myticket-7.png", title: "Laugh Out Loud Live!", date: "Nov 3", venue: "The Spotlight Theatre", price: "$53.99", badgeKey: null, badgeColor: null },
-  { id: 2, image: "/images/landingPage/event-myticket-8.png", title: "Colors of Modernity", date: "Jan 10", venue: "Grandview Art Gallery", price: "$49.99", badgeKey: "trending", badgeColor: "green" },
-  { id: 3, image: "/images/landingPage/event-myticket-2.jpg", title: "Taste of the Valley", date: "Oct 18", venue: "Greenleaf Pavilion", price: "$65.99", badgeKey: null, badgeColor: null },
-  { id: 4, image: "/images/landingPage/event-myticket-3.jpg", title: "Sunset Acoustic Sessions", date: "Dec 5", venue: "Bayview Terrace", price: "$39.99", badgeKey: "almostFull", badgeColor: "red" },
-  { id: 5, image: "/images/landingPage/event-myticket-6.jpg", title: "Neon Nights DJ Party", date: "Feb 14", venue: "Skyline Lounge", price: "$59.99", badgeKey: null, badgeColor: null },
+  { id: 1, image: "/images/landingPage/event-myticket-7.png", title: "Laugh Out Loud Live!", date: "2026-11-03", venue: "The Spotlight Theatre", price: "$53.99", badgeKey: null, badgeColor: null },
+  { id: 2, image: "/images/landingPage/event-myticket-8.png", title: "Colors of Modernity", date: "2026-01-10", venue: "Grandview Art Gallery", price: "$49.99", badgeKey: "trending", badgeColor: "green" },
+  { id: 3, image: "/images/landingPage/event-myticket-2.jpg", title: "Taste of the Valley", date: "2026-10-18", venue: "Greenleaf Pavilion", price: "$65.99", badgeKey: null, badgeColor: null },
+  { id: 4, image: "/images/landingPage/event-myticket-3.jpg", title: "Sunset Acoustic Sessions", date: "2026-12-05", venue: "Bayview Terrace", price: "$39.99", badgeKey: "almostFull", badgeColor: "red" },
+  { id: 5, image: "/images/landingPage/event-myticket-6.jpg", title: "Neon Nights DJ Party", date: "2026-02-14", venue: "Skyline Lounge", price: "$59.99", badgeKey: null, badgeColor: null },
 ];
 
 const CARDS_PER_PAGE = 3;
@@ -28,6 +28,8 @@ interface EventsInCaliforniaProps {
 
 const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaProps) => {
   const t = useTranslations("landing.city");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   const totalPages = Math.ceil(californiaEvents.length / CARDS_PER_PAGE);
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
@@ -73,11 +75,17 @@ const EventsInCalifornia = ({ selectedCity = "California" }: EventsInCaliforniaP
               {event.title}
             </h3>
             <p className="text-sm text-medium-gray mb-1.5">
-              <bdi>{event.date}</bdi> • {event.venue}
+              <bdi>{new Date(event.date).toLocaleDateString(
+                localeMap[locale] || 'en-US',
+                { month: 'short', day: 'numeric' }
+              )}</bdi> • {event.venue}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-sm font-semibold text-black">
-                {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
+                {t.rich("fromPrice", {
+                  price: event.price,
+                  bdi: (chunks) => <bdi>{chunks}</bdi>
+                })}
               </span>
               {event.badgeKey && (
                 <span

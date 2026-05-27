@@ -36,21 +36,20 @@ const EventDetailsNavbar = ({ isLoggedIn = false }: EventDetailsNavbarProps) => 
 
   return (
     <nav className="w-full h-16 bg-white px-4 md:px-8 flex items-center justify-between border-b border-[#D0D0D0]">
-      {/* Left section: Logo */}
-      <div className="flex items-center">
+      {/* Left section: Logo + Need Assistance */}
+      <div className="flex items-center gap-4">
         <Link to="/" className="flex items-center gap-2">
           <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
           <span className="text-xl font-bold text-black">Ormeet</span>
         </Link>
-      </div>
-
-      {/* Right section: Need Assistance + Language + Auth/Profile */}
-      <div className="flex items-center gap-3 lg:gap-4">
-        {/* Need Assistance Button */}
+        <div className="h-5 w-px bg-[#D0D0D0]" aria-hidden="true" />
         <button className="px-6 py-2 text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors text-sm font-semibold">
           {t('header.needAssistance')}
         </button>
+      </div>
 
+      {/* Right section: Language + Auth/Profile */}
+      <div className="flex items-center gap-3 lg:gap-4">
         {/* Language selector */}
         <LanguageSwitcher />
 

@@ -145,7 +145,7 @@ const EventDetailsGlobal = () => {
           reviewCount: avgRating.count > 1000 ? `${(avgRating.count / 1000).toFixed(1)}K` : String(avgRating.count || 0),
           views: event.views || 0,
           favorites: event.favorites || 0,
-          badge: event.status === 'published' ? 'Trending' : '',
+          badge: event.status === 'published' ? 'trending' : '',
           date: dateStr,
           time: timeStr,
           venue: event.venue?.name || event.customLocation?.city || 'TBA',
@@ -373,6 +373,39 @@ const EventDetailsGlobal = () => {
     return slots;
   };
   const timeSlots = generateTimeSlots();
+
+  const moreFromOrganizerEvents = [
+    {
+      id: 1,
+      image: Event2,
+      title: "New York's Best Croissant - The 2025 Finale",
+      date: '2026-04-20',
+      venue: 'ABC Cooking School',
+      price: '65.99',
+      badgeKey: 'salesEndSoon',
+      badgeColor: 'orange',
+    },
+    {
+      id: 2,
+      image: Event3,
+      title: 'Epic Esports Championship',
+      date: '2026-04-20',
+      venue: 'Mercedes-Benz Arena',
+      price: '65.99',
+      badgeKey: 'almostFull',
+      badgeColor: 'blue',
+    },
+    {
+      id: 3,
+      image: Event4,
+      title: 'Global Tech Innovators Summit 2025',
+      date: '2026-04-20',
+      venue: 'Marina Convention Center',
+      price: '65.99',
+      badgeKey: 'onlyFewLeft',
+      badgeColor: 'orange',
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -1034,74 +1067,37 @@ const EventDetailsGlobal = () => {
                 </h2>
                 
                 <div className="space-y-4">
-                  {/* Event Card 1 */}
-                  <div className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
-                    <img 
-                      src={Event2} 
-                      alt="New York's Best Croissant - The 2025 Finale" 
-                      className="w-[165px] h-[110px] object-cover rounded-lg shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
-                        New York's Best Croissant - The 2025 Finale
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-[#757575] mb-2">
-                        <span>Apr 20</span>
-                        <span>•</span>
-                        <span>ABC Cooking School</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-black">from $65.99</span>
-                        <span className="text-xs font-medium text-[#FF4000] bg-[#FFF4F3] px-2 py-1 rounded">Sales end soon</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Event Card 2 */}
-                  <div className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
-                    <img 
-                      src={Event3} 
-                      alt="Epic Esports Championship" 
-                      className="w-[165px] h-[110px] object-cover rounded-lg shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
-                        Epic Esports Championship
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-[#757575] mb-2">
-                        <span>Apr 20</span>
-                        <span>•</span>
-                        <span>Mercedes-Benz Arena</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-black">from $65.99</span>
-                        <span className="text-xs font-medium text-[#00A3FF] bg-[#E6F7FF] px-2 py-1 rounded">Almost full</span>
+                  {moreFromOrganizerEvents.map((event) => (
+                    <div key={event.id} className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
+                      <img
+                        src={event.image}
+                        alt={event.title}
+                        className="w-[165px] h-[110px] object-cover rounded-lg shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
+                          {event.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs text-[#757575] mb-2">
+                          <bdi>{new Date(event.date).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' })}</bdi>
+                          <span>•</span>
+                          <span>{event.venue}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-black">
+                            {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
+                          </span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            event.badgeColor === 'blue'
+                              ? 'text-[#00A3FF] bg-[#E6F7FF]'
+                              : 'text-[#FF4000] bg-[#FFF4F3]'
+                          }`}>
+                            {t(`eventDetails.badges.${event.badgeKey}`)}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Event Card 3 */}
-                  <div className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
-                    <img 
-                      src={Event4} 
-                      alt="Global Tech Innovators Summit 2025" 
-                      className="w-[165px] h-[110px] object-cover rounded-lg shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
-                        Global Tech Innovators Summit 2025
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-[#757575] mb-2">
-                        <span>Apr 20</span>
-                        <span>•</span>
-                        <span>Marina Convention Center</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-black">from $65.99</span>
-                        <span className="text-xs font-medium text-[#FF4000] bg-[#FFF4F3] px-2 py-1 rounded">Only few left</span>
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1116,7 +1112,7 @@ const EventDetailsGlobal = () => {
                 </div>
                 {eventData.badge && (
                   <span className="px-3 py-1 text-xs font-medium text-[#34A853] border border-[#34A853] rounded-full">
-                    {eventData.badge}
+                    {t(`eventDetails.badges.${eventData.badge}`)}
                   </span>
                 )}
               </div>
@@ -1191,7 +1187,7 @@ const EventDetailsGlobal = () => {
                           <span className={`text-xs font-medium px-2 py-1 rounded ${
                             event.badgeColor === 'blue' ? 'text-[#00A3FF] bg-[#E6F7FF]' : 'text-[#FF4000] bg-[#FFF4F3]'
                           }`}>
-                            {event.badge}
+                            {t(`eventDetails.badges.${event.badge}`)}
                           </span>
                         )}
                       </div>

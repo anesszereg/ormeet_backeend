@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { CarouselEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 
@@ -12,41 +12,43 @@ const events: CarouselEvent[] = [
     id: 1,
     image: "/images/landingPage/event-myticket-6.jpg",
     title: "Neon Nights DJ Party",
-    date: "Apr 20",
+    date: "2026-04-20",
     venue: "Skyline Lounge",
   },
   {
     id: 2,
     image: "/images/landingPage/event-myticket-3.jpg",
     title: "Rhythm & Beats Music Festival",
-    date: "Apr 20",
+    date: "2026-05-15",
     venue: "Hyde Park",
   },
   {
     id: 3,
     image: "/images/landingPage/event-myticket-2.jpg",
     title: "Global Tech Innovators Summit",
-    date: "Apr 20",
+    date: "2026-06-08",
     venue: "Marina Convention Center",
   },
   {
     id: 4,
     image: "/images/landingPage/event-myticket-8.png",
     title: "Summer Jazz & Blues Festival",
-    date: "May 15",
+    date: "2026-07-22",
     venue: "Riverside Amphitheater",
   },
   {
     id: 5,
     image: "/images/landingPage/event-myticket-7.png",
     title: "Street Food Festival",
-    date: "Jun 5",
+    date: "2026-08-10",
     venue: "Downtown Plaza",
   },
 ];
 
 const EventCarousel = () => {
   const t = useTranslations("landing.carousel");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   const [currentIndex, setCurrentIndex] = useState(1);
 
   const handlePrev = useCallback(() => {
@@ -96,7 +98,10 @@ const EventCarousel = () => {
               {prev.title}
             </h3>
             <p className="text-white/70 text-xs mt-1">
-              <bdi>{prev.date}</bdi> &bull; {prev.venue}
+              <bdi>{new Date(prev.date).toLocaleDateString(
+                localeMap[locale] || 'en-US',
+                { month: 'short', day: 'numeric' }
+              )}</bdi> &bull; {prev.venue}
             </p>
           </div>
         </div>
@@ -137,7 +142,10 @@ const EventCarousel = () => {
               {current.title}
             </h3>
             <p className="text-white/80 text-sm mt-1">
-              <bdi>{current.date}</bdi> &bull; {current.venue}
+              <bdi>{new Date(current.date).toLocaleDateString(
+                localeMap[locale] || 'en-US',
+                { month: 'short', day: 'numeric' }
+              )}</bdi> &bull; {current.venue}
             </p>
           </div>
         </div>
@@ -177,7 +185,10 @@ const EventCarousel = () => {
               {next.title}
             </h3>
             <p className="text-white/70 text-xs mt-1">
-              <bdi>{next.date}</bdi> &bull; {next.venue}
+              <bdi>{new Date(next.date).toLocaleDateString(
+                localeMap[locale] || 'en-US',
+                { month: 'short', day: 'numeric' }
+              )}</bdi> &bull; {next.venue}
             </p>
           </div>
         </div>

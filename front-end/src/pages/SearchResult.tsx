@@ -39,7 +39,7 @@ const SearchResult = () => {
   const [selectedLocation, setSelectedLocation] = useState('Oran');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 300 });
-  const [selectedDate, setSelectedDate] = useState('Apr 20, 2025');
+  const [selectedDate, setSelectedDate] = useState(() => t('searchResult.defaultDate'));
   const [selectedTimeFilter, setSelectedTimeFilter] = useState('Today');
   const [selectedOrganizer, setSelectedOrganizer] = useState('Events by Organizers You Follow');
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -48,6 +48,7 @@ const SearchResult = () => {
   const [filteredEvents, setFilteredEvents] = useState<MappedEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchParams] = useSearchParams();
+  const [mapZoom, setMapZoom] = useState(12);
   const searchCategory = searchParams.get('category') || '';
   const searchLocation = searchParams.get('location') || '';
 
@@ -475,7 +476,7 @@ const SearchResult = () => {
           <div className="w-full h-full relative rounded-lg overflow-hidden">
             {/* Google Map iframe */}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3355089.3864504!2d-121.4944!3d37.2719!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x808fb9fe5f285e3d%3A0x8b5109a227086f55!2sCalifornia%2C%20USA!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s"
+              src={`https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3355089.3864504!2d3.0590!3d36.7762!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sAlgiers%2C%20Algeria!5e0!3m2!1sen!2s!4v1234567890123!5m2!1sen!2s&z=${mapZoom}`}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -495,14 +496,20 @@ const SearchResult = () => {
               </button>
 
               {/* Zoom in */}
-              <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors">
+              <button 
+                onClick={() => setMapZoom(prev => Math.min(prev + 1, 20))}
+                className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors cursor-pointer"
+              >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M10 5V15M5 10H15" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
               </button>
 
               {/* Zoom out */}
-              <button className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors">
+              <button 
+                onClick={() => setMapZoom(prev => Math.max(prev - 1, 1))}
+                className="w-10 h-10 bg-white rounded-lg shadow-md flex items-center justify-center hover:bg-[#F8F8F8] transition-colors cursor-pointer"
+              >
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M5 10H15" stroke="#4F4F4F" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
@@ -540,7 +547,7 @@ const SearchResult = () => {
                 onClick={() => setSelectedMapEvent(filteredEvents[1])}
                 className="absolute top-20 start-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
-                {filteredEvents[1].price}
+                {filteredEvents[1].price === 'Free' ? t('searchResult.freePrice') : filteredEvents[1].price}
               </button>
             )}
             {filteredEvents[5] && (
@@ -548,7 +555,7 @@ const SearchResult = () => {
                 onClick={() => setSelectedMapEvent(filteredEvents[5])}
                 className="absolute top-32 start-48 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
-                {filteredEvents[5].price}
+                {filteredEvents[5].price === 'Free' ? t('searchResult.freePrice') : filteredEvents[5].price}
               </button>
             )}
             {filteredEvents[0] && (
@@ -556,7 +563,7 @@ const SearchResult = () => {
                 onClick={() => setSelectedMapEvent(filteredEvents[0])}
                 className="absolute bottom-32 end-32 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
-                {filteredEvents[0].price}
+                {filteredEvents[0].price === 'Free' ? t('searchResult.freePrice') : filteredEvents[0].price}
               </button>
             )}
             {filteredEvents[4] && (
@@ -564,7 +571,7 @@ const SearchResult = () => {
                 onClick={() => setSelectedMapEvent(filteredEvents[4])}
                 className="absolute bottom-56 start-56 bg-white px-3 py-1.5 rounded-full shadow-md text-sm font-semibold text-black cursor-pointer hover:bg-[#FF4000] hover:text-white transition-colors"
               >
-                {filteredEvents[4].price}
+                {filteredEvents[4].price === 'Free' ? t('searchResult.freePrice') : filteredEvents[4].price}
               </button>
             )}
           </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import type { TrendingEvent } from "@/types";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import { usePagination } from "@/hooks/usePagination";
@@ -9,23 +9,26 @@ import PaginationControls from "@/components/ui/PaginationControls";
 
 type TrendingItem = Omit<TrendingEvent, "badge"> & {
   badgeKey: "almostFull" | "salesEndSoon" | "onlyFewLeft" | null;
+  date: string;
 };
 
 const trendingEvents: TrendingItem[] = [
-  { id: 1, image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badgeKey: "almostFull", badgeColor: "blue" },
-  { id: 2, image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=800&fit=crop", title: "Rooftop DJ Nights", price: "$53.99", badgeKey: null, badgeColor: null },
-  { id: 3, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=800&fit=crop", title: "SoCal Street Bites", price: "$53.99", badgeKey: "salesEndSoon", badgeColor: "red" },
-  { id: 4, image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=800&fit=crop", title: "Local Artists Showcase", price: "$53.99", badgeKey: "onlyFewLeft", badgeColor: "red" },
-  { id: 5, image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", price: "$53.99", badgeKey: null, badgeColor: null },
-  { id: 6, image: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&h=800&fit=crop", title: "Urban Art Exhibition", price: "$53.99", badgeKey: "almostFull", badgeColor: "blue" },
-  { id: 7, image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=800&fit=crop", title: "Wine Tasting Evening", price: "$53.99", badgeKey: null, badgeColor: null },
-  { id: 8, image: "https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=600&h=800&fit=crop", title: "Comedy Night Special", price: "$53.99", badgeKey: "salesEndSoon", badgeColor: "red" },
+  { id: 1, image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", date: "2026-04-20", price: "$53.99", badgeKey: "almostFull", badgeColor: "blue" },
+  { id: 2, image: "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=600&h=800&fit=crop", title: "Rooftop DJ Nights", date: "2026-05-15", price: "$53.99", badgeKey: null, badgeColor: null },
+  { id: 3, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&h=800&fit=crop", title: "SoCal Street Bites", date: "2026-06-08", price: "$53.99", badgeKey: "salesEndSoon", badgeColor: "red" },
+  { id: 4, image: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&h=800&fit=crop", title: "Local Artists Showcase", date: "2026-07-22", price: "$53.99", badgeKey: "onlyFewLeft", badgeColor: "red" },
+  { id: 5, image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=800&fit=crop", title: "Golden Beats Music Fest", date: "2026-08-10", price: "$53.99", badgeKey: null, badgeColor: null },
+  { id: 6, image: "https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?w=600&h=800&fit=crop", title: "Urban Art Exhibition", date: "2026-09-05", price: "$53.99", badgeKey: "almostFull", badgeColor: "blue" },
+  { id: 7, image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&h=800&fit=crop", title: "Wine Tasting Evening", date: "2026-04-25", price: "$53.99", badgeKey: null, badgeColor: null },
+  { id: 8, image: "https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=600&h=800&fit=crop", title: "Comedy Night Special", date: "2026-05-30", price: "$53.99", badgeKey: "salesEndSoon", badgeColor: "red" },
 ];
 
 const CARDS_PER_PAGE = 5;
 
 const TrendingEvents = () => {
   const t = useTranslations("landing.trending");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   const totalPages = Math.ceil(trendingEvents.length / CARDS_PER_PAGE);
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
@@ -85,7 +88,18 @@ const TrendingEvents = () => {
                 </h3>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm text-black">
-                    {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
+                    {new Date(event.date).toLocaleDateString(
+                      localeMap[locale] || 'en-US',
+                      { month: 'short', day: 'numeric' }
+                    )}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm text-black">
+                    {t.rich("fromPrice", {
+                      price: event.price,
+                      bdi: (chunks) => <bdi>{chunks}</bdi>
+                    })}
                   </span>
                 </div>
                 {event.badgeKey && (

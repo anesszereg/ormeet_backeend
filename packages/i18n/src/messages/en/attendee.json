@@ -36,7 +36,9 @@
     },
     "map": {
       "title": "Event locations map"
-    }
+    },
+    "freePrice": "Free",
+    "defaultDate": "Apr 20, 2025"
   },
   "eventDetails": {
     "dateTime": {
@@ -156,6 +158,12 @@
       "sectionTitleSuffix": "events in similar category",
       "paginationOf": "of",
       "fromPrice": "from"
+    },
+    "badges": {
+      "trending": "Trending",
+      "almostFull": "Almost full",
+      "salesEndSoon": "Sales end soon",
+      "onlyFewLeft": "Only few left"
     },
     "newsletter": {
       "title": "Be the first to know,",

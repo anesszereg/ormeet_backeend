@@ -85,27 +85,22 @@ const SearchResultNavbar = () => {
   );
 
   return (
-    <nav className="w-full h-16 bg-white px-4 md:px-8 flex items-center justify-between shadow-md border-b border-[#D0D0D0]">
-      {/* Left section: Logo */}
-      <div className="flex items-center">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
-          <span className="text-xl font-bold text-black">Ormeet</span>
-        </div>
+    <nav className="w-full h-16 bg-white px-4 md:px-8 flex items-center justify-between shadow-md border-b border-[#D0D0D0] gap-4">
+      {/* Section 1: Logo */}
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
+        <span className="text-xl font-bold text-black">Ormeet</span>
       </div>
 
-      {/* Center: Search bar */}
-      <div className="absolute start-1/2 -translate-x-1/2 flex items-center bg-white border border-[#D0D0D0] focus-within:border-[#FF4000] focus-within:ring-2 focus-within:ring-[#FF4000]/10 transition-all" style={{ borderRadius: '85.41px', width: '420px', height: '38px' }}>
-        {/* Location icon on the left */}
-        <img 
-          src={LocationSearchIcon} 
-          alt="Location" 
-          className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px] pointer-events-none" 
-        />
-        
+      {/* Section 2: Search bar (centered via flex, no position absolute) */}
+      <div className="hidden md:flex items-center bg-white border border-[#D0D0D0] focus-within:border-[#FF4000] focus-within:ring-2 focus-within:ring-[#FF4000]/10 transition-all" style={{ borderRadius: '85.41px', width: '420px', height: '38px', flexShrink: 0 }}>
+        {/* Location icon inside the bar */}
+        <div className="flex-shrink-0 ps-2">
+          <img src={LocationSearchIcon} alt="" className="w-[30px] h-[30px]" />
+        </div>
+
         {/* Location input */}
-        <div className="relative flex items-center flex-1" ref={locationInputRef}>
+        <div className="relative flex-1" ref={locationInputRef}>
           <input
             type="text"
             value={locationQuery}
@@ -113,12 +108,12 @@ const SearchResultNavbar = () => {
             onKeyPress={handleKeyPress}
             onFocus={() => locationQuery.length >= 3 && setShowLocationSuggestions(true)}
             placeholder={t('header.searchLocationPlaceholder')}
-            className="w-full ps-11 pe-3 text-sm text-black placeholder:text-[#BCBCBC] outline-none bg-transparent"
+            className="w-full ps-2 pe-3 text-sm text-black placeholder:text-[#BCBCBC] outline-none bg-transparent text-start"
             style={{ height: '38px' }}
           />
-            
+
           {showLocationSuggestions && filteredLocationSuggestions.length > 0 && (
-            <div className="absolute start-0 top-full mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-2 z-50">
+            <div className="absolute start-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-2 z-50">
               {filteredLocationSuggestions.map((location, index) => (
                 <button
                   key={index}
@@ -136,10 +131,10 @@ const SearchResultNavbar = () => {
         </div>
 
         {/* Separator */}
-        <div className="h-5 w-px bg-[#D0D0D0] self-center"></div>
-        
+        <div className="h-5 w-px bg-[#D0D0D0] flex-shrink-0"></div>
+
         {/* Event type input */}
-        <div className="relative flex items-center flex-1" ref={eventTypeInputRef}>
+        <div className="relative flex-1" ref={eventTypeInputRef}>
           <input
             type="text"
             value={eventTypeQuery}
@@ -147,10 +142,10 @@ const SearchResultNavbar = () => {
             onKeyPress={handleKeyPress}
             onFocus={() => eventTypeQuery.length >= 3 && setShowEventTypeSuggestions(true)}
             placeholder={t('header.searchEventPlaceholder')}
-            className="w-full ps-3 pe-10 text-sm text-black placeholder:text-[#BCBCBC] outline-none bg-transparent"
+            className="w-full ps-3 pe-3 text-sm text-black placeholder:text-[#BCBCBC] outline-none bg-transparent text-start"
             style={{ height: '38px' }}
           />
-            
+
           {showEventTypeSuggestions && filteredEventTypeSuggestions.length > 0 && (
             <div className="absolute start-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-[#EEEEEE] py-2 z-50">
               {filteredEventTypeSuggestions.map((type, index) => (
@@ -169,17 +164,17 @@ const SearchResultNavbar = () => {
           )}
         </div>
 
-        {/* Search icon on the right */}
-        <img 
-          src={SearchIcon} 
-          alt="Search" 
-          className="absolute end-1 top-1/2 -translate-y-1/2 w-8 h-8 cursor-pointer hover:opacity-80 transition-opacity" 
+        {/* Search icon button inside the bar */}
+        <button
           onClick={handleSearch}
-        />
+          className="flex-shrink-0 pe-1 cursor-pointer hover:opacity-80 transition-opacity"
+        >
+          <img src={SearchIcon} alt="Search" className="w-8 h-8" />
+        </button>
       </div>
 
-      {/* Right section: Language + Auth */}
-      <div className="flex items-center gap-3 lg:gap-4">
+      {/* Section 3: Language + Auth */}
+      <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0">
         {/* Language selector */}
         <LanguageSwitcher />
 

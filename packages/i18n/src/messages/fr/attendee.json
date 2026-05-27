@@ -36,7 +36,9 @@
     },
     "map": {
       "title": "Carte des événements"
-    }
+    },
+    "freePrice": "Gratuit",
+    "defaultDate": "20 avr. 2025"
   },
   "eventDetails": {
     "dateTime": {
@@ -160,6 +162,12 @@
       "sectionTitleSuffix": "populaires dans la même catégorie",
       "paginationOf": "sur",
       "fromPrice": "à partir de"
+    },
+    "badges": {
+      "trending": "Tendance",
+      "almostFull": "Bientôt complet",
+      "salesEndSoon": "Ventes bientôt terminées",
+      "onlyFewLeft": "Derniers billets"
     },
     "newsletter": {
       "title": "Soyez les premiers informés,",

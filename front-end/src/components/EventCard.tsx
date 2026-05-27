@@ -44,7 +44,7 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-1">
             <span className="text-sm md:text-xs text-[#757575]">{t('eventCard.fromPrice')}</span>
-            <span className="text-lg md:text-base font-semibold text-black"><bdi>{price}</bdi></span>
+            <span className="text-lg md:text-base font-semibold text-black"><bdi>{price === 'Free' ? t('searchResult.freePrice') : price}</bdi></span>
           </div>
           {badge && (
             <span 

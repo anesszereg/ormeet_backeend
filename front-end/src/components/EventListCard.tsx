@@ -62,7 +62,7 @@ const EventListCard = ({
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#757575]">{t('eventListCard.fromPrice')}</span>
-            <span className="text-base font-semibold text-black"><bdi>{price}</bdi></span>
+            <span className="text-base font-semibold text-black"><bdi>{price === 'Free' ? t('searchResult.freePrice') : price}</bdi></span>
           </div>
           {badge && (
             <span 

@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 
 /* ------------------------------------------------------------------ */
@@ -71,18 +71,18 @@ const CATEGORY_IMAGES = {
 
 /** Mock event data — each event has a category for filtering */
 const ALL_EVENTS: DiscoverEvent[] = [
-  { id: 1,  title: "Golden Beats Music Fest",   date: "Apr 20", venue: "Sunset Arena",         price: "$53.99", image: CATEGORY_IMAGES.Music[0],                category: "Music" },
-  { id: 2,  title: "Rooftop DJ Nights",         date: "May 5",  venue: "Skyline Lounge",       price: "$45.99", image: CATEGORY_IMAGES.Music[1],                category: "Music" },
-  { id: 3,  title: "Acoustic Unplugged",        date: "Jun 12", venue: "Bayview Terrace",      price: "$29.99", image: CATEGORY_IMAGES.Music[2],                category: "Music" },
-  { id: 4,  title: "Championship Finals",       date: "May 18", venue: "Grand Stadium",        price: "$89.99", image: CATEGORY_IMAGES.Sports[0],               category: "Sports" },
-  { id: 5,  title: "City Marathon 2025",        date: "Jun 1",  venue: "Downtown Circuit",     price: "$35.00", image: CATEGORY_IMAGES.Sports[1],               category: "Sports" },
-  { id: 6,  title: "Swim Invitational",         date: "Jul 8",  venue: "Aquatic Center",       price: "$25.00", image: CATEGORY_IMAGES.Sports[2],               category: "Sports" },
-  { id: 7,  title: "SoCal Street Bites",        date: "Apr 28", venue: "Greenleaf Pavilion",   price: "$15.99", image: CATEGORY_IMAGES["Food & Drink"][0],      category: "Food & Drink" },
-  { id: 8,  title: "Wine & Dine Evening",       date: "May 22", venue: "Vineyard Estate",      price: "$65.99", image: CATEGORY_IMAGES["Food & Drink"][1],      category: "Food & Drink" },
-  { id: 9,  title: "Gourmet Food Festival",     date: "Jun 15", venue: "Central Park",         price: "$20.00", image: CATEGORY_IMAGES["Food & Drink"][2],      category: "Food & Drink" },
-  { id: 10, title: "Street Art Walkthrough",    date: "Jun 3",  venue: "Arts District",        price: "$12.00", image: CATEGORY_IMAGES["Art & Performance"][1], category: "Art & Performance" },
-  { id: 11, title: "Abstract Expressions",      date: "Jul 20", venue: "Modern Art Museum",    price: "$38.00", image: CATEGORY_IMAGES["Art & Performance"][2], category: "Art & Performance" },
-  { id: 12, title: "Live Theater Night",        date: "Aug 5",  venue: "City Playhouse",       price: "$42.00", image: CATEGORY_IMAGES["Art & Performance"][0], category: "Art & Performance" },
+  { id: 1,  title: "Golden Beats Music Fest",   date: "2026-04-20", venue: "Sunset Arena",         price: "$53.99", image: CATEGORY_IMAGES.Music[0],                category: "Music" },
+  { id: 2,  title: "Rooftop DJ Nights",         date: "2026-05-05", venue: "Skyline Lounge",       price: "$45.99", image: CATEGORY_IMAGES.Music[1],                category: "Music" },
+  { id: 3,  title: "Acoustic Unplugged",        date: "2026-06-12", venue: "Bayview Terrace",      price: "$29.99", image: CATEGORY_IMAGES.Music[2],                category: "Music" },
+  { id: 4,  title: "Championship Finals",       date: "2026-05-18", venue: "Grand Stadium",        price: "$89.99", image: CATEGORY_IMAGES.Sports[0],               category: "Sports" },
+  { id: 5,  title: "City Marathon 2025",        date: "2026-06-01", venue: "Downtown Circuit",     price: "$35.00", image: CATEGORY_IMAGES.Sports[1],               category: "Sports" },
+  { id: 6,  title: "Swim Invitational",         date: "2026-07-08", venue: "Aquatic Center",       price: "$25.00", image: CATEGORY_IMAGES.Sports[2],               category: "Sports" },
+  { id: 7,  title: "SoCal Street Bites",        date: "2026-04-28", venue: "Greenleaf Pavilion",   price: "$15.99", image: CATEGORY_IMAGES["Food & Drink"][0],      category: "Food & Drink" },
+  { id: 8,  title: "Wine & Dine Evening",       date: "2026-05-22", venue: "Vineyard Estate",      price: "$65.99", image: CATEGORY_IMAGES["Food & Drink"][1],      category: "Food & Drink" },
+  { id: 9,  title: "Gourmet Food Festival",     date: "2026-06-15", venue: "Central Park",         price: "$20.00", image: CATEGORY_IMAGES["Food & Drink"][2],      category: "Food & Drink" },
+  { id: 10, title: "Street Art Walkthrough",    date: "2026-06-03", venue: "Arts District",        price: "$12.00", image: CATEGORY_IMAGES["Art & Performance"][1], category: "Art & Performance" },
+  { id: 11, title: "Abstract Expressions",      date: "2026-07-20", venue: "Modern Art Museum",    price: "$38.00", image: CATEGORY_IMAGES["Art & Performance"][2], category: "Art & Performance" },
+  { id: 12, title: "Live Theater Night",        date: "2026-08-05", venue: "City Playhouse",       price: "$42.00", image: CATEGORY_IMAGES["Art & Performance"][0], category: "Art & Performance" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -100,6 +100,8 @@ interface DiscoverSectionProps {
 
 const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
   const t = useTranslations("landing.discover");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   const [selectedCity, setSelectedCity] = useState<City>("California");
   const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("all");
   const activeCategory = useMemo<Category>(
@@ -269,10 +271,16 @@ const DiscoverSection = ({ onCityChange }: DiscoverSectionProps) => {
                 {event.title}
               </h3>
               <p className="text-sm text-medium-gray mb-1.5">
-                <bdi>{event.date}</bdi> • {event.venue}
+                <bdi>{new Date(event.date).toLocaleDateString(
+                  localeMap[locale] || 'en-US',
+                  { month: 'short', day: 'numeric' }
+                )}</bdi> • {event.venue}
               </p>
               <span className="text-sm font-semibold text-black">
-                {t("fromPrice", { price: <bdi>{event.price}</bdi> as any })}
+                {t.rich("fromPrice", {
+                  price: event.price,
+                  bdi: (chunks) => <bdi>{chunks}</bdi>
+                })}
               </span>
             </div>
           ))}
