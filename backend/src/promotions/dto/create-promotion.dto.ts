@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDate, IsOptional, Min, Max } from 'class-validator';
+import { IsString, IsNumber, IsDate, IsOptional, Min, Max, IsEnum } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PromotionType } from '../../entities';
 
 export class CreatePromotionDto {
   @ApiProperty({ example: 'SUMMER2025' })
@@ -12,11 +13,21 @@ export class CreatePromotionDto {
   @IsOptional()
   description?: string;
 
-  @ApiProperty({ example: 20 })
+  @ApiProperty({ enum: PromotionType, example: PromotionType.PERCENT })
+  @IsEnum(PromotionType)
+  type: PromotionType;
+
+  @ApiProperty({ example: 20, description: 'Percentage (0-100) when type=percent, or fixed amount when type=fixed' })
   @IsNumber()
   @Min(0)
+  value: number;
+
+  @ApiPropertyOptional({ example: 20 })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
   @Max(100)
-  discountPercentage: number;
+  discountPercentage?: number;
 
   @ApiPropertyOptional({ example: 100 })
   @IsNumber()

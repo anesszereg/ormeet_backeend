@@ -2,16 +2,20 @@ import api from './api';
 
 // ========== Types ==========
 
+export type PromotionType = 'percent' | 'fixed' | 'free-ticket';
+
 export interface Promotion {
   id: string;
   eventId?: string;
   code: string;
-  discountType: 'percentage' | 'fixed';
-  discountValue: number;
+  description?: string;
+  type: PromotionType;
+  value: number;
+  discountPercentage?: number;
   maxUses?: number;
-  currentUses: number;
-  startDate?: string;
-  endDate?: string;
+  usedCount: number;
+  validFrom: string;
+  validUntil: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -20,20 +24,24 @@ export interface Promotion {
 export interface CreatePromotionDto {
   eventId?: string;
   code: string;
-  discountType: 'percentage' | 'fixed';
-  discountValue: number;
+  description?: string;
+  type: PromotionType;
+  value: number;
   maxUses?: number;
-  startDate?: string;
-  endDate?: string;
+  validFrom: string;
+  validUntil: string;
 }
 
-export interface UpdatePromotionDto extends Partial<CreatePromotionDto> {}
+export interface UpdatePromotionDto extends Partial<CreatePromotionDto> {
+  isActive?: boolean;
+}
 
 export interface ValidationResult {
   valid: boolean;
-  discountType?: 'percentage' | 'fixed';
+  discountType?: PromotionType;
   discountValue?: number;
   message?: string;
+  promotion?: Promotion;
 }
 
 // ========== Service ==========
@@ -54,8 +62,12 @@ class PromotionService {
     return response.data;
   }
 
-  async validate(code: string): Promise<ValidationResult> {
-    const response = await api.post<ValidationResult>(`/promotions/validate/${code}`);
+  async validate(code: string, eventId?: string): Promise<ValidationResult> {
+    const response = await api.post<ValidationResult>(
+      `/promotions/validate/${code}`,
+      undefined,
+      { params: eventId ? { eventId } : undefined },
+    );
     return response.data;
   }
 

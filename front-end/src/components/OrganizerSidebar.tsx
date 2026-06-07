@@ -30,6 +30,7 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
     { id: 'events', label: t('sidebar.events'), icon: EventIcon },
     { id: 'attendees', label: t('sidebar.attendees'), icon: AttendeesIcon },
     { id: 'orders', label: t('sidebar.orders'), icon: OrdersIcon },
+    { id: 'promotions', label: t('sidebar.promotions', 'Promo codes'), icon: OrdersIcon },
     { id: 'account-settings', label: t('sidebar.accountSettings'), icon: AccountSettingsIcon },
   ];
 

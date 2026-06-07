@@ -39,6 +39,8 @@ interface LocationState {
   }>;
   subtotal: number;
   serviceCharge: number;
+  discountCode?: string;
+  discountAmount?: number;
   total: number;
 }
 
@@ -91,6 +93,7 @@ const PurchaseConfirmation: React.FC = () => {
             country: '',
           },
           paymentMethod: 'credit_card',
+          discountCode: state.discountCode,
           metadata: { source: 'web_app' },
         };
 

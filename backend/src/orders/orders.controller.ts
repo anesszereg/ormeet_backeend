@@ -18,7 +18,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderDto, CreateOrderEnhancedDto, CompletePaymentDto, RefundOrderDto } from './dto';
+import { CreateOrderDto, UpdateOrderDto, CreateOrderEnhancedDto, CompletePaymentDto, RefundOrderDto, ManualAttendeeDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -114,6 +114,21 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
   @ApiResponse({ status: 404, description: 'Ticket type not found' })
   create(@Body() createOrderDto: CreateOrderEnhancedDto) {
     return this.ordersService.createEnhanced(createOrderDto);
+  }
+
+  @Post('manual-attendee')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ORGANIZER, UserRole.ADMIN)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Manually register an attendee (organizer)',
+    description: 'Creates a free comp order + ticket for an attendee. Finds or creates the attendee account by email.',
+  })
+  @ApiResponse({ status: 201, description: 'Attendee registered and ticket issued' })
+  @ApiResponse({ status: 400, description: 'Ticket type does not belong to the event' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  createManualAttendee(@Body() dto: ManualAttendeeDto) {
+    return this.ordersService.createManualAttendee(dto);
   }
 
   @Get()

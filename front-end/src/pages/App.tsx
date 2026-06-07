@@ -25,6 +25,8 @@ import OAuthCallback from './OAuthCallback';
 import Support from './Support';
 import HostEvents from './HostEvents';
 import Profile from './Profile';
+import ReviewPage from './ReviewPage';
+import PrivacyPolicy from './PrivacyPolicy';
 
 const App = () => {
   useApplyDirection();
@@ -131,6 +133,16 @@ const App = () => {
             <Profile />
           </ProtectedRoute>
         } />
+
+        {/* Review Page - Protected Route */}
+        <Route path="/event/:eventId/review" element={
+          <ProtectedRoute>
+            <ReviewPage />
+          </ProtectedRoute>
+        } />
+
+        {/* Privacy Policy - Public */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       </Routes>
     </Router>
   );

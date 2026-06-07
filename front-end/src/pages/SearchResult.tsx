@@ -28,6 +28,9 @@ interface MappedEvent {
   badge?: string;
   badgeColor?: string;
   description: string;
+  isPast: boolean;
+  availableSpots: number;
+  endAtRaw: string;
 }
 
 const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
@@ -61,23 +64,31 @@ const SearchResult = () => {
   const [events, setEvents] = useState<MappedEvent[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<MappedEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const fetchEvents = async () => {
       setIsLoading(true);
       try {
         const apiEvents = await eventService.getAllEvents({ status: 'published' });
+        const now = new Date();
         const mapped: MappedEvent[] = apiEvents.map((e: ApiEvent) => {
           const startDate = new Date(e.startAt);
+          const endDate = new Date(e.endAt);
+          const isPast = endDate < now;
           const lowestPrice = e.ticketTypes?.reduce((min, tt) => Math.min(min, Number(tt.price)), Infinity) ?? 0;
+          const availableSpots = e.ticketTypes?.reduce((sum, tt) => sum + (Number(tt.quantityTotal || 0) - Number(tt.quantitySold || 0)), 0) ?? 0;
           return {
             id: e.id,
             image: e.images?.[0] || EventImageFallback,
             title: e.title,
             date: startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
-            venue: e.venue?.name || '',
+            venue: e.venue?.name || (e as any).customLocation?.city || '',
             price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
             description: e.shortDescription || '',
+            isPast,
+            availableSpots,
+            endAtRaw: e.endAt,
           };
         });
         setEvents(mapped);
@@ -182,6 +193,17 @@ const SearchResult = () => {
     <div className="flex flex-col min-h-screen w-full bg-white">
       {/* Navbar */}
       <SearchResultNavbar />
+
+      {/* Map toggle button for mobile */}
+      <button
+        onClick={() => setShowMap(v => !v)}
+        className="md:hidden fixed bottom-6 end-6 z-50 flex items-center gap-2 px-4 py-3 bg-black text-white rounded-full shadow-lg text-sm font-medium"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 13l4.553 2.276A1 1 0 0021 21.382V10.618a1 1 0 00-.553-.894L15 7m0 13V7m0 0L9 7"/>
+        </svg>
+        {showMap ? t('searchResult.map.hide', 'Hide map') : t('searchResult.map.show', 'Show map')}
+      </button>
 
       {/* Main content - Two columns */}
       <div className="flex flex-1 overflow-hidden">
@@ -442,22 +464,43 @@ const SearchResult = () => {
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#FF4000]"></div>
                 </div>
               ) : filteredEvents.length === 0 ? (
-                <div className="col-span-full flex flex-col items-center justify-center py-20">
-                  <p className="text-[#757575] text-sm">{t('searchResult.empty.message')}</p>
-                  <button 
-                    onClick={() => {
-                      setSelectedCategories([]);
-                      setPriceRange({ min: 0, max: 300 });
-                    }}
-                    className="mt-4 px-4 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
-                  >
-                    {t('searchResult.empty.clearFilters')}
-                  </button>
+                <div className="col-span-full">
+                  <div className="flex flex-col items-center justify-center py-12">
+                    <svg className="w-14 h-14 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-[#757575] text-sm mb-1">{t('searchResult.empty.message')}</p>
+                    <button 
+                      onClick={() => { setSelectedCategories([]); setPriceRange({ min: 0, max: 300 }); }}
+                      className="mt-3 px-4 py-2 text-sm font-medium text-[#FF4000] border border-[#FF4000] rounded-full hover:bg-[#FFF4F3] transition-colors"
+                    >
+                      {t('searchResult.empty.clearFilters')}
+                    </button>
+                  </div>
+                  {events.length > 0 && (
+                    <div className="mt-6">
+                      <h3 className="text-base font-semibold text-black mb-4">{t('searchResult.empty.suggestions', 'You might also like')}</h3>
+                      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+                        {events.slice(0, 6).map((event) => (
+                          <EventCard
+                            key={event.id}
+                            eventId={event.id}
+                            image={event.image}
+                            title={event.title}
+                            date={event.date}
+                            venue={event.venue}
+                            price={event.price}
+                            isPast={event.isPast}
+                            availableSpots={event.availableSpots}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : filteredEvents.map((event) => (
                 viewMode === 'list' ? (
                   <div key={event.id} className="w-full">
-                    {/* Petits écrans (<1024px): Toujours EventCard vertical - Image en haut, infos en bas */}
                     <div className="w-full max-w-md lg:hidden">
                       <EventCard
                         eventId={event.id}
@@ -468,9 +511,10 @@ const SearchResult = () => {
                         price={event.price}
                         badge={event.badge}
                         badgeColor={event.badgeColor}
+                        isPast={event.isPast}
+                        availableSpots={event.availableSpots}
                       />
                     </div>
-                    {/* Grands écrans (≥1024px): Toujours EventListCard horizontal - Image à gauche, infos à droite */}
                     <div className="hidden lg:block w-full">
                       <EventListCard
                         eventId={event.id}
@@ -482,6 +526,8 @@ const SearchResult = () => {
                         badge={event.badge}
                         badgeColor={event.badgeColor}
                         description={event.description}
+                        isPast={event.isPast}
+                        availableSpots={event.availableSpots}
                       />
                     </div>
                   </div>
@@ -496,6 +542,8 @@ const SearchResult = () => {
                     price={event.price}
                     badge={event.badge}
                     badgeColor={event.badgeColor}
+                    isPast={event.isPast}
+                    availableSpots={event.availableSpots}
                   />
                 )
               ))}
@@ -503,13 +551,13 @@ const SearchResult = () => {
           </div>
         </div>
 
-        {/* Right column - Google Map */}
+        {/* Right column - Google Map (hidden on mobile, toggle via FAB) */}
         <div
-          className={`${isFilterOpen
-            ? 'w-[260px] xl:w-[360px] 2xl:w-[420px]'
-            : 'w-[550px] xl:w-[650px] 2xl:w-[750px]'
-          } relative shrink-0 pt-6`}
-          style={{ height: 'calc(100vh - 64px)' }}
+          className={`${showMap ? 'fixed inset-0 z-40' : 'hidden'} md:relative md:flex md:z-auto ${isFilterOpen
+            ? 'md:w-[260px] xl:w-[360px] 2xl:w-[420px]'
+            : 'md:w-[550px] xl:w-[650px] 2xl:w-[750px]'
+          } shrink-0 md:pt-6`}
+          style={{ height: showMap ? '100%' : 'calc(100vh - 64px)' }}
         >
           <div className="w-full h-full relative rounded-lg overflow-hidden">
             {/* Google Map iframe — pins on whatever location the user

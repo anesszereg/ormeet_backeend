@@ -1,11 +1,13 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import type { Testimonial } from "@/types";
 import { usePagination } from "@/hooks/usePagination";
 import PaginationControls from "@/components/ui/PaginationControls";
+import { useLandingReviews } from "@/hooks/useLandingReviews";
+import type { LandingReview } from "@/lib/api";
 
 const allTestimonialPages: Testimonial[][] = [
   [
@@ -160,7 +162,20 @@ const allTestimonialPages: Testimonial[][] = [
   ],
 ];
 
-const TOTAL_PAGES = allTestimonialPages.length;
+const reviewToTestimonial = (r: LandingReview): Testimonial => ({
+  id: typeof r.id === 'string' ? parseInt(r.id, 36) || 0 : r.id,
+  name: r.name,
+  role: r.role,
+  avatar: r.avatar,
+  rating: r.rating,
+  text: r.text,
+});
+
+const chunkArray = <T,>(arr: T[], size: number): T[][] => {
+  const result: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
+  return result;
+};
 
 const STAR_PATH = "M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z";
 
@@ -221,8 +236,18 @@ const TestimonialCard = ({ t }: { t: Testimonial }) => (
 
 const Testimonials = () => {
   const t = useTranslations("landing.testimonials");
-  const { page, handlePrev, handleNext } = usePagination({ totalPages: TOTAL_PAGES });
-  const currentTestimonials = allTestimonialPages[page - 1];
+  const { reviews, hasLoaded } = useLandingReviews();
+
+  const testimonialPages = useMemo(() => {
+    if (hasLoaded && reviews.length >= 6) {
+      return chunkArray(reviews.map(reviewToTestimonial), 6);
+    }
+    return allTestimonialPages;
+  }, [reviews, hasLoaded]);
+
+  const totalPages = testimonialPages.length;
+  const { page, handlePrev, handleNext } = usePagination({ totalPages });
+  const currentTestimonials = testimonialPages[page - 1] ?? testimonialPages[0];
   const topRow = currentTestimonials.slice(0, 3);
   const bottomRow = currentTestimonials.slice(3, 6);
 
@@ -276,7 +301,7 @@ const Testimonials = () => {
       <div className="flex items-center justify-center mt-10">
         <PaginationControls
           page={page}
-          totalPages={TOTAL_PAGES}
+          totalPages={totalPages}
           onPrev={handlePrev}
           onNext={handleNext}
         />

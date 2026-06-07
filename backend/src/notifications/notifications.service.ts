@@ -1,13 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification, NotificationType } from '../entities/notification.entity';
+import type { NotificationsGateway } from './notifications.gateway';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    @Optional() private readonly gateway?: NotificationsGateway,
   ) {}
 
   async create(
@@ -27,7 +29,9 @@ export class NotificationsService {
       metadata,
       read: false,
     });
-    return await this.notificationRepository.save(notification);
+    const saved = await this.notificationRepository.save(notification);
+    this.gateway?.notifyUser(userId, saved);
+    return saved;
   }
 
   async findByUser(userId: string, limit = 50): Promise<Notification[]> {

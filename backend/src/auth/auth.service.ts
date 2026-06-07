@@ -13,6 +13,7 @@ import * as crypto from 'crypto';
 import { User, UserRole, VerificationCode, VerificationType, VerificationPurpose, Organization } from '../entities';
 import { RegisterDto, LoginDto, ForgotPasswordDto, ResetPasswordDto, VerifyEmailDto, SendVerificationCodeDto, VerifyCodeDto, LoginWithCodeDto } from './dto';
 import { EmailService } from '../email/email.service';
+import { SmsService } from '../sms/sms.service';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly organizationRepository: Repository<Organization>,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    private readonly smsService: SmsService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -442,9 +444,11 @@ export class AuthService {
         console.log(`📧 Email Code for ${email}: ${code} (Purpose: ${purpose})`);
       }
     } else if (type === VerificationType.PHONE && phone) {
-      // TODO: Implement SMS sending (Twilio, etc.)
-      console.log(`📱 SMS Code for ${phone}: ${code}`);
-      // For now, just log it (in production, integrate SMS service)
+      // Sends via Twilio when configured, otherwise logs to console (dev fallback).
+      const sent = await this.smsService.sendVerificationCode(phone, code);
+      if (!sent) {
+        console.log(`📱 SMS Code for ${phone}: ${code} (Purpose: ${purpose})`);
+      }
     }
 
     return {
@@ -621,5 +625,14 @@ export class AuthService {
       user: this.sanitizeUser(user),
       token,
     };
+  }
+
+  async deleteAccount(userId: string): Promise<{ message: string }> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.remove(user);
+    return { message: 'Account deleted successfully' };
   }
 }

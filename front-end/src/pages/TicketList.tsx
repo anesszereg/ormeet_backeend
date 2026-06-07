@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ticketTypeService, { TicketType as ApiTicketType } from '../services/ticketTypeService';
 import eventService from '../services/eventService';
+import promotionService, { PromotionType } from '../services/promotionService';
 
 // Import SVG icons (used as fallback based on ticket type)
 import GeneralAdmissionIcon from '../assets/Svgs/eventDetails/generalAdmission.svg';
@@ -66,6 +67,10 @@ const TicketList: React.FC = () => {
   const [eventInfo, setEventInfo] = useState<EventInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState('');
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; type: PromotionType; value: number } | null>(null);
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -144,8 +149,47 @@ const TicketList: React.FC = () => {
     return tickets.reduce((sum, ticket) => sum + (ticket.price * ticket.quantity), 0);
   };
 
+  const calculateDiscount = () => {
+    if (!appliedPromo) return 0;
+    const subtotal = calculateSubtotal();
+    if (appliedPromo.type === 'percent') {
+      return (subtotal * appliedPromo.value) / 100;
+    }
+    if (appliedPromo.type === 'fixed') {
+      return Math.min(appliedPromo.value, subtotal);
+    }
+    return 0;
+  };
+
   const calculateTotal = () => {
-    return calculateSubtotal() + serviceCharge;
+    return Math.max(0, calculateSubtotal() - calculateDiscount()) + serviceCharge;
+  };
+
+  const handleApplyPromo = async () => {
+    const code = promoCode.trim();
+    if (!code || !eventId) return;
+    setPromoLoading(true);
+    setPromoError(null);
+    try {
+      const result = await promotionService.validate(code, eventId);
+      if (result.valid && result.discountType && result.discountValue != null) {
+        setAppliedPromo({ code, type: result.discountType, value: Number(result.discountValue) });
+      } else {
+        setAppliedPromo(null);
+        setPromoError(result.message || t('ticketList.promo.invalid', 'Invalid promo code'));
+      }
+    } catch (err: any) {
+      setAppliedPromo(null);
+      setPromoError(err.response?.data?.message || t('ticketList.promo.invalid', 'Invalid promo code'));
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode('');
+    setPromoError(null);
   };
 
   const getOrderSummaryItems = () => {
@@ -166,6 +210,8 @@ const TicketList: React.FC = () => {
         orderItems,
         subtotal: calculateSubtotal(),
         serviceCharge,
+        discountCode: appliedPromo?.code,
+        discountAmount: calculateDiscount(),
         total: calculateTotal(),
       },
     });
@@ -335,10 +381,47 @@ const TicketList: React.FC = () => {
                     </span>
                   </div>
                 ))}
+                {appliedPromo && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#34A853]">{t('ticketList.orderSummary.discount', 'Discount')} ({appliedPromo.code})</span>
+                    <span className="text-sm font-semibold text-[#34A853]">-${calculateDiscount().toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-[#4F4F4F]">{t('ticketList.orderSummary.serviceCharge')}</span>
                   <span className="text-sm font-semibold text-black">${serviceCharge.toFixed(2)}</span>
                 </div>
+              </div>
+
+              {/* Promo code */}
+              <div className="mb-4">
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between bg-[#F0FAF3] border border-[#34A853] rounded-lg px-3 py-2">
+                    <span className="text-sm font-medium text-[#34A853]">{appliedPromo.code}</span>
+                    <button onClick={handleRemovePromo} className="text-xs text-[#757575] hover:text-[#FF4000] cursor-pointer">
+                      {t('ticketList.promo.remove', 'Remove')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={promoCode}
+                      onChange={(e) => setPromoCode(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleApplyPromo(); }}
+                      placeholder={t('ticketList.promo.placeholder', 'Promo code')}
+                      className="flex-1 px-3 py-2 text-sm border border-[#EEEEEE] rounded-lg focus:outline-none focus:border-[#FF4000]"
+                    />
+                    <button
+                      onClick={handleApplyPromo}
+                      disabled={promoLoading || !promoCode.trim()}
+                      className="px-4 py-2 text-sm font-semibold rounded-lg bg-black text-white hover:bg-[#333333] disabled:bg-[#EEEEEE] disabled:text-[#CCCCCC] cursor-pointer"
+                    >
+                      {promoLoading ? '...' : t('ticketList.promo.apply', 'Apply')}
+                    </button>
+                  </div>
+                )}
+                {promoError && <p className="text-xs text-[#FF4000] mt-1">{promoError}</p>}
               </div>
 
               {/* Spacer to push total and button to bottom */}

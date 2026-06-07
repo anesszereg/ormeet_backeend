@@ -15,6 +15,7 @@ export { Media } from './media.entity';
 export { UserFavoriteEvent } from './user-favorite-event.entity';
 export { UserFollowingOrganizer } from './user-following-organizer.entity';
 export { Notification, NotificationType } from './notification.entity';
+export { BankAccount, BankAccountStatus } from './bank-account.entity';
 
 // Export enums
 export { UserRole, EventCategory } from './user.entity';

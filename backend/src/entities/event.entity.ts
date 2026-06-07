@@ -174,6 +174,9 @@ export class Event {
   @Column({ type: 'boolean', default: false, name: 'refunds_allowed' })
   refundsAllowed: boolean;
 
+  @Column({ type: 'boolean', default: false, name: 'requires_approval' })
+  requiresApproval: boolean;
+
   // Event Guidelines
   @Column({ type: 'jsonb', nullable: true })
   guidelines: {

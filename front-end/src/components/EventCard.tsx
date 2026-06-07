@@ -10,9 +10,11 @@ interface EventCardProps {
   badge?: string;
   badgeColor?: string;
   eventId?: string;
+  isPast?: boolean;
+  availableSpots?: number;
 }
 
-const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CAF50', eventId }: EventCardProps) => {
+const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CAF50', eventId, isPast = false, availableSpots }: EventCardProps) => {
   const { t } = useTranslation('attendee');
   const navigate = useNavigate();
 
@@ -25,7 +27,7 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
   return (
     <div 
       onClick={handleClick}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all w-full border border-[#EEEEEE] cursor-pointer hover:scale-[1.02]"
+      className={`bg-white rounded-2xl overflow-hidden transition-all w-full border border-[#EEEEEE] cursor-pointer ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.02]'}`}
     >
       {/* Event image */}
       <div className="relative w-full h-48 md:h-56">
@@ -46,7 +48,19 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
             <span className="text-sm md:text-xs text-[#757575]">{t('eventCard.fromPrice')}</span>
             <span className="text-lg md:text-base font-semibold text-black">{price}</span>
           </div>
-          {badge && (
+          {isPast ? (
+            <span className="text-sm md:text-xs font-medium px-3 py-1.5 md:py-1 rounded-full bg-gray-100 text-gray-500">
+              {t('eventCard.pastEvent', 'Past')}
+            </span>
+          ) : availableSpots !== undefined && availableSpots <= 10 && availableSpots > 0 ? (
+            <span className="text-sm md:text-xs font-medium px-3 py-1.5 md:py-1 rounded-full bg-orange-50 text-orange-500">
+              {availableSpots} {t('eventCard.spotsLeft', 'left')}
+            </span>
+          ) : availableSpots === 0 ? (
+            <span className="text-sm md:text-xs font-medium px-3 py-1.5 md:py-1 rounded-full bg-red-50 text-red-500">
+              {t('eventCard.soldOut', 'Sold out')}
+            </span>
+          ) : badge ? (
             <span 
               className="text-sm md:text-xs font-medium px-3 py-1.5 md:py-1 rounded-full"
               style={{ 
@@ -56,7 +70,7 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
             >
               {badge}
             </span>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

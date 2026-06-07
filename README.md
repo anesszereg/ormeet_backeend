@@ -479,8 +479,11 @@ Create a `.env` file in the `backend` directory:
 # Application
 NODE_ENV=development
 PORT=3000
+APP_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:5173
 
-# Database
+# Database (use DATABASE_URL for Render/Heroku, or individual vars for local)
+DATABASE_URL=
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USERNAME=postgres
@@ -488,11 +491,38 @@ DATABASE_PASSWORD=postgres
 DATABASE_NAME=event_organization_db
 
 # JWT
+# IMPORTANT: Change this to a secure random string in production
+# Generate with: openssl rand -base64 32
 JWT_SECRET=your-super-secret-jwt-key-change-in-production
 JWT_EXPIRATION=7d
 
 # CORS
 CORS_ORIGIN=*
+
+# Email – Resend (https://resend.com/api-keys)
+RESEND_API_KEY=re_your_resend_api_key
+EMAIL_FROM=Ormeet <onboarding@resend.dev>
+
+# Google OAuth (https://console.cloud.google.com/apis/credentials)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+
+# Facebook OAuth (https://developers.facebook.com/apps)
+FACEBOOK_APP_ID=your-facebook-app-id
+FACEBOOK_APP_SECRET=your-facebook-app-secret
+FACEBOOK_CALLBACK_URL=http://localhost:3000/auth/facebook/callback
+
+# Twilio SMS – phone verification codes (https://console.twilio.com)
+# Optional: if omitted the code is printed to the server console (dev fallback).
+TWILIO_ACCOUNT_SID=your-twilio-account-sid
+TWILIO_AUTH_TOKEN=your-twilio-auth-token
+TWILIO_PHONE_NUMBER=+15551234567
+
+# Cloudinary – image uploads (https://console.cloudinary.com/settings/api-keys)
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
 
 # pgAdmin (Optional)
 PGADMIN_EMAIL=admin@admin.com
@@ -506,6 +536,16 @@ Generate a secure secret:
 ```bash
 openssl rand -base64 32
 ```
+
+| Variable | Required | Notes |
+|---|---|---|
+| `JWT_SECRET` | ✅ | Min 32 random chars in production |
+| `DATABASE_URL` | ✅* | Use this **or** the individual `DATABASE_*` vars |
+| `RESEND_API_KEY` | ✅ | Email delivery (welcome, verification, reset) |
+| `GOOGLE_CLIENT_ID/SECRET` | ⬜ | Google OAuth login |
+| `FACEBOOK_APP_ID/SECRET` | ⬜ | Facebook OAuth login |
+| `TWILIO_ACCOUNT_SID/AUTH_TOKEN/PHONE_NUMBER` | ⬜ | SMS verification codes; falls back to console log |
+| `CLOUDINARY_*` | ⬜ | Image uploads; uploads disabled without this |
 
 ---
 

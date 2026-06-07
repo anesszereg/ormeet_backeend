@@ -173,6 +173,11 @@ export class CreateEventDto {
   @IsBoolean()
   refundsAllowed?: boolean;
 
+  @ApiPropertyOptional({ example: false, default: false, description: 'Require manual approval before confirming reservations' })
+  @IsOptional()
+  @IsBoolean()
+  requiresApproval?: boolean;
+
   @ApiPropertyOptional({
     type: EventGuidelinesDto,
     example: {

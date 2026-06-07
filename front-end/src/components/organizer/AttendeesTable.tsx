@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import organizerService, { Attendee as ApiAttendee, Event as ApiEvent } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
+import { exportToCsv } from '../../utils/csvExport';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
 import ExportIcon from '../../assets/Svgs/organiser/dashboard/Orders/export.svg';
 import ExportModal from './ExportModal';
 import AddAttendeeModal from './AddAttendeeModal';
+import QRCheckInScanner from './QRCheckInScanner';
 import CreateEventIcon from '../../assets/Svgs/organiser/dashboard/Events/createEvent.svg';
 import FilterIcon from '../../assets/Svgs/organiser/dashboard/Attendee/filter.svg';
 import FilterOnClickIcon from '../../assets/Svgs/organiser/dashboard/Attendee/filterOnClick.svg';
@@ -61,6 +63,7 @@ const AttendeesTable = () => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isAddAttendeeModalOpen, setIsAddAttendeeModalOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
   const attendeesPerPage = 9;
 
   // API Data States
@@ -74,8 +77,7 @@ const AttendeesTable = () => {
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Fetch attendees from API
-  useEffect(() => {
-    const fetchAttendees = async () => {
+  const fetchAttendees = useCallback(async () => {
       if (!user?.id) return;
       
       setIsLoading(true);
@@ -146,10 +148,11 @@ const AttendeesTable = () => {
       } finally {
         setIsLoading(false);
       }
-    };
-
-    fetchAttendees();
   }, [user?.id]);
+
+  useEffect(() => {
+    fetchAttendees();
+  }, [fetchAttendees]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -324,7 +327,25 @@ const AttendeesTable = () => {
   };
 
   const handleExport = (selectedEvent: string) => {
-    console.log('Exporting attendees for event:', selectedEvent);
+    // The modal yields an event id; resolve it to the event name the
+    // attendee rows are keyed by (fall back to matching the raw value).
+    const selectedName =
+      eventsToDisplay.find((e) => e.id === selectedEvent)?.name ?? selectedEvent;
+    const rows = attendeesToDisplay.filter(
+      (a) => selectedEvent === 'all' || a.eventName === selectedName,
+    );
+    exportToCsv(
+      `attendees-${new Date().toISOString().slice(0, 10)}`,
+      rows,
+      [
+        { header: 'Name', accessor: (a) => a.name },
+        { header: 'Email', accessor: (a) => a.email },
+        { header: 'Event', accessor: (a) => a.eventName },
+        { header: 'Ticket Type', accessor: (a) => a.ticketType },
+        { header: 'Registration Date', accessor: (a) => a.registrationDate },
+        { header: 'Status', accessor: (a) => (a.status === 'checked-in' ? 'Checked In' : 'Not Checked In') },
+      ],
+    );
   };
 
   const renderCalendar = () => {
@@ -425,6 +446,15 @@ const AttendeesTable = () => {
           >
             <img src={ExportIcon} alt="Export" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />
             <span>{t('attendees.export')}</span>
+          </button>
+          <button
+            onClick={() => setIsScannerOpen(true)}
+            className="flex items-center gap-2 px-4 border border-light-gray bg-transparent hover:border-primary text-gray hover:text-black font-medium text-sm rounded-full transition-all cursor-pointer h-[38px] whitespace-nowrap"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h.01M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4z" />
+            </svg>
+            <span>{t('attendees.scanQr', 'Scan QR')}</span>
           </button>
           <button
             onClick={() => setIsAddAttendeeModalOpen(true)}
@@ -1090,13 +1120,26 @@ const AttendeesTable = () => {
         events={eventsToDisplay}
       />
 
+      {/* QR Check-in Scanner */}
+      <QRCheckInScanner
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        events={eventsToDisplay.map((e) => ({ id: e.id, name: e.name }))}
+        onCheckedIn={fetchAttendees}
+      />
+
       {/* Add Attendee Modal */}
       <AddAttendeeModal
         isOpen={isAddAttendeeModalOpen}
         onClose={() => setIsAddAttendeeModalOpen(false)}
-        onConfirm={(data) => {
-          console.log('Adding attendee:', data);
-          setIsAddAttendeeModalOpen(false);
+        onConfirm={async (data) => {
+          await organizerService.addManualAttendee({
+            eventId: data.eventId,
+            ticketTypeId: data.ticketTypeId,
+            name: `${data.firstName} ${data.lastName}`.trim(),
+            email: data.email,
+          });
+          await fetchAttendees();
         }}
         events={apiEvents}
       />

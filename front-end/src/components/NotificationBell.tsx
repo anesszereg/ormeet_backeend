@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import notificationService, { Notification, NotificationType } from '../services/notificationService';
+import socketService from '../services/socketService';
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
 const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
@@ -44,6 +45,22 @@ const NotificationBell = () => {
       }
     };
     fetchNotifications();
+  }, []);
+
+  // Real-time WebSocket subscription
+  useEffect(() => {
+    socketService.connect();
+
+    const handler = (incoming: unknown) => {
+      const notif = incoming as Notification;
+      setNotifications((prev) => [notif, ...prev]);
+      console.log('[NotificationBell] Real-time notification:', notif.title);
+    };
+
+    socketService.on('new_notification', handler);
+    return () => {
+      socketService.off('new_notification', handler);
+    };
   }, []);
 
   useEffect(() => {

@@ -106,6 +106,71 @@ export const normalizeEvent = (e: BackendEvent): LandingEvent => {
   };
 };
 
+export interface LandingReview {
+  id: string | number;
+  name: string;
+  role: string;
+  avatar: string;
+  rating: number;
+  text: string;
+}
+
+interface BackendReview {
+  id: string;
+  rating: number;
+  comment?: string;
+  user?: {
+    name?: string;
+    profilePhoto?: string;
+  };
+  event?: {
+    title?: string;
+  };
+}
+
+const FALLBACK_AVATARS = [
+  "/images/landingPage/photoPorifle/mask-group-1.png",
+  "/images/landingPage/photoPorifle/mask-group-2.png",
+  "/images/landingPage/photoPorifle/mask-group.png",
+  "/images/landingPage/photoPorifle/mask-group-3.png",
+];
+
+export const normalizeReview = (r: BackendReview, index: number): LandingReview => ({
+  id: r.id,
+  name: r.user?.name || "Ormeet User",
+  role: r.event?.title ? `Attendee · ${r.event.title}` : "Event Attendee",
+  avatar: r.user?.profilePhoto || FALLBACK_AVATARS[index % FALLBACK_AVATARS.length],
+  rating: r.rating,
+  text: r.comment || "",
+});
+
+/**
+ * Fetch recent approved reviews from the backend. Returns an empty array on
+ * any error so the landing page can fall back to its evergreen static content.
+ */
+export async function fetchPublishedReviews(): Promise<LandingReview[]> {
+  try {
+    const res = await fetch(
+      `${BACKEND_ORIGIN}/reviews?approved=true`,
+      { cache: "no-store" },
+    );
+    if (!res.ok) return [];
+    const json = (await res.json()) as BackendReview[] | { data?: BackendReview[] };
+    const list: BackendReview[] = Array.isArray(json)
+      ? json
+      : Array.isArray(json?.data)
+        ? json.data!
+        : [];
+    return list
+      .filter((r) => r.comment && r.comment.trim().length > 20)
+      .slice(0, 18)
+      .map(normalizeReview);
+  } catch (err) {
+    console.warn("[landing-page] failed to fetch reviews:", err);
+    return [];
+  }
+}
+
 /**
  * Fetch published events from the backend. Returns an empty array on
  * any error so the landing page can fall back to its evergreen mock

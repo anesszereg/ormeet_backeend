@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import organizerService, { TicketTypeInfo } from '../../services/organizerService';
 
 interface Event {
   id: string;
@@ -12,16 +13,15 @@ interface AddAttendeeData {
   email: string;
   eventId: string;
   ticketType: string;
+  ticketTypeId: string;
 }
 
 interface AddAttendeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (data: AddAttendeeData) => void;
+  onConfirm: (data: AddAttendeeData) => Promise<void> | void;
   events: Event[];
 }
-
-const TICKET_TYPES = ['General', 'VIP', 'Early Bird'];
 
 const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeModalProps) => {
   const { t } = useTranslation(['organizer', 'common']);
@@ -34,6 +34,10 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
   const [isTicketDropdownOpen, setIsTicketDropdownOpen] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [ticketTypes, setTicketTypes] = useState<TicketTypeInfo[]>([]);
+  const [isLoadingTickets, setIsLoadingTickets] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const eventDropdownRef = useRef<HTMLDivElement>(null);
   const ticketDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -64,8 +68,35 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
       setIsTicketDropdownOpen(false);
       setEmailError('');
       setShowSuccess(false);
+      setTicketTypes([]);
+      setSubmitError('');
     }
   }, [isOpen]);
+
+  // Load ticket types whenever the selected event changes.
+  useEffect(() => {
+    if (!selectedEvent) {
+      setTicketTypes([]);
+      return;
+    }
+    let cancelled = false;
+    setIsLoadingTickets(true);
+    setSelectedTicketType('');
+    organizerService
+      .getEventById(selectedEvent)
+      .then((event) => {
+        if (!cancelled) setTicketTypes(event.ticketTypes || []);
+      })
+      .catch(() => {
+        if (!cancelled) setTicketTypes([]);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingTickets(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedEvent]);
 
   if (!isOpen) return null;
 
@@ -87,27 +118,40 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
     }
   };
 
+  const selectedTicketTypeObj = ticketTypes.find((tt) => tt.id === selectedTicketType);
   const isFormValid = firstName.trim() && lastName.trim() && email.trim() && validateEmail(email) && selectedEvent && selectedTicketType && !emailError;
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!isFormValid) {
       if (email.trim() && !validateEmail(email)) {
         setEmailError(t('organizer:addAttendee.validation.emailInvalid'));
       }
       return;
     }
-    onConfirm({
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.trim(),
-      eventId: selectedEvent,
-      ticketType: selectedTicketType,
-    });
-    setShowSuccess(true);
-    setTimeout(() => {
-      setShowSuccess(false);
-      onClose();
-    }, 3000);
+    setSubmitError('');
+    setIsSubmitting(true);
+    try {
+      await onConfirm({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        eventId: selectedEvent,
+        ticketType: selectedTicketTypeObj?.name || '',
+        ticketTypeId: selectedTicketType,
+      });
+      setShowSuccess(true);
+      setTimeout(() => {
+        setShowSuccess(false);
+        onClose();
+      }, 2000);
+    } catch (err: any) {
+      setSubmitError(
+        err?.response?.data?.message ||
+          t('organizer:addAttendee.validation.submitError', { defaultValue: 'Failed to add attendee. Please try again.' }),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const getSelectedEventName = () => {
@@ -234,13 +278,18 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                   </label>
                   <div className="relative" ref={ticketDropdownRef}>
                 <button
+                  disabled={!selectedEvent || isLoadingTickets}
                   onClick={() => {
                     setIsTicketDropdownOpen(!isTicketDropdownOpen);
                     setIsEventDropdownOpen(false);
                   }}
-                  className="w-full flex items-center justify-between px-4 py-3 bg-white border border-light-gray rounded-lg text-sm text-black hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer"
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white border border-light-gray rounded-lg text-sm text-black hover:border-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <span>{selectedTicketType || '–'}</span>
+                  <span>
+                    {isLoadingTickets
+                      ? t('common:loading', { defaultValue: 'Loading...' })
+                      : selectedTicketTypeObj?.name || '–'}
+                  </span>
                   <svg 
                     className={`w-4 h-4 text-gray transition-transform ${isTicketDropdownOpen ? 'rotate-180' : ''}`} 
                     fill="none" 
@@ -253,27 +302,37 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                 
                 {isTicketDropdownOpen && (
                   <div className="absolute bottom-full start-0 end-0 mb-2 bg-white rounded-lg shadow-lg border border-light-gray py-1 z-[60] max-h-48 overflow-y-auto">
-                    {TICKET_TYPES.map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => {
-                          setSelectedTicketType(type);
-                          setIsTicketDropdownOpen(false);
-                        }}
-                        className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
-                          selectedTicketType === type
-                            ? 'bg-primary-light text-primary font-medium'
-                            : 'text-gray hover:bg-secondary-light'
-                        }`}
-                      >
-                        {type}
-                      </button>
-                    ))}
+                    {ticketTypes.length === 0 ? (
+                      <div className="px-4 py-2 text-sm text-gray">
+                        {t('organizer:addAttendee.noTicketTypes', { defaultValue: 'No ticket types for this event' })}
+                      </div>
+                    ) : (
+                      ticketTypes.map((tt) => (
+                        <button
+                          key={tt.id}
+                          onClick={() => {
+                            setSelectedTicketType(tt.id);
+                            setIsTicketDropdownOpen(false);
+                          }}
+                          className={`w-full px-4 py-2 text-start text-sm transition-colors cursor-pointer ${
+                            selectedTicketType === tt.id
+                              ? 'bg-primary-light text-primary font-medium'
+                              : 'text-gray hover:bg-secondary-light'
+                          }`}
+                        >
+                          {tt.name}
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
               </div>
                 </div>
               </div>
+
+              {submitError && (
+                <p className="text-sm text-red-500 mb-3">{submitError}</p>
+              )}
 
               <div className="flex items-center gap-3">
                 <button
@@ -284,11 +343,13 @@ const AddAttendeeModal = ({ isOpen, onClose, onConfirm, events }: AddAttendeeMod
                 </button>
                 <button
                   onClick={handleConfirm}
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || isSubmitting}
                   className="flex-1 px-4 py-2.5 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000]"
                   style={{ boxShadow: !isFormValid ? 'none' : '0 4px 12px rgba(255, 64, 0, 0.25)' }}
                 >
-                  {t('organizer:addAttendee.confirm')}
+                  {isSubmitting
+                    ? t('common:loading', { defaultValue: 'Loading...' })
+                    : t('organizer:addAttendee.confirm')}
                 </button>
               </div>
             </>

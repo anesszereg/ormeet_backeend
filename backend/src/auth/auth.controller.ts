@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Get, Query, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, Get, Delete, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiExcludeEndpoint } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
@@ -407,6 +407,16 @@ POST /auth/login-with-code
   @ApiResponse({ status: 302, description: 'Redirects to Facebook login page' })
   async facebookAuth() {
     // Guard redirects to Facebook
+  }
+
+  @Delete('account')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete the authenticated user\'s account and all personal data' })
+  @ApiResponse({ status: 200, description: 'Account deleted successfully' })
+  async deleteAccount(@Req() req: Request) {
+    const user = req.user as { id: string };
+    return this.authService.deleteAccount(user.id);
   }
 
   @Get('facebook/callback')

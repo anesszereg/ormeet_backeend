@@ -1,18 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import EditIcon from '../../assets/Svgs/edit.svg';
+import bankAccountService, { BankAccount } from '../../services/bankAccountService';
 import SuccessIcon from '../../assets/Svgs/success.svg';
 import ErrorIcon from '../../assets/Svgs/error.svg';
-
-interface BankAccount {
-  accountHolderName: string;
-  bankName: string;
-  country: string;
-  iban: string;
-  swiftBic: string;
-  status: 'verified' | 'pending';
-}
 
 const BankAccountSettings = () => {
   const { t } = useTranslation(['organizer', 'common']);
@@ -20,6 +11,21 @@ const BankAccountSettings = () => {
 
   // Bank account state
   const [bankAccount, setBankAccount] = useState<BankAccount | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Load existing bank account from backend
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const account = await bankAccountService.getMine();
+        setBankAccount(account);
+      } catch (err) {
+        // No account or not permitted; leave empty state.
+        setBankAccount(null);
+      }
+    };
+    load();
+  }, []);
   
   // Modal states
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
@@ -126,7 +132,7 @@ const BankAccountSettings = () => {
   };
 
   // Handle form submission
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validation
     if (!formData.accountHolderName.trim()) {
       setFormError(t('organizer:bankAccount.modal.validation.accountHolderRequired'));
@@ -149,35 +155,35 @@ const BankAccountSettings = () => {
       return;
     }
 
-    // Simulate API call
+    setIsSubmitting(true);
     try {
-      // In real app, make API call here
-      const newBankAccount: BankAccount = {
+      const saved = await bankAccountService.upsert({
         accountHolderName: formData.accountHolderName,
         bankName: formData.bankName,
         country: formData.country,
         iban: formData.iban,
         swiftBic: formData.swiftBic,
-        status: 'pending'
-      };
-      
-      setBankAccount(newBankAccount);
-      
+        organizationId: user?.organizationId || undefined,
+      });
+
+      setBankAccount(saved);
+
       // Show success popup
       setSuccessMessage(t('organizer:bankAccount.modal.success'));
       setShowSuccess(true);
-      
+
       setTimeout(() => {
         setShowSuccess(false);
         setIsAddEditModalOpen(false);
-      }, 3000);
-      
+      }, 2000);
     } catch (error) {
       // Show error popup
       setShowError(true);
       setTimeout(() => {
         setShowError(false);
       }, 3000);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -201,13 +207,18 @@ const BankAccountSettings = () => {
     setIsDeleteConfirmOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
+    try {
+      await bankAccountService.remove();
+    } catch (err) {
+      // Ignore; we still clear the UI below.
+    }
     setBankAccount(null);
     setShowDeleteSuccess(true);
     setTimeout(() => {
       setShowDeleteSuccess(false);
       setIsDeleteConfirmOpen(false);
-    }, 3000);
+    }, 2000);
   };
 
   const handleCancelDelete = () => {
@@ -445,15 +456,15 @@ const BankAccountSettings = () => {
                     </button>
                     <button
                       onClick={handleSubmit}
-                      disabled={!isFormValid()}
+                      disabled={!isFormValid() || isSubmitting}
                       className={`px-5 py-2 font-medium text-sm rounded-full transition-all whitespace-nowrap ${
-                        isFormValid()
+                        isFormValid() && !isSubmitting
                           ? 'bg-[#FF4000] hover:bg-[#E63900] text-white cursor-pointer'
                           : 'bg-[#E0E0E0] text-[#9CA3AF] cursor-not-allowed'
                       }`}
-                      style={isFormValid() ? { boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' } : {}}
+                      style={isFormValid() && !isSubmitting ? { boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' } : {}}
                     >
-                      {t('organizer:bankAccount.modal.saveChanges')}
+                      {isSubmitting ? t('common:status.saving', 'Saving...') : t('organizer:bankAccount.modal.saveChanges')}
                     </button>
                   </div>
                 </>

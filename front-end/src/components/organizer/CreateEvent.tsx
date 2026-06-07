@@ -67,6 +67,7 @@ interface EventFormData {
   faqs: FAQData[];
   status: 'draft' | 'publish';
   visibility: 'public' | 'private';
+  requiresApproval: boolean;
 }
 
 
@@ -138,7 +139,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         }],
         faqs: initialData.faqs,
         status: 'draft',
-        visibility: initialData.visibility
+        visibility: initialData.visibility,
+        requiresApproval: (initialData as any).requiresApproval ?? false,
       };
     }
     return {
@@ -163,7 +165,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       }],
       faqs: [],
       status: 'draft',
-      visibility: 'public'
+      visibility: 'public',
+      requiresApproval: false,
     };
   };
 
@@ -726,6 +729,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           answer: faq.answer
         }))
       } : undefined,
+      requiresApproval: formData.requiresApproval,
     };
   };
 
@@ -1828,6 +1832,42 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               {formData.visibility === 'public' 
                 ? 'Your event will be visible to everyone' 
                 : 'Your event will only be accessible via direct link'}
+            </p>
+          </div>
+
+          {/* Reservation Approval */}
+          <div>
+            <label className="block text-sm font-medium text-black mb-2">
+              Reservation Approval
+            </label>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, requiresApproval: false }))}
+                className={`flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium transition-all ${
+                  !formData.requiresApproval
+                    ? 'border-primary bg-primary-light text-primary'
+                    : 'border-light-gray bg-white text-gray hover:border-primary hover:text-primary'
+                }`}
+              >
+                Auto-approve
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, requiresApproval: true }))}
+                className={`flex-1 px-4 py-2.5 border rounded-lg text-sm font-medium transition-all ${
+                  formData.requiresApproval
+                    ? 'border-primary bg-primary-light text-primary'
+                    : 'border-light-gray bg-white text-gray hover:border-primary hover:text-primary'
+                }`}
+              >
+                Manual approval
+              </button>
+            </div>
+            <p className="mt-2 text-xs text-input-gray">
+              {formData.requiresApproval
+                ? 'You must manually approve each reservation request'
+                : 'Reservations are automatically confirmed after payment'}
             </p>
           </div>
         </div>

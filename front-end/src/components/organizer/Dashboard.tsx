@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import organizerService, { Event, Order } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
@@ -40,7 +40,7 @@ const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ
 const Dashboard = ({ onCreateEvent }: DashboardProps) => {
   const { t, i18n } = useTranslation(['organizer', 'common']);
   const { user } = useAuth();
-  const [selectedPeriod, setSelectedPeriod] = useState('Weekly');
+  const [selectedPeriod, setSelectedPeriod] = useState('weekly');
   const [isPeriodDropdownOpen, setIsPeriodDropdownOpen] = useState(false);
   const [isActivitiesModalOpen, setIsActivitiesModalOpen] = useState(false);
   const periodRef = useRef<HTMLDivElement>(null);
@@ -48,14 +48,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
   // API Data States
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalOrders: 0,
-    totalReturns: 0,
-    totalRevenue: 0,
-    ordersChange: 0,
-    returnsChange: 0,
-    revenueChange: 0,
-  });
   const [events, setEvents] = useState<Event[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
 
@@ -90,31 +82,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
         setOrders(organizerOrders);
         
         console.log('📊 [Dashboard] Organizer Orders (filtered):', organizerOrders);
-
-        // Calculate stats
-        const paidOrders = organizerOrders.filter(o => o.status === 'paid');
-        const refundedOrders = organizerOrders.filter(o => o.status === 'refunded');
-        const totalRevenue = paidOrders.reduce((sum, o) => {
-          const amount = typeof o.amountTotal === 'string' ? parseFloat(o.amountTotal) : o.amountTotal;
-          return sum + (amount || 0);
-        }, 0);
-
-        // No historical data available yet — show 0% change
-        const ordersChange = 0;
-        const returnsChange = 0;
-        const revenueChange = 0;
-
-        const calculatedStats = {
-          totalOrders: organizerOrders.length,
-          totalReturns: refundedOrders.length,
-          totalRevenue,
-          ordersChange,
-          returnsChange,
-          revenueChange,
-        };
-        
-        console.log('📊 [Dashboard] Calculated Stats:', calculatedStats);
-        setStats(calculatedStats);
       } catch (err) {
         console.error('❌ [Dashboard] Failed to fetch dashboard data:', err);
         setError(t('dashboard:error'));
@@ -125,6 +92,62 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
 
     fetchDashboardData();
   }, [user?.id]);
+
+  // Period window helpers (current window vs. previous window for deltas)
+  const getPeriodWindows = (period: string) => {
+    const now = new Date();
+    const currentStart = new Date(now);
+    if (period === 'monthly') {
+      currentStart.setDate(now.getDate() - 30);
+    } else if (period === 'yearly') {
+      currentStart.setFullYear(now.getFullYear() - 1);
+    } else {
+      currentStart.setDate(now.getDate() - 7);
+    }
+    const windowMs = now.getTime() - currentStart.getTime();
+    const prevStart = new Date(currentStart.getTime() - windowMs);
+    return { currentStart, prevStart, now };
+  };
+
+  const orderAmount = (o: Order) =>
+    typeof o.amountTotal === 'string' ? parseFloat(o.amountTotal) : (o.amountTotal || 0);
+
+  const pctChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return Math.round(((current - previous) / previous) * 100);
+  };
+
+  // Compute period-windowed stats and trend deltas
+  const stats: DashboardStats = useMemo(() => {
+    const { currentStart, prevStart } = getPeriodWindows(selectedPeriod);
+    const inWindow = (o: Order, start: Date, end: Date) => {
+      const d = new Date(o.createdAt);
+      return d >= start && d < end;
+    };
+
+    const current = orders.filter(o => inWindow(o, currentStart, new Date()));
+    const previous = orders.filter(o => inWindow(o, prevStart, currentStart));
+
+    const sumPaid = (list: Order[]) =>
+      list.filter(o => o.status === 'paid').reduce((sum, o) => sum + orderAmount(o), 0);
+    const countReturns = (list: Order[]) => list.filter(o => o.status === 'refunded').length;
+
+    const curOrders = current.length;
+    const prevOrders = previous.length;
+    const curReturns = countReturns(current);
+    const prevReturns = countReturns(previous);
+    const curRevenue = sumPaid(current);
+    const prevRevenue = sumPaid(previous);
+
+    return {
+      totalOrders: curOrders,
+      totalReturns: curReturns,
+      totalRevenue: curRevenue,
+      ordersChange: pctChange(curOrders, prevOrders),
+      returnsChange: pctChange(curReturns, prevReturns),
+      revenueChange: pctChange(curRevenue, prevRevenue),
+    };
+  }, [orders, selectedPeriod]);
 
   // Generate recent activities from real orders data
   const recentActivities: Activity[] = orders.slice(0, 5).map((order) => {
@@ -148,12 +171,19 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
     yearly: t('dashboard:topSelling.period.yearly'),
   };
 
-  // Generate ticket data from real orders
+  // Generate ticket data from real orders within the selected period
   const getTicketData = () => {
+    const { currentStart } = getPeriodWindows(selectedPeriod);
+    const now = new Date();
+    const periodOrders = orders.filter(o => {
+      const d = new Date(o.createdAt);
+      return d >= currentStart && d < now;
+    });
+
     // Group orders by ticket type and calculate stats
     const ticketStats = new Map<string, { sold: number; revenue: number }>();
     
-    orders.forEach(order => {
+    periodOrders.forEach(order => {
       if (order.status === 'paid' && order.items) {
         order.items.forEach(item => {
           const current = ticketStats.get(item.ticketTypeId) || { sold: 0, revenue: 0 };

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import organizerService, { Order as ApiOrder, Event as ApiEvent } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
+import { exportToCsv } from '../../utils/csvExport';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
@@ -323,7 +324,25 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   };
 
   const handleExport = (selectedEvent: string) => {
-    console.log('Exporting orders for event:', selectedEvent);
+    const rows = ordersToDisplay.filter(
+      (o) => selectedEvent === 'all' || o.eventName === selectedEvent,
+    );
+    exportToCsv(
+      `orders-${new Date().toISOString().slice(0, 10)}`,
+      rows,
+      [
+        { header: 'Order ID', accessor: (o) => o.orderId },
+        { header: 'Event', accessor: (o) => o.eventName },
+        { header: 'Buyer', accessor: (o) => o.buyerName },
+        { header: 'Ticket Type', accessor: (o) => o.ticketType },
+        { header: 'Quantity', accessor: (o) => o.qty },
+        { header: 'Total Price', accessor: (o) => o.totalPrice },
+        { header: 'Payment', accessor: (o) => o.payment },
+        { header: 'Order Date', accessor: (o) => o.orderDate },
+        { header: 'Ticket Status', accessor: (o) => o.ticketStatus },
+        { header: 'Status', accessor: (o) => o.status },
+      ],
+    );
   };
 
   const renderCalendar = () => {
@@ -1005,7 +1024,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onConfirm={handleExport}
-        events={[]}
+        events={Array.from(new Set(ordersToDisplay.map((o) => o.eventName))).map((name) => ({ id: name, name }))}
       />
     </div>
   );

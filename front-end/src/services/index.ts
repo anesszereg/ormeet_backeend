@@ -8,3 +8,5 @@ export { default as orderService } from './orderService';
 export { default as promotionService } from './promotionService';
 export { default as reviewService } from './reviewService';
 export { default as venueService } from './venueService';
+export { default as bankAccountService } from './bankAccountService';
+export { default as socketService } from './socketService';

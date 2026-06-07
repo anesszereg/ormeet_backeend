@@ -6,6 +6,7 @@ import CreateEvent from '../../components/organizer/CreateEvent';
 import EventsTable from '../../components/organizer/EventsTable';
 import AttendeesTable from '../../components/organizer/AttendeesTable';
 import OrdersTable from '../../components/organizer/OrdersTable';
+import PromotionsTable from '../../components/organizer/PromotionsTable';
 import AccountSettingsOrganizer from '../../components/organizer/AccountSettingsOrganizer';
 
 interface EventDataForEdit {
@@ -197,6 +198,9 @@ const DashboardOrganizer = () => {
 
       case 'orders':
         return <OrdersTable />;
+
+      case 'promotions':
+        return <PromotionsTable />;
 
       case 'account-settings':
         return <AccountSettingsOrganizer />;

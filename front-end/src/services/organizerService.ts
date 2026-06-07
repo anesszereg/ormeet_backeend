@@ -70,6 +70,7 @@ export interface CreateEventDto {
   ageLimit?: number;
   allowReentry?: boolean;
   refundsAllowed?: boolean;
+  requiresApproval?: boolean;
   tickets?: TicketTypeDto[];
   guidelines?: {
     ageRequirement?: string;
@@ -374,6 +375,16 @@ class OrganizerService {
 
   async checkInAttendee(data: CheckInDto): Promise<CheckInResponse> {
     const response = await api.post<CheckInResponse>('/attendance/check-in', data);
+    return response.data;
+  }
+
+  async addManualAttendee(data: {
+    eventId: string;
+    ticketTypeId: string;
+    name: string;
+    email: string;
+  }): Promise<Order> {
+    const response = await api.post<Order>('/orders/manual-attendee', data);
     return response.data;
   }
 

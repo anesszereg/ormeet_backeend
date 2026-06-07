@@ -7,6 +7,7 @@ import ReviewsModal from '../components/ReviewsModal';
 import eventService, { Event as ApiEvent } from '../services/eventService';
 import reviewService, { Review as ApiReview } from '../services/reviewService';
 import userPreferencesService from '../services/userPreferencesService';
+import organizerService from '../services/organizerService';
 
 import NextImageIcon from '../assets/Svgs/eventDetails/nextImage.svg';
 import PastImageIcon from '../assets/Svgs/eventDetails/pastImage.svg';
@@ -52,7 +53,14 @@ interface EventData {
   organizerName: string;
   organizerWebsite: string;
   organizerEmail: string;
+  organizerPhone: string;
+  organizerSocials: Record<string, string>;
+  organizerFollowers: number;
+  organizerEventsCount: number;
   capacity: number;
+  availableSpots: number;
+  startAtRaw: string;
+  endAtRaw: string;
   allowReentry: boolean;
   refundsAllowed: boolean;
   ageLimit: number | null;
@@ -135,6 +143,43 @@ const EventDetailsGlobal = () => {
           ? `${event.venue.address}, ${event.venue.city}, ${event.venue.country}`
           : '';
 
+        // Best-effort organizer public details & stats
+        let organizerWebsite = '';
+        let organizerEmail = '';
+        let organizerPhone = '';
+        let organizerSocials: Record<string, string> = {};
+        let organizerFollowers = 0;
+        const organizerEventsCount = event.organizerId
+          ? allEvents.filter((e: ApiEvent) => e.organizerId === event.organizerId).length
+          : 0;
+
+        if (event.organizerId) {
+          const [orgResult, followersResult] = await Promise.allSettled([
+            organizerService.getOrganizationById(event.organizerId),
+            userPreferencesService.getFollowersCount(event.organizerId),
+          ]);
+          if (orgResult.status === 'fulfilled' && orgResult.value) {
+            const org = orgResult.value;
+            organizerWebsite = org.website || '';
+            organizerEmail = org.contactEmail || '';
+            organizerPhone = org.contactPhone || '';
+            const socials = org.settings?.socialLinks;
+            if (socials && typeof socials === 'object') {
+              organizerSocials = Object.fromEntries(
+                Object.entries(socials).filter(([, url]) => typeof url === 'string' && url),
+              ) as Record<string, string>;
+            }
+          }
+          if (followersResult.status === 'fulfilled') {
+            organizerFollowers = followersResult.value || 0;
+          }
+        }
+
+        const availableSpots = event.ticketTypes?.reduce(
+          (sum, tt) => sum + (Number(tt.quantityTotal || 0) - Number(tt.quantitySold || 0)),
+          0,
+        ) ?? 0;
+
         setEventData({
           id: event.id,
           title: event.title,
@@ -152,9 +197,16 @@ const EventDetailsGlobal = () => {
           address: venueAddress,
           organizerId: event.organizerId || '',
           organizerName: event.organizer?.name || '',
-          organizerWebsite: '',
-          organizerEmail: '',
+          organizerWebsite,
+          organizerEmail,
+          organizerPhone,
+          organizerSocials,
+          organizerFollowers,
+          organizerEventsCount,
           capacity: event.capacity || 0,
+          availableSpots,
+          startAtRaw: event.startAt,
+          endAtRaw: event.endAt,
           allowReentry: event.allowReentry || false,
           refundsAllowed: event.refundsAllowed || false,
           ageLimit: event.ageLimit ?? null,
@@ -285,10 +337,12 @@ const EventDetailsGlobal = () => {
       if (isFavorite) {
         await userPreferencesService.removeFavoriteEvent(eventId);
         setIsFavorite(false);
+        setEventData(prev => prev ? { ...prev, favorites: Math.max(0, prev.favorites - 1) } : prev);
         console.log('✅ Removed from favorites');
       } else {
         await userPreferencesService.addFavoriteEvent(eventId);
         setIsFavorite(true);
+        setEventData(prev => prev ? { ...prev, favorites: prev.favorites + 1 } : prev);
         console.log('✅ Added to favorites');
       }
     } catch (err: any) {
@@ -477,13 +531,18 @@ const EventDetailsGlobal = () => {
                   <span className="text-sm text-[#757575]">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
                 </div>
                 
-                {/* Views */}
+                {/* Available Spots */}
                 <div className="flex items-center gap-1.5">
                   <svg className="w-5 h-5 text-[#757575]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span className="text-sm text-[#757575]">{eventData.views.toLocaleString()} {t('eventDetails.stats.views')}</span>
+                  {eventData.availableSpots > 0 ? (
+                    <span className={`text-sm ${eventData.availableSpots <= 10 ? 'text-orange-500 font-medium' : 'text-[#757575]'}`}>
+                      {eventData.availableSpots.toLocaleString()} {t('eventDetails.stats.spotsAvailable', 'spots available')}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-red-500 font-medium">{t('eventDetails.stats.soldOut', 'Sold out')}</span>
+                  )}
                 </div>
                 
                 {/* Favorites */}
@@ -803,9 +862,19 @@ const EventDetailsGlobal = () => {
                       {/* Organizer Info */}
                       <div>
                         <h3 className="text-base font-semibold text-black mb-3">{eventData.organizerName || 'Organizer'}</h3>
-                        
-                        {/* Stats - Hidden until we have real organizer stats from API */}
-                        {/* TODO: Fetch organizer stats from API */}
+
+                        {/* Organizer public stats */}
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-sm font-bold text-black">{eventData.organizerFollowers.toLocaleString()}</span>
+                            <span className="text-xs text-[#757575]">{t('eventDetails.organizer.followers', 'Followers')}</span>
+                          </div>
+                          <div className="w-px h-4 bg-[#D9D9D9]" />
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-sm font-bold text-black">{eventData.organizerEventsCount.toLocaleString()}</span>
+                            <span className="text-xs text-[#757575]">{t('eventDetails.organizer.events', 'Events')}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -841,8 +910,48 @@ const EventDetailsGlobal = () => {
                     </p>
                   )}
 
-                  {/* Social Links and More Details - Hidden until organizer API provides social links */}
-                  {/* TODO: Add social links from organizer API data when available */}
+                  {/* Website & Social Links */}
+                  {(eventData.organizerWebsite || eventData.organizerPhone || Object.keys(eventData.organizerSocials).length > 0) && (
+                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-[#E0EBEA]">
+                      {eventData.organizerWebsite && (
+                        <a
+                          href={eventData.organizerWebsite.startsWith('http') ? eventData.organizerWebsite : `https://${eventData.organizerWebsite}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-[#FF4000] transition-colors"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="2" y1="12" x2="22" y2="12" />
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                          </svg>
+                          {t('eventDetails.organizer.website', 'Website')}
+                        </a>
+                      )}
+                      {eventData.organizerPhone && (
+                        <a
+                          href={`tel:${eventData.organizerPhone}`}
+                          className="inline-flex items-center gap-1.5 text-sm font-medium text-black hover:text-[#FF4000] transition-colors"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.81.36 1.6.7 2.34a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.74.34 1.53.57 2.34.7A2 2 0 0 1 22 16.92z" />
+                          </svg>
+                          {eventData.organizerPhone}
+                        </a>
+                      )}
+                      {Object.entries(eventData.organizerSocials).map(([platform, url]) => (
+                        <a
+                          key={platform}
+                          href={url.startsWith('http') ? url : `https://${url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full text-xs font-medium text-black capitalize hover:text-[#FF4000] transition-colors border border-[#E0EBEA]"
+                        >
+                          {platform}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -886,16 +995,29 @@ const EventDetailsGlobal = () => {
                   )}
                 </div>
 
-                {/* View All Reviews Button */}
-                <button 
-                  onClick={() => setIsReviewsModalOpen(true)}
-                  className="flex items-center justify-between gap-3 ps-6 pe-2 py-2 bg-white text-black text-base font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors group"
-                >
-                  <span>{t('eventDetails.reviews.viewAll')}</span>
-                  <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center transition-colors">
-                    <img src={AllReviewsIcon} alt="View all" className="w-9 h-9" />
-                  </div>
-                </button>
+                {/* Reviews Actions */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <button 
+                    onClick={() => setIsReviewsModalOpen(true)}
+                    className="flex items-center justify-between gap-3 ps-6 pe-2 py-2 bg-white text-black text-base font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors"
+                  >
+                    <span>{t('eventDetails.reviews.viewAll')}</span>
+                    <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center transition-colors">
+                      <img src={AllReviewsIcon} alt="View all" className="w-9 h-9" />
+                    </div>
+                  </button>
+                  {user && (
+                    <button
+                      onClick={() => navigate(`/event/${eventId}/review`)}
+                      className="flex items-center gap-2 px-6 py-2.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-colors"
+                    >
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      {t('eventDetails.reviews.writeReview', 'Write a Review')}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {/* Got Questions? We've Got Answers Section */}
@@ -1122,12 +1244,31 @@ const EventDetailsGlobal = () => {
               </div>
 
               {/* Get Tickets Button */}
-              <button 
-                onClick={() => navigate(`/event/${eventId}/tickets`)}
-                className="w-full lg:w-auto px-10 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
-              >
-                {t('eventDetails.getTickets')}
-              </button>
+              {(() => {
+                const now = new Date();
+                const isPast = eventData.endAtRaw ? new Date(eventData.endAtRaw) < now : false;
+                const isSoldOut = eventData.availableSpots === 0 && (eventData.capacity ?? 0) > 0;
+                const isDisabled = isPast || isSoldOut;
+                return (
+                  <button
+                    onClick={() => !isDisabled && navigate(`/event/${eventId}/tickets`)}
+                    disabled={isDisabled}
+                    className={`w-full lg:w-auto px-10 py-3 font-semibold rounded-full transition-colors text-base ${
+                      isPast
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : isSoldOut
+                        ? 'bg-red-100 text-red-400 cursor-not-allowed'
+                        : 'bg-[#FF4000] text-white hover:bg-[#E63900] cursor-pointer'
+                    }`}
+                  >
+                    {isPast
+                      ? t('eventDetails.eventEnded', 'Event Ended')
+                      : isSoldOut
+                      ? t('eventDetails.soldOut', 'Sold Out')
+                      : t('eventDetails.getTickets')}
+                  </button>
+                );
+              })()}
             </div>
           </div>
 

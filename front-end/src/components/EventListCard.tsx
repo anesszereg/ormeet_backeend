@@ -11,6 +11,8 @@ interface EventListCardProps {
   badgeColor?: string;
   description?: string;
   eventId?: string;
+  isPast?: boolean;
+  availableSpots?: number;
 }
 
 const EventListCard = ({ 
@@ -22,7 +24,9 @@ const EventListCard = ({
   badge, 
   badgeColor = '#4CAF50',
   description,
-  eventId
+  eventId,
+  isPast = false,
+  availableSpots,
 }: EventListCardProps) => {
   const { t } = useTranslation('attendee');
   const navigate = useNavigate();
@@ -36,7 +40,7 @@ const EventListCard = ({
   return (
     <div 
       onClick={handleClick}
-      className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer flex w-full border border-[#EEEEEE] hover:scale-[1.01]"
+      className={`bg-white rounded-2xl overflow-hidden transition-all cursor-pointer flex w-full border border-[#EEEEEE] ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.01]'}`}
     >
       {/* Event image - Left side */}
       <div className="relative w-[240px] xl:w-[280px] 2xl:w-[320px] h-[180px] shrink-0">
@@ -64,7 +68,19 @@ const EventListCard = ({
             <span className="text-xs text-[#757575]">{t('eventListCard.fromPrice')}</span>
             <span className="text-base font-semibold text-black">{price}</span>
           </div>
-          {badge && (
+          {isPast ? (
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-500">
+              {t('eventListCard.pastEvent', 'Past')}
+            </span>
+          ) : availableSpots !== undefined && availableSpots <= 10 && availableSpots > 0 ? (
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-orange-50 text-orange-500">
+              {availableSpots} {t('eventListCard.spotsLeft', 'left')}
+            </span>
+          ) : availableSpots === 0 ? (
+            <span className="text-xs font-medium px-3 py-1 rounded-full bg-red-50 text-red-500">
+              {t('eventListCard.soldOut', 'Sold out')}
+            </span>
+          ) : badge ? (
             <span 
               className="text-xs font-medium px-3 py-1 rounded-full"
               style={{ 
@@ -74,7 +90,7 @@ const EventListCard = ({
             >
               {badge}
             </span>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Promotion } from '../entities';
+import { Promotion, PromotionType } from '../entities';
 import { CreatePromotionDto, UpdatePromotionDto } from './dto';
 
 @Injectable()
@@ -25,8 +25,15 @@ export class PromotionsService {
       throw new BadRequestException('Promotion code already exists');
     }
 
+    // Keep the legacy discountPercentage column in sync with type/value so
+    // both the order discount logic (type/value) and any older readers work.
+    const discountPercentage =
+      createPromotionDto.discountPercentage ??
+      (createPromotionDto.type === PromotionType.PERCENT ? createPromotionDto.value : 0);
+
     const promotion = this.promotionRepository.create({
       ...createPromotionDto,
+      discountPercentage,
       usedCount: 0,
       isActive: true,
     });
@@ -76,7 +83,16 @@ export class PromotionsService {
     return promotion;
   }
 
-  async validate(code: string): Promise<{ valid: boolean; message?: string; promotion?: Promotion }> {
+  async validate(
+    code: string,
+    eventId?: string,
+  ): Promise<{
+    valid: boolean;
+    message?: string;
+    discountType?: PromotionType;
+    discountValue?: number;
+    promotion?: Promotion;
+  }> {
     const promotion = await this.promotionRepository.findOne({
       where: { code },
     });
@@ -89,12 +105,17 @@ export class PromotionsService {
       return { valid: false, message: 'Promotion is no longer active' };
     }
 
+    // Event-scoped codes only apply to their event.
+    if (promotion.eventId && eventId && promotion.eventId !== eventId) {
+      return { valid: false, message: 'This code is not valid for this event' };
+    }
+
     const now = new Date();
-    if (now < promotion.validFrom) {
+    if (promotion.validFrom && now < promotion.validFrom) {
       return { valid: false, message: 'Promotion has not started yet' };
     }
 
-    if (now > promotion.validUntil) {
+    if (promotion.validUntil && now > promotion.validUntil) {
       return { valid: false, message: 'Promotion has expired' };
     }
 
@@ -102,7 +123,12 @@ export class PromotionsService {
       return { valid: false, message: 'Promotion has reached maximum uses' };
     }
 
-    return { valid: true, promotion };
+    return {
+      valid: true,
+      discountType: promotion.type,
+      discountValue: Number(promotion.value),
+      promotion,
+    };
   }
 
   async incrementUsage(id: string): Promise<Promotion> {

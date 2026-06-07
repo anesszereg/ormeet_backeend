@@ -103,6 +103,10 @@ const AccountSettings = () => {
     confirmPassword: ''
   });
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   
   // Handlers for Personal Info
   const handleProfileSave = async () => {
@@ -252,6 +256,19 @@ const AccountSettings = () => {
     return `•••• •••• •••• ${lastFour}`;
   };
   
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    setIsDeletingAccount(true);
+    setDeleteError('');
+    try {
+      await authService.deleteAccount();
+      window.location.href = '/login';
+    } catch (err: any) {
+      setDeleteError(err.response?.data?.message || 'Failed to delete account');
+      setIsDeletingAccount(false);
+    }
+  };
+
   // Handlers for Login & Security
   const handlePasswordSave = async () => {
     if (!passwordData.currentPassword.trim()) {
@@ -725,7 +742,7 @@ const AccountSettings = () => {
               </div>
               
               {/* Two-factor Authentication Section */}
-              <div className="pt-6 border-t border-[#EEEEEE]">
+              <div className="pt-6 border-t border-[#EEEEEE] mb-8">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
@@ -741,6 +758,18 @@ const AccountSettings = () => {
                     <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
                   </label>
                 </div>
+              </div>
+
+              {/* Danger Zone */}
+              <div className="pt-6 border-t border-red-100">
+                <h3 className="text-base font-semibold text-red-600 mb-1">{t('accountSettings.dangerZone.title', 'Danger Zone')}</h3>
+                <p className="text-sm text-[#4F4F4F] mb-4">{t('accountSettings.dangerZone.description', 'Permanently delete your account and all associated personal data. This action cannot be undone.')}</p>
+                <button
+                  onClick={() => { setDeleteConfirmText(''); setDeleteError(''); setIsDeleteModalOpen(true); }}
+                  className="px-5 py-2.5 bg-red-50 text-red-600 border border-red-200 text-sm font-medium rounded-full hover:bg-red-100 transition-colors cursor-pointer"
+                >
+                  {t('accountSettings.dangerZone.deleteButton', 'Delete My Account')}
+                </button>
               </div>
             </div>
           )}
@@ -1141,6 +1170,55 @@ const AccountSettings = () => {
                 <p className="text-lg font-semibold text-black">{t('accountSettings.loginSecurity.modals.changePassword.success')}</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+      {/* Delete Account Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h2 className="text-lg font-bold text-black">{t('accountSettings.dangerZone.modal.title', 'Delete Your Account?')}</h2>
+            </div>
+            <p className="text-sm text-[#4F4F4F] mb-4 leading-relaxed">
+              {t('accountSettings.dangerZone.modal.description', 'This will permanently delete your account, all your tickets, bookings, and personal data. This action cannot be undone.')}
+            </p>
+            <p className="text-sm font-medium text-black mb-2">
+              {t('accountSettings.dangerZone.modal.typeConfirm', 'Type DELETE to confirm:')}
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="DELETE"
+              className="w-full px-4 py-2.5 border border-red-200 rounded-lg text-sm text-black focus:outline-none focus:border-red-400 transition-all mb-4"
+            />
+            {deleteError && (
+              <p className="text-sm text-red-600 mb-4">{deleteError}</p>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeletingAccount}
+                className="flex-1 px-4 py-2.5 border border-[#EEEEEE] text-black text-sm font-medium rounded-full hover:bg-[#F8F8F8] transition-colors"
+              >
+                {t('accountSettings.dangerZone.modal.cancel', 'Cancel')}
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || isDeletingAccount}
+                className="flex-1 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeletingAccount
+                  ? t('accountSettings.dangerZone.modal.deleting', 'Deleting...')
+                  : t('accountSettings.dangerZone.modal.confirm', 'Delete Account')}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -372,6 +372,13 @@ class AuthService {
     }
     return response.data;
   }
+
+  async deleteAccount(): Promise<{ message: string }> {
+    const response = await api.delete<{ message: string }>('/auth/account');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return response.data;
+  }
 }
 
 export default new AuthService();

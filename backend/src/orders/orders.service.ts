@@ -6,8 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Order, OrderStatus, TicketType, Promotion, PromotionType, Ticket, Event } from '../entities';
+import { Order, OrderStatus, PaymentMethod, TicketType, Promotion, PromotionType, Ticket, Event, User, UserRole } from '../entities';
 import { CreateOrderDto, UpdateOrderDto, CreateOrderEnhancedDto } from './dto';
+import * as bcrypt from 'bcrypt';
+import { randomBytes } from 'crypto';
 import { EmailService } from '../email/email.service';
 import { PdfTicketService } from './pdf-ticket.service';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -26,6 +28,8 @@ export class OrdersService {
     private readonly ticketRepository: Repository<Ticket>,
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly emailService: EmailService,
     private readonly pdfTicketService: PdfTicketService,
     private readonly notificationsService: NotificationsService,
@@ -445,6 +449,63 @@ export class OrdersService {
     }
 
     return savedOrder;
+  }
+
+  /**
+   * Manually register an attendee for an event (organizer action).
+   * Finds or creates the attendee user by email, then creates a free
+   * comp order and generates a ticket via the standard payment flow so
+   * the attendee receives a real ticket + confirmation email.
+   */
+  async createManualAttendee(dto: {
+    eventId: string;
+    ticketTypeId: string;
+    name: string;
+    email: string;
+  }): Promise<Order> {
+    const ticketType = await this.ticketTypeRepository.findOne({
+      where: { id: dto.ticketTypeId },
+    });
+    if (!ticketType || ticketType.eventId !== dto.eventId) {
+      throw new BadRequestException('Ticket type does not belong to this event');
+    }
+
+    // Find an existing attendee account for this email, or create one.
+    let user = await this.userRepository.findOne({
+      where: { email: dto.email, role: UserRole.ATTENDEE },
+    });
+    if (!user) {
+      const randomPassword = randomBytes(16).toString('hex');
+      user = this.userRepository.create({
+        name: dto.name,
+        email: dto.email,
+        passwordHash: await bcrypt.hash(randomPassword, 10),
+        role: UserRole.ATTENDEE,
+        emailVerified: false,
+      });
+      user = await this.userRepository.save(user);
+    }
+
+    // Create a free (comp) pending order, then complete it so tickets
+    // are generated through the existing flow.
+    const order = this.orderRepository.create({
+      userId: user.id,
+      eventId: dto.eventId,
+      items: [{ ticketTypeId: dto.ticketTypeId, quantity: 1, unitPrice: 0 }],
+      amountSubtotal: 0,
+      discountAmount: 0,
+      serviceFee: 0,
+      processingFee: 0,
+      amountTotal: 0,
+      currency: 'USD',
+      status: OrderStatus.PENDING,
+      paymentMethod: PaymentMethod.CASH,
+      billingName: dto.name,
+      billingEmail: dto.email,
+    });
+    const savedOrder = await this.orderRepository.save(order);
+
+    return this.completePayment(savedOrder.id, `comp_${Date.now()}`);
   }
 
   // Generate unique ticket code

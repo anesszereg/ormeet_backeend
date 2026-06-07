@@ -18,6 +18,7 @@ import { UsersModule } from './users/users.module';
 import { UploadModule } from './upload/upload.module';
 import { UserPreferencesModule } from './user-preferences/user-preferences.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
 import {
   User,
   Organization,
@@ -35,6 +36,7 @@ import {
   UserFavoriteEvent,
   UserFollowingOrganizer,
   Notification,
+  BankAccount,
 } from './entities';
 
 @Module({
@@ -72,6 +74,7 @@ import {
               UserFavoriteEvent,
               UserFollowingOrganizer,
               Notification,
+              BankAccount,
             ],
             synchronize: !isProduction,
             logging: !isProduction,
@@ -106,6 +109,7 @@ import {
             UserFavoriteEvent,
             UserFollowingOrganizer,
             Notification,
+            BankAccount,
           ],
           synchronize: !isProduction,
           logging: !isProduction,
@@ -128,6 +132,7 @@ import {
     UploadModule,
     UserPreferencesModule,
     NotificationsModule,
+    BankAccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

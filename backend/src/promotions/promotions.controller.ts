@@ -64,9 +64,10 @@ export class PromotionsController {
 
   @Post('validate/:code')
   @ApiOperation({ summary: 'Validate a promotion code' })
+  @ApiQuery({ name: 'eventId', required: false })
   @ApiResponse({ status: 200, description: 'Return validation result' })
-  validate(@Param('code') code: string) {
-    return this.promotionsService.validate(code);
+  validate(@Param('code') code: string, @Query('eventId') eventId?: string) {
+    return this.promotionsService.validate(code, eventId);
   }
 
   @Get(':id')

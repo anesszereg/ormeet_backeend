@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
 import FooterBg from '../assets/imges/footer.png';
 
@@ -110,7 +111,7 @@ const Footer = () => {
             <h3 className="text-base font-semibold text-black mb-4">{t('footer.legal.title')}</h3>
             <ul className="space-y-2">
               <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.termsOfService')}</a></li>
-              <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.privacyPolicy')}</a></li>
+              <li><Link to="/privacy-policy" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.privacyPolicy')}</Link></li>
               <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.cookiePolicy')}</a></li>
               <li><a href="#" className="text-sm text-[#4F4F4F] hover:text-[#FF4000] transition-colors">{t('footer.legal.refundCancellation')}</a></li>
             </ul>
