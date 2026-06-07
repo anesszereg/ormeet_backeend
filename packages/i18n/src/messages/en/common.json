@@ -5,7 +5,8 @@
     "support": "Support",
     "login": "Log In",
     "signup": "Sign up",
-    "logout": "Log out"
+    "logout": "Log out",
+    "dashboard": "Dashboard"
   },
   "cta": {
     "getStarted": "Get started",

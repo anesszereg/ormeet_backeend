@@ -5,7 +5,8 @@
     "support": "Aide",
     "login": "Se connecter",
     "signup": "S'inscrire",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "dashboard": "Tableau de bord"
   },
   "cta": {
     "getStarted": "Commencer",

@@ -37,6 +37,18 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
     navigate('/login');
   };
 
+  const handleLogoClick = () => {
+    const landingUrl = import.meta.env.VITE_LANDING_URL || 'https://ormeet.com';
+    try {
+      const target = new URL(landingUrl);
+      if (target.host !== window.location.host) {
+        window.location.href = landingUrl;
+        return;
+      }
+    } catch { /* ignore */ }
+    navigate('/');
+  };
+
   return (
     // Navbar container: full width, white background, shadow as per Figma (Y:4, Blur:8, #000000 8%)
     // Height: 64px for comfortable spacing, padding horizontal for content alignment
@@ -57,9 +69,9 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
           </button>
         )}
         {/* Logo: Slightly reduced size for Figma accuracy, vertically centered */}
-        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8 cursor-pointer" />
+        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8 cursor-pointer" onClick={handleLogoClick} />
         {/* Brand text: 20px font size, bold weight, black color, vertically aligned with logo */}
-        <span className="text-xl font-bold text-black leading-none cursor-pointer hover:text-[#FF4000] transition-colors">Ormeet</span>
+        <span onClick={handleLogoClick} className="text-xl font-bold text-black leading-none cursor-pointer hover:text-[#FF4000] transition-colors">Ormeet</span>
       </div>
 
       {/* Center section: Navigation links - Hidden on mobile */}
