@@ -58,12 +58,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  // Sync auth state to a cookie so the landing page (different origin/port) can read it
+  // Sync auth state to a cookie readable by the landing page on a sibling subdomain.
+  // On app.ormeet.com → sets domain=.ormeet.com so www.ormeet.com can also read it.
+  // On localhost → omits domain so it stays shared across all local ports.
   useEffect(() => {
+    const hostname = window.location.hostname;
+    const parts = hostname.split('.');
+    const parentDomain = parts.length >= 2 ? '.' + parts.slice(-2).join('.') : '';
+    const domainAttr = parentDomain ? `; domain=${parentDomain}` : '';
+
     if (user) {
-      document.cookie = `ormeet_auth=${user.role}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
+      document.cookie = `ormeet_auth=${user.role}; path=/${domainAttr}; max-age=${7 * 24 * 3600}; SameSite=Lax`;
     } else {
-      document.cookie = 'ormeet_auth=; path=/; max-age=0; SameSite=Lax';
+      document.cookie = `ormeet_auth=; path=/${domainAttr}; max-age=0; SameSite=Lax`;
     }
   }, [user]);
 
