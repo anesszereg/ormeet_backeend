@@ -184,14 +184,14 @@ const Login = () => {
     }
   };
 
+  const API_BASE = (import.meta.env.VITE_API_BASE_URL as string || 'http://localhost:3000/').replace(/\/$/, '');
+
   const handleGoogleLogin = () => {
-    // Redirect to backend Google OAuth endpoint
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = `${API_BASE}/auth/google`;
   };
 
   const handleFacebookLogin = () => {
-    // Redirect to backend Facebook OAuth endpoint
-    window.location.href = 'http://localhost:3000/auth/facebook';
+    window.location.href = `${API_BASE}/auth/facebook`;
   };
 
   return (
