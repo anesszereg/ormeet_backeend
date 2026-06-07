@@ -51,6 +51,9 @@ import {
       useFactory: (configService: ConfigService) => {
         const databaseUrl = configService.get('DATABASE_URL');
         const isProduction = configService.get('NODE_ENV') === 'production';
+        // Allow explicit override — set DATABASE_SYNCHRONIZE=true on Render when deploying schema changes
+        const syncEnv = configService.get<string>('DATABASE_SYNCHRONIZE');
+        const shouldSync = syncEnv !== undefined ? syncEnv === 'true' : !isProduction;
         
         // Support both DATABASE_URL and individual variables
         if (databaseUrl) {
@@ -76,7 +79,7 @@ import {
               Notification,
               BankAccount,
             ],
-            synchronize: !isProduction,
+            synchronize: shouldSync,
             logging: !isProduction,
             ssl: isProduction ? { rejectUnauthorized: false } : false,
             extra: {
@@ -111,7 +114,7 @@ import {
             Notification,
             BankAccount,
           ],
-          synchronize: !isProduction,
+          synchronize: shouldSync,
           logging: !isProduction,
           ssl: isProduction ? { rejectUnauthorized: false } : false,
         };

@@ -7,6 +7,11 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+
+      # ── Database ──────────────────────────────────────────────────────────────
+      # Use DATABASE_URL (preferred on Render managed PostgreSQL) OR individual vars
+      - key: DATABASE_URL
+        sync: false
       - key: DATABASE_HOST
         sync: false
       - key: DATABASE_PORT
@@ -17,12 +22,44 @@ services:
         sync: false
       - key: DATABASE_NAME
         sync: false
+      # Set to "true" temporarily after adding new entities/columns, then remove
+      - key: DATABASE_SYNCHRONIZE
+        value: "true"
+
+      # ── Auth ──────────────────────────────────────────────────────────────────
       - key: JWT_SECRET
         sync: false
       - key: JWT_EXPIRATION
         value: 7d
+
+      # ── Frontend / CORS ───────────────────────────────────────────────────────
       - key: FRONTEND_URL
         sync: false
+      - key: CORS_ORIGIN
+        value: "*"
+
+      # ── Google OAuth ──────────────────────────────────────────────────────────
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+
+      # ── Facebook OAuth ────────────────────────────────────────────────────────
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: FACEBOOK_CALLBACK_URL
+        sync: false
+
+      # ── Email (Resend) ────────────────────────────────────────────────────────
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # Legacy SMTP (kept for backward compat)
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
@@ -32,4 +69,20 @@ services:
       - key: SMTP_PASS
         sync: false
       - key: SMTP_FROM
+        sync: false
+
+      # ── Twilio SMS (optional) ─────────────────────────────────────────────────
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+      # ── Cloudinary (image uploads) ────────────────────────────────────────────
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
         sync: false
