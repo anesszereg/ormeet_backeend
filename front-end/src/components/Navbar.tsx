@@ -33,6 +33,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
 
   const handleLogout = () => {
     logout();
+    localStorage.removeItem('ormeet_lp_auth');
     setIsProfileMenuOpen(false);
     navigate('/login');
   };
@@ -42,7 +43,11 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
     try {
       const target = new URL(landingUrl);
       if (target.host !== window.location.host) {
-        window.location.href = landingUrl;
+        if (user) {
+          target.searchParams.set('auth', '1');
+          target.searchParams.set('role', user.role || 'attendee');
+        }
+        window.location.href = target.toString();
         return;
       }
     } catch { /* ignore */ }
