@@ -33,7 +33,6 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
 
   const handleLogout = () => {
     logout();
-    localStorage.removeItem('ormeet_lp_auth');
     setIsProfileMenuOpen(false);
     navigate('/login');
   };

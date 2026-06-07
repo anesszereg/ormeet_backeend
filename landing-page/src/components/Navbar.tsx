@@ -18,56 +18,33 @@ const Navbar = () => {
   const [dashboardUrl, setDashboardUrl] = useState(`${MAIN_APP_URL}/dashboard-attendee`);
 
   useEffect(() => {
-    const LS_KEY = 'ormeet_lp_auth';
+    // Primary: read the ormeet_auth cookie set by the React app on login.
+    // Cookies are shared across ports on the same hostname (localhost:5173 ↔ localhost:3000)
+    // and across subdomains in production when domain=.ormeet.com.
+    const match = document.cookie.match(/(?:^|;\s*)ormeet_auth=([^;]+)/);
+    const role = match ? match[1] : null;
 
-    // 1. Check URL params — set when navigating cross-origin from the React app
+    if (role) {
+      setIsLoggedIn(true);
+      if (role === 'organizer') {
+        setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
+      }
+      return;
+    }
+
+    // Fallback: URL params passed by handleLogoClick for cross-origin nav
     const params = new URLSearchParams(window.location.search);
     const authParam = params.get('auth');
     const roleParam = params.get('role') || 'attendee';
-
     if (authParam === '1') {
       setIsLoggedIn(true);
       if (roleParam === 'organizer') {
         setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
       }
-      // Persist for subsequent landing page visits
-      localStorage.setItem(LS_KEY, JSON.stringify({ loggedIn: true, role: roleParam }));
-      // Clean params from URL without a page reload
       const clean = new URL(window.location.href);
       clean.searchParams.delete('auth');
       clean.searchParams.delete('role');
       window.history.replaceState({}, '', clean.toString());
-      return;
-    }
-
-    // 2. Check landing-page-specific localStorage (set on a previous visit)
-    try {
-      const stored = localStorage.getItem(LS_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed?.loggedIn) {
-          setIsLoggedIn(true);
-          if (parsed.role === 'organizer') {
-            setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
-          }
-          return;
-        }
-      }
-    } catch { /* ignore */ }
-
-    // 3. Same-origin fallback (dev: both apps on localhost)
-    const token = localStorage.getItem('token');
-    if (token) {
-      setIsLoggedIn(true);
-      try {
-        const userRaw = localStorage.getItem('user');
-        if (userRaw) {
-          const parsed = JSON.parse(userRaw);
-          if (parsed?.role === 'organizer') {
-            setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
-          }
-        }
-      } catch { /* ignore */ }
     }
   }, []);
 

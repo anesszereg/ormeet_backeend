@@ -58,6 +58,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
+  // Sync auth state to a cookie so the landing page (different origin/port) can read it
+  useEffect(() => {
+    if (user) {
+      document.cookie = `ormeet_auth=${user.role}; path=/; max-age=${7 * 24 * 3600}; SameSite=Lax`;
+    } else {
+      document.cookie = 'ormeet_auth=; path=/; max-age=0; SameSite=Lax';
+    }
+  }, [user]);
+
   const login = async (data: LoginDto) => {
     const response = await authService.login(data);
     console.log('🔐 [Auth] Login successful');
