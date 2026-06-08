@@ -6,55 +6,42 @@ import { useTranslations } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 
-const FALLBACK_EVENTS: LandingEvent[] = [
-  {
-    id: "fallback-1",
-    image: "/images/landingPage/event-myticket-6.jpg",
-    title: "Neon Nights DJ Party",
-    date: "Apr 20",
-    venue: "Skyline Lounge",
-    city: "",
-    category: "",
-    price: "",
-  },
-  {
-    id: "fallback-2",
-    image: "/images/landingPage/event-myticket-3.jpg",
-    title: "Rhythm & Beats Music Festival",
-    date: "Apr 20",
-    venue: "Hyde Park",
-    city: "",
-    category: "",
-    price: "",
-  },
-  {
-    id: "fallback-3",
-    image: "/images/landingPage/event-myticket-2.jpg",
-    title: "Global Tech Innovators Summit",
-    date: "Apr 20",
-    venue: "Marina Convention Center",
-    city: "",
-    category: "",
-    price: "",
-  },
-];
-
 interface EventCarouselProps {
   events: LandingEvent[];
   isLoading: boolean;
 }
 
+/** Skeleton card shown while the backend fetch is in flight */
+const SkeletonCard = ({ size }: { size: "sm" | "lg" }) => (
+  <div
+    className={`relative shrink-0 rounded-2xl overflow-hidden bg-gray-200 animate-pulse ${
+      size === "lg"
+        ? "w-[calc(100%-360px)] md:w-[calc(100%-440px)] lg:w-[calc(100%-530px)] max-w-[680px] h-[280px] md:h-[340px] lg:h-[380px]"
+        : "w-[160px] md:w-[200px] lg:w-[240px] h-[260px] md:h-[320px] lg:h-[360px]"
+    }`}
+  />
+);
+
 const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
   const t = useTranslations("landing.carousel");
-  // While the fetch is in flight, show evergreen marketing imagery so
-  // the hero area never looks empty.
-  const list = events.length >= 3
-    ? events
-    : isLoading
-      ? FALLBACK_EVENTS
-      : events.length > 0
-        ? events
-        : FALLBACK_EVENTS;
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return (
+      <section className="w-full overflow-hidden py-2 mb-8">
+        <div className="relative flex items-center justify-center gap-3 md:gap-4 lg:gap-5 px-0">
+          <SkeletonCard size="sm" />
+          <SkeletonCard size="lg" />
+          <SkeletonCard size="sm" />
+        </div>
+      </section>
+    );
+  }
+
+  // No real events — hide the section entirely
+  if (events.length === 0) return null;
+
+  const list = events;
 
   const [currentIndex, setCurrentIndex] = useState(
     list.length > 1 ? 1 : 0,
@@ -129,7 +116,7 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
 
         {/* Center (Active) Card - Clickable */}
         <div 
-          onClick={() => current.id.startsWith("fallback-") ? null : handleEventClick(current.id)}
+          onClick={() => handleEventClick(current.id)}
           className="relative shrink-0 w-[calc(100%-360px)] md:w-[calc(100%-440px)] lg:w-[calc(100%-530px)] max-w-[680px] h-[280px] md:h-[340px] lg:h-[380px] rounded-2xl overflow-hidden shadow-xl transition-all duration-300 cursor-pointer hover:shadow-2xl hover:scale-[1.02]"
           style={{ willChange: 'transform, box-shadow' }}
         >
