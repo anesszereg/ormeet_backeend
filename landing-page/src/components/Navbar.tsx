@@ -18,33 +18,61 @@ const Navbar = () => {
   const [dashboardUrl, setDashboardUrl] = useState(`${MAIN_APP_URL}/dashboard-attendee`);
 
   useEffect(() => {
-    // Primary: read the ormeet_auth cookie set by the React app on login.
-    // Cookies are shared across ports on the same hostname (localhost:5173 ↔ localhost:3000)
-    // and across subdomains in production when domain=.ormeet.com.
-    const match = document.cookie.match(/(?:^|;\s*)ormeet_auth=([^;]+)/);
-    const role = match ? match[1] : null;
+    const LS_KEY = 'ormeet_lp_auth';
+    const params = new URLSearchParams(window.location.search);
 
-    if (role) {
+    // Helper: apply role and persist to localStorage for back-button survival
+    const applyAuth = (role: string) => {
       setIsLoggedIn(true);
-      if (role === 'organizer') {
-        setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
-      }
+      if (role === 'organizer') setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify({ role, ts: Date.now() }));
+      } catch { /* ignore */ }
+    };
+
+    // 0. Logout signal — clear any persisted state and show login/signup
+    if (params.get('logout') === '1') {
+      try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+      const clean = new URL(window.location.href);
+      clean.searchParams.delete('logout');
+      window.history.replaceState({}, '', clean.toString());
       return;
     }
 
-    // Fallback: URL params passed by handleLogoClick for cross-origin nav
-    const params = new URLSearchParams(window.location.search);
+    // 1. Cookie (works on localhost and with proper subdomain setup in production)
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)ormeet_auth=([^;]+)/);
+    if (cookieMatch) {
+      applyAuth(cookieMatch[1]);
+      return;
+    }
+
+    // 2. URL params (passed by handleLogoClick on cross-origin navigation)
     const authParam = params.get('auth');
     const roleParam = params.get('role') || 'attendee';
     if (authParam === '1') {
-      setIsLoggedIn(true);
-      if (roleParam === 'organizer') {
-        setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
-      }
+      applyAuth(roleParam);
       const clean = new URL(window.location.href);
       clean.searchParams.delete('auth');
       clean.searchParams.delete('role');
       window.history.replaceState({}, '', clean.toString());
+      return;
+    }
+
+    // 3. localStorage fallback (persists across back-button / direct URL visits)
+    //    Expires after 7 days to avoid stale state after eventual logout.
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        const stored = JSON.parse(raw) as { role: string; ts: number };
+        const SEVEN_DAYS = 7 * 24 * 3600 * 1000;
+        if (stored?.ts && Date.now() - stored.ts < SEVEN_DAYS) {
+          applyAuth(stored.role);
+        } else {
+          localStorage.removeItem(LS_KEY); // expired — clean up
+        }
+      }
+    } catch {
+      try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
     }
   }, []);
 

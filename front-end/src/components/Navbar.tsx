@@ -34,6 +34,15 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
   const handleLogout = () => {
     logout();
     setIsProfileMenuOpen(false);
+    const landingUrl = import.meta.env.VITE_LANDING_URL || 'https://ormeet.com';
+    try {
+      const target = new URL(landingUrl);
+      if (target.host !== window.location.host) {
+        target.searchParams.set('logout', '1');
+        window.location.href = target.toString();
+        return;
+      }
+    } catch { /* ignore */ }
     navigate('/login');
   };
 
