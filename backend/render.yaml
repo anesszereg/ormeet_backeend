@@ -71,13 +71,11 @@ services:
       - key: SMTP_FROM
         sync: false
 
-      # ── Twilio SMS (optional) ─────────────────────────────────────────────────
-      - key: TWILIO_ACCOUNT_SID
+      # ── MessageBird SMS (optional) ────────────────────────────────────────────
+      - key: MESSAGEBIRD_API_KEY
         sync: false
-      - key: TWILIO_AUTH_TOKEN
-        sync: false
-      - key: TWILIO_PHONE_NUMBER
-        sync: false
+      - key: MESSAGEBIRD_ORIGINATOR
+        value: Ormeet
 
       # ── Cloudinary (image uploads) ────────────────────────────────────────────
       - key: CLOUDINARY_CLOUD_NAME
