@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +26,10 @@ const Login = () => {
   // the backend returns 409 MULTIPLE_ACCOUNTS and we ask the user which one
   // to log into.
   const [availableRoles, setAvailableRoles] = useState<string[] | null>(null);
+  // Phone OTP flow
+  const [phoneStep, setPhoneStep] = useState<'phone' | 'otp'>('phone');
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handlePhoneChange = (fullPhone: string) => {
     setPhone(fullPhone);
@@ -46,13 +50,67 @@ const Login = () => {
 
   const handleLoginMethodChange = (method: 'email' | 'phone') => {
     setLoginMethod(method);
-    if (error) {
-      console.log('Clearing error on login method change');
-      setError('');
+    setPhoneStep('phone');
+    setOtpDigits(['', '', '', '', '', '']);
+    if (error) setError('');
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (value && !/^\d$/.test(value)) return;
+    const next = [...otpDigits];
+    next[index] = value;
+    setOtpDigits(next);
+    if (value && index < 5) otpRefs.current[index + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
+      otpRefs.current[index - 1]?.focus();
     }
   };
 
-  const { login } = useAuth();
+  const handleSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone) return;
+    setIsLoading(true);
+    setError('');
+    try {
+      await authService.sendVerificationCode({ phone, type: 'phone', purpose: 'login' });
+      setPhoneStep('otp');
+      setSuccessMessage('Code sent! Check your phone.');
+      setTimeout(() => setSuccessMessage(''), 5000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to send code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const code = otpDigits.join('');
+    if (code.length !== 6) return;
+    setIsLoading(true);
+    setError('');
+    try {
+      await loginWithCode({ phone, type: 'phone', code });
+      const user = authService.getCurrentUser();
+      const needsOnboarding = user?.role === 'organizer'
+        ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
+        : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
+      if (needsOnboarding) {
+        navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', { replace: true });
+      } else {
+        navigate(user?.role === 'organizer' ? '/dashboard-organizer' : '/dashboard-attendee', { replace: true });
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Invalid or expired code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const { login, loginWithCode } = useAuth();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || '/';
 
@@ -331,13 +389,11 @@ const Login = () => {
             </div>
           )}
 
-          {/* Login Form */}
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <label htmlFor={loginMethod === 'email' ? 'email' : 'phone'} className="text-sm font-medium text-black">
-                {loginMethod === 'email' ? t('login.fields.emailLabel') : t('login.fields.phoneLabel')}
-              </label>
-              {loginMethod === 'email' ? (
+          {/* Login Form — email: password-based | phone: OTP-based */}
+          {loginMethod === 'email' ? (
+            <form onSubmit={handleLogin} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="email" className="text-sm font-medium text-black">{t('login.fields.emailLabel')}</label>
                 <input
                   type="email"
                   id="email"
@@ -347,52 +403,76 @@ const Login = () => {
                   required
                   className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
                 />
-              ) : (
-                <PhoneInput
-                  value={phone}
-                  onChange={handlePhoneChange}
-                  required
-                  placeholder={t('login.fields.phonePlaceholder')}
-                />
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-sm font-medium text-black">{t('login.fields.passwordLabel')}</label>
-              <input
-                type="password"
-                id="password"
-                placeholder={t('login.fields.passwordPlaceholder')}
-                value={password}
-                onChange={(e) => handleInputChange('password', e.target.value)}
-                required
-                className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
-              <label className="flex items-center gap-2 text-sm text-[#4F4F4F] cursor-pointer">
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password" className="text-sm font-medium text-black">{t('login.fields.passwordLabel')}</label>
                 <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-[18px] h-[18px] cursor-pointer accent-[#FF4000]"
+                  type="password"
+                  id="password"
+                  placeholder={t('login.fields.passwordPlaceholder')}
+                  value={password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  required
+                  className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
                 />
-                <span>{t('login.rememberMe')}</span>
-              </label>
-              <a href="/forgot-password" className="text-sm text-[#FF4000] font-medium hover:opacity-80 transition-opacity">
-                {t('login.forgotPassword')}
-              </a>
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={isLoading}
-              className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
-            >
-              {isLoading ? t('login.submitting') : t('login.submitButton')}
-            </button>
-          </form>
+              </div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+                <label className="flex items-center gap-2 text-sm text-[#4F4F4F] cursor-pointer">
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="w-[18px] h-[18px] cursor-pointer accent-[#FF4000]" />
+                  <span>{t('login.rememberMe')}</span>
+                </label>
+                <a href="/forgot-password" className="text-sm text-[#FF4000] font-medium hover:opacity-80 transition-opacity">{t('login.forgotPassword')}</a>
+              </div>
+              <button type="submit" disabled={isLoading} className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none">
+                {isLoading ? t('login.submitting') : t('login.submitButton')}
+              </button>
+            </form>
+          ) : phoneStep === 'phone' ? (
+            /* Phone step 1: enter number → send OTP */
+            <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-black">{t('login.fields.phoneLabel')}</label>
+                <PhoneInput value={phone} onChange={handlePhoneChange} required placeholder={t('login.fields.phonePlaceholder')} />
+              </div>
+              <button type="submit" disabled={isLoading || !phone} className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed">
+                {isLoading ? 'Sending...' : 'Send Code'}
+              </button>
+            </form>
+          ) : (
+            /* Phone step 2: enter OTP → verify & login */
+            <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-[#4F4F4F]">Code sent to <span className="font-semibold text-black">{phone}</span></p>
+                <div className="flex gap-2 sm:gap-3">
+                  {otpDigits.map((digit, i) => (
+                    <input
+                      key={i}
+                      ref={(el) => { otpRefs.current[i] = el; }}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(i, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                      className="w-12 h-14 sm:w-14 sm:h-16 text-center text-xl sm:text-2xl font-semibold border-[1.5px] border-[#EEEEEE] rounded-lg focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/20 transition-all"
+                      required
+                    />
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <button type="button" onClick={() => { setPhoneStep('phone'); setOtpDigits(['','','','','','']); setError(''); }} className="text-[#4F4F4F] hover:text-black transition-colors">
+                  ← Change number
+                </button>
+                <button type="button" onClick={(e) => handleSendOtp(e as any)} disabled={isLoading} className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity disabled:opacity-50">
+                  Resend code
+                </button>
+              </div>
+              <button type="submit" disabled={isLoading || otpDigits.some(d => !d)} className="w-full px-6 py-3.5 bg-[#FF4000] text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-all hover:bg-[#F0450B] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(255,64,0,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed">
+                {isLoading ? 'Verifying...' : 'Verify & Log In'}
+              </button>
+            </form>
+          )}
 
           {/* Divider */}
           <div className="flex items-center text-[#4F4F4F] text-sm">
