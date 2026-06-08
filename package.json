@@ -20,7 +20,6 @@
     "install:all": "npm install && cd backend && npm install && cd ../landing-page && npm install && cd ../front-end && npm install"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1",
-    "next": "^16.1.6"
+    "concurrently": "^9.2.1"
   }
 }
