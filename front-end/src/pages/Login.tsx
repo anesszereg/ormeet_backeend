@@ -101,7 +101,7 @@ const Login = () => {
       if (needsOnboarding) {
         navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', { replace: true });
       } else {
-        navigate(user?.role === 'organizer' ? '/dashboard-organizer' : '/dashboard-attendee', { replace: true });
+        redirectAfterLogin(user);
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid or expired code. Please try again.');
@@ -113,6 +113,27 @@ const Login = () => {
   const { login, loginWithCode } = useAuth();
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || '/';
+
+  // After a successful login, bounce through the landing page so its localStorage
+  // gets populated with the auth state before arriving at the dashboard.
+  // This ensures the landing page always hides Login/Signup on the next visit.
+  const redirectAfterLogin = (user: ReturnType<typeof authService.getCurrentUser>) => {
+    const dashboardPath = user?.role === 'organizer' ? '/dashboard-organizer' : '/dashboard-attendee';
+    const landingUrl = (import.meta.env.VITE_LANDING_URL as string) || '';
+    if (landingUrl) {
+      try {
+        const target = new URL(landingUrl);
+        if (target.host !== window.location.host) {
+          target.searchParams.set('auth', '1');
+          target.searchParams.set('role', user?.role || 'attendee');
+          target.searchParams.set('redirect', `${window.location.origin}${dashboardPath}`);
+          window.location.href = target.toString();
+          return;
+        }
+      } catch { /* ignore */ }
+    }
+    navigate(dashboardPath, { replace: true });
+  };
 
   useEffect(() => {
     const message = (location.state as any)?.message;
@@ -180,13 +201,7 @@ const Login = () => {
       }
       
       console.log('✅ [Login] User has completed onboarding, redirecting to dashboard');
-      
-      // Navigate to dashboard based on user role
-      if (user?.role === 'organizer') {
-        navigate('/dashboard-organizer', { replace: true });
-      } else {
-        navigate('/dashboard-attendee', { replace: true });
-      }
+      redirectAfterLogin(user);
     } catch (err: any) {
       const data = err.response?.data;
 

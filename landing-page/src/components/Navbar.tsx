@@ -46,11 +46,17 @@ const Navbar = () => {
       return;
     }
 
-    // 2. URL params (passed by handleLogoClick on cross-origin navigation)
+    // 2. URL params (passed by handleLogoClick / redirectAfterLogin on cross-origin navigation)
     const authParam = params.get('auth');
     const roleParam = params.get('role') || 'attendee';
+    const redirectUrl = params.get('redirect');
     if (authParam === '1') {
       applyAuth(roleParam);
+      if (redirectUrl) {
+        // Login flow: bounce through landing page to set localStorage, then forward to dashboard
+        window.location.href = redirectUrl;
+        return;
+      }
       const clean = new URL(window.location.href);
       clean.searchParams.delete('auth');
       clean.searchParams.delete('role');
