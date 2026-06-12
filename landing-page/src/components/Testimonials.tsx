@@ -195,7 +195,7 @@ const StarRating = ({ rating }: { rating: number }) => {
         </svg>
       ))}
       {hasHalf && (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" suppressHydrationWarning>
           <defs>
             <linearGradient id={gradientId}>
               <stop offset="50%" stopColor="#FFA500" />

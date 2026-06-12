@@ -39,11 +39,11 @@ const EventsInCalifornia = ({
     return matches.length > 0 ? matches : events;
   }, [events, selectedCity]);
 
-  if (!hasLoaded) return null;
-  if (filtered.length === 0) return null;
-
   const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
+
+  if (!hasLoaded) return null;
+  if (filtered.length === 0) return null;
   const startIndex = (page - 1) * CARDS_PER_PAGE;
   const currentEvents = filtered.slice(startIndex, startIndex + CARDS_PER_PAGE);
 

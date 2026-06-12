@@ -25,6 +25,32 @@ const SkeletonCard = ({ size }: { size: "sm" | "lg" }) => (
 const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
   const t = useTranslations("landing.carousel");
 
+  const [currentIndex, setCurrentIndex] = useState(events.length > 1 ? 1 : 0);
+
+  const handlePrev = useCallback(() => {
+    setCurrentIndex((prev) => (prev === 0 ? events.length - 1 : prev - 1));
+  }, [events.length]);
+
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev === events.length - 1 ? 0 : prev + 1));
+  }, [events.length]);
+
+  /** Navigate to event detail page - frontend route */
+  const handleEventClick = useCallback((eventId: string) => {
+    window.location.href = `${FRONTEND_ORIGIN}/event/${eventId}`;
+  }, []);
+
+  const { prev, current, next } = useMemo(() => {
+    const safeIndex = Math.min(currentIndex, events.length - 1);
+    const prevIndex = safeIndex === 0 ? events.length - 1 : safeIndex - 1;
+    const nextIndex = safeIndex === events.length - 1 ? 0 : safeIndex + 1;
+    return {
+      prev: events[prevIndex],
+      current: events[safeIndex],
+      next: events[nextIndex],
+    };
+  }, [currentIndex, events]);
+
   // Show skeleton while loading
   if (isLoading) {
     return (
@@ -40,36 +66,6 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
 
   // No real events — hide the section entirely
   if (events.length === 0) return null;
-
-  const list = events;
-
-  const [currentIndex, setCurrentIndex] = useState(
-    list.length > 1 ? 1 : 0,
-  );
-
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? list.length - 1 : prev - 1));
-  }, [list.length]);
-
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === list.length - 1 ? 0 : prev + 1));
-  }, [list.length]);
-
-  /** Navigate to event detail page - frontend route */
-  const handleEventClick = useCallback((eventId: string) => {
-    window.location.href = `${FRONTEND_ORIGIN}/event/${eventId}`;
-  }, []);
-
-  const { prev, current, next } = useMemo(() => {
-    const safeIndex = Math.min(currentIndex, list.length - 1);
-    const prevIndex = safeIndex === 0 ? list.length - 1 : safeIndex - 1;
-    const nextIndex = safeIndex === list.length - 1 ? 0 : safeIndex + 1;
-    return {
-      prev: list[prevIndex],
-      current: list[safeIndex],
-      next: list[nextIndex],
-    };
-  }, [currentIndex, list]);
 
   if (!current) return null;
 

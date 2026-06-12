@@ -21,11 +21,12 @@ interface TrendingEventsProps {
 
 const TrendingEvents = ({ events, hasLoaded }: TrendingEventsProps) => {
   const t = useTranslations("landing.trending");
+  const totalPages = Math.max(1, Math.ceil(events.length / CARDS_PER_PAGE));
+  const { page, handlePrev, handleNext } = usePagination({ totalPages });
+
   if (!hasLoaded) return null;
   if (events.length === 0) return null;
 
-  const totalPages = Math.max(1, Math.ceil(events.length / CARDS_PER_PAGE));
-  const { page, handlePrev, handleNext } = usePagination({ totalPages });
   const startIndex = (page - 1) * CARDS_PER_PAGE;
   const currentEvents = events.slice(startIndex, startIndex + CARDS_PER_PAGE);
 
