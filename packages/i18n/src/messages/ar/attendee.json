@@ -1,562 +1,598 @@
 {
   "searchResult": {
-    "resultsCount": "{{count}} Results",
-    "resultsFor": "for",
-    "filterButton": "Filter",
+    "resultsCount_zero": "لا نتائج",
+    "resultsCount_one": "نتيجة واحدة",
+    "resultsCount_two": "نتيجتان",
+    "resultsCount_few": "{{count}} نتائج",
+    "resultsCount_many": "{{count}} نتيجة",
+    "resultsCount_other": "{{count}} نتيجة",
+    "resultsFor": "لـ",
+    "filterButton": "تصفية",
     "filters": {
-      "title": "Filters",
-      "locationLabel": "Location",
-      "categoriesLabel": "Categories",
-      "categoriesPlaceholder": "e.g. Music, Sports, Business",
-      "showMore": "Show More",
-      "showLess": "Show Less",
-      "priceLabel": "Price",
-      "priceMin": "Minimum",
-      "priceMax": "Maximum",
-      "whenLabel": "When",
+      "title": "الفلاتر",
+      "locationLabel": "الموقع",
+      "categoriesLabel": "الفئات",
+      "categoriesPlaceholder": "مثال: موسيقى، رياضة، أعمال",
+      "showMore": "عرض المزيد",
+      "showLess": "عرض أقل",
+      "priceLabel": "السعر",
+      "priceMin": "الحد الأدنى",
+      "priceMax": "الحد الأقصى",
+      "whenLabel": "متى",
       "timeOptions": {
-        "today": "Today",
-        "thisWeekend": "This Weekend",
-        "thisWeek": "This Week",
-        "thisMonth": "This Month"
+        "today": "اليوم",
+        "thisWeekend": "هذا الأسبوع المبكر",
+        "thisWeek": "هذا الأسبوع",
+        "thisMonth": "هذا الشهر"
       },
-      "organizersLabel": "Organizers",
+      "organizersLabel": "المنظّمون",
       "organizerOptions": {
-        "following": "Events by Organizers You Follow",
-        "all": "Events by All Organizers"
+        "following": "فعاليات المنظّمين الذين تتابعهم",
+        "all": "فعاليات جميع المنظّمين"
+      },
+      "cityLabel": "المدينة",
+      "eventTypeLabel": "نوع الفعالية",
+      "eventTypeAll": "الكل",
+      "eventTypeFree": "مجاني",
+      "eventTypePaid": "مدفوع",
+      "clearAll": "مسح الكل",
+      "showResults_zero": "لا توجد نتائج",
+      "showResults_one": "عرض نتيجة واحدة",
+      "showResults_two": "عرض نتيجتين",
+      "showResults_few": "عرض {{count}} نتائج",
+      "showResults_many": "عرض {{count}} نتيجة",
+      "showResults_other": "عرض {{count}} نتيجة",
+      "close": "إغلاق",
+      "cities": {
+        "Algiers": "الجزائر",
+        "Oran": "وهران",
+        "Constantine": "قسنطينة",
+        "Annaba": "عنابة",
+        "Blida": "البليدة",
+        "Setif": "سطيف"
+      },
+      "categories": {
+        "Music": "موسيقى",
+        "Sports": "رياضة",
+        "Tech": "تكنولوجيا",
+        "Nightlife": "حياة ليلية",
+        "Food & Drink": "مأكولات ومشروبات",
+        "Business": "أعمال",
+        "Fitness": "لياقة"
       }
     },
     "viewMode": {
-      "listAlt": "List view",
-      "gridAlt": "Grid view"
+      "listAlt": "عرض القائمة",
+      "gridAlt": "عرض الشبكة"
     },
     "empty": {
-      "message": "No events found matching your criteria.",
-      "clearFilters": "Clear Filters"
+      "message": "لا توجد فعاليات تطابق معاييرك.",
+      "clearFilters": "مسح الفلاتر"
     },
     "map": {
-      "title": "Event locations map"
-    }
+      "title": "خريطة مواقع الفعاليات"
+    },
+    "freePrice": "مجاني",
+    "defaultDate": "20 أبريل 2025"
   },
+
   "eventDetails": {
     "dateTime": {
-      "sectionTitle": "Date & Time",
-      "changeDate": "Change date",
-      "closeCalendar": "Close Calendar",
+      "sectionTitle": "التاريخ والوقت",
+      "changeDate": "تغيير التاريخ",
+      "closeCalendar": "إغلاق التقويم",
       "calendarDays": {
-        "sun": "Sun",
-        "mon": "Mon",
-        "tue": "Tue",
-        "wed": "Wed",
-        "thu": "Thu",
-        "fri": "Fri",
-        "sat": "Sat"
+        "sun": "الأحد",
+        "mon": "الإثنين",
+        "tue": "الثلاثاء",
+        "wed": "الأربعاء",
+        "thu": "الخميس",
+        "fri": "الجمعة",
+        "sat": "السبت",
+        "jan": "جانفي",
+        "feb": "فيفري",
+        "mar": "مارس",
+        "apr": "أفريل",
+        "may": "ماي",
+        "jun": "جوان",
+        "jul": "جويلية",
+        "aug": "أوت",
+        "sep": "سبتمبر",
+        "oct": "أكتوبر",
+        "nov": "نوفمبر",
+        "dec": "ديسمبر"
       },
-      "timeSlotsAvailable_one": "{{count}} time available for {{date}}",
-      "timeSlotsAvailable_other": "{{count}} times available for {{date}}",
-      "selectTime": "Please select a suitable time for your event from the options below.",
-      "noTimeSlots": "No time slots available for this date."
+      "timeSlotsAvailable_one": "{{count}} توقيت متاح يوم {{date}}",
+      "timeSlotsAvailable_other": "{{count}} توقيتات متاحة يوم {{date}}",
+      "selectTime": "اختر التوقيت الذي يناسبك من الخيارات أدناه.",
+      "noTimeSlots": "لا توجد توقيتات متاحة في هذا التاريخ."
     },
     "location": {
-      "sectionTitle": "Location",
-      "seeOnMap": "See on map",
-      "closeMap": "Close map",
-      "mapTitle": "Event location map"
+      "sectionTitle": "المكان",
+      "seeOnMap": "عرض على الخريطة",
+      "closeMap": "إغلاق الخريطة",
+      "mapTitle": "خريطة موقع الفعالية"
     },
     "stats": {
-      "reviews": "reviews",
-      "views": "views",
-      "favorites": "favorites"
+      "reviews": "تقييم",
+      "views": "مشاهدة",
+      "favorites": "إعجاب"
     },
     "actions": {
-      "addToFavorites": "Add to favorites",
-      "removeFromFavorites": "Remove from favorites",
-      "loginToFavorite": "Login to add to favorites",
-      "shareEvent": "Share event",
-      "prevImage": "Previous image",
-      "nextImage": "Next image",
-      "goToImage": "Go to image {{number}}"
+      "addToFavorites": "إضافة إلى المفضّلة",
+      "removeFromFavorites": "إزالة من المفضّلة",
+      "loginToFavorite": "سجّل دخولك للإضافة إلى المفضّلة",
+      "shareEvent": "مشاركة الفعالية",
+      "prevImage": "الصورة السابقة",
+      "nextImage": "الصورة التالية",
+      "goToImage": "الانتقال إلى الصورة {{number}}"
     },
     "alerts": {
-      "favoriteFailed": "Failed to update favorites",
-      "followFailed": "Failed to update following status"
+      "favoriteFailed": "تعذّر تحديث المفضّلة",
+      "followFailed": "تعذّر تحديث المتابعة"
     },
     "guidelines": {
-      "sectionTitle": "Event rules & guidelines",
+      "sectionTitle": "قواعد وإرشادات الفعالية",
       "ageRequirement": {
-        "label": "Age requirement:",
-        "defaultText": "This event is for guests aged {{age}} and over. Valid ID required at entry.",
-        "noRestriction": "No age restriction"
+        "label": "السن المطلوب:",
+        "defaultText": "هذه الفعالية مخصّصة لمن هم في سنّ {{age}} وأكثر. يلزم إحضار بطاقة هوية صالحة عند الدخول.",
+        "noRestriction": "لا قيود على السن"
       },
       "entryPolicy": {
-        "label": "Entry policy:",
-        "reentryAllowed": "Re-entry is allowed.",
-        "noReentry": "No re-entry is allowed after leaving the venue."
+        "label": "سياسة الدخول:",
+        "reentryAllowed": "إعادة الدخول مسموحة.",
+        "noReentry": "إعادة الدخول غير مسموحة بعد المغادرة."
       },
       "accessibility": {
-        "label": "Accessibility:"
+        "label": "إمكانية الوصول:"
       },
       "refundPolicy": {
-        "label": "Refund policy:",
-        "refundsAvailable": "Refunds are available according to our refund policy.",
-        "noRefunds": "All ticket sales are final. Refunds are only issued if the event is canceled."
+        "label": "سياسة الاسترداد:",
+        "refundsAvailable": "الاسترداد ممكن وفقًا لسياستنا.",
+        "noRefunds": "جميع المبيعات نهائية. لا استرداد إلا في حال إلغاء الفعالية."
       },
       "prohibitedItems": {
-        "label": "Prohibited items:"
+        "label": "ممنوعات:"
       },
       "allowedItems": {
-        "label": "Allowed items:"
+        "label": "مسموحات:"
       }
     },
     "organizer": {
-      "sectionTitle": "Meet your",
-      "sectionTitleBold": "organiser",
-      "follow": "Follow",
-      "following": "Following",
-      "contact": "Contact",
-      "loginToFollow": "Login to follow organizer",
-      "isOrganizing": "{{name}} is organizing this event."
+      "sectionTitle": "تعرّف على",
+      "sectionTitleBold": "منظّمك",
+      "follow": "متابعة",
+      "following": "متابَع",
+      "contact": "تواصل",
+      "loginToFollow": "سجّل دخولك لمتابعة المنظّم",
+      "isOrganizing": "{{name}} ينظّم هذه الفعالية."
     },
     "reviews": {
-      "noReviews": "No reviews yet. Be the first to review this event!",
-      "viewAll": "View all reviews"
+      "noReviews": "لا توجد تقييمات بعد. كن أوّل من يقيّم هذه الفعالية!",
+      "viewAll": "عرض كل التقييمات"
     },
     "faq": {
-      "sectionTitle": "Got",
-      "sectionTitleBold1": "Questions?",
-      "sectionTitleMid": "We've Got",
-      "sectionTitleBold2": "Answers",
+      "sectionTitle": "هل لديك",
+      "sectionTitleBold1": "أسئلة؟",
+      "sectionTitleMid": "لدينا",
+      "sectionTitleBold2": "الإجابات",
       "items": [
         {
-          "question": "Can I get a refund if I can't attend?",
-          "answer": "Refunds are available up to 48 hours before the event starts. After this period, tickets are non-refundable. Please contact our support team for assistance."
+          "question": "هل يمكنني استرداد المبلغ إذا لم أتمكّن من الحضور؟",
+          "answer": "الاسترداد متاح حتى 48 ساعة قبل بداية الفعالية. بعد هذه المهلة، تذاكر الدخول غير قابلة للاسترداد. تواصل مع فريق المساعدة عند الحاجة."
         },
         {
-          "question": "Will there be security at the event?",
-          "answer": "Yes, professional security personnel will be present throughout the event to ensure everyone's safety. Bag checks will be conducted at entry points."
+          "question": "هل سيكون هناك أمن في الفعالية؟",
+          "answer": "نعم، سيكون أمن محترف حاضرًا طوال الفعالية لضمان سلامة الجميع. ستُجرى عمليات تفتيش الحقائب عند المداخل."
         },
         {
-          "question": "Can I buy tickets at the door?",
-          "answer": "Tickets may be available at the door subject to availability. However, we strongly recommend purchasing tickets online in advance to guarantee entry."
+          "question": "هل يمكنني شراء التذاكر عند المدخل؟",
+          "answer": "قد تتوفّر تذاكر عند المدخل حسب الأماكن المتاحة. ننصح بشدّة بشراء التذاكر عبر الإنترنت مسبقًا لضمان الدخول."
         },
         {
-          "question": "Is there a lost and found service for lost items?",
-          "answer": "Yes, we have a dedicated lost and found station at the venue. If you lose an item, please visit the information desk or contact us after the event."
+          "question": "هل توجد خدمة للأشياء المفقودة؟",
+          "answer": "نعم، يوجد ركن مخصّص للأشياء المفقودة في الموقع. في حال فقدان شيء، توجّه إلى مكتب الاستعلامات أو تواصل معنا بعد الفعالية."
         },
         {
-          "question": "Are bags or backpacks allowed inside the venue?",
-          "answer": "Small bags and purses are allowed but will be subject to security checks. Large backpacks and luggage are not permitted for safety reasons."
+          "question": "هل الحقائب وحقائب الظهر مسموحة؟",
+          "answer": "الحقائب الصغيرة وحقائب اليد مسموحة لكن ستخضع للتفتيش. حقائب الظهر الكبيرة والأمتعة ممنوعة لأسباب أمنية."
         }
       ]
     },
-    "moreFromOrganizer": "More from",
-    "moreFromOrganizerFallback": "this organizer",
+    "moreFromOrganizer": "المزيد من",
+    "moreFromOrganizerFallback": "هذا المنظّم",
     "trending": {
-      "sectionTitle": "Trending",
-      "sectionTitleSuffix": "events in similar category",
-      "paginationOf": "of",
-      "fromPrice": "from"
-    },
-    "newsletter": {
-      "title": "Be the first to know,",
-      "titleSuffix": "never miss an event again!",
-      "description": "Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.",
-      "emailPlaceholder": "Enter your email",
-      "ctaButton": "Keep Me Updated"
-    },
-    "price": {
-      "from": "From"
-    },
-    "getTickets": "Get Tickets Now!",
-    "error": {
-      "notFound": "Event not found",
-      "goBack": "Go Back"
-    }
-  },
-  "ticketList": {
-    "goBack": "Go Back",
-    "orderSummary": {
-      "title": "Order Summary",
-      "serviceCharge": "Service charge",
-      "total": "Total"
+      "sectionTitle": "فعاليات",
+      "sectionTitleSuffix": "رائجة في فئة مشابهة",
+      "paginationOf": "من",
+      "fromPrice": "ابتداءً من"
     },
     "badges": {
-      "soldOut": "Sold out",
-      "onlyFewLeft": "Only few left",
-      "almostFull": "Almost full"
+      "trending": "رائج",
+      "almostFull": "أوشكت على الامتلاء",
+      "salesEndSoon": "البيع ينتهي قريبًا",
+      "onlyFewLeft": "آخر التذاكر"
+    },
+    "newsletter": {
+      "title": "كن أوّل من يعرف،",
+      "titleSuffix": "لا تفوّت أي فعالية بعد اليوم!",
+      "description": "تلقَّ آخر العروض، الوصول المبكر، وفعاليات مختارة بعناية — مباشرةً إلى بريدك.",
+      "emailPlaceholder": "أدخل بريدك الإلكتروني",
+      "ctaButton": "أبقني على اطّلاع"
+    },
+    "price": {
+      "from": "ابتداءً من"
+    },
+    "getTickets": "احجز الآن!",
+    "error": {
+      "notFound": "الفعالية غير موجودة",
+      "goBack": "رجوع"
+    }
+  },
+
+  "ticketList": {
+    "goBack": "رجوع",
+    "orderSummary": {
+      "title": "ملخّص الطلب",
+      "serviceCharge": "رسوم الخدمة",
+      "total": "المجموع"
+    },
+    "badges": {
+      "soldOut": "نفدت التذاكر",
+      "onlyFewLeft": "آخر التذاكر",
+      "almostFull": "أوشكت على الامتلاء"
     },
     "error": {
-      "goBack": "Go Back"
+      "goBack": "رجوع"
     }
   },
 
   "purchaseConfirmation": {
-    "processing": "Processing your order...",
+    "processing": "جاري معالجة طلبك…",
     "error": {
-      "title": "Order Failed",
-      "goBack": "Go Back"
+      "title": "فشل الطلب",
+      "goBack": "رجوع"
     },
-    "title": "Thank You for Your Purchase!",
-    "ticketsConfirmed": "Your tickets are confirmed and sent to",
-    "orderId": "Your order ID",
-    "goToMyTickets": "Go to My Tickets",
-    "youAreGoingTo": "You are going to",
-    "yourTickets": "Your tickets",
-    "ticket_one": "Ticket",
-    "ticket_other": "Tickets",
-    "youMightEnjoy": "You might also enjoy",
-    "fromPrice": "from",
-    "loadMore": "Load More"
+    "title": "شكرًا على شرائك!",
+    "ticketsConfirmed": "تم تأكيد تذاكرك وأُرسلت إلى",
+    "orderId": "رقم طلبك",
+    "goToMyTickets": "إلى تذاكري",
+    "youAreGoingTo": "أنت ذاهب إلى",
+    "yourTickets": "تذاكرك",
+    "ticket_one": "تذكرة",
+    "ticket_other": "تذاكر",
+    "youMightEnjoy": "قد يعجبك أيضًا",
+    "fromPrice": "ابتداءً من",
+    "loadMore": "عرض المزيد"
   },
 
   "profile": {
-    "roleOrganizer": "Organizer",
-    "roleAttendee": "Attendee",
-    "editProfile": "Edit Profile",
-    "personalInfo": "Personal Information",
-    "fullName": "Full Name",
-    "emailAddress": "Email Address",
-    "phoneNumber": "Phone Number",
-    "phonePlaceholder": "Add your phone number",
-    "bio": "Bio",
-    "bioPlaceholder": "Tell us about yourself",
-    "saveChanges": "Save Changes",
-    "accountSettings": "Account Settings",
-    "changePassword": "Change Password",
-    "privacySettings": "Privacy Settings",
-    "notificationPreferences": "Notification Preferences",
-    "photoAlt": "Profile"
+    "roleOrganizer": "منظّم",
+    "roleAttendee": "مشارك",
+    "editProfile": "تعديل الملف الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "fullName": "الاسم الكامل",
+    "emailAddress": "البريد الإلكتروني",
+    "phoneNumber": "رقم الهاتف",
+    "phonePlaceholder": "أضف رقم هاتفك",
+    "bio": "نبذة",
+    "bioPlaceholder": "أخبرنا عن نفسك",
+    "saveChanges": "حفظ التعديلات",
+    "accountSettings": "إعدادات الحساب",
+    "changePassword": "تغيير كلمة المرور",
+    "privacySettings": "إعدادات الخصوصية",
+    "notificationPreferences": "تفضيلات الإشعارات",
+    "photoAlt": "صورة الملف الشخصي"
   },
 
   "support": {
-    "title": "Support Center",
-    "subtitle": "Need help? We're here for you!",
-    "contactUs": "Contact Us",
+    "title": "مركز المساعدة",
+    "subtitle": "تحتاج مساعدة؟ نحن هنا من أجلك!",
+    "contactUs": "تواصل معنا",
     "emailSupport": {
-      "label": "Email Support"
+      "label": "الدعم عبر البريد"
     },
     "liveChat": {
-      "label": "Live Chat",
-      "hours": "Available Mon-Fri, 9AM-5PM PST"
+      "label": "محادثة مباشرة",
+      "hours": "متوفّر من الإثنين إلى الجمعة، من 9 صباحًا إلى 5 مساءً"
     },
     "phoneSupport": {
-      "label": "Phone Support"
+      "label": "الدعم الهاتفي"
     },
     "faq": {
-      "title": "Frequently Asked Questions",
+      "title": "الأسئلة الشائعة",
       "cancelOrder": {
-        "question": "How do I cancel my order?",
-        "answer": "You can cancel your order from the My Tickets section in your dashboard. Click on the event and select \"Cancel Order\". Refunds are subject to the event's refund policy."
+        "question": "كيف ألغي طلبي؟",
+        "answer": "يمكنك إلغاء طلبك من قسم «تذاكري» في لوحة التحكم. اضغط على الفعالية واختر «إلغاء الطلب». الاسترداد يخضع لسياسة الاسترداد الخاصة بالفعالية."
       },
       "findTickets": {
-        "question": "Where can I find my tickets?",
-        "answer": "Your tickets are available in the Dashboard under \"My Tickets\". You'll also receive them via email after purchase."
+        "question": "أين أجد تذاكري؟",
+        "answer": "تذاكرك متاحة في لوحة التحكم، قسم «تذاكري». ستصلك أيضًا عبر البريد الإلكتروني بعد الشراء."
       },
       "contactOrganizer": {
-        "question": "How do I contact an event organizer?",
-        "answer": "On the event details page, scroll down to the \"Meet your organiser\" section where you'll find contact information."
+        "question": "كيف أتواصل مع منظّم الفعالية؟",
+        "answer": "في صفحة الفعالية، انزل إلى قسم «تعرّف على منظّمك» لتجد معلومات التواصل."
       }
     },
-    "goBack": "Go Back"
+    "goBack": "رجوع"
   },
 
   "unauthorized": {
-    "title": "Access Denied",
-    "description": "You don't have permission to access this page. Please contact an administrator if you believe this is an error.",
-    "goToDashboard": "Go to Dashboard"
+    "title": "الوصول مرفوض",
+    "description": "ليس لديك صلاحية الوصول إلى هذه الصفحة. تواصل مع المسؤول إذا كنت تعتقد أن هذا خطأ.",
+    "goToDashboard": "إلى لوحة التحكم"
   },
 
   "hostEvents": {
-    "title": "Host Your Events with",
+    "title": "نظّم فعالياتك مع",
     "titleBrand": "Ormeet",
-    "subtitle": "Create unforgettable experiences. Manage everything from ticket sales to attendee engagement in one powerful platform.",
+    "subtitle": "اصنع تجارب لا تُنسى. أدر بيع التذاكر والتفاعل مع المشاركين، كل ذلك من منصّة قوية واحدة.",
     "features": {
       "ticketManagement": {
-        "title": "Easy Ticket Management",
-        "description": "Create multiple ticket types, set pricing, and manage inventory with our intuitive ticketing system."
+        "title": "إدارة سهلة للتذاكر",
+        "description": "أنشئ أنواعًا متعدّدة من التذاكر، حدّد الأسعار، وأدر المخزون بأداة سهلة الاستخدام."
       },
       "analytics": {
-        "title": "Real-time Analytics",
-        "description": "Track ticket sales, revenue, and attendee engagement with comprehensive analytics and insights."
+        "title": "إحصائيات مباشرة",
+        "description": "تابع المبيعات، الإيرادات، وتفاعل المشاركين من خلال تحليلات شاملة."
       },
       "attendeeManagement": {
-        "title": "Attendee Management",
-        "description": "Check-in attendees with QR codes, send updates, and manage your guest list effortlessly."
+        "title": "إدارة المشاركين",
+        "description": "تحقّق من دخول المشاركين عبر رموز QR، أرسل تحديثات، وأدر قائمة الضيوف بسهولة."
       }
     },
-    "whyOrmeet": "Why Choose Ormeet?",
+    "whyOrmeet": "لماذا تختار Ormeet؟",
     "benefits": {
       "lowFees": {
-        "title": "Low Platform Fees",
-        "description": "Keep more of your revenue with our competitive pricing"
+        "title": "رسوم منخفضة",
+        "description": "احتفظ بأكبر حصة من إيراداتك بفضل أسعارنا التنافسية"
       },
       "securePayments": {
-        "title": "Secure Payments",
-        "description": "Fast, secure payment processing with multiple options"
+        "title": "مدفوعات آمنة",
+        "description": "معالجة مدفوعات سريعة وآمنة مع خيارات متعدّدة"
       },
       "marketingTools": {
-        "title": "Marketing Tools",
-        "description": "Promote your events with built-in marketing features"
+        "title": "أدوات تسويقية",
+        "description": "روّج لفعالياتك بميزات تسويق مدمجة"
       },
       "support": {
-        "title": "24/7 Support",
-        "description": "Get help whenever you need it from our dedicated team"
+        "title": "دعم على مدار الساعة",
+        "description": "احصل على المساعدة في أي وقت من فريقنا المتخصّص"
       }
     },
-    "getStarted": "Get Started as an Organizer",
-    "alreadyOrganizer": "Already an organizer?",
-    "signIn": "Sign In",
-    "alertMessage": "Failed to upgrade account. Please try again."
+    "getStarted": "كن منظّمًا",
+    "alreadyOrganizer": "أنت منظّم بالفعل؟",
+    "signIn": "تسجيل الدخول",
+    "alertMessage": "تعذّر ترقية الحساب. يُرجى المحاولة مجددًا."
   },
-
   "myTickets": {
-    "title": "My Tickets",
+    "title": "تذاكري",
     "tabs": {
-      "upcoming": "Upcoming",
-      "past": "Past",
-      "cancelled": "Cancelled"
+      "upcoming": "القادمة",
+      "past": "السابقة",
+      "cancelled": "الملغاة"
     },
-    "ticketCount_one": "{{count}} Ticket",
-    "ticketCount_other": "{{count}} Tickets",
-    "searchPlaceholder": "Search Tickets",
+    "ticketCount_one": "{{count}} تذكرة",
+    "ticketCount_other": "{{count}} تذاكر",
+    "searchPlaceholder": "ابحث في تذاكرك",
     "sort": {
-      "newestFirst": "Newest First",
-      "oldestFirst": "Oldest First",
-      "az": "A-Z"
+      "newestFirst": "الأحدث أوّلًا",
+      "oldestFirst": "الأقدم أوّلًا",
+      "az": "أ-ي"
     },
-    "ticketBadge_one": "{{count}} Ticket",
-    "ticketBadge_other": "{{count}} Tickets",
+    "ticketBadge_one": "{{count}} تذكرة",
+    "ticketBadge_other": "{{count}} تذاكر",
     "empty": {
-      "title": "No tickets found",
-      "upcoming": "You don't have any upcoming events.",
-      "past": "You don't have any past events.",
-      "cancelled": "You don't have any cancelled events."
+      "title": "لا توجد تذاكر",
+      "upcoming": "لا توجد لديك فعاليات قادمة.",
+      "past": "لا توجد لديك فعاليات سابقة.",
+      "cancelled": "لا توجد لديك فعاليات ملغاة."
     }
   },
 
   "favoriteEvents": {
-    "title": "Favourite Events",
-    "removeFromFavorites": "Remove from favorites",
-    "viewDetails": "View Details",
-    "browseEvents": "Browse Events",
+    "title": "الفعاليات المفضّلة",
+    "removeFromFavorites": "إزالة من المفضّلة",
+    "viewDetails": "عرض التفاصيل",
+    "browseEvents": "تصفّح الفعاليات",
     "empty": {
-      "title": "No Favorite Events Yet",
-      "description": "Start adding events to your favorites to see them here!"
+      "title": "لا توجد مفضّلات بعد",
+      "description": "أضف فعاليات إلى مفضّلتك لتجدها هنا!"
     }
   },
 
   "following": {
-    "title": "Organisers you follow",
-    "visitWebsite": "Visit Website →",
-    "unfollow": "Unfollow",
-    "browseEvents": "Browse Events",
+    "title": "المنظّمون الذين تتابعهم",
+    "visitWebsite": "زيارة الموقع ←",
+    "unfollow": "إلغاء المتابعة",
+    "browseEvents": "تصفّح الفعاليات",
     "empty": {
-      "title": "Not Following Anyone Yet",
-      "description": "Start following organizers to stay updated with their latest events!"
+      "title": "أنت لا تتابع أحدًا بعد",
+      "description": "تابع المنظّمين لتبقى على اطّلاع بآخر فعالياتهم!"
     }
   },
 
   "eventCard": {
-    "fromPrice": "from"
+    "fromPrice": "ابتداءً من"
   },
 
   "eventListCard": {
-    "fromPrice": "from"
+    "fromPrice": "ابتداءً من"
   },
 
   "eventMapCard": {
-    "fromPrice": "from",
-    "closeAria": "Close"
+    "fromPrice": "ابتداءً من",
+    "closeAria": "إغلاق"
   },
 
   "locationMapModal": {
-    "title": "Location",
-    "closeMap": "Close map",
-    "mapTitle": "Event location map"
+    "title": "المكان",
+    "closeMap": "إغلاق الخريطة",
+    "mapTitle": "خريطة موقع الفعالية"
   },
 
   "reviewsModal": {
-    "title": "All Reviews",
-    "reviewCount": "({{count}} reviews)"
-  },
-
-  "notificationBell": {
-    "ariaLabel": "Notifications",
-    "panelTitle": "Notifications",
-    "empty": "No notifications yet",
-    "typeLabels": {
-      "EVENT_CANCELLED": "Cancelled",
-      "EVENT_UPDATED": "Updated",
-      "EVENT_REMINDER": "Reminder",
-      "TICKET_PURCHASED": "Purchase",
-      "ORDER_CONFIRMED": "Confirmed",
-      "REFUND_PROCESSED": "Refund"
-    },
-    "timeAgo": {
-      "justNow": "Just now",
-      "minutesAgo": "{{count}}m ago",
-      "hoursAgo": "{{count}}h ago",
-      "daysAgo": "{{count}}d ago"
-    }
+    "title": "كل التقييمات",
+    "reviewCount": "({{count}} تقييم)"
   },
 
   "onboardingInterests": {
-    "logoAlt": "Ormeet Logo",
-    "welcomeTitle": "Welcome to Ormeet!",
-    "subtitle": "Let's get to know you!",
-    "question": "What kind of events excite you?",
-    "saving": "Saving...",
-    "finishLogin": "Finish & Login",
-    "errorFallback": "Failed to save interests. Please try again.",
+    "logoAlt": "شعار Ormeet",
+    "welcomeTitle": "أهلًا بك في Ormeet!",
+    "subtitle": "لنتعرّف عليك!",
+    "question": "ما نوع الفعاليات التي تشدّك؟",
+    "saving": "جاري الحفظ…",
+    "finishLogin": "إنهاء وتسجيل الدخول",
+    "errorFallback": "تعذّر حفظ اهتماماتك. يُرجى المحاولة مجددًا.",
     "error": {
-      "selectCategory": "Please select at least one category"
+      "selectCategory": "اختر فئة واحدة على الأقل"
     },
     "categories": {
-      "music": "Music",
-      "fitness": "Fitness",
-      "sports": "Sports",
-      "tech": "Tech",
-      "nightlife": "Nightlife",
-      "dating": "Dating",
-      "holiday": "Holiday"
+      "music": "موسيقى",
+      "fitness": "لياقة بدنية",
+      "sports": "رياضة",
+      "tech": "تكنولوجيا",
+      "nightlife": "حياة ليلية",
+      "dating": "مواعدة",
+      "holiday": "عطل"
     }
   },
 
   "accountSettings": {
-    "pageTitle": "Personal Info",
-    "pageSubtitle": "Verify your personal info to enhance your experience.",
+    "pageTitle": "المعلومات الشخصية",
+    "pageSubtitle": "أكّد معلوماتك الشخصية لتحسين تجربتك.",
     "menu": {
-      "personalInfo": "Personal Info",
-      "paymentMethods": "Payment Methods",
-      "emailPreferences": "Email preferences",
-      "loginSecurity": "Login & security"
+      "personalInfo": "المعلومات الشخصية",
+      "paymentMethods": "وسائل الدفع",
+      "emailPreferences": "تفضيلات البريد",
+      "loginSecurity": "تسجيل الدخول والأمان"
     },
     "personalInfo": {
-      "profile": "Profile",
-      "email": "Email",
-      "phone": "Phone",
-      "location": "Location",
-      "edit": "Edit",
-      "verified": "Verified",
-      "verifyPhone": "Verify your phone",
+      "profile": "الملف الشخصي",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "location": "الموقع",
+      "edit": "تعديل",
+      "verified": "موثَّق",
+      "verifyPhone": "وثّق رقم هاتفك",
       "modals": {
-        "editProfile": "Edit Profile",
-        "editEmail": "Edit Email",
-        "editPhone": "Edit Phone",
-        "editLocation": "Edit Location",
-        "fullName": "Full Name",
-        "fullNamePlaceholder": "Enter your full name",
-        "profilePhotoAlt": "Profile",
-        "profilePhoto": "Profile Photo",
-        "uploadHint": "Choose file or Drop here",
-        "uploadFormats": "PNG or JPG (max 5MB)",
-        "currentEmail": "Current Email",
-        "newEmail": "New Email",
-        "newEmailPlaceholder": "Enter new email",
-        "currentPhone": "Current Phone",
-        "newPhone": "New Phone Number",
-        "newPhonePlaceholder": "Enter new phone number",
-        "country": "Country",
-        "countryPlaceholder": "Enter country",
-        "city": "City",
-        "cityPlaceholder": "Enter city",
-        "address": "Address",
-        "addressPlaceholder": "Enter address (optional)",
-        "password": "Password",
-        "passwordPlaceholder": "Enter your password",
-        "saveChanges": "Save changes",
-        "cancel": "Cancel",
-        "success": "Changes saved successfully"
+        "editProfile": "تعديل الملف الشخصي",
+        "editEmail": "تعديل البريد الإلكتروني",
+        "editPhone": "تعديل رقم الهاتف",
+        "editLocation": "تعديل الموقع",
+        "fullName": "الاسم الكامل",
+        "fullNamePlaceholder": "أدخل اسمك الكامل",
+        "profilePhotoAlt": "صورة الملف الشخصي",
+        "profilePhoto": "صورة الملف الشخصي",
+        "uploadHint": "اختر ملفًا أو أسقطه هنا",
+        "uploadFormats": "PNG أو JPG (5 ميغابايت كحدّ أقصى)",
+        "currentEmail": "البريد الحالي",
+        "newEmail": "البريد الجديد",
+        "newEmailPlaceholder": "أدخل البريد الجديد",
+        "currentPhone": "الهاتف الحالي",
+        "newPhone": "رقم الهاتف الجديد",
+        "newPhonePlaceholder": "أدخل رقم الهاتف الجديد",
+        "country": "البلد",
+        "countryPlaceholder": "أدخل بلدك",
+        "city": "المدينة",
+        "cityPlaceholder": "أدخل مدينتك",
+        "address": "العنوان",
+        "addressPlaceholder": "أدخل عنوانك (اختياري)",
+        "password": "كلمة المرور",
+        "passwordPlaceholder": "أدخل كلمة المرور",
+        "saveChanges": "حفظ التعديلات",
+        "cancel": "إلغاء",
+        "success": "تم حفظ التعديلات بنجاح"
       },
       "validation": {
-        "fullNameRequired": "Full name is required",
-        "newEmailRequired": "New email is required",
-        "passwordRequired": "Password is required",
-        "invalidEmail": "Please enter a valid email address",
-        "newPhoneRequired": "New phone number is required",
-        "countryRequired": "Country is required",
-        "cityRequired": "City is required"
+        "fullNameRequired": "الاسم الكامل مطلوب",
+        "newEmailRequired": "البريد الجديد مطلوب",
+        "passwordRequired": "كلمة المرور مطلوبة",
+        "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+        "newPhoneRequired": "رقم الهاتف الجديد مطلوب",
+        "countryRequired": "البلد مطلوب",
+        "cityRequired": "المدينة مطلوبة"
       }
     },
     "paymentMethods": {
       "empty": {
-        "title": "Add your preferred payment method",
-        "description": "Securely save a payment method to make ticket purchases quick and easy. You can update it anytime.",
-        "addButton": "Add Payment Method"
+        "title": "أضف وسيلة الدفع المفضّلة لديك",
+        "description": "احفظ وسيلة دفع بشكل آمن لتسهيل شراء التذاكر. يمكنك تعديلها متى شئت.",
+        "addButton": "إضافة وسيلة دفع"
       },
-      "savedCards": "Saved Cards",
-      "addMore": "Add more",
-      "addPaymentTitle": "Add Payment method",
-      "addPaymentSubtitle": "Add your card to enjoy smooth and hassle-free booking.",
-      "cardNumber": "Card Number",
+      "savedCards": "البطاقات المحفوظة",
+      "addMore": "إضافة",
+      "addPaymentTitle": "إضافة وسيلة دفع",
+      "addPaymentSubtitle": "أضف بطاقتك للاستمتاع بتجربة حجز سلسة وسريعة.",
+      "cardNumber": "رقم البطاقة",
       "cardNumberPlaceholder": "0000    0000    0000    0000",
-      "expireMonth": "Expire Month",
-      "expireYear": "Expire Year",
+      "expireMonth": "شهر الانتهاء",
+      "expireYear": "سنة الانتهاء",
       "cvv": "CVV",
-      "cvvPlaceholder": "Enter CVV",
-      "saveCard": "Save Card",
-      "goBackAlt": "Go Back"
+      "cvvPlaceholder": "أدخل CVV",
+      "saveCard": "حفظ البطاقة",
+      "goBackAlt": "رجوع"
     },
     "emailPreferences": {
-      "title": "Email preferences",
-      "subtitle": "Choose the emails you want to receive—stay informed, not overwhelmed.",
+      "title": "تفضيلات البريد",
+      "subtitle": "اختر الرسائل التي ترغب في تلقّيها — ابقَ على اطّلاع دون أن تثقل عليك.",
       "options": {
         "ticketConfirmations": {
-          "title": "Ticket Confirmations",
-          "description": "Get a confirmation email after purchasing tickets."
+          "title": "تأكيدات التذاكر",
+          "description": "تلقَّ بريد تأكيد بعد كل عملية شراء."
         },
         "eventReminders": {
-          "title": "Event Reminders",
-          "description": "Receive reminders before your event starts."
+          "title": "تذكيرات بالفعاليات",
+          "description": "تلقَّ تذكيرات قبل بداية فعالياتك."
         },
         "eventUpdates": {
-          "title": "Event Updates & Cancellations",
-          "description": "Be notified if any changes are made to your registered events."
+          "title": "التحديثات والإلغاءات",
+          "description": "اعرف بأي تغييرات تطرأ على فعالياتك المسجّلة."
         },
         "newEvents": {
-          "title": "New Events in My Area",
-          "description": "Get emails about trending or upcoming events near you."
+          "title": "فعاليات جديدة قريبة منك",
+          "description": "تلقَّ رسائل عن الفعاليات الرائجة أو القادمة في منطقتك."
         },
         "specialOffers": {
-          "title": "Special Offers & Discounts",
-          "description": "Receive exclusive ticket offers, early bird pricing, and promotions."
+          "title": "عروض وتخفيضات حصرية",
+          "description": "استفد من عروض حصرية، أسعار الحجز المبكر، والترقيات."
         },
         "newsletters": {
-          "title": "Newsletters & Platform Updates",
-          "description": "Stay in the loop with Ormeet tips, stories, and announcements."
+          "title": "النشرات والتحديثات",
+          "description": "ابقَ على اطّلاع بأخبار Ormeet، نصائحها، وإعلاناتها."
         },
         "surveys": {
-          "title": "Surveys & Feedback Requests",
-          "description": "Help us improve by sharing your experience after events."
+          "title": "استبيانات وآراء",
+          "description": "ساعدنا على التحسّن من خلال مشاركة تجربتك بعد الفعاليات."
         }
       }
     },
     "loginSecurity": {
-      "title": "Login & security",
-      "subtitle": "Set a unique password to protect your account",
-      "password": "Password",
-      "changePassword": "Change Password",
+      "title": "تسجيل الدخول والأمان",
+      "subtitle": "اختر كلمة مرور قوية لحماية حسابك",
+      "password": "كلمة المرور",
+      "changePassword": "تغيير كلمة المرور",
       "twoFactor": {
-        "title": "Two-factor authentication",
-        "description": "Two-factor authentication adds extra security by requiring a second step to verify your identity during login."
+        "title": "المصادقة الثنائية",
+        "description": "تضيف المصادقة الثنائية طبقة أمان إضافية بطلب خطوة ثانية للتحقّق من هويتك عند تسجيل الدخول."
       },
       "modals": {
         "changePassword": {
-          "title": "Change Password",
-          "currentPassword": "Current Password",
-          "currentPasswordPlaceholder": "Enter current password",
-          "newPassword": "New Password",
-          "newPasswordPlaceholder": "Enter new password",
-          "confirmPassword": "Confirm New Password",
-          "confirmPasswordPlaceholder": "Confirm new password",
-          "saveChanges": "Save changes",
-          "cancel": "Cancel",
-          "success": "Changes saved successfully",
+          "title": "تغيير كلمة المرور",
+          "currentPassword": "كلمة المرور الحالية",
+          "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+          "newPassword": "كلمة المرور الجديدة",
+          "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+          "confirmPassword": "تأكيد كلمة المرور",
+          "confirmPasswordPlaceholder": "أكّد كلمة المرور الجديدة",
+          "saveChanges": "حفظ التعديلات",
+          "cancel": "إلغاء",
+          "success": "تم حفظ التعديلات بنجاح",
           "validation": {
-            "currentRequired": "Current password is required",
-            "newRequired": "New password is required",
-            "minLength": "Password must be at least 8 characters",
-            "match": "Passwords do not match"
+            "currentRequired": "كلمة المرور الحالية مطلوبة",
+            "newRequired": "كلمة المرور الجديدة مطلوبة",
+            "minLength": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل",
+            "match": "كلمتا المرور غير متطابقتين"
           }
         }
       }
@@ -564,33 +600,53 @@
   },
 
   "eventDetailsComponent": {
-    "goBack": "Go Back",
-    "dateTime": "Date & Time",
-    "venue": "Venue",
-    "allTickets": "All Tickets",
-    "ticketType": "Ticket Type",
-    "status": "Status",
-    "attendeeName": "Attendee Name",
-    "ticketNumber": "Ticket Number",
-    "ticketId": "Ticket ID",
-    "showDetails": "Show Details",
-    "showLess": "Show Less",
-    "qrInfo": "Use the QR code below to check in at the event",
-    "downloadTicket": "Download Ticket",
-    "cancelOrder": "Cancel Order",
-    "cancelling": "Cancelling...",
-    "refundPolicy": "Refund Policy",
-    "refundDays": "{{days}} days before event",
-    "eventOrganizer": "Event Organizer",
-    "contactOrganizer": "Contact Organizer",
-    "more": "More",
-    "orderId": "Order ID #{{id}}",
-    "purchasedOn": "Purchased on {{date}}",
+    "goBack": "رجوع",
+    "dateTime": "التاريخ والوقت",
+    "venue": "المكان",
+    "allTickets": "كل التذاكر",
+    "ticketType": "نوع التذكرة",
+    "status": "الحالة",
+    "attendeeName": "اسم المشارك",
+    "ticketNumber": "رقم التذكرة",
+    "ticketId": "معرّف التذكرة",
+    "showDetails": "عرض التفاصيل",
+    "showLess": "إخفاء",
+    "qrInfo": "استخدم رمز QR أدناه للدخول إلى الفعالية",
+    "downloadTicket": "تحميل التذكرة",
+    "cancelOrder": "إلغاء الطلب",
+    "cancelling": "جاري الإلغاء…",
+    "refundPolicy": "سياسة الاسترداد",
+    "refundDays": "{{days}} أيام قبل الفعالية",
+    "eventOrganizer": "منظّم الفعالية",
+    "contactOrganizer": "تواصل مع المنظّم",
+    "more": "المزيد",
+    "orderId": "طلب رقم {{id}}",
+    "purchasedOn": "تاريخ الشراء {{date}}",
     "cancelDialog": {
-      "title": "Cancel Order",
-      "message": "Are you sure you want to cancel this order? This action cannot be undone.",
-      "confirm": "Yes, Cancel Order",
-      "cancel": "Keep Order"
+      "title": "إلغاء الطلب",
+      "message": "هل أنت متأكّد من إلغاء هذا الطلب؟ لا يمكن التراجع عن هذا الإجراء.",
+      "confirm": "نعم، ألغِ الطلب",
+      "cancel": "الاحتفاظ بالطلب"
+    }
+  },
+
+  "notificationBell": {
+    "ariaLabel": "الإشعارات",
+    "panelTitle": "الإشعارات",
+    "empty": "لا توجد إشعارات بعد",
+    "typeLabels": {
+      "EVENT_CANCELLED": "ملغاة",
+      "EVENT_UPDATED": "محدَّثة",
+      "EVENT_REMINDER": "تذكير",
+      "TICKET_PURCHASED": "شراء",
+      "ORDER_CONFIRMED": "مؤكَّد",
+      "REFUND_PROCESSED": "استرداد"
+    },
+    "timeAgo": {
+      "justNow": "الآن",
+      "minutesAgo": "قبل {{count}} د",
+      "hoursAgo": "قبل {{count}} س",
+      "daysAgo": "قبل {{count}} ي"
     }
   }
 }

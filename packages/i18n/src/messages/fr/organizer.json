@@ -84,8 +84,13 @@
       "priceRequired": "Le prix est requis",
       "imageSizeError": "Chaque image ne doit pas dépasser 10 Mo",
       "imageFormatError": "Seules les images PNG et JPG sont acceptées",
-      "faqQuestionRequired": "Question is required",
-      "faqAnswerRequired": "Answer is required"
+      "faqQuestionRequired": "La question est requise",
+      "faqAnswerRequired": "La réponse est requise"
+    },
+    "publicationSection": "Publication et visibilité",
+    "faq": {
+      "questionPlaceholder": "Saisissez votre question",
+      "answerPlaceholder": "Saisissez votre réponse"
     },
     "actions": {
       "saveDraft": "Enregistrer le brouillon",
@@ -225,6 +230,12 @@
       "ticketsSold": "Billets vendus",
       "capacity": "{{percentage}} % de la capacité",
       "faq": "FAQ",
+      "date": "Date",
+      "time": "Heure",
+      "locationLabel": "Lieu",
+      "onlineLink": "Lien en ligne",
+      "quantity": "Quantité",
+      "of": "sur",
       "actions": {
         "delete": "Supprimer",
         "edit": "Modifier l'événement",
@@ -557,7 +568,16 @@
           "emailRequired": "L'adresse e-mail est requise",
           "invalidEmail": "Veuillez saisir une adresse e-mail valide",
           "roleRequired": "Veuillez attribuer un rôle"
-        }
+        },
+        "viewDetails": "Voir les détails",
+        "inviteSent": "Invitation envoyée",
+        "memberDetails": "Détails du membre",
+        "lastActive": "Dernière activité",
+        "ticketResentSuccess": "Billet renvoyé avec succès",
+        "ticketResentError": "Échec de l'envoi du billet. Veuillez réessayer.",
+        "roleChangeError": "Échec du changement de rôle. Veuillez réessayer.",
+        "rolePlaceholder": "Nom du rôle",
+        "addressPlaceholder": "Adresse (facultatif)"
       },
       "roles": {
         "searchPlaceholder": "Rechercher un rôle",

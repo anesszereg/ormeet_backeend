@@ -439,7 +439,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     }
 
     return (
-      <div className="absolute start-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50" style={{ width: '320px' }}>
+      <div className="absolute start-0 top-full mt-2 bg-white rounded-xl shadow-lg border border-light-gray p-4 z-50 w-full max-w-[320px]">
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-3">
           <button
@@ -1094,7 +1094,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               </div>
 
             {/* Time Row */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="relative" ref={startTimeRef}>
                 <label className="block text-sm font-medium text-black mb-2">
                   {t('createEvent.form.startTime')} <span className="text-[#FF3425]">*</span>
@@ -1184,7 +1184,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
               {/* Country and State Row (conditional) */}
               {(formData.eventType === 'in-person' || formData.eventType === 'hybrid') && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-black mb-2">
                       {t('createEvent.form.country')} <span className="text-[#FF3425]">*</span>
@@ -1370,7 +1370,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           <button
                             type="button"
                             onClick={() => moveImage(index, index - 1)}
-                            className="p-2 bg-white rounded-lg hover:bg-secondary-light transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-white rounded-lg hover:bg-secondary-light transition-colors"
                             title="Move left"
                           >
                             <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1383,7 +1383,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         <button
                           type="button"
                           onClick={() => removeImage(image.id)}
-                          className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                           title="Delete image"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1396,7 +1396,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           <button
                             type="button"
                             onClick={() => moveImage(index, index + 1)}
-                            className="p-2 bg-white rounded-lg hover:bg-secondary-light transition-colors"
+                            className="w-10 h-10 flex items-center justify-center bg-white rounded-lg hover:bg-secondary-light transition-colors"
                             title="Move right"
                           >
                             <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1422,7 +1422,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         <div className="bg-white border border-light-gray rounded-xl p-5">
           <h2 className="text-lg font-semibold text-black mb-4">{t('createEvent.steps.tickets')}</h2>
           
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[400px] overflow-y-auto pe-1">
             {formData.tickets.map((ticket, index) => (
               <div key={ticket.id} className="border border-light-gray rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -1489,7 +1489,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 </div>
 
                 {/* Line 2: Price Type, Quantity, and Price */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {/* Price Type Select */}
                   <div className="relative">
                     <label className="block text-sm font-medium text-black mb-2">
@@ -1725,7 +1725,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           }));
                         }
                       }}
-                      placeholder="Enter your question"
+                      placeholder={t('createEvent.faq.questionPlaceholder')}
                       className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
                         faqErrors[faq.id]?.question ? 'border-[#FF3425]' : 'border-light-gray'
                       }`}
@@ -1756,7 +1756,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           }));
                         }
                       }}
-                      placeholder="Enter your answer"
+                      placeholder={t('createEvent.faq.answerPlaceholder')}
                       rows={3}
                       className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all resize-none ${
                         faqErrors[faq.id]?.answer ? 'border-[#FF3425]' : 'border-light-gray'
@@ -1798,7 +1798,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
         {/* 6. Publication & Visibility */}
         <div className="bg-white border border-light-gray rounded-xl p-5">
-          <h2 className="text-lg font-semibold text-black mb-4">Publication & Visibility</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">{t('createEvent.publicationSection')}</h2>
           
           <div className="max-w-md">
             <label className="block text-sm font-medium text-black mb-2">
@@ -1880,13 +1880,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-between gap-4 pt-4">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <button
               type="button"
               onClick={() => setIsPreviewModalOpen(true)}
               disabled={isSubmitting}
-              className="flex items-center gap-2 ps-5 pe-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 ps-5 pe-5 py-2 border border-gray text-gray rounded-full text-sm font-medium hover:bg-secondary-light hover:border-black hover:text-black transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
                 <path d="M10 3.33301C5.83333 3.33301 2.27499 5.73301 0.833328 9.16634C2.27499 12.5997 5.83333 14.9997 10 14.9997C14.1667 14.9997 17.725 12.5997 19.1667 9.16634C17.725 5.73301 14.1667 3.33301 10 3.33301Z" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1899,7 +1899,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 type="button"
                 onClick={handleSaveDraft}
                 disabled={isSubmitting}
-                className="ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto ps-5 pe-5 py-2 border border-primary text-primary rounded-full text-sm font-medium hover:bg-primary-light transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? t('createEvent.actions.saving') : t('createEvent.actions.saveDraft')}
               </button>
@@ -1909,7 +1909,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             type="button"
             onClick={mode === 'edit' ? onSaveChanges : handlePublish}
             disabled={isSubmitting}
-            className="ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}
           >
             {isSubmitting ? t('createEvent.actions.publishing') : (mode === 'edit' ? t('createEvent.actions.saveChanges') : t('createEvent.actions.publish'))}

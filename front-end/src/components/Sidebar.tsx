@@ -12,9 +12,10 @@ interface SidebarProps {
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
   onCollapseChange?: (collapsed: boolean) => void;
+  onMobileClose?: () => void;
 }
 
-const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: SidebarProps) => {
+const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange, onMobileClose }: SidebarProps) => {
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -53,15 +54,15 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
           {/* Button: circular with hover effect */}
           <button
             onClick={handleToggleCollapse}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#EEEEEE] transition-all cursor-pointer"
+            className="shrink-0 w-8 h-8 hidden lg:flex items-center justify-center rounded-full hover:bg-[#EEEEEE] transition-all cursor-pointer"
             aria-label={isCollapsed ? t('sidebar.expandAria') : t('sidebar.collapseAria')}
           >
             {isCollapsed ? (
               // Circle arrow pointing right (expand)
-              <BsFillArrowRightCircleFill size={24} />
+              <BsFillArrowRightCircleFill size={24} className="rtl:scale-x-[-1]" />
             ) : (
               // Circle arrow pointing left (collapse)
-              <BsFillArrowLeftCircleFill size={24} />
+              <BsFillArrowLeftCircleFill size={24} className="rtl:scale-x-[-1]" />
             )}
           </button>
         </div>
@@ -104,7 +105,7 @@ const Sidebar = ({ activeTab = 'my-tickets', onTabChange, onCollapseChange }: Si
               {/* Menu item button: full width, padding for comfortable click area */}
               {/* Height: 44px, rounded corners for modern look */}
               <button
-                onClick={() => onTabChange?.(item.id)}
+                onClick={() => { onTabChange?.(item.id); onMobileClose?.(); }}
                 className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-3 py-2.5 rounded-lg transition-all relative cursor-pointer ${activeTab === item.id
                     ? 'bg-[#FAFAFA] text-black'
                     : 'text-[#434343] hover:bg-white/50 hover:text-[#FF4000]'

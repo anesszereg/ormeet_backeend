@@ -1,550 +1,439 @@
 {
-  "bankAccount": {
-    "sectionTitle": "Bank Account",
-    "sectionSubtitle": "Manage the bank account that will receive event payouts",
-    "empty": {
-      "title": "No bank account added",
-      "description": "You must add a bank account to receive payouts from your events.",
-      "addButton": "Add bank account",
-      "adminOnly": "Only admin can add bank account"
-    },
-    "card": {
-      "accountHolderName": "Account Holder Name",
-      "bankName": "Bank Name",
-      "country": "Country",
-      "iban": "IBAN",
-      "statusVerified": "Verified",
-      "statusPending": "Pending verification",
-      "deleteButton": "Delete",
-      "deleteTitle": "Delete bank account",
-      "editButton": "Edit bank account"
-    },
-    "modal": {
-      "titleAdd": "Add Bank Account",
-      "titleEdit": "Edit Bank Account",
-      "fields": {
-        "accountHolderName": "Account Holder Name",
-        "accountHolderNamePlaceholder": "Enter account holder name",
-        "bankName": "Bank Name",
-        "bankNamePlaceholder": "Enter bank name",
-        "country": "Country",
-        "countryPlaceholder": "Enter country",
-        "iban": "IBAN",
-        "ibanPlaceholder": "Enter IBAN (e.g., GB29NWBK60161331926819)",
-        "swiftBic": "SWIFT / BIC",
-        "swiftBicPlaceholder": "Enter SWIFT/BIC code (e.g., NWBKGB2L)"
-      },
-      "validation": {
-        "accountHolderRequired": "Account holder name is required",
-        "bankNameRequired": "Bank name is required",
-        "countryRequired": "Country is required",
-        "ibanRequired": "IBAN is required",
-        "swiftRequired": "SWIFT/BIC is required",
-        "ibanInvalid": "Invalid IBAN format",
-        "swiftInvalid": "Invalid SWIFT/BIC code"
-      },
-      "saveChanges": "Save changes",
-      "success": "Bank account saved successfully",
-      "error": "Action failed. Please try again"
-    },
-    "deleteModal": {
-      "title": "Confirm deletion",
-      "description": "Are you sure you want to delete this bank account?",
-      "confirm": "Confirm",
-      "success": "Bank account deleted successfully"
-    }
-  },
-
-  "export": {
-    "title": "Export data",
-    "description": "Select the event you want to export data for.",
-    "selectEventLabel": "Select Event",
-    "allEvents": "All events",
-    "confirm": "Confirm"
-  },
-
-  "addAttendee": {
-    "title": "Add Attendee",
-    "description": "Fill in the details to add a new attendee to an event.",
-    "fields": {
-      "firstName": "First Name",
-      "firstNamePlaceholder": "Enter first name",
-      "lastName": "Last Name",
-      "lastNamePlaceholder": "Enter last name",
-      "email": "Email",
-      "emailPlaceholder": "Enter email address",
-      "event": "Event",
-      "ticketType": "Ticket Type"
-    },
-    "validation": {
-      "emailInvalid": "Please enter a valid email address"
-    },
-    "confirm": "Confirm",
-    "success": "Attendee added successfully"
-  },
-
-  "eventPreview": {
-    "modalTitle": "Event Preview",
-    "modalSubtitle": "This is how your event will appear to attendees",
-    "closeAria": "Close preview",
-    "prevImageAria": "Previous image",
-    "nextImageAria": "Next image",
-    "goToImageAria": "Go to image {{number}}",
-    "addToFavoritesAria": "Add to favorites",
-    "shareEventAria": "Share event",
-    "ratingNew": "New",
-    "noReviews": "No reviews yet",
-    "untitledEvent": "Untitled Event",
-    "noDescription": "No description provided",
-    "dateTime": "Date & Time",
-    "dateNotSet": "Date not set",
-    "location": "Location",
-    "locationNotSet": "Location not set",
-    "seeOnMap": "See on map",
-    "closeMap": "Close map",
-    "mapTitle": "Event location map",
-    "onlineAccess": "Online Access",
-    "category": "Category",
-    "availableTickets": "Available Tickets",
-    "ticketQuantityAvailable": "{{quantity}} available",
-    "ticketQuantityNotSet": "Quantity not set",
-    "ticketFree": "Free",
-    "faqTitle": "Got Questions? We've Got Answers",
-    "fromPrice": "From",
-    "getTickets": "Get Tickets Now!",
-    "visibilityPublic": "Public Event",
-    "visibilityPrivate": "Private Event"
-  },
-
-  "timePicker": {
-    "selectTimeLabel": "SELECT TIME"
-  },
-
   "createEvent": {
-    "pageTitle": "{{mode}} Event",
-    "pageSubtitle": "Fill in the essential information to {{mode}} your event quickly",
-    "backToDashboard": "Back to Dashboard",
-    "backToEvents": "Back to Events",
+    "pageTitle": "{{mode}} فعالية",
+    "pageSubtitle": "أدخل المعلومات الأساسية {{mode}} فعاليتك بسرعة",
+    "backToDashboard": "العودة إلى لوحة التحكم",
+    "backToEvents": "العودة إلى الفعاليات",
     "steps": {
-      "essentialInfo": "Essential Information",
-      "dateLocation": "Date & Location",
-      "images": "Event Images",
-      "tickets": "Tickets & Pricing"
+      "essentialInfo": "المعلومات الأساسية",
+      "dateLocation": "التاريخ والمكان",
+      "images": "صور الفعالية",
+      "tickets": "التذاكر والأسعار"
     },
     "form": {
-      "eventTitle": "Event Title",
-      "eventTitlePlaceholder": "Enter your event title",
-      "eventCategory": "Event Category",
-      "eventCategoryPlaceholder": "Select a category",
-      "eventType": "Event Type",
-      "eventTypePlaceholder": "Select event type",
-      "eventTypeInPerson": "In-person",
-      "eventTypeHybrid": "Hybrid",
-      "eventTypeRemote": "Remote",
-      "description": "Description",
-      "descriptionPlaceholder": "Tell attendees what your event is about...",
-      "eventDate": "Event Date",
-      "eventDatePlaceholder": "MM/DD/YYYY",
-      "startTime": "Start Time",
-      "startTimePlaceholder": "Select time",
-      "endTime": "End Time",
-      "endTimePlaceholder": "Select time",
-      "country": "Country",
-      "countryPlaceholder": "Select country",
-      "state": "State",
-      "statePlaceholder": "Select state",
-      "mapAddress": "Map Address",
-      "mapAddressPlaceholder": "Enter the complete venue address",
-      "onlineLink": "Online Link",
-      "onlineLinkPlaceholder": "https://zoom.us/j/...",
-      "onlineLinkOptional": "(Optional)",
-      "mapPreview": "Map Preview",
-      "imagesInfo": "The first image will be used as the event cover on Ormeet",
+      "eventTitle": "عنوان الفعالية",
+      "eventTitlePlaceholder": "أدخل عنوان فعاليتك",
+      "eventCategory": "الفئة",
+      "eventCategoryPlaceholder": "اختر فئة",
+      "eventType": "نوع الفعالية",
+      "eventTypePlaceholder": "اختر نوع الفعالية",
+      "eventTypeInPerson": "حضوري",
+      "eventTypeHybrid": "هجين",
+      "eventTypeRemote": "عن بُعد",
+      "description": "الوصف",
+      "descriptionPlaceholder": "أخبر المشاركين عن فعاليتك…",
+      "eventDate": "تاريخ الفعالية",
+      "eventDatePlaceholder": "يوم/شهر/سنة",
+      "startTime": "وقت البداية",
+      "startTimePlaceholder": "اختر الوقت",
+      "endTime": "وقت النهاية",
+      "endTimePlaceholder": "اختر الوقت",
+      "country": "البلد",
+      "countryPlaceholder": "اختر البلد",
+      "state": "الولاية",
+      "statePlaceholder": "اختر الولاية",
+      "mapAddress": "العنوان",
+      "mapAddressPlaceholder": "أدخل العنوان الكامل للمكان",
+      "onlineLink": "رابط البث",
+      "onlineLinkPlaceholder": "https://zoom.us/j/…",
+      "onlineLinkOptional": "(اختياري)",
+      "mapPreview": "معاينة الخريطة",
+      "imagesInfo": "ستُستخدم الصورة الأولى كغلاف للفعالية على Ormeet",
       "uploadZone": {
-        "click": "Click to upload",
-        "dragDrop": " or drag and drop",
-        "formats": "PNG or JPG (max 10MB per image)"
+        "click": "اضغط للرفع",
+        "dragDrop": " أو اسحب وأفلت",
+        "formats": "PNG أو JPG (10 ميغابايت كحدّ أقصى لكل صورة)"
       },
-      "coverBadge": "Cover",
-      "moveLeft": "Move left",
-      "moveRight": "Move right",
-      "deleteImage": "Delete image",
-      "ticketLabel": "Ticket {{number}}",
-      "ticketType": "Ticket Type",
-      "ticketTypePlaceholder": "e.g., VIP, General Admission, Early Bird",
-      "ticketTypeHint": "Enter a custom ticket type name",
-      "priceType": "Price Type",
-      "priceTypePlaceholder": "Select price type",
-      "priceTypeFree": "Free",
-      "priceTypePaid": "Paid",
-      "quantity": "Quantity",
+      "coverBadge": "الغلاف",
+      "moveLeft": "تحريك لليسار",
+      "moveRight": "تحريك لليمين",
+      "deleteImage": "حذف الصورة",
+      "ticketLabel": "تذكرة {{number}}",
+      "ticketType": "نوع التذكرة",
+      "ticketTypePlaceholder": "مثل: VIP، عادية، Early Bird",
+      "ticketTypeHint": "أدخل اسمًا مخصّصًا لنوع التذكرة",
+      "priceType": "نوع التسعير",
+      "priceTypePlaceholder": "اختر نوع التسعير",
+      "priceTypeFree": "مجانية",
+      "priceTypePaid": "مدفوعة",
+      "quantity": "الكمية",
       "quantityPlaceholder": "0",
-      "price": "Price",
+      "price": "السعر",
       "pricePlaceholder": "0.00",
-      "addTicket": "Add Another Ticket",
-      "removeTicket": "Remove ticket"
+      "addTicket": "إضافة تذكرة أخرى",
+      "removeTicket": "حذف التذكرة"
     },
     "validation": {
-      "titleRequired": "Event title is required",
-      "categoryRequired": "Please select a category",
-      "eventTypeRequired": "Please select an event type",
-      "dateRequired": "Date range is required",
-      "startTimeRequired": "Start time is required",
-      "endTimeRequired": "End time is required",
-      "countryRequired": "Country is required",
-      "stateRequired": "State is required",
-      "mapAddressRequired": "Map address is required",
-      "imagesRequired": "At least one event image is required",
-      "descriptionRequired": "Description is required",
-      "ticketTypeRequired": "Ticket type is required",
-      "duplicateTicketType": "Duplicate ticket type. Each ticket type must be unique",
-      "priceTypeRequired": "Price type is required",
-      "quantityRequired": "Quantity is required",
-      "priceRequired": "Price is required",
-      "imageSizeError": "Each image size should not exceed 10MB",
-      "imageFormatError": "Only PNG and JPG images are allowed",
-      "faqQuestionRequired": "Question is required",
-      "faqAnswerRequired": "Answer is required"
+      "titleRequired": "عنوان الفعالية مطلوب",
+      "categoryRequired": "اختر فئة",
+      "eventTypeRequired": "اختر نوع الفعالية",
+      "dateRequired": "نطاق التاريخ مطلوب",
+      "startTimeRequired": "وقت البداية مطلوب",
+      "endTimeRequired": "وقت النهاية مطلوب",
+      "countryRequired": "البلد مطلوب",
+      "stateRequired": "الولاية مطلوبة",
+      "mapAddressRequired": "العنوان مطلوب",
+      "imagesRequired": "صورة واحدة على الأقل مطلوبة",
+      "descriptionRequired": "الوصف مطلوب",
+      "ticketTypeRequired": "نوع التذكرة مطلوب",
+      "duplicateTicketType": "نوع التذكرة مكرّر. يجب أن يكون كل نوع فريدًا",
+      "priceTypeRequired": "نوع التسعير مطلوب",
+      "quantityRequired": "الكمية مطلوبة",
+      "priceRequired": "السعر مطلوب",
+      "imageSizeError": "يجب ألّا يتجاوز حجم كل صورة 10 ميغابايت",
+      "imageFormatError": "صيغ الصور المسموحة: PNG و JPG فقط",
+      "faqQuestionRequired": "السؤال مطلوب",
+      "faqAnswerRequired": "الإجابة مطلوبة"
+    },
+    "publicationSection": "النشر والظهور",
+    "faq": {
+      "questionPlaceholder": "أدخل سؤالك",
+      "answerPlaceholder": "أدخل إجابتك"
     },
     "actions": {
-      "saveDraft": "Save as Draft",
-      "publish": "Publish Event",
-      "saveChanges": "Save Changes",
-      "preview": "Preview",
-      "creating": "Creating...",
-      "saving": "Saving...",
-      "publishing": "Publishing..."
+      "saveDraft": "حفظ كمسوّدة",
+      "publish": "نشر الفعالية",
+      "saveChanges": "حفظ التعديلات",
+      "preview": "معاينة",
+      "creating": "جاري الإنشاء…",
+      "saving": "جاري الحفظ…",
+      "publishing": "جاري النشر…"
     },
     "calendar": {
-      "selectMonth": "Select Month",
-      "clear": "Clear",
-      "sun": "Sun",
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat"
+      "selectMonth": "اختر الشهر",
+      "clear": "مسح",
+      "sun": "الأحد",
+      "mon": "الإثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت"
     },
     "categories": {
-      "Music": "Music",
-      "Tech": "Tech",
-      "Business": "Business",
-      "Art": "Art",
-      "Sport": "Sport",
-      "Food & Drink": "Food & Drink",
-      "Health & Wellness": "Health & Wellness",
-      "Education": "Education",
-      "Community": "Community",
-      "Other": "Other"
+      "Music": "موسيقى",
+      "Tech": "تكنولوجيا",
+      "Business": "أعمال",
+      "Art": "فن",
+      "Sport": "رياضة",
+      "Food & Drink": "مأكولات ومشروبات",
+      "Health & Wellness": "صحة وعافية",
+      "Education": "تعليم",
+      "Community": "مجتمع",
+      "Other": "أخرى"
     }
   },
 
   "dashboard": {
-    "title": "Dashboard",
-    "createEvent": "Create Event",
+    "title": "لوحة التحكم",
+    "createEvent": "إنشاء فعالية",
     "stats": {
-      "totalOrders": "Total Orders",
-      "totalReturns": "Total Returns",
-      "totalRevenue": "Total Revenue",
-      "fromLastWeek": "From Last Week",
-      "fromLastMonth": "From Last Month",
-      "fromLastYear": "From Last Year"
+      "totalOrders": "إجمالي الطلبات",
+      "totalReturns": "إجمالي المرتجعات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "fromLastWeek": "مقارنة بالأسبوع الماضي",
+      "fromLastMonth": "مقارنة بالشهر الماضي",
+      "fromLastYear": "مقارنة بالسنة الماضية"
     },
     "topSelling": {
-      "title": "Top Selling Ticket Categories",
+      "title": "أكثر التذاكر مبيعًا",
       "period": {
-        "weekly": "Weekly",
-        "monthly": "Monthly",
-        "yearly": "Yearly"
+        "weekly": "أسبوعي",
+        "monthly": "شهري",
+        "yearly": "سنوي"
       },
       "table": {
-        "ticketType": "Ticket Type",
-        "sold": "Sold",
-        "conversion": "Conversion",
-        "totalSales": "Total Sales %",
+        "ticketType": "نوع التذكرة",
+        "sold": "المبيعات",
+        "conversion": "التحويل",
+        "totalSales": "% من المبيعات",
         "trend": "{{period}}",
-        "up": "Up",
-        "down": "Down",
-        "noChange": "No Change"
+        "up": "ارتفاع",
+        "down": "انخفاض",
+        "noChange": "ثابت"
       }
     },
     "recentActivities": {
-      "title": "Recent Activities",
-      "seeAll": "See All",
+      "title": "آخر النشاطات",
+      "seeAll": "عرض الكل",
       "empty": {
-        "title": "No recent activities",
-        "description": "Activities will appear here when orders are placed"
+        "title": "لا توجد نشاطات حديثة",
+        "description": "ستظهر النشاطات هنا عند تسجيل طلبات جديدة"
       },
       "actions": {
-        "purchased": "purchased tickets for",
-        "ordered": "placed an order for"
+        "purchased": "اشترى تذاكر لـ",
+        "ordered": "قام بطلب لـ"
       }
     },
     "alerts": {
-      "important": "Important Alerts",
-      "actionRequired": "Action Required",
-      "noAlerts": "No alerts at the moment",
-      "noActions": "No actions required"
+      "important": "تنبيهات مهمّة",
+      "actionRequired": "إجراء مطلوب",
+      "noAlerts": "لا توجد تنبيهات حاليًا",
+      "noActions": "لا توجد إجراءات مطلوبة"
     },
     "modal": {
-      "allActivities": "All Activities"
+      "allActivities": "كل النشاطات"
     },
-    "loading": "Loading dashboard data",
-    "error": "Failed to load dashboard data"
+    "loading": "جاري تحميل بيانات لوحة التحكم",
+    "error": "تعذّر تحميل بيانات لوحة التحكم"
   },
 
   "events": {
-    "title": "Events",
-    "createEvent": "Create Event",
+    "title": "الفعاليات",
+    "createEvent": "إنشاء فعالية",
     "tabs": {
-      "all": "All Events",
-      "ongoing": "Ongoing Events",
-      "upcoming": "Upcoming Events",
-      "past": "Past Events",
-      "drafts": "Drafts"
+      "all": "كل الفعاليات",
+      "ongoing": "الجارية",
+      "upcoming": "القادمة",
+      "past": "السابقة",
+      "drafts": "المسوّدات"
     },
-    "searchPlaceholder": "Search Events",
+    "searchPlaceholder": "ابحث عن فعالية",
     "sortOptions": {
-      "newest": "Newest First",
-      "oldest": "Oldest First",
-      "az": "A-Z"
+      "newest": "الأحدث أوّلًا",
+      "oldest": "الأقدم أوّلًا",
+      "az": "أ-ي"
     },
-    "dateFilter": "All Date",
-    "eventCount": "{{count}} Events",
+    "dateFilter": "كل التواريخ",
+    "eventCount": "{{count}} فعالية",
     "table": {
       "headers": {
-        "eventName": "Event Name",
-        "date": "Date",
-        "location": "Location",
-        "status": "Status",
-        "sold": "Sold"
+        "eventName": "اسم الفعالية",
+        "date": "التاريخ",
+        "location": "المكان",
+        "status": "الحالة",
+        "sold": "المبيعات"
       },
       "status": {
-        "ongoing": "Ongoing",
-        "upcoming": "Upcoming",
-        "completed": "Completed",
-        "draft": "Draft"
+        "ongoing": "جارية",
+        "upcoming": "قادمة",
+        "completed": "منتهية",
+        "draft": "مسوّدة"
       }
     },
     "empty": {
-      "title": "No events found",
-      "descriptionSearch": "Try adjusting your search or filters",
-      "descriptionNoEvents": "Create your first event to get started",
-      "createButton": "Create Event"
+      "title": "لا توجد فعاليات",
+      "descriptionSearch": "جرّب تعديل البحث أو التصفية",
+      "descriptionNoEvents": "أنشئ أوّل فعالية لتبدأ",
+      "createButton": "إنشاء فعالية"
     },
-    "loading": "Loading events...",
+    "loading": "جاري تحميل الفعاليات…",
     "pagination": {
-      "showing": "Showing {{start}}-{{end}} of {{total}} Events"
+      "showing": "عرض {{start}}-{{end}} من {{total}} فعالية"
     },
     "modal": {
-      "aboutEvent": "About This Event",
-      "venue": "Venue",
-      "tickets": "Tickets",
-      "ticketsSold": "Tickets Sold",
-      "capacity": "{{percentage}}% capacity",
-      "faq": "FAQ",
+      "aboutEvent": "عن هذه الفعالية",
+      "venue": "المكان",
+      "tickets": "التذاكر",
+      "ticketsSold": "التذاكر المباعة",
+      "capacity": "{{percentage}}% من السعة",
+      "faq": "الأسئلة الشائعة",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "locationLabel": "المكان",
+      "onlineLink": "الرابط الإلكتروني",
+      "quantity": "الكمية",
+      "of": "من",
       "actions": {
-        "delete": "Delete",
-        "edit": "Edit Event",
-        "duplicate": "Duplicate Event",
-        "sendReminders": "Send Reminders",
-        "sending": "Sending..."
+        "delete": "حذف",
+        "edit": "تعديل الفعالية",
+        "duplicate": "نسخ الفعالية",
+        "sendReminders": "إرسال تذكيرات",
+        "sending": "جاري الإرسال…"
       }
     },
     "deleteModal": {
-      "title": "Delete Event",
-      "description": "Are you sure you want to delete \"{{eventName}}\"? This action cannot be undone.",
-      "cancel": "Cancel",
-      "delete": "Delete Event",
-      "deleting": "Deleting...",
-      "success": "Event deleted successfully"
+      "title": "حذف الفعالية",
+      "description": "هل أنت متأكّد من حذف «{{eventName}}»؟ لا يمكن التراجع عن هذا الإجراء.",
+      "cancel": "إلغاء",
+      "delete": "حذف الفعالية",
+      "deleting": "جاري الحذف…",
+      "success": "تم حذف الفعالية بنجاح"
     },
     "calendar": {
-      "selectMonth": "Select Month",
-      "clear": "Clear"
+      "selectMonth": "اختر الشهر",
+      "clear": "مسح"
     },
     "ticketStatus": {
-      "free": "Free",
-      "price": "${{price}}"
+      "free": "مجانية",
+      "price": "{{price}} د.ج"
     }
   },
 
   "attendees": {
-    "title": "Attendees",
-    "export": "Export",
-    "addAttendee": "Add Attendee",
-    "count": "{{count}} Attendees",
-    "searchPlaceholder": "Search by name or email",
+    "title": "المشاركون",
+    "export": "تصدير",
+    "addAttendee": "إضافة مشارك",
+    "count": "{{count}} مشارك",
+    "searchPlaceholder": "ابحث بالاسم أو البريد",
     "sortOptions": {
-      "newest": "Newest First",
-      "oldest": "Oldest First",
-      "az": "A-Z"
+      "newest": "الأحدث أوّلًا",
+      "oldest": "الأقدم أوّلًا",
+      "az": "أ-ي"
     },
-    "dateFilter": "All Date",
-    "filterButton": "Filter",
+    "dateFilter": "كل التواريخ",
+    "filterButton": "تصفية",
     "filter": {
-      "ticketType": "Ticket Type",
-      "status": "Check-In Status",
+      "ticketType": "نوع التذكرة",
+      "status": "حالة الدخول",
       "vip": "VIP",
-      "general": "General",
-      "earlyBird": "Early Bird",
-      "checkedIn": "Checked-in",
-      "notCheckedIn": "Not Checked-in",
-      "byEvent": "Or by event",
-      "seeAll": "See all",
-      "clearAll": "Clear all",
-      "showAttendees": "Show {{count}} Attendees"
+      "general": "عادية",
+      "earlyBird": "الحجز المبكر",
+      "checkedIn": "دخل",
+      "notCheckedIn": "لم يدخل",
+      "byEvent": "أو حسب الفعالية",
+      "seeAll": "عرض الكل",
+      "clearAll": "مسح الكل",
+      "showAttendees": "عرض {{count}} مشارك"
     },
     "table": {
       "headers": {
-        "name": "Attendee Name",
-        "email": "Email",
-        "event": "Event",
-        "ticketType": "Ticket Type",
-        "status": "Status"
+        "name": "اسم المشارك",
+        "email": "البريد الإلكتروني",
+        "event": "الفعالية",
+        "ticketType": "نوع التذكرة",
+        "status": "الحالة"
       },
       "status": {
-        "checkedIn": "Checked-in",
-        "notCheckedIn": "Not Checked-in"
+        "checkedIn": "دخل",
+        "notCheckedIn": "لم يدخل"
       }
     },
     "empty": {
-      "title": "No attendees yet",
-      "description": "Attendees will appear here when they check in to your events."
+      "title": "لا يوجد مشاركون بعد",
+      "description": "سيظهر المشاركون هنا عند تسجيلهم في فعالياتك."
     },
-    "loading": "Loading attendees...",
+    "loading": "جاري تحميل المشاركين…",
     "pagination": {
-      "showing": "Showing {{start}}-{{end}} of {{total}} Attendees"
+      "showing": "عرض {{start}}-{{end}} من {{total}} مشارك"
     },
     "modal": {
-      "selectEvent": "Select Event",
-      "created": "Created: {{date}}"
+      "selectEvent": "اختر فعالية",
+      "created": "تاريخ الإنشاء: {{date}}"
     },
     "detailsModal": {
-      "title": "Attendee Details",
-      "email": "Email",
-      "registrationDate": "Registration Date",
-      "event": "Event",
-      "ticketType": "Ticket Type",
-      "status": "Status",
+      "title": "تفاصيل المشارك",
+      "email": "البريد الإلكتروني",
+      "registrationDate": "تاريخ التسجيل",
+      "event": "الفعالية",
+      "ticketType": "نوع التذكرة",
+      "status": "الحالة",
       "actions": {
-        "checkIn": "Check In",
-        "checkingIn": "Checking in...",
-        "delete": "Delete",
-        "resendTicket": "Resend Ticket"
+        "checkIn": "تسجيل الدخول",
+        "checkingIn": "جاري التسجيل…",
+        "delete": "حذف",
+        "resendTicket": "إعادة إرسال التذكرة"
       }
     },
     "deleteModal": {
-      "title": "Confirm Deletion",
-      "description": "Are you sure you want to delete {{attendeeName}}?",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "success": "Attendee successfully deleted"
+      "title": "تأكيد الحذف",
+      "description": "هل أنت متأكّد من حذف {{attendeeName}}؟",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "success": "تم حذف المشارك بنجاح"
     },
     "resend": {
-      "success": "Ticket resent successfully",
-      "error": "Failed to resend ticket. Please try again"
+      "success": "تم إعادة إرسال التذكرة بنجاح",
+      "error": "تعذّر إعادة إرسال التذكرة. حاول مجددًا"
     },
     "calendar": {
-      "selectMonth": "Select Month",
-      "clear": "Clear"
+      "selectMonth": "اختر الشهر",
+      "clear": "مسح"
     }
   },
-
   "orders": {
-    "title": "Orders",
-    "export": "Export",
+    "title": "الطلبات",
+    "export": "تصدير",
     "stats": {
-      "totalOrders": "Total Orders",
-      "totalReturns": "Total Returns",
-      "totalRevenue": "Total Revenue",
-      "fromLastMonth": "From last month"
+      "totalOrders": "إجمالي الطلبات",
+      "totalReturns": "إجمالي المرتجعات",
+      "totalRevenue": "إجمالي الإيرادات",
+      "fromLastMonth": "مقارنة بالشهر الماضي"
     },
     "tabs": {
-      "all": "All Orders",
-      "active": "Active",
-      "draft": "Draft",
-      "inTransit": "In transit",
-      "completed": "Completed",
-      "cancelled": "Cancelled"
+      "all": "كل الطلبات",
+      "active": "نشطة",
+      "draft": "مسوّدة",
+      "inTransit": "قيد المعالجة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
     },
-    "searchPlaceholder": "Search order",
+    "searchPlaceholder": "ابحث عن طلب",
     "sortOptions": {
-      "newest": "Newest First",
-      "oldest": "Oldest First",
-      "az": "A-Z"
+      "newest": "الأحدث أوّلًا",
+      "oldest": "الأقدم أوّلًا",
+      "az": "أ-ي"
     },
-    "dateFilter": "All Date",
-    "orderCount": "{{count}} Orders",
+    "dateFilter": "كل التواريخ",
+    "orderCount": "{{count}} طلب",
     "table": {
       "headers": {
-        "eventName": "Event Name",
-        "buyer": "Buyer",
-        "ticketType": "Ticket Type",
-        "qty": "Qty",
-        "totalPrice": "Total Price",
-        "payment": "Payment",
-        "orderDate": "Order Date"
+        "eventName": "اسم الفعالية",
+        "buyer": "المشتري",
+        "ticketType": "نوع التذكرة",
+        "qty": "الكمية",
+        "totalPrice": "السعر الإجمالي",
+        "payment": "الدفع",
+        "orderDate": "تاريخ الطلب"
       },
       "payment": {
-        "paid": "Paid",
-        "pending": "Pending",
-        "failed": "Failed"
+        "paid": "مدفوع",
+        "pending": "قيد الانتظار",
+        "failed": "فشل"
       }
     },
     "empty": {
-      "title": "No orders yet",
-      "description": "Orders will appear here when customers purchase tickets for your events."
+      "title": "لا توجد طلبات بعد",
+      "description": "ستظهر الطلبات هنا عندما يشتري العملاء تذاكر لفعالياتك."
     },
-    "loading": "Loading orders...",
+    "loading": "جاري تحميل الطلبات…",
     "pagination": {
-      "showing": "Showing {{start}}-{{end}} of {{total}} Orders"
+      "showing": "عرض {{start}}-{{end}} من {{total}} طلب"
     },
     "detailsModal": {
-      "title": "Order Details",
-      "orderId": "Order ID",
-      "orderDate": "Order Date",
-      "event": "Event",
-      "quantity": "Quantity",
-      "ticketType": "Ticket Type",
-      "totalPrice": "Total Price",
-      "paymentStatus": "Payment Status",
-      "orderStatus": "Order Status",
+      "title": "تفاصيل الطلب",
+      "orderId": "رقم الطلب",
+      "orderDate": "تاريخ الطلب",
+      "event": "الفعالية",
+      "quantity": "الكمية",
+      "ticketType": "نوع التذكرة",
+      "totalPrice": "السعر الإجمالي",
+      "paymentStatus": "حالة الدفع",
+      "orderStatus": "حالة الطلب",
       "actions": {
-        "refund": "Refund",
-        "cancel": "Cancel Order",
-        "delete": "Delete"
+        "refund": "استرداد",
+        "cancel": "إلغاء الطلب",
+        "delete": "حذف"
       }
     },
     "deleteModal": {
-      "title": "Confirm Deletion",
-      "description": "Are you sure you want to delete order {{orderId}}?",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "deleting": "Deleting...",
-      "success": "Order successfully deleted"
+      "title": "تأكيد الحذف",
+      "description": "هل أنت متأكّد من حذف الطلب {{orderId}}؟",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "deleting": "جاري الحذف…",
+      "success": "تم حذف الطلب بنجاح"
     },
     "calendar": {
-      "selectMonth": "Select Month",
-      "clear": "Clear"
+      "selectMonth": "اختر الشهر",
+      "clear": "مسح"
     },
     "errors": {
-      "loadFailed": "Failed to load orders",
-      "deleteFailed": "Failed to delete order",
-      "refundFailed": "Failed to refund order",
-      "cancelFailed": "Failed to cancel order"
+      "loadFailed": "تعذّر تحميل الطلبات",
+      "deleteFailed": "تعذّر حذف الطلب",
+      "refundFailed": "تعذّر استرداد الطلب",
+      "cancelFailed": "تعذّر إلغاء الطلب"
     }
   },
 
   "accountSettings": {
     "title": "إعدادات الحساب",
-    "subtitle": "إدارة تفضيلات حسابك وإعدادات مؤسستك.",
+    "subtitle": "أدر تفضيلات حسابك وإعدادات منظّمتك.",
     "menu": {
       "personalInfo": "المعلومات الشخصية",
-      "aboutOrganization": "حول المؤسسة",
+      "aboutOrganization": "عن المنظّمة",
       "teamRoles": "الفريق والأدوار",
-      "paymentPayout": "الدفع والمستحقات",
+      "paymentPayout": "الدفع والتحويلات",
       "emailPreferences": "تفضيلات البريد",
       "loginSecurity": "تسجيل الدخول والأمان"
     },
@@ -554,12 +443,12 @@
       "phone": "الهاتف",
       "location": "الموقع",
       "edit": "تعديل",
-      "verified": "موثّق",
-      "verifyPhone": "توثيق رقم هاتفك",
+      "verified": "موثَّق",
+      "verifyPhone": "وثّق رقم هاتفك",
       "modals": {
         "editProfile": "تعديل الملف الشخصي",
         "editEmail": "تعديل البريد الإلكتروني",
-        "editPhone": "تعديل الهاتف",
+        "editPhone": "تعديل رقم الهاتف",
         "editLocation": "تعديل الموقع",
         "fullName": "الاسم الكامل",
         "fullNamePlaceholder": "أدخل اسمك الكامل",
@@ -569,38 +458,38 @@
         "currentPhone": "الهاتف الحالي",
         "newPhone": "رقم الهاتف الجديد",
         "newPhonePlaceholder": "أدخل رقم الهاتف الجديد",
-        "country": "الدولة",
-        "countryPlaceholder": "أدخل الدولة",
+        "country": "البلد",
+        "countryPlaceholder": "أدخل بلدك",
         "city": "المدينة",
-        "cityPlaceholder": "أدخل المدينة",
+        "cityPlaceholder": "أدخل مدينتك",
         "address": "العنوان",
         "password": "كلمة المرور",
         "passwordPlaceholder": "أدخل كلمة المرور",
         "profilePhoto": "صورة الملف الشخصي",
-        "uploadHint": "اختر ملفاً أو أسقطه هنا",
-        "uploadFormats": "PNG أو JPG (بحد أقصى 5 ميغابايت)",
-        "saveChanges": "حفظ التغييرات",
+        "uploadHint": "اختر ملفًا أو أسقطه هنا",
+        "uploadFormats": "PNG أو JPG (5 ميغابايت كحدّ أقصى)",
+        "saveChanges": "حفظ التعديلات",
         "cancel": "إلغاء",
-        "success": "تم حفظ التغييرات بنجاح"
+        "success": "تم حفظ التعديلات بنجاح"
       },
       "validation": {
         "fullNameRequired": "الاسم الكامل مطلوب",
         "newEmailRequired": "البريد الجديد مطلوب",
         "passwordRequired": "كلمة المرور مطلوبة",
-        "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+        "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
         "newPhoneRequired": "رقم الهاتف الجديد مطلوب",
-        "countryRequired": "الدولة مطلوبة",
+        "countryRequired": "البلد مطلوب",
         "cityRequired": "المدينة مطلوبة"
       }
     },
     "organization": {
-      "title": "ملف المؤسسة",
-      "subtitle": "عرّف المشاركين بنفسك. أضف تفاصيل علامتك التجارية وبناء الثقة مع جمهورك.",
+      "title": "ملف المنظّمة",
+      "subtitle": "عرّف المشاركين بمنظّمتك. أضف تفاصيل علامتك وابنِ ثقة مع جمهورك.",
       "fields": {
-        "name": "اسم المؤسسة",
-        "namePlaceholder": "أدخل اسم المؤسسة",
-        "type": "نوع المؤسسة",
-        "typePlaceholder": "اختر نوع المؤسسة",
+        "name": "اسم المنظّمة",
+        "namePlaceholder": "أدخل اسم المنظّمة",
+        "type": "نوع المنظّمة",
+        "typePlaceholder": "اختر نوع المنظّمة",
         "types": {
           "company": "شركة",
           "association": "جمعية",
@@ -608,37 +497,37 @@
           "individual": "فرد",
           "other": "أخرى"
         },
-        "logo": "شعار المؤسسة",
-        "uploadHint": "اختر ملفاً أو أسقطه هنا",
-        "uploadFormats": "PNG أو JPG (400×400 بكسل، بحد أقصى 5 ميغابايت)",
+        "logo": "شعار المنظّمة",
+        "uploadHint": "اختر ملفًا أو أسقطه هنا",
+        "uploadFormats": "PNG أو JPG (400×400 بكسل، 5 ميغابايت كحدّ أقصى)",
         "address": "العنوان",
-        "addressPlaceholder": "مثال: حي جميل، الجزائر العاصمة",
-        "email": "بريد المؤسسة",
-        "emailPlaceholder": "مثال: contact@ormeet.com",
+        "addressPlaceholder": "مثل: جولي فو، القبة، الجزائر",
+        "email": "بريد المنظّمة",
+        "emailPlaceholder": "مثل: contact@ormeet.com",
         "phone": "هاتف التواصل",
-        "phonePlaceholder": "أضف رقم هاتف مؤسستك",
-        "description": "حول مؤسستك",
-        "descriptionPlaceholder": "اكتب وصفاً موجزاً عن نوع الفعاليات التي تنظمها وما يمكن للمشاركين توقعه."
+        "phonePlaceholder": "أضف رقم هاتف منظّمتك",
+        "description": "عن منظّمتك",
+        "descriptionPlaceholder": "اكتب وصفًا قصيرًا عن نوع الفعاليات التي تنظّمها وما يمكن أن يتوقّعه المشاركون."
       },
       "socialMedia": {
         "title": "روابط التواصل الاجتماعي",
-        "subtitle": "اربط حساباتك الاجتماعية ليتمكن المشاركون من متابعتك.",
-        "facebook": "فيسبوك",
+        "subtitle": "اربط حساباتك الاجتماعية ليتمكّن المشاركون من إيجادك ومتابعتك.",
+        "facebook": "Facebook",
         "facebookPlaceholder": "facebook.com/yourpage",
-        "instagram": "إنستغرام",
+        "instagram": "Instagram",
         "instagramPlaceholder": "@yourusername",
-        "linkedin": "لينكدإن",
+        "linkedin": "LinkedIn",
         "linkedinPlaceholder": "linkedin.com/company/yourname",
-        "youtube": "يوتيوب",
+        "youtube": "YouTube",
         "youtubePlaceholder": "youtube.com/@yourchannel"
       },
       "validation": {
-        "nameRequired": "اسم المؤسسة مطلوب",
+        "nameRequired": "اسم المنظّمة مطلوب",
         "logoSizeError": "يجب أن يكون حجم الملف أقل من 5 ميغابايت"
       },
-      "saveChanges": "حفظ التغييرات",
-      "saving": "جارٍ الحفظ...",
-      "success": "تم حفظ بيانات المؤسسة بنجاح!"
+      "saveChanges": "حفظ التعديلات",
+      "saving": "جاري الحفظ…",
+      "success": "تم حفظ المنظّمة بنجاح!"
     },
     "teamRoles": {
       "tabs": {
@@ -647,7 +536,7 @@
       },
       "team": {
         "count": "{{count}} عضو{{plural}}",
-        "searchPlaceholder": "البحث عن عضو",
+        "searchPlaceholder": "ابحث عن عضو",
         "inviteMember": "دعوة عضو",
         "table": {
           "name": "الاسم",
@@ -659,35 +548,44 @@
           "active": "نشط",
           "pending": "قيد الانتظار"
         },
-        "empty": "لا يوجد أعضاء في الفريق",
+        "empty": "لم يتم العثور على أي عضو",
         "invite": {
-          "title": "إضافة عضو إلى فريقك",
-          "subtitle": "أدخل عنوان البريد الإلكتروني للعضو ثم حدد دوره الذي سيحدد صلاحياته.",
-          "email": "عنوان البريد الإلكتروني",
-          "emailPlaceholder": "زميل@مثال.com",
+          "title": "أضف عضوًا إلى فريقك",
+          "subtitle": "أدخل البريد الإلكتروني لعضو فريقك، ثم اختر صلاحياته بإسناد دور له.",
+          "email": "البريد الإلكتروني",
+          "emailPlaceholder": "teammate@example.com",
           "invitationCode": "رمز الدعوة",
           "invitationCodePlaceholder": "أدخل رمز الدعوة",
-          "role": "تعيين الدور",
-          "rolePlaceholder": "اختر دوراً",
+          "role": "إسناد دور",
+          "rolePlaceholder": "اختر دورًا",
           "send": "إرسال الدعوة",
           "cancel": "إلغاء",
           "success": "تم إرسال الدعوة بنجاح"
         },
         "validation": {
-          "emailRequired": "عنوان البريد الإلكتروني مطلوب",
-          "invalidEmail": "يرجى إدخال عنوان بريد إلكتروني صحيح",
-          "roleRequired": "يرجى تعيين دور"
-        }
+          "emailRequired": "البريد الإلكتروني مطلوب",
+          "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+          "roleRequired": "يجب إسناد دور"
+        },
+        "viewDetails": "عرض التفاصيل",
+        "inviteSent": "تم إرسال الدعوة",
+        "memberDetails": "تفاصيل العضو",
+        "lastActive": "آخر نشاط",
+        "ticketResentSuccess": "تم إعادة إرسال التذكرة بنجاح",
+        "ticketResentError": "تعذّر إعادة إرسال التذكرة. يُرجى المحاولة مجددًا.",
+        "roleChangeError": "تعذّر تغيير الدور. يُرجى المحاولة مجددًا.",
+        "rolePlaceholder": "اسم الدور",
+        "addressPlaceholder": "أدخل العنوان (اختياري)"
       },
       "roles": {
-        "searchPlaceholder": "البحث عن أدوار",
+        "searchPlaceholder": "ابحث عن دور",
         "createRole": "إنشاء دور",
         "table": {
           "role": "الدور",
           "permissions": "الصلاحيات"
         },
-        "empty": "لا توجد أدوار مخصصة",
-        "duplicateWarning": "يوجد دور بهذا الاسم بالفعل. يرجى اختيار اسم آخر.",
+        "empty": "لا توجد أدوار مخصّصة",
+        "duplicateWarning": "يوجد دور بهذا الاسم بالفعل. اختر اسمًا مختلفًا.",
         "form": {
           "titleCreate": "إنشاء دور",
           "titleEdit": "تعديل الدور",
@@ -702,11 +600,11 @@
             "ticketsAndPricing": "التذاكر والأسعار",
             "viewTickets": "عرض التذاكر",
             "editTicketTypesAndPricing": "تعديل أنواع التذاكر والأسعار",
-            "managePromoCodes": "إدارة الرموز الترويجية",
+            "managePromoCodes": "إدارة رموز التخفيض",
             "ordersAndAttendees": "الطلبات والمشاركون",
             "viewAttendees": "عرض المشاركين",
             "exportAttendeeData": "تصدير بيانات المشاركين",
-            "checkInAttendees": "تسجيل حضور المشاركين",
+            "checkInAttendees": "تسجيل دخول المشاركين",
             "editAttendeeInfo": "تعديل معلومات المشاركين",
             "reportsAndAnalytics": "التقارير والتحليلات",
             "viewAnalyticsDashboard": "عرض لوحة التحليلات",
@@ -717,10 +615,10 @@
             "sendEventReminders": "إرسال تذكيرات الفعاليات",
             "settings": "الإعدادات",
             "viewSettings": "عرض الإعدادات",
-            "manageTeamAccess": "إدارة صلاحيات الفريق"
+            "manageTeamAccess": "إدارة وصول الفريق"
           },
           "create": "إنشاء الدور",
-          "saveChanges": "حفظ التغييرات",
+          "saveChanges": "حفظ التعديلات",
           "cancel": "إلغاء"
         },
         "actions": {
@@ -728,65 +626,65 @@
           "duplicate": "نسخ",
           "delete": "حذف",
           "confirmDelete": "تأكيد الحذف",
-          "deleteDescription": "هل أنت متأكد من حذف هذا؟",
-          "deleteSuccess": "تم الحذف بنجاح"
+          "deleteDescription": "هل أنت متأكّد من حذف هذا الدور؟",
+          "deleteSuccess": "تم حذف الدور بنجاح"
         }
       },
       "memberDetails": {
         "changeRole": "تغيير الدور",
         "currentRole": "الدور الحالي",
         "newRole": "الدور الجديد",
-        "newRolePlaceholder": "اختر دوراً",
+        "newRolePlaceholder": "اختر دورًا",
         "cancel": "إلغاء",
         "confirm": "تأكيد",
         "success": "تم تغيير الدور بنجاح",
-        "error": "فشل تغيير الدور"
+        "error": "تعذّر تغيير الدور"
       }
     },
     "emailPreferences": {
-      "title": "تفضيلات البريد الإلكتروني",
-      "subtitle": "اختر الرسائل التي تريد استلامها — ابقَ على اطلاع دون إرهاق.",
+      "title": "تفضيلات البريد",
+      "subtitle": "اختر الرسائل التي ترغب في تلقّيها — ابقَ على اطّلاع دون أن تثقل عليك.",
       "options": {
         "eventUpdates": {
-          "title": "تحديثات الفعاليات",
-          "description": "احصل على إشعارات عند تسجيل المشاركين أو تعديل تفاصيل الفعاليات."
+          "title": "تحديثات وتغييرات الفعاليات",
+          "description": "اعرف عند تسجيل المشاركين أو تعديل تفاصيل الفعالية."
         },
         "ticketSales": {
           "title": "إشعارات مبيعات التذاكر",
-          "description": "استلم تنبيهات عند شراء التذاكر لفعالياتك."
+          "description": "تلقَّ تنبيهات عند شراء تذاكر لفعالياتك."
         },
         "attendeeMessages": {
           "title": "رسائل المشاركين",
-          "description": "احصل على إشعارات عند إرسال المشاركين رسائل أو استفسارات."
+          "description": "اعرف عند إرسال المشاركين لرسائل أو أسئلة."
         },
         "payoutNotifications": {
-          "title": "إشعارات المستحقات",
-          "description": "كن على اطلاع بمعالجة المدفوعات وحالة المستحقات."
+          "title": "إشعارات التحويلات",
+          "description": "ابقَ على اطّلاع بمعالجة المدفوعات وحالة التحويلات."
         },
         "platformUpdates": {
-          "title": "تحديثات المنصة",
-          "description": "ابقَ على اطلاع بالميزات والتحسينات الجديدة للمنصة."
+          "title": "تحديثات المنصّة والميزات",
+          "description": "ابقَ على اطّلاع بآخر الميزات وتحسينات المنصّة."
         },
         "marketingTips": {
-          "title": "نصائح التسويق",
-          "description": "استلم نصائح لترويج فعالياتك وزيادة الحضور."
+          "title": "نصائح وأفضل ممارسات التسويق",
+          "description": "تلقَّ نصائح للترويج لفعالياتك وزيادة الحضور."
         },
         "newsletters": {
-          "title": "النشرات الإخبارية وقصص النجاح",
-          "description": "استلهم من تجارب المنظمين الآخرين ورؤى الصناعة."
+          "title": "النشرات وقصص النجاح",
+          "description": "استلهم من تجارب منظّمين آخرين ومن رؤى القطاع."
         }
       }
     },
     "loginSecurity": {
       "title": "تسجيل الدخول والأمان",
-      "subtitle": "حدد كلمة مرور فريدة لحماية حسابك",
+      "subtitle": "اختر كلمة مرور قوية لحماية حسابك",
       "password": {
         "title": "كلمة المرور",
         "changePassword": "تغيير كلمة المرور"
       },
       "twoFactor": {
         "title": "المصادقة الثنائية",
-        "description": "تضيف المصادقة الثنائية أماناً إضافياً من خلال طلب خطوة تحقق ثانية عند تسجيل الدخول."
+        "description": "تضيف المصادقة الثنائية طبقة أمان إضافية بطلب خطوة ثانية للتحقّق من هويتك عند تسجيل الدخول."
       },
       "modals": {
         "changePassword": {
@@ -796,10 +694,10 @@
           "newPassword": "كلمة المرور الجديدة",
           "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
           "confirmPassword": "تأكيد كلمة المرور",
-          "confirmPasswordPlaceholder": "أكد كلمة المرور الجديدة",
-          "saveChanges": "حفظ التغييرات",
+          "confirmPasswordPlaceholder": "أكّد كلمة المرور الجديدة",
+          "saveChanges": "حفظ التعديلات",
           "cancel": "إلغاء",
-          "success": "تم حفظ التغييرات بنجاح",
+          "success": "تم حفظ التعديلات بنجاح",
           "validation": {
             "currentRequired": "كلمة المرور الحالية مطلوبة",
             "newRequired": "كلمة المرور الجديدة مطلوبة",
@@ -810,70 +708,190 @@
       }
     }
   },
-
   "onboarding": {
     "brandInfo": {
-      "title": "Welcome to Ormeet!",
-      "subtitle": "Tell us about your brand or yourself",
+      "title": "أهلًا بك في Ormeet!",
+      "subtitle": "أخبرنا عن علامتك أو عن نفسك",
       "fields": {
-        "organisationName": "Organisation Name",
-        "organisationPlaceholder": "Enter your organisation name",
-        "eventTypes": "What kind of events do you host?",
-        "eventsPerYear": "How many events will you host next year?",
-        "eventsPerYearPlaceholder": "Number of events",
+        "organisationName": "اسم المنظّمة",
+        "organisationPlaceholder": "أدخل اسم منظّمتك",
+        "eventTypes": "ما نوع الفعاليات التي تنظّمها؟",
+        "eventsPerYear": "كم فعالية ستنظّم في السنة القادمة؟",
+        "eventsPerYearPlaceholder": "عدد الفعاليات",
         "eventsPerYearOptions": {
-          "1-5": "1-5 events",
-          "6-10": "6-10 events",
-          "11-20": "11-20 events",
-          "21-50": "21-50 events",
-          "50+": "50+ events"
+          "1-5": "1-5 فعاليات",
+          "6-10": "6-10 فعاليات",
+          "11-20": "11-20 فعالية",
+          "21-50": "21-50 فعالية",
+          "50+": "أكثر من 50 فعالية"
         },
-        "averageAttendees": "Average number of attendees per event",
-        "averageAttendeesPlaceholder": "Number of attendees",
+        "averageAttendees": "متوسّط عدد المشاركين في كل فعالية",
+        "averageAttendeesPlaceholder": "عدد المشاركين",
         "averageAttendeesOptions": {
-          "1-50": "1-50 attendees",
-          "51-100": "51-100 attendees",
-          "101-250": "101-250 attendees",
-          "251-500": "251-500 attendees",
-          "500-1000": "500-1000 attendees",
-          "1000+": "1000+ attendees"
+          "1-50": "1-50 مشارك",
+          "51-100": "51-100 مشارك",
+          "101-250": "101-250 مشارك",
+          "251-500": "251-500 مشارك",
+          "500-1000": "500-1000 مشارك",
+          "1000+": "أكثر من 1000 مشارك"
         }
       },
       "eventTypesList": [
-        "Live Music",
-        "Nightlife Events",
-        "DJ Events",
-        "Art Exhibitions",
-        "Fitness",
-        "Holiday",
-        "Dating",
-        "Webinars",
-        "Conferences",
-        "Food & Drink",
-        "Kids & Family",
-        "Gaming & Tech",
-        "Business & Finance"
+        "حفلات مباشرة",
+        "حياة ليلية",
+        "حفلات DJ",
+        "معارض فنية",
+        "لياقة بدنية",
+        "عطل",
+        "مواعدة",
+        "ندوات عبر الإنترنت",
+        "مؤتمرات",
+        "مأكولات ومشروبات",
+        "أطفال وعائلة",
+        "ألعاب وتكنولوجيا",
+        "أعمال ومالية"
       ],
-      "submit": "Finish & Login",
-      "saving": "Saving...",
-      "errorFallback": "Failed to save brand info. Please try again."
+      "submit": "إنهاء وتسجيل الدخول",
+      "saving": "جاري الحفظ…",
+      "errorFallback": "تعذّر حفظ معلومات العلامة. يُرجى المحاولة مجددًا."
     }
   },
 
-  "dateTimeModal": {
-    "title": "Date & Time",
-    "closeCalendar": "Close Calendar",
-    "days": {
-      "sun": "Sun",
-      "mon": "Mon",
-      "tue": "Tue",
-      "wed": "Wed",
-      "thu": "Thu",
-      "fri": "Fri",
-      "sat": "Sat"
+  "bankAccount": {
+    "sectionTitle": "الحساب البنكي",
+    "sectionSubtitle": "أدر الحساب البنكي الذي ستُحوَّل إليه إيرادات الفعاليات",
+    "empty": {
+      "title": "لم يتم إضافة حساب بنكي",
+      "description": "يجب إضافة حساب بنكي لتلقّي إيرادات فعالياتك.",
+      "addButton": "إضافة حساب بنكي",
+      "adminOnly": "إضافة حساب بنكي متاحة للمسؤول فقط"
     },
-    "timesAvailable_one": "{{count}} time available for {{date}}",
-    "timesAvailable_other": "{{count}} times available for {{date}}",
-    "selectTimeSubtitle": "Please select a suitable time for your event from the options below."
+    "card": {
+      "accountHolderName": "اسم صاحب الحساب",
+      "bankName": "اسم البنك",
+      "country": "البلد",
+      "iban": "IBAN",
+      "statusVerified": "موثَّق",
+      "statusPending": "قيد التحقّق",
+      "deleteButton": "حذف",
+      "deleteTitle": "حذف الحساب البنكي",
+      "editButton": "تعديل الحساب البنكي"
+    },
+    "modal": {
+      "titleAdd": "إضافة حساب بنكي",
+      "titleEdit": "تعديل الحساب البنكي",
+      "fields": {
+        "accountHolderName": "اسم صاحب الحساب",
+        "accountHolderNamePlaceholder": "أدخل اسم صاحب الحساب",
+        "bankName": "اسم البنك",
+        "bankNamePlaceholder": "أدخل اسم البنك",
+        "country": "البلد",
+        "countryPlaceholder": "أدخل البلد",
+        "iban": "IBAN",
+        "ibanPlaceholder": "أدخل رقم IBAN (مثل: DZ580000000000000000000000)",
+        "swiftBic": "SWIFT / BIC",
+        "swiftBicPlaceholder": "أدخل رمز SWIFT/BIC (مثل: BNALDZALXXX)"
+      },
+      "validation": {
+        "accountHolderRequired": "اسم صاحب الحساب مطلوب",
+        "bankNameRequired": "اسم البنك مطلوب",
+        "countryRequired": "البلد مطلوب",
+        "ibanRequired": "رقم IBAN مطلوب",
+        "swiftRequired": "رمز SWIFT/BIC مطلوب",
+        "ibanInvalid": "صيغة IBAN غير صالحة",
+        "swiftInvalid": "رمز SWIFT/BIC غير صالح"
+      },
+      "saveChanges": "حفظ التعديلات",
+      "success": "تم حفظ الحساب البنكي بنجاح",
+      "error": "تعذّرت العملية. حاول مجددًا"
+    },
+    "deleteModal": {
+      "title": "تأكيد الحذف",
+      "description": "هل أنت متأكّد من حذف هذا الحساب البنكي؟",
+      "confirm": "تأكيد",
+      "success": "تم حذف الحساب البنكي بنجاح"
+    }
+  },
+
+  "export": {
+    "title": "تصدير البيانات",
+    "description": "اختر الفعالية التي تريد تصدير بياناتها.",
+    "selectEventLabel": "اختر الفعالية",
+    "allEvents": "كل الفعاليات",
+    "confirm": "تأكيد"
+  },
+
+  "addAttendee": {
+    "title": "إضافة مشارك",
+    "description": "أدخل التفاصيل لإضافة مشارك جديد إلى فعالية.",
+    "fields": {
+      "firstName": "الاسم",
+      "firstNamePlaceholder": "أدخل الاسم",
+      "lastName": "اللقب",
+      "lastNamePlaceholder": "أدخل اللقب",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "event": "الفعالية",
+      "ticketType": "نوع التذكرة"
+    },
+    "validation": {
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا"
+    },
+    "confirm": "تأكيد",
+    "success": "تم إضافة المشارك بنجاح"
+  },
+
+  "eventPreview": {
+    "modalTitle": "معاينة الفعالية",
+    "modalSubtitle": "هكذا ستظهر فعاليتك للمشاركين",
+    "closeAria": "إغلاق المعاينة",
+    "prevImageAria": "الصورة السابقة",
+    "nextImageAria": "الصورة التالية",
+    "goToImageAria": "الانتقال إلى الصورة {{number}}",
+    "addToFavoritesAria": "إضافة إلى المفضّلة",
+    "shareEventAria": "مشاركة الفعالية",
+    "ratingNew": "جديدة",
+    "noReviews": "لا توجد تقييمات بعد",
+    "untitledEvent": "فعالية بدون عنوان",
+    "noDescription": "لا يوجد وصف",
+    "dateTime": "التاريخ والوقت",
+    "dateNotSet": "التاريخ غير محدّد",
+    "location": "المكان",
+    "locationNotSet": "المكان غير محدّد",
+    "seeOnMap": "عرض على الخريطة",
+    "closeMap": "إغلاق الخريطة",
+    "mapTitle": "خريطة موقع الفعالية",
+    "onlineAccess": "وصول عن بُعد",
+    "category": "الفئة",
+    "availableTickets": "التذاكر المتاحة",
+    "ticketQuantityAvailable": "{{quantity}} متاحة",
+    "ticketQuantityNotSet": "الكمية غير محدّدة",
+    "ticketFree": "مجانية",
+    "faqTitle": "هل لديك أسئلة؟ لدينا الإجابات",
+    "fromPrice": "ابتداءً من",
+    "getTickets": "احجز الآن!",
+    "visibilityPublic": "فعالية عامّة",
+    "visibilityPrivate": "فعالية خاصّة"
+  },
+
+  "timePicker": {
+    "selectTimeLabel": "اختر الوقت"
+  },
+
+  "dateTimeModal": {
+    "title": "التاريخ والوقت",
+    "closeCalendar": "إغلاق التقويم",
+    "days": {
+      "sun": "الأحد",
+      "mon": "الإثنين",
+      "tue": "الثلاثاء",
+      "wed": "الأربعاء",
+      "thu": "الخميس",
+      "fri": "الجمعة",
+      "sat": "السبت"
+    },
+    "timesAvailable_one": "{{count}} توقيت متاح يوم {{date}}",
+    "timesAvailable_other": "{{count}} توقيتات متاحة يوم {{date}}",
+    "selectTimeSubtitle": "اختر التوقيت الذي يناسبك من الخيارات أدناه."
   }
 }

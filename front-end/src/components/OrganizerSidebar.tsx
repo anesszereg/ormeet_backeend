@@ -51,9 +51,9 @@ const OrganizerSidebar = ({ activeTab = 'dashboard', onTabChange, onCollapseChan
             aria-label={isCollapsed ? t('sidebar.expandAria') : t('sidebar.collapseAria')}
           >
             {isCollapsed ? (
-              <BsFillArrowRightCircleFill size={24} />
+              <BsFillArrowRightCircleFill size={24} className="rtl:scale-x-[-1]" />
             ) : (
-              <BsFillArrowLeftCircleFill size={24} />
+              <BsFillArrowLeftCircleFill size={24} className="rtl:scale-x-[-1]" />
             )}
           </button>
         </div>

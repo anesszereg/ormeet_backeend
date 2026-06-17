@@ -1,104 +1,110 @@
 {
   "nav": {
-    "browseEvents": "Browse events",
-    "hostEvents": "Host events",
-    "support": "Support",
-    "login": "Log In",
-    "signup": "Sign up",
-    "logout": "Log out",
-    "dashboard": "لوحة التحكم"
+    "browseEvents": "تصفّح الفعاليات",
+    "hostEvents": "نظّم فعالية",
+    "support": "المساعدة",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب",
+    "logout": "تسجيل الخروج",
+    "dashboard": "لوحة التحكم",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
   },
   "cta": {
-    "getStarted": "Get started",
-    "learnMore": "Learn more",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "save": "Save",
-    "continue": "Continue",
-    "back": "Back"
+    "getStarted": "ابدأ الآن",
+    "learnMore": "اكتشف المزيد",
+    "submit": "إرسال",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "continue": "متابعة",
+    "back": "رجوع"
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة.",
     "privacy": "سياسة الخصوصية",
     "terms": "شروط الاستخدام",
-    "description": "Ormeet connects people through unforgettable events — from live concerts to workshops. Discover and book nearby experiences, or host your own with ease. Whether you're attending or organizing, Ormeet makes events simple, exciting, and effortlessly accessible.",
+    "description": "Ormeet تجمع المهتمين حول فعاليات لا تُنسى — من الحفلات المباشرة إلى ورشات العمل. اكتشف واحجز تجارب قريبة منك، أو نظّم فعالياتك الخاصة بكل سهولة. سواء كنت مشاركًا أو منظّمًا، Ormeet تجعل الفعاليات بسيطة، ممتعة، وفي متناول الجميع.",
     "browseEvents": {
-      "title": "Browse Events",
-      "music": "Music",
-      "sports": "Sports",
-      "business": "Business",
-      "fitness": "Fitness",
-      "nightlife": "Nightlife",
-      "holiday": "Holiday",
-      "dating": "Dating",
-      "festival": "Festival"
+      "title": "تصفّح الفعاليات",
+      "music": "موسيقى",
+      "sports": "رياضة",
+      "business": "أعمال",
+      "fitness": "لياقة بدنية",
+      "nightlife": "حياة ليلية",
+      "holiday": "عطل",
+      "dating": "مواعدة",
+      "festival": "مهرجانات"
     },
     "hostEvents": {
-      "title": "Host Events",
-      "createEvents": "Create Events",
-      "features": "Features",
-      "pricing": "Pricing"
+      "title": "تنظيم الفعاليات",
+      "createEvents": "أنشئ فعالية",
+      "features": "الميزات",
+      "pricing": "الأسعار"
     },
     "support": {
-      "title": "Support",
-      "helpCenter": "Help center",
-      "findTickets": "Find your tickets",
-      "contactOrganizer": "Contact event organizer"
+      "title": "المساعدة",
+      "helpCenter": "مركز المساعدة",
+      "findTickets": "استعد تذاكرك",
+      "contactOrganizer": "تواصل مع المنظّم"
     },
     "company": {
-      "title": "Company",
-      "aboutUs": "About us",
-      "contactUs": "Contact us",
-      "blog": "Blog"
+      "title": "الشركة",
+      "aboutUs": "من نحن",
+      "contactUs": "تواصل معنا",
+      "blog": "المدونة"
     },
     "legal": {
-      "title": "Legal",
-      "termsOfService": "Terms of Service",
-      "privacyPolicy": "Privacy Policy",
-      "cookiePolicy": "Cookie Policy",
-      "refundCancellation": "Refund & Cancellation"
+      "title": "الشؤون القانونية",
+      "termsOfService": "شروط الاستخدام",
+      "privacyPolicy": "سياسة الخصوصية",
+      "cookiePolicy": "سياسة ملفات تعريف الارتباط",
+      "refundCancellation": "الاسترداد والإلغاء"
     },
-    "copyright": "© 2025 Ormeet. All rights reserved."
+    "copyright": "© 2025 Ormeet. جميع الحقوق محفوظة."
   },
   "confirmDialog": {
-    "defaultConfirm": "OK",
-    "defaultCancel": "Cancel"
+    "defaultConfirm": "موافق",
+    "defaultCancel": "إلغاء"
   },
   "phoneInput": {
-    "searchPlaceholder": "Search country...",
-    "noCountriesFound": "No countries found"
+    "searchPlaceholder": "ابحث عن بلد…",
+    "noCountriesFound": "لا توجد بلدان مطابقة"
   },
   "sidebar": {
-    "title": "لوحة التحكم",
+    "title": "القائمة",
     "searchPlaceholder": "بحث",
     "expandAria": "توسيع الشريط الجانبي",
-    "collapseAria": "طي الشريط الجانبي",
+    "collapseAria": "تصغير الشريط الجانبي",
     "myTickets": "تذاكري",
-    "favoriteEvents": "الفعاليات المفضلة",
-    "following": "المتابَعون",
+    "favoriteEvents": "المفضّلة",
+    "following": "متابَعون",
     "accountSettings": "إعدادات الحساب",
     "dashboard": "لوحة التحكم",
     "events": "الفعاليات",
-    "attendees": "الحضور",
+    "attendees": "المشاركون",
     "orders": "الطلبات",
     "workspace": "مساحة العمل",
     "addWorkspaceAria": "إضافة مساحة عمل"
   },
   "header": {
     "toggleMenuAria": "فتح القائمة",
-    "searchLocationPlaceholder": "البحث عن موقع",
-    "searchEventPlaceholder": "نوع الفعالية",
-    "needAssistance": "هل تحتاج مساعدة؟"
+    "searchLocationPlaceholder": "ابحث عن مكان",
+    "searchEventPlaceholder": "ابحث عن فعالية",
+    "needAssistance": "تحتاج مساعدة؟"
+  },
+  "aria": {
+    "trend": "تراند",
+    "change": "التغيير"
   },
   "userMenu": {
     "profile": "الملف الشخصي",
     "dashboard": "لوحة التحكم",
-    "attendeeDashboard": "لوحة الحضور",
-    "organizerDashboard": "لوحة المنظِّم",
-    "becomeOrganizer": "كن منظِّماً",
+    "attendeeDashboard": "فضاء المشارك",
+    "organizerDashboard": "فضاء المنظّم",
+    "becomeOrganizer": "كن منظّمًا",
     "myTickets": "تذاكري",
     "settings": "الإعدادات",
-    "helpSupport": "المساعدة / الدعم",
+    "helpSupport": "المساعدة",
     "verified": "موثَّق"
   }
 }

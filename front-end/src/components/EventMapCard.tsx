@@ -62,13 +62,13 @@ const EventMapCard = ({
           {title}
         </h3>
         <p className="text-sm text-[#757575] mb-1">
-          {date} • {venue}
+          <bdi>{date}</bdi> • {venue}
         </p>
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#757575]">{t('eventMapCard.fromPrice')}</span>
-            <span className="text-base font-semibold text-black">{price}</span>
+            <span className="text-base font-semibold text-black"><bdi>{price === 'Free' ? t('searchResult.freePrice') : price}</bdi></span>
           </div>
           {badge && (
             <span 

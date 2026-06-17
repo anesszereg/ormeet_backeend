@@ -23,7 +23,7 @@
     "headingPrefix": "Découvrez",
     "headingMiddle": "les événements à",
     "locationAlt": "Lieu",
-    "fromPrice": "à partir de {price}",
+    "fromPrice": "à partir de <bdi>{price}</bdi>",
     "empty": "Aucun événement trouvé dans cette catégorie.",
     "categories": {
       "all": "Toutes les catégories",
@@ -36,7 +36,7 @@
   "trending": {
     "titlePrefix": "Événements",
     "titleSuffix": "populaires",
-    "fromPrice": "à partir de {price}",
+    "fromPrice": "à partir de <bdi>{price}</bdi>",
     "badges": {
       "almostFull": "Bientôt complet",
       "salesEndSoon": "Fin des ventes",
@@ -45,7 +45,7 @@
   },
   "city": {
     "headingPrefix": "Événements à",
-    "fromPrice": "à partir de {price}",
+    "fromPrice": "à partir de <bdi>{price}</bdi>",
     "badges": {
       "trending": "Tendance",
       "almostFull": "Bientôt complet"

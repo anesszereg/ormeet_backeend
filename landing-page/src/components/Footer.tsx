@@ -26,7 +26,7 @@ const Footer = () => {
     <div className="w-full">
       <footer className="w-full bg-white border-t border-light-gray">
         {/* Main Footer Content */}
-        <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 xl:px-20 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-10 md:py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             {/* Logo and Description */}
             <div className="lg:col-span-1">
@@ -147,7 +147,7 @@ const Footer = () => {
 
         {/* Copyright Section */}
         <div className="border-t border-light-gray">
-          <div className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 xl:px-20 py-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-4">
             <p className="text-sm text-muted text-center">
               {t("copyright", { year })}
             </p>
@@ -156,13 +156,13 @@ const Footer = () => {
       </footer>
 
       {/* Large Ormeet Text Background */}
-      <div className="w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: "280px" }}>
+      <div className="w-full bg-white flex items-center justify-center overflow-hidden h-[120px] sm:h-[180px] md:h-[220px] lg:h-[280px]">
         <Image
           src="/images/landingPage/footer.png"
           alt={t("logoAlt")}
           width={1200}
           height={280}
-          className="h-full w-auto object-contain"
+          className="w-full h-auto object-contain max-h-full"
         />
       </div>
     </div>

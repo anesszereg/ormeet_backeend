@@ -53,6 +53,11 @@ const PurchaseConfirmation: React.FC = () => {
   const { user } = useAuth();
   const state = location.state as LocationState | null;
 
+  const handleGoBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   const [showAllEvents, setShowAllEvents] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
   const [isProcessing, setIsProcessing] = useState(true);
@@ -63,16 +68,10 @@ const PurchaseConfirmation: React.FC = () => {
   useEffect(() => {
     const createOrder = async () => {
       if (!state || !user) {
-        console.error('❌ [PurchaseConfirmation] Missing state or user');
         setError('Missing order information. Please go back and try again.');
         setIsProcessing(false);
         return;
       }
-
-      console.log('🛒 [PurchaseConfirmation] Creating order...');
-      console.log('👤 [PurchaseConfirmation] User ID:', user.id);
-      console.log('📧 [PurchaseConfirmation] User email:', user.email);
-      console.log('📦 [PurchaseConfirmation] Order items:', state.orderItems);
 
       try {
         const orderData: CreateOrderDto = {
@@ -97,18 +96,13 @@ const PurchaseConfirmation: React.FC = () => {
           metadata: { source: 'web_app' },
         };
 
-        console.log('📤 [PurchaseConfirmation] Sending order to backend:', orderData);
         const createdOrder = await orderService.create(orderData);
-        console.log('✅ [PurchaseConfirmation] Order created:', createdOrder.id);
 
         // Auto-complete payment (simulated — in production, integrate Stripe/PayPal here)
-        console.log('💳 [PurchaseConfirmation] Completing payment...');
         const paidOrder = await orderService.completePayment(createdOrder.id, `sim_${Date.now()}`);
-        console.log('✅ [PurchaseConfirmation] Payment completed, order status:', paidOrder.status);
         setOrder(paidOrder);
       } catch (err: any) {
-        console.error('❌ [PurchaseConfirmation] Order creation failed:', err);
-        console.error('❌ [PurchaseConfirmation] Error details:', err.response?.data);
+        console.error('Failed to process order:', err);
         setError(err.response?.data?.message || 'Failed to process your order. Please try again.');
       } finally {
         setIsProcessing(false);
@@ -174,7 +168,7 @@ const PurchaseConfirmation: React.FC = () => {
           </div>
           <h2 className="text-xl font-bold text-black mb-2">{t('purchaseConfirmation.error.title')}</h2>
           <p className="text-red-500 mb-6">{error}</p>
-          <button onClick={() => navigate(-1)} className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors">{t('purchaseConfirmation.error.goBack')}</button>
+          <button onClick={handleGoBack} className="px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors">{t('purchaseConfirmation.error.goBack')}</button>
         </div>
       </div>
     );
@@ -244,7 +238,7 @@ const PurchaseConfirmation: React.FC = () => {
           >
             <span className="text-sm">{t('purchaseConfirmation.goToMyTickets')}</span>
             <div className="w-7 h-7 bg-white rounded-full flex items-center justify-center ms-4">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="rtl:scale-x-[-1]">
                 <path 
                   d="M3.5 8H12.5M12.5 8L8.5 4M12.5 8L8.5 12" 
                   stroke="#FF4000" 
@@ -293,7 +287,7 @@ const PurchaseConfirmation: React.FC = () => {
               <div className="flex-1 h-px bg-[#EEEEEE]"></div>
             </div>
             
-            <div className="flex gap-8">
+            <div className="flex flex-wrap gap-x-8 gap-y-4">
               {ticketSummary.map((ticket, index) => (
                 <div key={index}>
                   <p className="text-sm text-[#757575]">{ticket.name}</p>
@@ -320,7 +314,7 @@ const PurchaseConfirmation: React.FC = () => {
                 <img 
                   src={event.image} 
                   alt={event.title}
-                  className="w-[140px] h-[95px] object-cover rounded-lg shrink-0"
+                  className="w-[110px] h-[80px] sm:w-[140px] sm:h-[95px] object-cover rounded-lg shrink-0"
                 />
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base font-semibold text-black mb-2 line-clamp-1">

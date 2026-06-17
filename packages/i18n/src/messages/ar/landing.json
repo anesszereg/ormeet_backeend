@@ -1,140 +1,139 @@
 {
   "meta": {
-    "title": "Ormeet — Find your next event",
-    "description": "Discover concerts, workshops, meetups, festivals and book your tickets in seconds."
+    "title": "Ormeet — اعثر على فعاليتك القادمة",
+    "description": "اكتشف الحفلات، ورشات العمل، اللقاءات، والمهرجانات، واحجز تذاكرك في ثوانٍ."
   },
   "hero": {
-    "title": "<b>Find</b> It. <b>Book</b> It. <b>Enjoy</b> It.",
-    "subtitle": "Find concerts, workshops, meetups, and more—your next event is just a search away."
+    "title": "<b>اكتشف</b>. <b>احجز</b>. <b>عش التجربة</b>.",
+    "subtitle": "حفلات، ورشات عمل، لقاءات، والمزيد — فعاليتك القادمة على بُعد بحث واحد."
   },
   "search": {
-    "whereLabel": "Where",
-    "wherePlaceholder": "Search Location",
-    "whatLabel": "What",
-    "whatPlaceholder": "Search events",
-    "buttonAria": "Search events",
-    "locationAlt": "Location"
+    "whereLabel": "أين",
+    "wherePlaceholder": "ابحث عن مكان",
+    "whatLabel": "ماذا",
+    "whatPlaceholder": "ابحث عن فعالية",
+    "buttonAria": "بحث",
+    "locationAlt": "الموقع"
   },
   "carousel": {
-    "previousAria": "Previous event",
-    "nextAria": "Next event"
+    "previousAria": "الفعالية السابقة",
+    "nextAria": "الفعالية التالية"
   },
   "discover": {
-    "headingPrefix": "Discover",
-    "headingMiddle": "events in",
-    "locationAlt": "Location",
-    "fromPrice": "from {price}",
-    "empty": "No events found in this category.",
+    "headingPrefix": "اكتشف",
+    "headingMiddle": "الفعاليات في",
+    "locationAlt": "الموقع",
+    "fromPrice": "ابتداءً من <bdi>{price}</bdi>",
+    "empty": "لا توجد فعاليات في هذه الفئة.",
     "categories": {
-      "all": "All Categories",
-      "music": "Music",
-      "sports": "Sports",
-      "foodDrink": "Food & Drink",
-      "artPerformance": "Art & Performance"
+      "all": "كل الفئات",
+      "music": "موسيقى",
+      "sports": "رياضة",
+      "foodDrink": "مأكولات ومشروبات",
+      "artPerformance": "فن وعروض"
     }
   },
   "trending": {
-    "titlePrefix": "Trending",
-    "titleSuffix": "events",
-    "fromPrice": "from {price}",
+    "titlePrefix": "الفعاليات",
+    "titleSuffix": "الأكثر رواجًا",
+    "fromPrice": "ابتداءً من <bdi>{price}</bdi>",
     "badges": {
-      "almostFull": "Almost full",
-      "salesEndSoon": "Sales end soon",
-      "onlyFewLeft": "Only few left"
+      "almostFull": "أوشكت على الامتلاء",
+      "salesEndSoon": "البيع ينتهي قريبًا",
+      "onlyFewLeft": "آخر التذاكر"
     }
   },
   "city": {
-    "headingPrefix": "Events in",
-    "fromPrice": "from {price}",
+    "headingPrefix": "فعاليات",
+    "fromPrice": "ابتداءً من <bdi>{price}</bdi>",
     "badges": {
-      "trending": "Trending",
-      "almostFull": "Almost full"
+      "trending": "رائج",
+      "almostFull": "أوشكت على الامتلاء"
     }
   },
   "vibe": {
-    "titleStart": "Find events that match",
-    "titleHighlight": "your vibe",
-    "description": "Browse events by category and find what you love — from music and fitness to food, business, art, and more. Ormeet has something for everyone!",
+    "titleStart": "اعثر على فعاليات تشبه",
+    "titleHighlight": "ذوقك",
+    "description": "تصفّح الفعاليات حسب الفئة واعثر على ما يناسبك — من الموسيقى واللياقة إلى الطبخ، الأعمال، الفن، والمزيد. Ormeet فيها شيء للجميع!",
     "categories": {
-      "fitness": "Fitness",
-      "music": "Music",
-      "dating": "Dating",
-      "nightlife": "Nightlife",
-      "holiday": "Holiday",
-      "foodDrink": "Food & Drink",
-      "art": "Art",
-      "sports": "Sports",
-      "business": "Business",
-      "wellness": "Wellness",
-      "comedy": "Comedy",
-      "theater": "Theater",
-      "outdoor": "Outdoor",
-      "tech": "Tech",
-      "fashion": "Fashion"
+      "fitness": "لياقة بدنية",
+      "music": "موسيقى",
+      "dating": "مواعدة",
+      "nightlife": "حياة ليلية",
+      "holiday": "عطل",
+      "foodDrink": "مأكولات ومشروبات",
+      "art": "فن",
+      "sports": "رياضة",
+      "business": "أعمال",
+      "wellness": "صحة وعافية",
+      "comedy": "كوميديا",
+      "theater": "مسرح",
+      "outdoor": "هواء طلق",
+      "tech": "تكنولوجيا",
+      "fashion": "موضة"
     }
   },
   "bigCities": {
-    "titleStart": "Big cities. bigger events.",
-    "titleHighlight": "find yours.",
-    "description": "Where's the fun happening? Just pick a city and find out! Discover events, meetups, and unforgettable experiences.",
-    "from": "From"
+    "titleStart": "مدن كبرى. فعاليات أكبر.",
+    "titleHighlight": "اعثر على فعاليتك.",
+    "description": "أين الأجواء الحلوة؟ اختر مدينتك واكتشف! تعرّف على الفعاليات، اللقاءات، والتجارب التي لا تُنسى.",
+    "from": "ابتداءً من"
   },
   "testimonials": {
-    "subtitle": "5000+ Happy Ormeet Users",
-    "titleLoved": "Loved",
-    "titleByAttendees": "by attendees.",
-    "titleTrusted": "trusted",
-    "titleByOrganizers": "by organizers."
+    "subtitle": "أكثر من 5000 مستخدم سعيد على Ormeet",
+    "titleLoved": "محبوبة",
+    "titleByAttendees": "من قِبل المشاركين.",
+    "titleTrusted": "موثوقة",
+    "titleByOrganizers": "من قِبل المنظّمين."
   },
   "newsletter": {
-    "title": "Be the first to know. never miss an event again!",
-    "description": "Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.",
-    "placeholder": "Enter your email",
-    "buttonAria": "Keep Me Updated"
+    "title": "كن أوّل من يعرف. لا تفوّت أي فعالية بعد اليوم!",
+    "description": "تلقَّ آخر العروض، الوصول المبكر، وفعاليات مختارة بعناية — مباشرةً إلى بريدك.",
+    "placeholder": "أدخل بريدك الإلكتروني",
+    "buttonAria": "أبقني على اطّلاع"
   },
   "footer": {
-    "description": "Ormeet connects people through unforgettable events — from live concerts to workshops. Discover and book nearby experiences, or host your own with ease. Whether you're attending or organizing, Ormeet makes events simple, exciting, and effortlessly accessible.",
-    "browseEvents": "Browse Events",
-    "hostEvents": "Host Events",
-    "support": "Support",
-    "company": "Company",
-    "legal": "Legal",
+    "description": "Ormeet تجمع المهتمين حول فعاليات لا تُنسى — من الحفلات المباشرة إلى ورشات العمل. اكتشف واحجز تجارب قريبة منك، أو نظّم فعالياتك الخاصة بكل سهولة. سواء كنت مشاركًا أو منظّمًا، Ormeet تجعل الفعاليات بسيطة، ممتعة، وفي متناول الجميع.",
+    "browseEvents": "تصفّح الفعاليات",
+    "hostEvents": "تنظيم الفعاليات",
+    "support": "المساعدة",
+    "company": "الشركة",
+    "legal": "الشؤون القانونية",
     "categories": {
-      "music": "Music",
-      "sports": "Sports",
-      "business": "Business",
-      "fitness": "Fitness",
-      "nightlife": "Nightlife",
-      "holiday": "Holiday",
-      "dating": "Dating",
-      "festival": "Festival"
+      "music": "موسيقى",
+      "sports": "رياضة",
+      "business": "أعمال",
+      "fitness": "لياقة بدنية",
+      "nightlife": "حياة ليلية",
+      "holiday": "عطل",
+      "dating": "مواعدة",
+      "festival": "مهرجانات"
     },
     "host": {
-      "createEvents": "Create Events",
-      "features": "Features",
-      "pricing": "Pricing"
+      "createEvents": "أنشئ فعالية",
+      "features": "الميزات",
+      "pricing": "الأسعار"
     },
     "supportLinks": {
-      "helpCenter": "Help center",
-      "findTickets": "Find your tickets",
-      "contactOrganizer": "Contact event organizer"
+      "helpCenter": "مركز المساعدة",
+      "findTickets": "استعد تذاكرك",
+      "contactOrganizer": "تواصل مع المنظّم"
     },
     "companyLinks": {
-      "about": "About us",
-      "contact": "Contact us",
-      "blog": "Blog"
+      "about": "من نحن",
+      "contact": "تواصل معنا",
+      "blog": "المدونة"
     },
     "legalLinks": {
-      "terms": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "cookies": "Cookie Policy",
-      "refund": "Refund & Cancellation"
+      "terms": "شروط الاستخدام",
+      "privacy": "سياسة الخصوصية",
+      "cookies": "سياسة ملفات تعريف الارتباط",
+      "refund": "الاسترداد والإلغاء"
     },
-    "copyright": "© {year} Ormeet. All rights reserved.",
+    "copyright": "© {year} Ormeet. جميع الحقوق محفوظة.",
     "logoAlt": "Ormeet"
   },
   "languageSwitcher": {
-    "label": "Change language"
+    "label": "تغيير اللغة"
   }
 }
-

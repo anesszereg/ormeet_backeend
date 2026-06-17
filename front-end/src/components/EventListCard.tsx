@@ -43,7 +43,7 @@ const EventListCard = ({
       className={`bg-white rounded-2xl overflow-hidden transition-all cursor-pointer flex w-full border border-[#EEEEEE] ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.01]'}`}
     >
       {/* Event image - Left side */}
-      <div className="relative w-[240px] xl:w-[280px] 2xl:w-[320px] h-[180px] shrink-0">
+      <div className="relative w-32 sm:w-40 md:w-[200px] lg:w-[240px] xl:w-[280px] 2xl:w-[320px] h-24 sm:h-32 md:h-[160px] lg:h-[180px] shrink-0">
         <img src={image} alt={title} className="w-full h-full object-cover" />
       </div>
 
@@ -54,7 +54,7 @@ const EventListCard = ({
             {title}
           </h3>
           <p className="text-sm text-[#757575] mb-2">
-            {date} • {venue}
+            <bdi>{date}</bdi> • {venue}
           </p>
           {description && (
             <p className="text-sm text-[#757575] line-clamp-2">
@@ -66,7 +66,7 @@ const EventListCard = ({
         <div className="flex items-center justify-between mt-2">
           <div className="flex items-baseline gap-1">
             <span className="text-xs text-[#757575]">{t('eventListCard.fromPrice')}</span>
-            <span className="text-base font-semibold text-black">{price}</span>
+            <span className="text-base font-semibold text-black"><bdi>{price === 'Free' ? t('searchResult.freePrice') : price}</bdi></span>
           </div>
           {isPast ? (
             <span className="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-500">

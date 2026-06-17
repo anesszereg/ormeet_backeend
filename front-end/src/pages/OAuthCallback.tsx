@@ -80,7 +80,7 @@ const OAuthCallback = () => {
           <div className="w-full max-w-[460px] flex flex-col gap-6 items-center">
             <img src={Logo} alt="Ormeet Logo" className="w-7 h-[38px]" />
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF4000]"></div>
-            <p className="text-lg text-[#4F4F4F]">Completing sign in...</p>
+            <p className="text-lg text-[#4F4F4F]">{t('oauthCallback.completing')}</p>
           </div>
         </div>
         <div className="hidden md:flex flex-1 relative overflow-hidden bg-gradient-to-br from-[#667eea] to-[#764ba2]">
@@ -98,8 +98,8 @@ const OAuthCallback = () => {
             <img src={Logo} alt="Ormeet Logo" className="w-7 h-[38px]" />
             
             <div className="flex flex-col gap-2">
-              <h1 className="text-2xl sm:text-[28px] font-bold text-black">Authentication Failed</h1>
-              <p className="text-sm text-[#4F4F4F] leading-relaxed">We couldn't complete your sign in.</p>
+              <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('oauthCallback.title')}</h1>
+              <p className="text-sm text-[#4F4F4F] leading-relaxed">{t('oauthCallback.errorMessage')}</p>
             </div>
 
             <div className="px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
@@ -110,7 +110,7 @@ const OAuthCallback = () => {
               onClick={() => navigate('/login')}
               className="w-full px-6 py-3.5 bg-[#FF4000] text-white text-base font-semibold rounded-lg hover:bg-[#E63900] transition-all"
             >
-              Back to Login
+              {t('oauthCallback.backToLogin')}
             </button>
           </div>
         </div>

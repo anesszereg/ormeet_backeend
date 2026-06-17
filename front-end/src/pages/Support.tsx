@@ -5,6 +5,11 @@ const Support = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('attendee');
 
+  const handleGoBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-lg p-8">
@@ -87,7 +92,7 @@ const Support = () => {
         </div>
 
         <button
-          onClick={() => navigate(-1)}
+          onClick={handleGoBack}
           className="mt-8 px-6 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
         >
           {t('support.goBack')}

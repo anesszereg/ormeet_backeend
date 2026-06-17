@@ -1,6 +1,7 @@
 {
   "searchResult": {
-    "resultsCount": "{{count}} Results",
+    "resultsCount_one": "{{count}} Result",
+    "resultsCount_other": "{{count}} Results",
     "resultsFor": "for",
     "filterButton": "Filter",
     "filters": {
@@ -24,6 +25,32 @@
       "organizerOptions": {
         "following": "Events by Organizers You Follow",
         "all": "Events by All Organizers"
+      },
+      "cityLabel": "City",
+      "eventTypeLabel": "Event Type",
+      "eventTypeAll": "All",
+      "eventTypeFree": "Free",
+      "eventTypePaid": "Paid",
+      "clearAll": "Clear all",
+      "showResults_one": "Show {{count}} result",
+      "showResults_other": "Show {{count}} results",
+      "close": "Close",
+      "cities": {
+        "Algiers": "Algiers",
+        "Oran": "Oran",
+        "Constantine": "Constantine",
+        "Annaba": "Annaba",
+        "Blida": "Blida",
+        "Setif": "Setif"
+      },
+      "categories": {
+        "Music": "Music",
+        "Sports": "Sports",
+        "Tech": "Tech",
+        "Nightlife": "Nightlife",
+        "Food & Drink": "Food & Drink",
+        "Business": "Business",
+        "Fitness": "Fitness"
       }
     },
     "viewMode": {
@@ -36,7 +63,9 @@
     },
     "map": {
       "title": "Event locations map"
-    }
+    },
+    "freePrice": "Free",
+    "defaultDate": "Apr 20, 2025"
   },
   "eventDetails": {
     "dateTime": {
@@ -50,7 +79,19 @@
         "wed": "Wed",
         "thu": "Thu",
         "fri": "Fri",
-        "sat": "Sat"
+        "sat": "Sat",
+        "jan": "Jan",
+        "feb": "Feb",
+        "mar": "Mar",
+        "apr": "Apr",
+        "may": "May",
+        "jun": "Jun",
+        "jul": "Jul",
+        "aug": "Aug",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Dec"
       },
       "timeSlotsAvailable_one": "{{count}} time available for {{date}}",
       "timeSlotsAvailable_other": "{{count}} times available for {{date}}",
@@ -156,6 +197,12 @@
       "sectionTitleSuffix": "events in similar category",
       "paginationOf": "of",
       "fromPrice": "from"
+    },
+    "badges": {
+      "trending": "Trending",
+      "almostFull": "Almost full",
+      "salesEndSoon": "Sales end soon",
+      "onlyFewLeft": "Only few left"
     },
     "newsletter": {
       "title": "Be the first to know,",

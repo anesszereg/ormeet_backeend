@@ -133,7 +133,7 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
 
                   <button
                     onClick={() => navigate(`/event/${event.id}`)}
-                    className="w-full py-2.5 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
+                    className="w-full py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
                   >
                     {t('favoriteEvents.viewDetails')}
                   </button>

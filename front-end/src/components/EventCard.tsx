@@ -40,13 +40,13 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
           {title}
         </h3>
         <p className="text-base md:text-sm text-[#757575] mb-2">
-          {date} • {venue}
+          <bdi>{date}</bdi> • {venue}
         </p>
 
         <div className="flex items-center justify-between mt-3">
           <div className="flex items-baseline gap-1">
             <span className="text-sm md:text-xs text-[#757575]">{t('eventCard.fromPrice')}</span>
-            <span className="text-lg md:text-base font-semibold text-black">{price}</span>
+            <span className="text-lg md:text-base font-semibold text-black"><bdi>{price === 'Free' ? t('searchResult.freePrice') : price}</bdi></span>
           </div>
           {isPast ? (
             <span className="text-sm md:text-xs font-medium px-3 py-1.5 md:py-1 rounded-full bg-gray-100 text-gray-500">

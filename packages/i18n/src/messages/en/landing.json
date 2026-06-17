@@ -23,7 +23,7 @@
     "headingPrefix": "Discover",
     "headingMiddle": "events in",
     "locationAlt": "Location",
-    "fromPrice": "from {price}",
+    "fromPrice": "from <bdi>{price}</bdi>",
     "empty": "No events found in this category.",
     "categories": {
       "all": "All Categories",
@@ -36,7 +36,7 @@
   "trending": {
     "titlePrefix": "Trending",
     "titleSuffix": "events",
-    "fromPrice": "from {price}",
+    "fromPrice": "from <bdi>{price}</bdi>",
     "badges": {
       "almostFull": "Almost full",
       "salesEndSoon": "Sales end soon",
@@ -45,7 +45,7 @@
   },
   "city": {
     "headingPrefix": "Events in",
-    "fromPrice": "from {price}",
+    "fromPrice": "from <bdi>{price}</bdi>",
     "badges": {
       "trending": "Trending",
       "almostFull": "Almost full"

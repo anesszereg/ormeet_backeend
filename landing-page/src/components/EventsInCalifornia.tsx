@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
@@ -27,6 +27,8 @@ const EventsInCalifornia = ({
   selectedCity = "California",
 }: EventsInCaliforniaProps) => {
   const t = useTranslations("landing.city");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   // Filter to events whose city/venue matches the selected city.
   // If no match, show every event (still real data).
   const filtered = useMemo(() => {
@@ -87,12 +89,21 @@ const EventsInCalifornia = ({
               {event.title}
             </h3>
             <p className="text-sm text-medium-gray mb-1.5">
-              {[event.date, event.venue].filter(Boolean).join(" • ")}
+              {event.date && (
+                <><bdi>{new Date(event.date).toLocaleDateString(
+                  localeMap[locale] || 'en-US',
+                  { month: 'short', day: 'numeric' }
+                )}</bdi> • </>
+              )}
+              {event.venue}
             </p>
             <div className="flex items-center gap-2 flex-wrap">
               {event.price && (
                 <span className="text-sm font-semibold text-black">
-                  {t("fromPrice", { price: event.price })}
+                  {t.rich("fromPrice", {
+                    price: event.price,
+                    bdi: (chunks) => <bdi>{chunks}</bdi>
+                  })}
                 </span>
               )}
               {event.category && (

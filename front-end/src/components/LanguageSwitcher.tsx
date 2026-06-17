@@ -20,9 +20,16 @@ export function LanguageSwitcher() {
   }, []);
 
   const switchTo = (loc: Locale) => {
+    if (loc === currentLocale) {
+      setOpen(false);
+      return;
+    }
     setLocaleCookie(loc);
     i18n.changeLanguage(loc);
     setOpen(false);
+    // Force a full re-render of the app to ensure all components
+    // (dates, currencies, formats) use the new locale immediately
+    window.location.reload();
   };
 
   return (

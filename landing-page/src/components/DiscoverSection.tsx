@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 
@@ -94,6 +94,8 @@ const DiscoverSection = ({
   onCityChange,
 }: DiscoverSectionProps) => {
   const t = useTranslations("landing.discover");
+  const locale = useLocale();
+  const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
   const [selectedCity, setSelectedCity] = useState<City>("California");
   const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("all");
   const activeCategory = useMemo<Category>(
@@ -259,11 +261,20 @@ const DiscoverSection = ({
                 {event.title}
               </h3>
               <p className="text-sm text-medium-gray mb-1.5">
-                {[event.date, event.venue].filter(Boolean).join(" • ")}
+                {event.date && (
+                  <><bdi>{new Date(event.date).toLocaleDateString(
+                    localeMap[locale] || 'en-US',
+                    { month: 'short', day: 'numeric' }
+                  )}</bdi> • </>
+                )}
+                {event.venue}
               </p>
               {event.price && (
                 <span className="text-sm font-semibold text-black">
-                  {t("fromPrice", { price: event.price })}
+                  {t.rich("fromPrice", {
+                    price: event.price,
+                    bdi: (chunks) => <bdi>{chunks}</bdi>
+                  })}
                 </span>
               )}
             </div>

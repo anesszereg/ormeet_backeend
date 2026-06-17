@@ -10,7 +10,7 @@ const Footer = () => {
       {/* Footer Content - Full width, positioned above image */}
       <footer className="w-full bg-white border-t border-[#EEEEEE]">
         {/* Main Footer Content */}
-        <div className="max-w-7xl mx-auto px-8 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           {/* Logo and Description - Takes more space */}
           <div className="md:col-span-1">
@@ -131,7 +131,7 @@ const Footer = () => {
       
       {/* Footer Background Image - Final element of the page, full width */}
       {/* Background color matches footer for visual continuity */}
-      <div className="w-full bg-white flex items-center justify-center overflow-hidden" style={{ height: '280px' }}>
+      <div className="w-full bg-white flex items-center justify-center overflow-hidden h-[120px] sm:h-[180px] md:h-[280px]">
         <img 
           src={FooterBg} 
           alt="Ormeet" 
