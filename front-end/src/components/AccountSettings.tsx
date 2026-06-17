@@ -428,8 +428,8 @@ const AccountSettings = () => {
                 <div className="space-y-6">
                   {savedCards.length === 0 ? (
                     /* Empty State */
-                    <div className="bg-white rounded-xl border border-light-gray p-12 flex flex-col items-center justify-center">
-                      <div className="w-64 h-40 mb-6">
+                    <div className="bg-white rounded-xl border border-light-gray p-6 sm:p-12 flex flex-col items-center justify-center">
+                      <div className="w-48 h-32 sm:w-64 sm:h-40 mb-6">
                         <img src={CardFirstImage} alt="Card" className="w-full h-full object-contain" />
                       </div>
                       <h2 className="text-xl font-bold text-black mb-2">{t('accountSettings.paymentMethods.empty.title')}</h2>
@@ -513,7 +513,7 @@ const AccountSettings = () => {
                           className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                         />
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="flex flex-col gap-2">
                           <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.expireMonth')}</label>
                           <input
@@ -731,7 +731,7 @@ const AccountSettings = () => {
                     <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
                     <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
                   </div>
-                  <label className="relative inline-flex items-center cursor-pointer ms-6">
+                  <label className="relative inline-flex items-center cursor-pointer ms-6 shrink-0">
                     <input
                       type="checkbox"
                       checked={twoFactorEnabled}
@@ -750,10 +750,23 @@ const AccountSettings = () => {
       {/* Profile Edit Modal */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showProfileSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setProfileError(''); setIsProfileModalOpen(false); }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label={t('accountSettings.personalInfo.modals.cancel')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {profileError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {profileError}
@@ -810,7 +823,7 @@ const AccountSettings = () => {
               </div>
             )}
             {!showProfileSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setProfileError('');
@@ -841,10 +854,23 @@ const AccountSettings = () => {
       {/* Email Edit Modal */}
       {isEmailModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showEmailSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setEmailError(''); setIsEmailModalOpen(false); }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label={t('accountSettings.personalInfo.modals.cancel')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {emailError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {emailError}
@@ -886,7 +912,7 @@ const AccountSettings = () => {
               </div>
             )}
             {!showEmailSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setEmailError('');
@@ -917,10 +943,23 @@ const AccountSettings = () => {
       {/* Phone Edit Modal */}
       {isPhoneModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPhoneSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setPhoneError(''); setIsPhoneModalOpen(false); }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label={t('accountSettings.personalInfo.modals.cancel')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {phoneError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {phoneError}
@@ -962,7 +1001,7 @@ const AccountSettings = () => {
               </div>
             )}
             {!showPhoneSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setPhoneError('');
@@ -993,10 +1032,23 @@ const AccountSettings = () => {
       {/* Location Edit Modal */}
       {isLocationModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showLocationSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setLocationError(''); setIsLocationModalOpen(false); }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label={t('accountSettings.personalInfo.modals.cancel')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {locationError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {locationError}
@@ -1039,7 +1091,7 @@ const AccountSettings = () => {
               </div>
             )}
             {!showLocationSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setLocationError('');
@@ -1070,10 +1122,23 @@ const AccountSettings = () => {
       {/* Password Edit Modal */}
       {isEditPasswordOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPasswordSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => { setPasswordError(''); setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' }); setIsEditPasswordOpen(false); }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label={t('accountSettings.loginSecurity.modals.changePassword.cancel')}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {passwordError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {passwordError}
@@ -1116,7 +1181,7 @@ const AccountSettings = () => {
               </div>
             )}
             {!showPasswordSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setPasswordError('');

@@ -25,27 +25,18 @@ const Login = () => {
 
   const handlePhoneChange = (fullPhone: string) => {
     setPhone(fullPhone);
-    if (error) {
-      console.log('Clearing error on phone change');
-      setError('');
-    }
+    if (error) setError('');
   };
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     if (field === 'email') setEmail(value);
     if (field === 'password') setPassword(value);
-    if (error) {
-      console.log('Clearing error on input change');
-      setError('');
-    }
+    if (error) setError('');
   };
 
   const handleLoginMethodChange = (method: 'email' | 'phone') => {
     setLoginMethod(method);
-    if (error) {
-      console.log('Clearing error on login method change');
-      setError('');
-    }
+    if (error) setError('');
   };
 
   const { login } = useAuth();
@@ -72,38 +63,26 @@ const Login = () => {
       
       const user = authService.getCurrentUser();
       
-      console.log('🔍 [Login] User data:', user);
-      console.log('🔍 [Login] User roles:', user?.roles);
-      console.log('🔍 [Login] interestedEventCategories:', user?.interestedEventCategories);
-      console.log('🔍 [Login] hostingEventTypes:', user?.hostingEventTypes);
-      
       // Check if user needs onboarding (first time login)
       // User needs onboarding if they don't have interests/hosting types set
       const needsOnboarding = user?.roles?.includes('organizer') 
         ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       
-      console.log('🔍 [Login] needsOnboarding:', needsOnboarding);
-      console.log('🔍 [Login] Is organizer:', user?.roles?.includes('organizer'));
-      
       if (needsOnboarding) {
         // Redirect to onboarding based on role
         if (user?.roles?.includes('organizer')) {
-          console.log('✅ [Login] Redirecting to organizer onboarding');
           // Use setTimeout to ensure navigation happens after state updates
           setTimeout(() => {
             navigate('/onboarding-brand-info', { replace: true });
           }, 100);
         } else {
-          console.log('✅ [Login] Redirecting to attendee onboarding');
           setTimeout(() => {
             navigate('/onboarding-interests', { replace: true });
           }, 100);
         }
         return;
       }
-      
-      console.log('✅ [Login] User has completed onboarding, redirecting to dashboard');
       
       // Navigate to dashboard based on user role
       if (user?.roles?.includes('organizer')) {
@@ -113,7 +92,6 @@ const Login = () => {
       }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || 'Login failed. Please try again.';
-      console.log('Setting error:', errorMessage);
       
       // Check if error is due to unverified email
       if (errorMessage.toLowerCase().includes('verify') || errorMessage.toLowerCase().includes('verification')) {

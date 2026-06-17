@@ -39,9 +39,9 @@ const HostEvents = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFF4F3] to-white">
       {/* Hero Section */}
-      <div className="max-w-6xl mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-6 py-10 md:py-20">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-black mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-6">
             {t('hostEvents.title')} <span className="text-[#FF4000]">{t('hostEvents.titleBrand')}</span>
           </h1>
           <p className="text-xl text-[#4F4F4F] max-w-2xl mx-auto">
@@ -89,7 +89,7 @@ const HostEvents = () => {
         </div>
 
         {/* Benefits Section */}
-        <div className="bg-white rounded-2xl p-12 shadow-sm mb-16">
+        <div className="bg-white rounded-2xl p-6 md:p-12 shadow-sm mb-16">
           <h2 className="text-3xl font-bold text-black mb-8 text-center">{t('hostEvents.whyOrmeet')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-start gap-4">

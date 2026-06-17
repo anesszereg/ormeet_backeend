@@ -97,7 +97,7 @@ const NotificationBell = () => {
       {/* Notification Panel */}
       {isOpen && (
         <div
-          className="absolute end-0 top-full mt-2 w-[370px] bg-white rounded-xl z-50 overflow-hidden border border-[#EEEEEE]"
+          className="absolute end-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-[370px] max-w-[370px] bg-white rounded-xl z-50 overflow-hidden border border-[#EEEEEE]"
           style={{ boxShadow: '0 8px 30px rgba(0, 0, 0, 0.10)' }}
         >
           {/* Header */}

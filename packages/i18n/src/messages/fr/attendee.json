@@ -1,6 +1,7 @@
 {
   "searchResult": {
-    "resultsCount": "{{count}} résultats",
+    "resultsCount_one": "{{count}} résultat",
+    "resultsCount_other": "{{count}} résultats",
     "resultsFor": "pour",
     "filterButton": "Filtrer",
     "filters": {
@@ -24,6 +25,32 @@
       "organizerOptions": {
         "following": "Événements des organisateurs suivis",
         "all": "Tous les organisateurs"
+      },
+      "cityLabel": "Ville",
+      "eventTypeLabel": "Type d'événement",
+      "eventTypeAll": "Tous",
+      "eventTypeFree": "Gratuit",
+      "eventTypePaid": "Payant",
+      "clearAll": "Tout effacer",
+      "showResults_one": "Voir {{count}} résultat",
+      "showResults_other": "Voir {{count}} résultats",
+      "close": "Fermer",
+      "cities": {
+        "Algiers": "Alger",
+        "Oran": "Oran",
+        "Constantine": "Constantine",
+        "Annaba": "Annaba",
+        "Blida": "Blida",
+        "Setif": "Sétif"
+      },
+      "categories": {
+        "Music": "Musique",
+        "Sports": "Sport",
+        "Tech": "Tech",
+        "Nightlife": "Nightlife",
+        "Food & Drink": "Restauration",
+        "Business": "Business",
+        "Fitness": "Fitness"
       }
     },
     "viewMode": {
@@ -52,7 +79,19 @@
         "wed": "Mer",
         "thu": "Jeu",
         "fri": "Ven",
-        "sat": "Sam"
+        "sat": "Sam",
+        "jan": "Jan",
+        "feb": "Fév",
+        "mar": "Mar",
+        "apr": "Avr",
+        "may": "Mai",
+        "jun": "Juin",
+        "jul": "Juil",
+        "aug": "Août",
+        "sep": "Sep",
+        "oct": "Oct",
+        "nov": "Nov",
+        "dec": "Déc"
       },
       "alerts": {
   "favoriteFailed": "Échec de la mise à jour des favoris",
@@ -84,8 +123,8 @@
       "goToImage": "Aller à l'image {{number}}"
     },
     "alerts": {
-      "favoriteFailed": "Failed to update favorites",
-      "followFailed": "Failed to update following status"
+      "favoriteFailed": "Impossible de mettre à jour les favoris",
+      "followFailed": "Impossible de mettre à jour les abonnements"
     },
     "guidelines": {
       "sectionTitle": "Règles et consignes",

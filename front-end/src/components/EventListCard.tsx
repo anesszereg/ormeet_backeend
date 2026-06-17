@@ -39,7 +39,7 @@ const EventListCard = ({
       className="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition-all cursor-pointer flex w-full border border-[#EEEEEE] hover:scale-[1.01]"
     >
       {/* Event image - Left side */}
-      <div className="relative w-[240px] xl:w-[280px] 2xl:w-[320px] h-[180px] shrink-0">
+      <div className="relative w-32 sm:w-40 md:w-[200px] lg:w-[240px] xl:w-[280px] 2xl:w-[320px] h-24 sm:h-32 md:h-[160px] lg:h-[180px] shrink-0">
         <img src={image} alt={title} className="w-full h-full object-cover" />
       </div>
 

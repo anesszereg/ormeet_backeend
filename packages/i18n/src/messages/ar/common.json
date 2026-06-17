@@ -5,7 +5,9 @@
     "support": "المساعدة",
     "login": "تسجيل الدخول",
     "signup": "إنشاء حساب",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة"
   },
   "cta": {
     "getStarted": "ابدأ الآن",
@@ -88,6 +90,10 @@
     "searchLocationPlaceholder": "ابحث عن مكان",
     "searchEventPlaceholder": "ابحث عن فعالية",
     "needAssistance": "تحتاج مساعدة؟"
+  },
+  "aria": {
+    "trend": "تراند",
+    "change": "التغيير"
   },
   "userMenu": {
     "profile": "الملف الشخصي",

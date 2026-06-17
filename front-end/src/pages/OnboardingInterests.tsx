@@ -182,7 +182,7 @@ const OnboardingInterests = () => {
                     : 'border-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed'
                 }`}
               >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <svg className="rtl:scale-x-[-1]" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
@@ -216,7 +216,7 @@ const OnboardingInterests = () => {
                     : 'border-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed'
                 }`}
               >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <svg className="rtl:scale-x-[-1]" width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M6 12l4-4-4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
@@ -251,7 +251,7 @@ const OnboardingInterests = () => {
               className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2"
             >
               {isLoading ? t('onboardingInterests.saving') : t('onboardingInterests.finishLogin')}
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5 rtl:scale-x-[-1]">
                 <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>

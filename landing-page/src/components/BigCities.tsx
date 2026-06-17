@@ -36,11 +36,11 @@ const BigCities = () => {
   const currentCities = allCityPages[page - 1];
 
   return (
-    <section className="w-full bg-white py-16 px-6 md:px-10 lg:px-16 xl:px-20">
+    <section className="w-full bg-white py-10 md:py-16 px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20">
       {/* Header area */}
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6 mb-10">
         {/* Left: Title */}
-        <h2 className="text-3xl md:text-4xl text-black leading-tight max-w-md">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl text-black leading-tight max-w-md">
           {t("titleStart")}{" "}
           <span className="font-bold">{t("titleHighlight")}</span>
         </h2>
@@ -60,7 +60,7 @@ const BigCities = () => {
       </div>
 
       {/* City Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {currentCities.map((city) => (
           <div
             key={city.id}
@@ -68,13 +68,13 @@ const BigCities = () => {
             onClick={() => window.open(`${FRONTEND_ORIGIN}/search-results?location=${encodeURIComponent(city.name)}`, "_blank", "noopener,noreferrer")}
           >
             {/* Image */}
-            <div className="relative w-full h-[320px] sm:h-[360px] lg:h-[400px]">
+            <div className="relative w-full h-[280px] sm:h-[340px] md:h-[360px] lg:h-[400px]">
               <Image
                 src={city.image}
                 alt={city.name}
                 fill
                 className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
               />
               {/* Dark gradient overlay at bottom */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />

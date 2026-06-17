@@ -104,12 +104,10 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
       try {
         // Use organizationId if available, otherwise fall back to user.id
         const organizerId = user.organizationId || user.id;
-        console.log('📅 [EventsTable] Using organizerId:', organizerId);
         
         const eventsData = await organizerService.getEvents({ organizerId });
         
         // Transform API events to FullEventData format
-        console.log('📅 [EventsTable] Fetched Events from API:', eventsData);
         
         const transformedEvents: FullEventData[] = eventsData.map((event: ApiEvent) => {
           // Determine status based on dates and API status
@@ -160,7 +158,6 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           };
         });
         
-        console.log('📅 [EventsTable] Transformed Events:', transformedEvents);
         setApiEvents(transformedEvents);
       } catch (err) {
         console.error('❌ [EventsTable] Failed to fetch events:', err);
@@ -202,7 +199,6 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
     setIsDeleting(true);
     try {
       await organizerService.deleteEvent(eventToDelete.id);
-      console.log('🗑️ [EventsTable] Event deleted:', eventToDelete.id);
       
       // Remove from local state
       setApiEvents(prev => prev.filter(e => e.id !== eventToDelete.id));

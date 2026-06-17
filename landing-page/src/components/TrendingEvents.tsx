@@ -35,10 +35,10 @@ const TrendingEvents = () => {
   const currentEvents = trendingEvents.slice(startIndex, startIndex + CARDS_PER_PAGE);
 
   return (
-    <section className="w-full px-6 md:px-10 lg:px-16 xl:px-20 pt-10 pb-8 bg-white">
+    <section className="w-full px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 pt-8 md:pt-10 pb-8 bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl text-black">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <h2 className="text-lg md:text-xl text-black">
           <span className="font-bold">{t("titlePrefix")}</span> {t("titleSuffix")}
         </h2>
         <PaginationControls
@@ -51,7 +51,7 @@ const TrendingEvents = () => {
       </div>
 
       {/* Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {currentEvents.map((event, index) => {
           const displayNumber = startIndex + index + 1;
           return (
@@ -62,7 +62,7 @@ const TrendingEvents = () => {
             >
               {/* Image + Number */}
               <div className="relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
-                <div className="relative w-full h-[280px] sm:h-[300px] lg:h-[320px]">
+                <div className="relative w-full h-[220px] sm:h-[280px] md:h-[300px] lg:h-[320px]">
                   <Image
                     src={event.image}
                     alt={event.title}
@@ -73,7 +73,7 @@ const TrendingEvents = () => {
                 </div>
                 <div className="absolute bottom-2 start-2 transition-transform duration-300 group-hover:scale-110">
                   <span
-                    className="text-7xl font-bold text-black"
+                    className="text-5xl md:text-6xl lg:text-7xl font-bold text-black"
                     style={{ WebkitTextStroke: "3px white" }}
                   >
                     {displayNumber}

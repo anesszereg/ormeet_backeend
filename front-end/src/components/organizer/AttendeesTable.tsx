@@ -84,11 +84,9 @@ const AttendeesTable = () => {
       try {
         // Use organizationId if available, otherwise fall back to user.id
         const organizerId = user.organizationId || user.id;
-        console.log('👥 [AttendeesTable] Using organizerId:', organizerId);
         
         // Fetch events first
         const eventsData = await organizerService.getEvents({ organizerId });
-        console.log('👥 [AttendeesTable] Fetched Events:', eventsData);
         const eventMap = new Map(eventsData.map((e: ApiEvent) => [e.id, e.title]));
         
         // Transform events for the event filter
@@ -138,7 +136,6 @@ const AttendeesTable = () => {
           }
         }
         
-        console.log('👥 [AttendeesTable] All Attendees:', allAttendees);
         setApiAttendees(allAttendees);
       } catch (err) {
         console.error('❌ [AttendeesTable] Failed to fetch attendees:', err);
@@ -176,17 +173,13 @@ const AttendeesTable = () => {
     try {
       // Find the event for this attendee
       const event = apiEvents.find(e => e.name === attendee.eventName);
-      if (!event) {
-        console.error('❌ [AttendeesTable] Event not found for attendee');
-        return;
-      }
+      if (!event) return;
 
       await organizerService.checkInAttendee({
         ticketId: attendee.id,
         eventId: event.id,
       });
       
-      console.log('✅ [AttendeesTable] Attendee checked in:', attendee.id);
       
       // Update local state
       setApiAttendees(prev => prev.map(a => 

@@ -142,7 +142,7 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
         
         {/* Dropdown */}
         {showDropdown && (
-          <div className="absolute top-full start-0 mt-1 w-80 bg-white border border-[#EEEEEE] rounded-lg shadow-lg z-50">
+          <div className="absolute top-full start-0 mt-1 w-[280px] max-w-[calc(100vw-2rem)] bg-white border border-[#EEEEEE] rounded-lg shadow-lg z-50">
             {/* Search */}
             <div className="p-3 border-b border-[#EEEEEE]">
               <input

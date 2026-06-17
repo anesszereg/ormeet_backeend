@@ -77,7 +77,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         // Fetch events first to filter orders by organizer's events
         // Use organizationId if available, otherwise fall back to user.id
         const organizerId = user.organizationId || user.id;
-        console.log('🛒 [OrdersTable] Using organizerId:', organizerId);
         
         const eventsData = await organizerService.getEvents({ organizerId });
         const eventIds = new Set(eventsData.map((e: ApiEvent) => e.id));
@@ -86,8 +85,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
         // Fetch all orders
         const ordersData = await organizerService.getOrders();
         
-        console.log('🛒 [OrdersTable] Fetched Events:', eventsData);
-        console.log('🛒 [OrdersTable] Fetched Orders:', ordersData);
         
         // Filter and transform orders for organizer's events
         const transformedOrders: Order[] = ordersData
@@ -127,7 +124,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             };
           });
         
-        console.log('🛒 [OrdersTable] Transformed Orders:', transformedOrders);
         setApiOrders(transformedOrders);
       } catch (err) {
         console.error('❌ [OrdersTable] Failed to fetch orders:', err);
@@ -167,7 +163,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
     setIsDeleting(true);
     try {
       await organizerService.deleteOrder(orderToDelete.id);
-      console.log('🗑️ [OrdersTable] Order deleted:', orderToDelete.id);
       
       // Remove from local state
       setApiOrders(prev => prev.filter(o => o.id !== orderToDelete.id));
@@ -192,7 +187,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   const handleRefundOrder = async (orderId: string) => {
     try {
       await organizerService.refundOrder(orderId);
-      console.log('💰 [OrdersTable] Order refunded:', orderId);
       
       // Update local state
       setApiOrders(prev => prev.map(o => 
@@ -209,7 +203,6 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   const handleCancelOrder = async (orderId: string) => {
     try {
       await organizerService.cancelOrder(orderId);
-      console.log('❌ [OrdersTable] Order cancelled:', orderId);
       
       // Update local state
       setApiOrders(prev => prev.map(o => 
@@ -435,7 +428,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 {isLoading ? '...' : apiOrders.length.toLocaleString()}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
@@ -452,7 +445,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 {isLoading ? '...' : apiOrders.filter(o => o.status === 'cancelled').length.toLocaleString()}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={DownIcon} alt="Down trend" className="w-full h-full object-contain" />
             </div>
           </div>
@@ -469,7 +462,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 {isLoading ? '...' : `$${apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={UpIcon} alt="Up trend" className="w-full h-full object-contain" />
             </div>
           </div>
@@ -666,13 +659,80 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             <div
               key={order.id}
               onClick={() => setSelectedOrder(order)}
-              className="flex flex-col md:grid md:grid-cols-9 gap-2 md:gap-1 px-2 lg:px-4 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
+              className="flex flex-col md:grid md:grid-cols-9 gap-2 md:gap-1 px-4 lg:px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer"
             >
-              <div className="md:col-span-2 flex items-center">
+              {/* Mobile: Card view */}
+              <div className="md:hidden">
+                {/* Header: Event name + payment status */}
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-sm font-semibold text-black truncate">{order.eventName}</h4>
+                    <p className="text-xs text-gray mt-0.5">{order.orderId}</p>
+                  </div>
+                  {/* Payment badge */}
+                  {order.payment === 'paid' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#10B981]/10 text-[#10B981] text-xs font-medium rounded-full shrink-0">
+                      <img src={PaidIcon} alt="Paid" className="w-3 h-3" />
+                      {t('orders.table.payment.paid')}
+                    </span>
+                  )}
+                  {order.payment === 'pending' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#F59E0B]/10 text-[#F59E0B] text-xs font-medium rounded-full shrink-0">
+                      <img src={PendingIcon} alt="Pending" className="w-3 h-3" />
+                      {t('orders.table.payment.pending')}
+                    </span>
+                  )}
+                  {order.payment === 'failed' && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#EF4444]/10 text-[#EF4444] text-xs font-medium rounded-full shrink-0">
+                      <img src={FailedIcon} alt="Failed" className="w-3 h-3" />
+                      {t('orders.table.payment.failed')}
+                    </span>
+                  )}
+                </div>
+
+                {/* Buyer with photo */}
+                <div className="flex items-center gap-2 mb-2">
+                  {order.buyerPhoto ? (
+                    <img
+                      src={order.buyerPhoto}
+                      alt={order.buyerName}
+                      className="w-6 h-6 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                  <span className="text-xs text-gray truncate">{order.buyerName}</span>
+                </div>
+
+                {/* Meta row: ticketType, qty, date */}
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray mb-3">
+                  <span>{order.ticketType}</span>
+                  <span>•</span>
+                  <span>×{order.qty}</span>
+                  <span>•</span>
+                  <span>{order.orderDate}</span>
+                </div>
+
+                {/* Total price */}
+                <div className="flex items-center justify-between pt-3 border-t border-light-gray">
+                  <span className="text-xs text-gray">{t('orders.table.headers.totalPrice')}</span>
+                  <span className="text-sm font-bold text-black">
+                    <bdi>${order.totalPrice}</bdi>
+                  </span>
+                </div>
+              </div>
+
+              {/* Desktop: Event Name */}
+              <div className="hidden md:flex md:col-span-2 items-center">
                 <span className="text-xs lg:text-sm font-semibold text-black">{order.eventName}</span>
               </div>
 
-              <div className="md:col-span-2 flex items-center gap-2">
+              {/* Desktop: Buyer */}
+              <div className="hidden md:flex md:col-span-2 items-center gap-2">
                 {order.buyerPhoto ? (
                   <img
                     src={order.buyerPhoto}
@@ -689,19 +749,23 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 <span className="text-xs lg:text-sm text-black">{order.buyerName}</span>
               </div>
 
-              <div className="md:col-span-1 flex items-center">
+              {/* Desktop: Ticket Type */}
+              <div className="hidden md:flex md:col-span-1 items-center">
                 <span className="text-xs lg:text-sm text-gray">{order.ticketType}</span>
               </div>
 
-              <div className="md:col-span-1 flex items-center">
+              {/* Desktop: Qty */}
+              <div className="hidden md:flex md:col-span-1 items-center">
                 <span className="text-xs lg:text-sm text-gray">{order.qty}</span>
               </div>
 
-              <div className="md:col-span-1 flex items-center">
-                <span className="text-xs lg:text-sm text-gray">${order.totalPrice}</span>
+              {/* Desktop: Total Price */}
+              <div className="hidden md:flex md:col-span-1 items-center">
+                <span className="text-xs lg:text-sm text-gray"><bdi>${order.totalPrice}</bdi></span>
               </div>
 
-              <div className="md:col-span-1 flex items-center">
+              {/* Desktop: Payment */}
+              <div className="hidden md:flex md:col-span-1 items-center">
                 {order.payment === 'paid' && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#10B981]/10 text-[#10B981] text-xs font-medium rounded-full">
                     <img src={PaidIcon} alt="Paid" className="w-3 h-3" />
@@ -722,10 +786,10 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 )}
               </div>
 
-              <div className="md:col-span-1 flex items-center">
+              {/* Desktop: Order Date */}
+              <div className="hidden md:flex md:col-span-1 items-center">
                 <span className="text-xs lg:text-sm text-gray">{order.orderDate}</span>
               </div>
-
             </div>
           ))
           )}

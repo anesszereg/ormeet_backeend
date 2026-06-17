@@ -85,6 +85,11 @@
       "faqQuestionRequired": "Question is required",
       "faqAnswerRequired": "Answer is required"
     },
+    "publicationSection": "Publication & Visibility",
+    "faq": {
+      "questionPlaceholder": "Enter your question",
+      "answerPlaceholder": "Enter your answer"
+    },
     "actions": {
       "saveDraft": "Save as Draft",
       "publish": "Publish Event",
@@ -223,6 +228,12 @@
       "ticketsSold": "Tickets Sold",
       "capacity": "{{percentage}}% capacity",
       "faq": "FAQ",
+      "date": "Date",
+      "time": "Time",
+      "locationLabel": "Location",
+      "onlineLink": "Online Link",
+      "quantity": "Quantity",
+      "of": "of",
       "actions": {
         "delete": "Delete",
         "edit": "Edit Event",
@@ -556,7 +567,16 @@
           "emailRequired": "Email address is required",
           "invalidEmail": "Please enter a valid email address",
           "roleRequired": "Please assign a role"
-        }
+        },
+        "viewDetails": "View Details",
+        "inviteSent": "Invite sent",
+        "memberDetails": "Team Member Details",
+        "lastActive": "Last Active",
+        "ticketResentSuccess": "Ticket resent successfully",
+        "ticketResentError": "Failed to resend ticket. Please try again.",
+        "roleChangeError": "Failed to change role. Please try again.",
+        "rolePlaceholder": "Add a role name",
+        "addressPlaceholder": "Enter address (optional)"
       },
       "roles": {
         "searchPlaceholder": "Search roles",

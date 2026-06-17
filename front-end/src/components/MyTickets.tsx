@@ -64,20 +64,10 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      if (!user) {
-        console.log('⚠️ [MyTickets] No user found, skipping ticket fetch');
-        return;
-      }
-      console.log('🎫 [MyTickets] Fetching tickets for user:', user.id);
-      console.log('👤 [MyTickets] User email:', user.email);
-      console.log('📛 [MyTickets] User name:', user.name);
+      if (!user) return;
       setIsLoading(true);
       try {
         const tickets = await ticketService.getByUser(user.id);
-        console.log(`✅ [MyTickets] Received ${tickets.length} tickets from API`);
-        if (tickets.length > 0) {
-          console.log('📋 [MyTickets] First ticket:', tickets[0]);
-        }
         setAllTickets(tickets);
       } catch (err) {
         console.error('❌ [MyTickets] Failed to fetch tickets:', err);
@@ -239,7 +229,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       <div className="flex items-center gap-6 border-b border-[#EEEEEE] mb-6">
         <button
           onClick={() => setActiveTab('upcoming')}
-          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+          className={`py-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'upcoming' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -251,7 +241,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
         </button>
         <button
           onClick={() => setActiveTab('past')}
-          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+          className={`py-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'past' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -262,7 +252,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
         </button>
         <button
           onClick={() => setActiveTab('cancelled')}
-          className={`pb-3 text-sm font-medium transition-colors relative cursor-pointer ${
+          className={`py-3 text-sm font-medium transition-colors relative cursor-pointer ${
             activeTab === 'cancelled' ? 'text-[#FF4000]' : 'text-[#4F4F4F] hover:text-black'
           }`}
         >
@@ -274,7 +264,7 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
       </div>
 
       {/* Ticket Count and Filters */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         {/* Ticket count */}
         <h2 className="text-base font-semibold text-black">
           {t('myTickets.ticketCount', { count: currentTickets.length })}
@@ -289,8 +279,8 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
               placeholder={t('myTickets.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="ps-4 pe-10 bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
-              style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
+              className="ps-4 pe-10 w-full sm:w-[187px] bg-white border border-[#EEEEEE] text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10 transition-all"
+              style={{ borderRadius: '85.41px', height: '38px' }}
             />
             {/* Search icon positioned on the right */}
             <img 
@@ -304,8 +294,8 @@ const MyTickets = ({ onEventSelect }: MyTicketsProps) => {
           <div className="relative">
             <button
               onClick={() => setIsSortOpen(!isSortOpen)}
-              className="flex items-center gap-2 ps-11 pe-3 border border-[#EEEEEE] bg-white cursor-pointer hover:border-[#FF4000] transition-colors"
-              style={{ borderRadius: '85.41px', width: '187px', height: '38px' }}
+              className="flex items-center gap-2 w-full sm:w-[187px] ps-11 pe-3 border border-[#EEEEEE] bg-white cursor-pointer hover:border-[#FF4000] transition-colors"
+              style={{ borderRadius: '85.41px', height: '38px' }}
             >
               {/* Newest icon on the left */}
               <img src={NewestIcon} alt="Sort" className="absolute start-1 top-1/2 -translate-y-1/2 w-[30px] h-[30px]" />

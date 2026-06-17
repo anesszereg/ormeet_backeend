@@ -9,7 +9,6 @@ import reviewService, { Review as ApiReview } from '../services/reviewService';
 import userPreferencesService from '../services/userPreferencesService';
 
 import NextImageIcon from '../assets/Svgs/eventDetails/nextImage.svg';
-import PastImageIcon from '../assets/Svgs/eventDetails/pastImage.svg';
 import StarIcon from '../assets/Svgs/eventDetails/star.svg';
 import FavoriteIcon from '../assets/Svgs/eventDetails/favorie.svg';
 import UploadIcon from '../assets/Svgs/eventDetails/upload.svg';
@@ -22,7 +21,6 @@ import AllowedItemsIcon from '../assets/Svgs/eventDetails/allowedItems.svg';
 import NoIcon from '../assets/Svgs/eventDetails/no.svg';
 import YesIcon from '../assets/Svgs/eventDetails/yes.svg';
 import AllReviewsIcon from '../assets/Svgs/eventDetails/allReviews.svg';
-import KeepMeUpdateIcon from '../assets/Svgs/eventDetails/keepMeUpdate.svg';
 
 import Event1 from '../assets/imges/event myticket 1.jpg';
 import Event2 from '../assets/imges/event myticket 2.jpg';
@@ -85,6 +83,11 @@ const EventDetailsGlobal = () => {
   const { eventId } = useParams();
   const { user } = useAuth();
   
+  const handleGoBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showDateTimeSection, setShowDateTimeSection] = useState(false);
   const [showLocationSection, setShowLocationSection] = useState(false);
@@ -424,17 +427,15 @@ const EventDetailsGlobal = () => {
         <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="flex flex-col items-center justify-center flex-1 py-20">
           <p className="text-red-500 mb-4">{error || t('eventDetails.error.notFound')}</p>
-          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">{t('eventDetails.error.goBack')}</button>
+          <button onClick={handleGoBack} className="text-[#FF4000] font-semibold hover:underline">{t('eventDetails.error.goBack')}</button>
         </div>
       </div>
     );
   }
 
 
-  console.log('✅ Mapped event data:', eventData);
-  
   return (
-    <div className="flex flex-col min-h-screen w-full bg-white">
+    <div className="flex flex-col min-h-screen w-full bg-white pb-20 lg:pb-0">
       {/* Navbar */}
       <EventDetailsNavbar isLoggedIn={!!user} />
 
@@ -456,7 +457,7 @@ const EventDetailsGlobal = () => {
               className="absolute start-4 md:start-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
               aria-label={t('eventDetails.actions.prevImage')}
             >
-              <img src={PastImageIcon} alt="Previous" className="w-full h-full" />
+              <img src={NextImageIcon} alt="Previous" className="w-full h-full scale-x-[-1] rtl:scale-x-[1]" />
             </button>
 
             {/* Next Image Button */}
@@ -465,7 +466,7 @@ const EventDetailsGlobal = () => {
               className="absolute end-4 md:end-6 top-1/2 -translate-y-1/2 w-[50px] h-[50px] md:w-[60px] md:h-[60px] flex items-center justify-center hover:scale-105 transition-transform z-10 cursor-pointer"
               aria-label={t('eventDetails.actions.nextImage')}
             >
-              <img src={NextImageIcon} alt="Next" className="w-full h-full" />
+              <img src={NextImageIcon} alt="Next" className="w-full h-full rtl:scale-x-[-1]" />
             </button>
 
             {/* Image Dots Indicator */}
@@ -497,12 +498,12 @@ const EventDetailsGlobal = () => {
               </h1>
 
               {/* Description */}
-              <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed mb-4 max-w-[650px]">
+              <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed mb-4 max-w-full lg:max-w-[650px]">
                 {eventData.description}
               </p>
 
               {/* Rating and Actions Row */}
-              <div className="flex items-center gap-4 mb-8">
+              <div className="flex items-center flex-wrap gap-3 md:gap-4 mb-8">
                 {/* Rating */}
                 <div className="flex items-center gap-1.5">
                   <img src={StarIcon} alt="Rating" className="w-5 h-5" />
@@ -576,15 +577,15 @@ const EventDetailsGlobal = () => {
                         <div className="flex items-center justify-between mb-6">
                           <button
                             onClick={handlePrevMonth}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
+                            className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
                           >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <svg className="rtl:scale-x-[-1]" width="20" height="20" viewBox="0 0 20 20" fill="none">
                               <path d="M12.5 15L7.5 10L12.5 5" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </button>
                           <div className="flex items-center gap-2">
                             <span className="text-base font-semibold text-black">{monthNames[selectedMonth - 1]} {selectedYear}</span>
-                            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-black text-white cursor-pointer">
+                            <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black text-white cursor-pointer">
                               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M8 4V12M4 8H12" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                               </svg>
@@ -592,9 +593,9 @@ const EventDetailsGlobal = () => {
                           </div>
                           <button
                             onClick={handleNextMonth}
-                            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
+                            className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
                           >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <svg className="rtl:scale-x-[-1]" width="20" height="20" viewBox="0 0 20 20" fill="none">
                               <path d="M7.5 15L12.5 10L7.5 5" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           </button>
@@ -819,7 +820,7 @@ const EventDetailsGlobal = () => {
                 
                 <div className="bg-[#F0F8F7] rounded-2xl p-6">
                   {/* Organizer Header */}
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
                     <div className="flex items-start gap-4">
                       {/* Organizer Logo with Verified Badge */}
                       <div className="relative">
@@ -847,7 +848,7 @@ const EventDetailsGlobal = () => {
                       <button 
                         onClick={handleToggleFollow}
                         disabled={!user || isTogglingFollow || !eventData.organizerId}
-                        className={`px-6 py-2.5 text-sm font-medium rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                        className={`shrink-0 px-6 py-2.5 min-h-[44px] text-sm font-medium rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           isFollowing 
                             ? 'bg-white text-black border border-black hover:bg-[#F8F8F8]' 
                             : 'bg-black text-white hover:bg-[#333333]'
@@ -859,7 +860,7 @@ const EventDetailsGlobal = () => {
                       {eventData.organizerEmail && (
                         <a 
                           href={`mailto:${eventData.organizerEmail}`}
-                          className="px-6 py-2.5 bg-white text-black text-sm font-medium rounded-full border border-black hover:bg-[#F8F8F8] transition-colors"
+                          className="shrink-0 px-6 py-2.5 min-h-[44px] bg-white text-black text-sm font-medium rounded-full border border-black hover:bg-[#F8F8F8] transition-colors"
                         >
                           {t('eventDetails.organizer.contact')}
                         </a>
@@ -1072,7 +1073,7 @@ const EventDetailsGlobal = () => {
                       <img
                         src={event.image}
                         alt={event.title}
-                        className="w-[165px] h-[110px] object-cover rounded-lg shrink-0"
+                        className="w-[120px] h-[90px] sm:w-[165px] sm:h-[110px] object-cover rounded-lg shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h3 className="text-base font-semibold text-black mb-2 line-clamp-2">
@@ -1139,30 +1140,30 @@ const EventDetailsGlobal = () => {
                   <button 
                     onClick={handleTrendingPrev}
                     disabled={trendingPage === 1}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full border border-[#EEEEEE] transition-colors ${
+                    className={`w-9 h-9 rounded-full border border-[#EEEEEE] bg-white text-[#1A1A1A] flex items-center justify-center transition-colors ${
                       trendingPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#F8F8F8] cursor-pointer'
                     }`}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M10 12L6 8L10 4" stroke="#333333" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg className="rtl:scale-x-[-1]" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
                   <button 
                     onClick={handleTrendingNext}
                     disabled={trendingPage === totalPages}
-                    className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors ${
-                      trendingPage === totalPages ? 'bg-gray-400 opacity-50 cursor-not-allowed' : 'bg-black hover:bg-[#333333] cursor-pointer'
+                    className={`w-9 h-9 rounded-full border border-[#EEEEEE] bg-white text-[#1A1A1A] flex items-center justify-center transition-colors ${
+                      trendingPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#F8F8F8] cursor-pointer'
                     }`}
                   >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M6 4L10 8L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg className="rtl:scale-x-[-1]" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </button>
                 </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {currentTrendingEvents.map((event, index) => {
                 const displayNumber = startIndex + index + 1;
                 return (
@@ -1171,10 +1172,10 @@ const EventDetailsGlobal = () => {
                       <img 
                         src={event.image} 
                         alt={event.title} 
-                        className="w-full h-[320px] object-cover transition-transform duration-300 group-hover:scale-110"
+                        className="w-full h-[200px] sm:h-[260px] lg:h-[320px] object-cover transition-transform duration-300 group-hover:scale-110"
                       />
                       <div className="absolute bottom-2 start-2 transition-transform duration-300 group-hover:scale-110">
-                        <span className="text-7xl font-bold text-black" style={{WebkitTextStroke: '3px white'}}>{displayNumber}</span>
+                        <span className="text-5xl sm:text-6xl lg:text-7xl font-bold text-black" style={{WebkitTextStroke: '3px white'}}>{displayNumber}</span>
                       </div>
                     </div>
                     <div className="mt-3">
@@ -1203,7 +1204,7 @@ const EventDetailsGlobal = () => {
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
               {/* Left Side - Title and Description */}
               <div className="flex-1">
-                <h2 className="text-2xl lg:text-3xl text-black mb-3 whitespace-nowrap">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl text-black mb-3">
                   <span className="font-bold">{t('eventDetails.newsletter.title')}</span> {t('eventDetails.newsletter.titleSuffix')}
                 </h2>
                 <p className="text-sm text-[#757575]">
@@ -1212,16 +1213,19 @@ const EventDetailsGlobal = () => {
               </div>
 
               {/* Right Side - Email Input with Button */}
-              <div className="flex-1 max-w-xl">
-                <div className="relative flex items-center bg-white border border-[#EEEEEE] rounded-full overflow-hidden">
-                  <input 
-                    type="email" 
-                    placeholder={t('eventDetails.newsletter.emailPlaceholder')} 
-                    className="flex-1 px-6 py-3 bg-transparent text-sm focus:outline-none"
+              <div className="flex-1 max-w-xl w-full">
+                <div className="relative flex items-center bg-white border border-[#EEEEEE] rounded-full p-1 h-12">
+                  <input
+                    type="email"
+                    placeholder={t('eventDetails.newsletter.emailPlaceholder')}
+                    className="flex-1 min-w-0 px-4 bg-transparent text-sm focus:outline-none"
                   />
-                  <button className="ps-6 pe-2 py-2.5 bg-[#FF4000] text-white font-bold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full m-1 flex items-center gap-4">
+                  <button className="shrink-0 inline-flex items-center gap-1.5 px-5 h-10 bg-[#FF4000] text-white font-semibold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full">
                     <span>{t('eventDetails.newsletter.ctaButton')}</span>
-                    <img src={KeepMeUpdateIcon} alt="" className="w-9 h-9 shrink-0" />
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 rtl:scale-x-[-1]">
+                      <line x1="7" y1="17" x2="17" y2="7" />
+                      <polyline points="7 7 17 7 17 17" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -1229,6 +1233,22 @@ const EventDetailsGlobal = () => {
           </div>
         </div>
       </main>
+
+      {/* Mobile sticky bottom CTA bar */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#EEEEEE] px-4 py-3 flex items-center justify-between gap-3" style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.08)' }}>
+        <div className="flex flex-col min-w-0">
+          <span className="text-xs text-[#757575] leading-tight">{t('eventDetails.price.from')}</span>
+          <span className="text-lg font-bold text-black leading-tight truncate">
+            <bdi>{eventData.price}</bdi>
+          </span>
+        </div>
+        <button
+          onClick={() => navigate(`/event/${eventId}/tickets`)}
+          className="shrink-0 bg-[#FF4000] text-white font-semibold px-6 h-12 rounded-full hover:bg-[#E63900] transition-colors whitespace-nowrap cursor-pointer"
+        >
+          {t('eventDetails.getTickets')}
+        </button>
+      </div>
 
       {/* Reviews Modal */}
       <ReviewsModal 

@@ -70,7 +70,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
       try {
         // Use organizationId if available, otherwise fall back to user.id
         const organizerId = user.organizationId || user.id;
-        console.log('📊 [Dashboard] Using organizerId:', organizerId);
         
         // Fetch events and orders in parallel
         const [eventsData, ordersData] = await Promise.all([
@@ -78,18 +77,12 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
           organizerService.getOrders(),
         ]);
 
-        // Log fetched data
-        console.log('📊 [Dashboard] Fetched Events:', eventsData);
-        console.log('📊 [Dashboard] Fetched Orders:', ordersData);
-        
         setEvents(eventsData);
         
         // Filter orders for organizer's events
         const eventIds = new Set(eventsData.map(e => e.id));
         const organizerOrders = ordersData.filter(o => eventIds.has(o.eventId));
         setOrders(organizerOrders);
-        
-        console.log('📊 [Dashboard] Organizer Orders (filtered):', organizerOrders);
 
         // Calculate stats
         const paidOrders = organizerOrders.filter(o => o.status === 'paid');
@@ -113,7 +106,6 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
           revenueChange,
         };
         
-        console.log('📊 [Dashboard] Calculated Stats:', calculatedStats);
         setStats(calculatedStats);
       } catch (err) {
         console.error('❌ [Dashboard] Failed to fetch dashboard data:', err);
@@ -253,7 +245,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                 {isLoading ? '...' : stats.totalOrders.toLocaleString()}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={stats.ordersChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
@@ -275,7 +267,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                 {isLoading ? '...' : stats.totalReturns.toLocaleString()}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={stats.returnsChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
@@ -297,7 +289,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
                 {isLoading ? '...' : `$${stats.totalRevenue.toLocaleString()}`}
               </h3>
             </div>
-            <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
               <img src={stats.revenueChange >= 0 ? UpIcon : DownIcon} alt={t('common:aria.trend')} className="w-full h-full object-contain" />
             </div>
           </div>
@@ -356,7 +348,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead>
                 <tr className="border-b border-light-gray">
                   <th className="text-start text-xs font-medium text-gray pb-3" style={{ width: '25%' }}>{t('dashboard:topSelling.table.ticketType')}</th>

@@ -85,6 +85,11 @@
       "faqQuestionRequired": "السؤال مطلوب",
       "faqAnswerRequired": "الإجابة مطلوبة"
     },
+    "publicationSection": "النشر والظهور",
+    "faq": {
+      "questionPlaceholder": "أدخل سؤالك",
+      "answerPlaceholder": "أدخل إجابتك"
+    },
     "actions": {
       "saveDraft": "حفظ كمسوّدة",
       "publish": "نشر الفعالية",
@@ -223,6 +228,12 @@
       "ticketsSold": "التذاكر المباعة",
       "capacity": "{{percentage}}% من السعة",
       "faq": "الأسئلة الشائعة",
+      "date": "التاريخ",
+      "time": "الوقت",
+      "locationLabel": "المكان",
+      "onlineLink": "الرابط الإلكتروني",
+      "quantity": "الكمية",
+      "of": "من",
       "actions": {
         "delete": "حذف",
         "edit": "تعديل الفعالية",
@@ -267,7 +278,7 @@
       "status": "حالة الدخول",
       "vip": "VIP",
       "general": "عادية",
-      "earlyBird": "Early Bird",
+      "earlyBird": "الحجز المبكر",
       "checkedIn": "دخل",
       "notCheckedIn": "لم يدخل",
       "byEvent": "أو حسب الفعالية",
@@ -555,7 +566,16 @@
           "emailRequired": "البريد الإلكتروني مطلوب",
           "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
           "roleRequired": "يجب إسناد دور"
-        }
+        },
+        "viewDetails": "عرض التفاصيل",
+        "inviteSent": "تم إرسال الدعوة",
+        "memberDetails": "تفاصيل العضو",
+        "lastActive": "آخر نشاط",
+        "ticketResentSuccess": "تم إعادة إرسال التذكرة بنجاح",
+        "ticketResentError": "تعذّر إعادة إرسال التذكرة. يُرجى المحاولة مجددًا.",
+        "roleChangeError": "تعذّر تغيير الدور. يُرجى المحاولة مجددًا.",
+        "rolePlaceholder": "اسم الدور",
+        "addressPlaceholder": "أدخل العنوان (اختياري)"
       },
       "roles": {
         "searchPlaceholder": "ابحث عن دور",

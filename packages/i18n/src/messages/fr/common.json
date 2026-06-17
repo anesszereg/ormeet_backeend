@@ -5,7 +5,9 @@
     "support": "Aide",
     "login": "Se connecter",
     "signup": "S'inscrire",
-    "logout": "Se déconnecter"
+    "logout": "Se déconnecter",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "cta": {
     "getStarted": "Commencer",
@@ -88,6 +90,10 @@
     "searchLocationPlaceholder": "Rechercher un lieu",
     "searchEventPlaceholder": "Rechercher un événement",
     "needAssistance": "Besoin d'aide ?"
+  },
+  "aria": {
+    "trend": "Tendance",
+    "change": "Variation"
   },
   "userMenu": {
     "profile": "Profil",

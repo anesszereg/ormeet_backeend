@@ -1359,13 +1359,13 @@ const AccountSettingsOrganizer = () => {
                             
                             {/* Role */}
                             <div className="flex items-center min-w-0 overflow-hidden">
-                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">Role:</span>
+                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">{t('accountSettings.teamRoles.team.roleLabel')}:</span>
                               <span className="text-sm text-black truncate">{member.role}</span>
                             </div>
                             
                             {/* Status */}
                             <div className="flex items-center gap-2 min-w-0 overflow-hidden">
-                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">Status:</span>
+                              <span className="lg:hidden text-xs text-gray me-2 shrink-0">{t('accountSettings.teamRoles.team.statusLabel')}:</span>
                               {member.status === 'active' ? (
                                 <>
                                   <svg className="w-4 h-4 text-success shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -1572,7 +1572,7 @@ const AccountSettingsOrganizer = () => {
                               {openActionMenu === role.id && (
                                 <div className="absolute end-0 bottom-10 w-48 bg-white border border-light-gray rounded-lg shadow-xl py-1" style={{ zIndex: 9999 }}>
                                   <button onClick={() => handleEditRole(role.id)} className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">{t('accountSettings.teamRoles.roles.actions.edit')}</button>
-                                  <button className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">View Details</button>
+                                  <button className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">{t('accountSettings.teamRoles.team.viewDetails')}</button>
                                   <button onClick={() => handleDuplicateRole(role.id)} className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors">{t('accountSettings.teamRoles.roles.actions.duplicate')}</button>
                                   <div className="border-t border-light-gray my-1"></div>
                                   <button 
@@ -1617,7 +1617,7 @@ const AccountSettingsOrganizer = () => {
                           type="text"
                           value={roleFormData.roleName}
                           onChange={(e) => setRoleFormData({ ...roleFormData, roleName: e.target.value })}
-                          placeholder="Add a role name"
+                          placeholder={t('accountSettings.teamRoles.team.rolePlaceholder')}
                           className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray/40 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
                         />
                       </div>
@@ -2177,10 +2177,26 @@ const AccountSettingsOrganizer = () => {
       {/* Profile Edit Modal */}
       {isProfileModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showProfileSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showProfileSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editProfile')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileError('');
+                      setIsProfileModalOpen(false);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label="Close"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {profileError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {profileError}
@@ -2238,7 +2254,7 @@ const AccountSettingsOrganizer = () => {
               </div>
             )}
             {!showProfileSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setProfileError('');
@@ -2269,10 +2285,26 @@ const AccountSettingsOrganizer = () => {
       {/* Email Edit Modal */}
       {isEmailModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showEmailSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showEmailSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editEmail')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmailError('');
+                      setIsEmailModalOpen(false);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label="Close"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {emailError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {emailError}
@@ -2314,7 +2346,7 @@ const AccountSettingsOrganizer = () => {
               </div>
             )}
             {!showEmailSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setEmailError('');
@@ -2345,10 +2377,26 @@ const AccountSettingsOrganizer = () => {
       {/* Phone Edit Modal */}
       {isPhoneModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showPhoneSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPhoneSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editPhone')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPhoneError('');
+                      setIsPhoneModalOpen(false);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label="Close"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {phoneError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {phoneError}
@@ -2390,7 +2438,7 @@ const AccountSettingsOrganizer = () => {
               </div>
             )}
             {!showPhoneSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setPhoneError('');
@@ -2421,10 +2469,26 @@ const AccountSettingsOrganizer = () => {
       {/* Location Edit Modal */}
       {isLocationModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showLocationSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showLocationSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.personalInfo.modals.editLocation')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLocationError('');
+                      setIsLocationModalOpen(false);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label="Close"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {locationError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {locationError}
@@ -2460,14 +2524,14 @@ const AccountSettingsOrganizer = () => {
                   type="text"
                   value={locationData.address}
                   onChange={(e) => setLocationData({ ...locationData, address: e.target.value })}
-                  placeholder="Enter address (optional)"
+                  placeholder={t('accountSettings.teamRoles.team.addressPlaceholder')}
                   className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
                 />
               </div>
               </div>
             )}
             {!showLocationSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setLocationError('');
@@ -2498,10 +2562,27 @@ const AccountSettingsOrganizer = () => {
       {/* Password Edit Modal */}
       {isEditPasswordOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
+          <div className={`bg-white rounded-2xl shadow-2xl p-5 sm:p-8 w-full transition-all ${showPasswordSuccess ? 'max-w-md' : 'max-w-lg'}`}>
             {!showPasswordSuccess && (
               <>
-                <h2 className="text-2xl font-bold text-black mb-6">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-bold text-black">{t('accountSettings.loginSecurity.modals.changePassword.title')}</h2>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPasswordError('');
+                      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                      setIsEditPasswordOpen(false);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors shrink-0"
+                    aria-label="Close"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round">
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                    </svg>
+                  </button>
+                </div>
                 {passwordError && (
                   <div className="mb-4 px-4 py-3 bg-red-50 border border-[#FF3425] rounded-lg text-[#FF3425] text-sm">
                     {passwordError}
@@ -2544,7 +2625,7 @@ const AccountSettingsOrganizer = () => {
               </div>
             )}
             {!showPasswordSuccess ? (
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="flex justify-end gap-3 flex-wrap mt-6">
                 <button
                   onClick={() => {
                     setPasswordError('');
@@ -2706,7 +2787,7 @@ const AccountSettingsOrganizer = () => {
 
             {/* Message */}
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-black mb-3">Invite sent</h3>
+              <h3 className="text-2xl font-bold text-black mb-3">{t('accountSettings.teamRoles.team.inviteSent')}</h3>
               <p className="text-sm text-gray">
                 Your invite is on its way! <span className="font-semibold text-black">{inviteTeamMemberData.email}</span> will get an email with instructions to join your team.
               </p>
@@ -2737,7 +2818,7 @@ const AccountSettingsOrganizer = () => {
               <>
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-6 border-b border-light-gray">
-                  <h2 className="text-xl font-bold text-black">Team Member Details</h2>
+                  <h2 className="text-xl font-bold text-black">{t('accountSettings.teamRoles.team.memberDetails')}</h2>
                   <button 
                     onClick={() => setSelectedMember(null)}
                     className="text-gray hover:text-black transition-colors cursor-pointer"
@@ -2774,13 +2855,13 @@ const AccountSettingsOrganizer = () => {
                     <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {/* Email */}
                       <div>
-                        <p className="text-xs text-gray mb-1">Email</p>
+                        <p className="text-xs text-gray mb-1">{t('accountSettings.teamRoles.team.emailLabel')}</p>
                         <p className="text-sm text-black font-medium">{selectedMember.email}</p>
                       </div>
 
                       {/* Role */}
                       <div>
-                        <p className="text-xs text-gray mb-1">Role</p>
+                        <p className="text-xs text-gray mb-1">{t('accountSettings.teamRoles.team.table.role')}</p>
                         <span className="inline-block px-3 py-1 bg-secondary-light text-sm font-medium text-black rounded-full">
                           {selectedMember.role}
                         </span>
@@ -2788,27 +2869,27 @@ const AccountSettingsOrganizer = () => {
 
                       {/* Status */}
                       <div>
-                        <p className="text-xs text-gray mb-1">Status</p>
+                        <p className="text-xs text-gray mb-1">{t('accountSettings.teamRoles.team.statusLabel')}</p>
                         {selectedMember.status === 'active' ? (
                           <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#10B981]/10 text-[#10B981] text-xs font-medium rounded-full">
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
-                            Active
+                            {t('accountSettings.teamRoles.team.status.active')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#FBBC04]/10 text-[#FBBC04] text-xs font-medium rounded-full">
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                             </svg>
-                            Pending
+                            {t('accountSettings.teamRoles.team.status.pending')}
                           </span>
                         )}
                       </div>
 
                       {/* Last Active / Enrollment Date */}
                       <div>
-                        <p className="text-xs text-gray mb-1">Last Active</p>
+                        <p className="text-xs text-gray mb-1">{t('accountSettings.teamRoles.team.lastActive')}</p>
                         <p className="text-sm text-black">{selectedMember.lastActive}</p>
                       </div>
                     </div>
@@ -2840,14 +2921,14 @@ const AccountSettingsOrganizer = () => {
               <div className="p-6">
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={SuccessIcon} alt="Success" className="w-16 h-16 mb-4" style={{ filter: 'invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%)' }} />
-                  <p className="text-lg font-semibold text-black">Ticket resent successfully</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.team.ticketResentSuccess')}</p>
                 </div>
               </div>
             ) : (
               <div className="p-6">
                 <div className="flex flex-col items-center justify-center py-8">
                   <img src={ErrorIcon} alt="Error" className="w-16 h-16 mb-4" />
-                  <p className="text-lg font-semibold text-black">Failed to resend ticket. Please try again.</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.team.ticketResentError')}</p>
                 </div>
               </div>
             )}
@@ -2963,7 +3044,7 @@ const AccountSettingsOrganizer = () => {
                     alt="Error" 
                     className="w-16 h-16 mb-4"
                   />
-                  <p className="text-lg font-semibold text-black">Failed to change role. Please try again</p>
+                  <p className="text-lg font-semibold text-black">{t('accountSettings.teamRoles.team.roleChangeError')}</p>
                 </div>
               </div>
             )}

@@ -27,7 +27,7 @@
   --font-size-button-small: 14px;
 
   /* Colors */
-  --color-primary: #E0234E;
+  --color-primary: #FF4000;
   --color-primary-dark: #F0450B;
   --color-primary-extra-dark: #E33900;
   --color-primary-light: #FFF4F3;
@@ -53,7 +53,7 @@
   --color-status-green: #0F9335;
   --color-status-light-green: #EBF6EE;
   --color-status-red: #FF3425;
-  --color-status-light-red: #FEEEE;
+  --color-status-light-red: #FEEEEE;
   --color-status-gray: #676767;
   --color-status-light-gray: #F0F0F0;
   --color-status-brown: #D8BC00;

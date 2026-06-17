@@ -5,7 +5,9 @@
     "support": "Support",
     "login": "Log In",
     "signup": "Sign up",
-    "logout": "Log out"
+    "logout": "Log out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "cta": {
     "getStarted": "Get started",
@@ -88,6 +90,10 @@
     "searchLocationPlaceholder": "Search location",
     "searchEventPlaceholder": "Event type",
     "needAssistance": "Need Assistance?"
+  },
+  "aria": {
+    "trend": "Trend",
+    "change": "Change"
   },
   "userMenu": {
     "profile": "Profile",

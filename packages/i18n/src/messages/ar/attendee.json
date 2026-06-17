@@ -1,6 +1,11 @@
 {
   "searchResult": {
-    "resultsCount": "{{count}} نتائج",
+    "resultsCount_zero": "لا نتائج",
+    "resultsCount_one": "نتيجة واحدة",
+    "resultsCount_two": "نتيجتان",
+    "resultsCount_few": "{{count}} نتائج",
+    "resultsCount_many": "{{count}} نتيجة",
+    "resultsCount_other": "{{count}} نتيجة",
     "resultsFor": "لـ",
     "filterButton": "تصفية",
     "filters": {
@@ -24,6 +29,36 @@
       "organizerOptions": {
         "following": "فعاليات المنظّمين الذين تتابعهم",
         "all": "فعاليات جميع المنظّمين"
+      },
+      "cityLabel": "المدينة",
+      "eventTypeLabel": "نوع الفعالية",
+      "eventTypeAll": "الكل",
+      "eventTypeFree": "مجاني",
+      "eventTypePaid": "مدفوع",
+      "clearAll": "مسح الكل",
+      "showResults_zero": "لا توجد نتائج",
+      "showResults_one": "عرض نتيجة واحدة",
+      "showResults_two": "عرض نتيجتين",
+      "showResults_few": "عرض {{count}} نتائج",
+      "showResults_many": "عرض {{count}} نتيجة",
+      "showResults_other": "عرض {{count}} نتيجة",
+      "close": "إغلاق",
+      "cities": {
+        "Algiers": "الجزائر",
+        "Oran": "وهران",
+        "Constantine": "قسنطينة",
+        "Annaba": "عنابة",
+        "Blida": "البليدة",
+        "Setif": "سطيف"
+      },
+      "categories": {
+        "Music": "موسيقى",
+        "Sports": "رياضة",
+        "Tech": "تكنولوجيا",
+        "Nightlife": "حياة ليلية",
+        "Food & Drink": "مأكولات ومشروبات",
+        "Business": "أعمال",
+        "Fitness": "لياقة"
       }
     },
     "viewMode": {
@@ -53,7 +88,19 @@
         "wed": "الأربعاء",
         "thu": "الخميس",
         "fri": "الجمعة",
-        "sat": "السبت"
+        "sat": "السبت",
+        "jan": "جانفي",
+        "feb": "فيفري",
+        "mar": "مارس",
+        "apr": "أفريل",
+        "may": "ماي",
+        "jun": "جوان",
+        "jul": "جويلية",
+        "aug": "أوت",
+        "sep": "سبتمبر",
+        "oct": "أكتوبر",
+        "nov": "نوفمبر",
+        "dec": "ديسمبر"
       },
       "timeSlotsAvailable_one": "{{count}} توقيت متاح يوم {{date}}",
       "timeSlotsAvailable_other": "{{count}} توقيتات متاحة يوم {{date}}",

@@ -111,7 +111,7 @@ const Following = () => {
 
               <button
                 onClick={() => handleUnfollow(org.id)}
-                className="w-full py-2.5 border-2 border-[#FF4000] text-[#FF4000] font-semibold rounded-full hover:bg-[#FFF4F3] transition-colors"
+                className="w-full py-3 border-2 border-[#FF4000] text-[#FF4000] font-semibold rounded-full hover:bg-[#FFF4F3] transition-colors"
               >
                 {t('following.unfollow')}
               </button>

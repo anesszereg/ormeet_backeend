@@ -58,9 +58,9 @@ const OnboardingChoice = () => {
             <h1 className="text-2xl sm:text-[28px] font-bold text-black">{t('onboardingChoice.title')}</h1>
             
             {/* Progress Bar */}
-            <div className="flex gap-2">
-              <div className="h-1 w-[100px] bg-black rounded-full"></div>
-              <div className="h-1 w-[100px] bg-[#EEEEEE] rounded-full"></div>
+            <div className="flex gap-2 w-full max-w-[400px]">
+              <div className="h-1 flex-1 bg-black rounded-full"></div>
+              <div className="h-1 flex-1 bg-[#EEEEEE] rounded-full"></div>
             </div>
           </div>
 
@@ -183,7 +183,7 @@ const OnboardingChoice = () => {
             className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#FF4000] mt-2 cursor-pointer"
           >
             {t('onboardingChoice.continueButton')}
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5 rtl:scale-x-[-1]">
               <path d="M7.5 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>

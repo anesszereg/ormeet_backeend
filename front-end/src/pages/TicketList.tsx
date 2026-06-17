@@ -152,6 +152,11 @@ const TicketList: React.FC = () => {
     return tickets.filter(ticket => ticket.quantity > 0);
   };
 
+  const handleGoBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   const handleContinue = () => {
     const orderItems = getOrderSummaryItems().map(t => ({
       ticketTypeId: t.id,
@@ -188,7 +193,7 @@ const TicketList: React.FC = () => {
         <EventDetailsNavbar isLoggedIn={!!user} />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <p className="text-red-500 mb-4">{error}</p>
-          <button onClick={() => navigate(-1)} className="text-[#FF4000] font-semibold hover:underline">{t('ticketList.error.goBack')}</button>
+          <button onClick={handleGoBack} className="text-[#FF4000] font-semibold hover:underline">{t('ticketList.error.goBack')}</button>
         </div>
       </div>
     );
@@ -200,13 +205,13 @@ const TicketList: React.FC = () => {
       <EventDetailsNavbar isLoggedIn={!!user} />
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8">
         {/* Go Back Button */}
         <button 
-          onClick={() => navigate(-1)}
+          onClick={handleGoBack}
           className="flex items-center gap-2 text-black mb-6 hover:text-[#FF4000] transition-colors cursor-pointer"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="rtl:scale-x-[-1]">
             <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span className="font-medium">{t('ticketList.goBack')}</span>
@@ -224,7 +229,7 @@ const TicketList: React.FC = () => {
                     selectedTicket === ticket.id ? 'border-[#FF4000]' : 'border-transparent'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-col sm:flex-row items-start gap-4">
                     {/* Ticket Icon */}
                     <div className="shrink-0">
                       <img src={ticket.icon} alt={ticket.name} className="w-[45px] h-[45px]" />
@@ -256,18 +261,18 @@ const TicketList: React.FC = () => {
                               <circle cx="8" cy="8" r="8" fill="#34A853"/>
                               <path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
-                            <span className="text-xs text-[#4F4F4F] whitespace-nowrap">{feature}</span>
+                            <span className="text-xs text-[#4F4F4F]">{feature}</span>
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-3 shrink-0">
+                    <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
                       <button
                         onClick={(e) => { e.stopPropagation(); updateQuantity(ticket.id, -1); }}
                         disabled={ticket.quantity === 0 || ticket.available === 0}
-                        className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
+                        className={`w-9 h-9 flex items-center justify-center rounded-full border-2 transition-colors ${
                           ticket.quantity === 0 || ticket.available === 0
                             ? 'border-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed' 
                             : 'border-black text-black hover:bg-[#F8F8F8]'
@@ -281,7 +286,7 @@ const TicketList: React.FC = () => {
                       <button
                         onClick={(e) => { e.stopPropagation(); updateQuantity(ticket.id, 1); }}
                         disabled={ticket.available === 0 || ticket.quantity >= Math.min(ticket.available, ticket.maxPerOrder || 10)}
-                        className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
+                        className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors cursor-pointer ${
                           ticket.available === 0 || ticket.quantity >= Math.min(ticket.available, ticket.maxPerOrder || 10)
                             ? 'bg-[#EEEEEE] text-[#CCCCCC] cursor-not-allowed'
                             : 'bg-black text-white hover:bg-[#333333]'
@@ -300,7 +305,7 @@ const TicketList: React.FC = () => {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl p-6 sticky top-6 min-h-[480px] flex flex-col">
+            <div className="bg-white rounded-2xl p-6 lg:sticky lg:top-6 lg:min-h-[480px] flex flex-col">
               {/* Event Info */}
               <div className="flex gap-3 mb-6 pb-6 border-b border-[#EEEEEE]">
                 <img 
@@ -354,7 +359,7 @@ const TicketList: React.FC = () => {
               {/* Continue Button */}
               <button 
                 onClick={handleContinue}
-                className="w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
+                className="hidden lg:block w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
                 disabled={getOrderSummaryItems().length === 0}
               >
                 {t('common:cta.continue')}
@@ -362,6 +367,22 @@ const TicketList: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+      {/* Mobile sticky bottom bar - total + continue */}
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#EEEEEE] px-4 py-3 flex items-center justify-between gap-3" style={{ boxShadow: '0 -2px 10px rgba(0,0,0,0.08)' }}>
+        <div className="flex flex-col min-w-0">
+          <span className="text-xs text-[#757575] leading-tight">{t('ticketList.orderSummary.total')}</span>
+          <span className="text-lg font-bold text-black leading-tight">
+            <bdi>${calculateTotal().toFixed(2)}</bdi>
+          </span>
+        </div>
+        <button
+          onClick={handleContinue}
+          disabled={getOrderSummaryItems().length === 0}
+          className="shrink-0 px-8 h-12 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors disabled:bg-[#EEEEEE] disabled:text-[#CCCCCC] disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          {t('common:cta.continue')}
+        </button>
       </div>
     </div>
   );

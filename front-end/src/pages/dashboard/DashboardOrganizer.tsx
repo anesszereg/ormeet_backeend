@@ -224,7 +224,7 @@ const DashboardOrganizer = () => {
         {/* Sidebar - Hidden on mobile, shown on lg+ */}
         <aside className={`
           fixed lg:relative inset-y-0 start-0 z-50 lg:z-auto
-          transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0
+          transform ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full rtl:translate-x-full'} lg:translate-x-0
           ${isSidebarCollapsed ? 'w-20' : 'w-60'} 
           shrink-0 min-h-full transition-all duration-300
           top-16 lg:top-0

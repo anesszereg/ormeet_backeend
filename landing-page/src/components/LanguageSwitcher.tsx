@@ -10,7 +10,15 @@ import {
   type Locale,
 } from "@ormeet/i18n";
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  /** "dropdown" (default): globe trigger + floating dropdown — desktop use.
+   *  "inline": flat list of full-width buttons — for the mobile drawer. */
+  variant?: "dropdown" | "inline";
+  /** Called after a locale switch — useful for the drawer to close itself. */
+  onSwitch?: () => void;
+}
+
+export function LanguageSwitcher({ variant = "dropdown", onSwitch }: LanguageSwitcherProps) {
   const currentLocale = useLocale() as Locale;
   const router = useRouter();
   const pathname = usePathname();
@@ -38,7 +46,48 @@ export function LanguageSwitcher() {
     router.push(newPath);
     router.refresh();
     setOpen(false);
+    onSwitch?.();
   };
+
+  if (variant === "inline") {
+    return (
+      <div className="flex flex-col gap-1">
+        {locales.map((loc) => {
+          const isActive = loc === currentLocale;
+          return (
+            <button
+              key={loc}
+              onClick={() => switchTo(loc)}
+              className={`flex items-center justify-between w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors text-start ${
+                isActive
+                  ? "bg-primary-light text-primary font-semibold"
+                  : "text-black hover:bg-secondary-light"
+              }`}
+            >
+              <span>{localeNames[loc]}</span>
+              {isActive && (
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M3 8L7 12L13 4"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>
