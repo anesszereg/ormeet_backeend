@@ -171,6 +171,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   };
 
   const [formData, setFormData] = useState<EventFormData>(getInitialFormData());
+  const [existingImages, setExistingImages] = useState<string[]>(initialData?.images || []);
 
   const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({});
   const [ticketErrors, setTicketErrors] = useState<Record<string, Partial<Record<keyof TicketData, string>>>>({});
@@ -552,6 +553,10 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     }));
   };
 
+  const removeExistingImage = (url: string) => {
+    setExistingImages(prev => prev.filter(img => img !== url));
+  };
+
   const moveImage = (fromIndex: number, toIndex: number) => {
     const newImages = [...formData.eventImages];
     const [movedImage] = newImages.splice(fromIndex, 1);
@@ -591,7 +596,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       if (!formData.mapAddress.trim()) newErrors.mapAddress = t('createEvent.validation.mapAddressRequired');
     }
     
-    if (formData.eventImages.length === 0) newErrors.eventImages = t('createEvent.validation.imagesRequired');
+    if (formData.eventImages.length === 0 && existingImages.length === 0) newErrors.eventImages = t('createEvent.validation.imagesRequired');
     if (!formData.description.trim()) newErrors.description = t('createEvent.validation.descriptionRequired');
     
     // Validate tickets
@@ -682,8 +687,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         };
       });
 
-    // Use uploaded image URLs
-    const validImages = imageUrls;
+    // Use uploaded image URLs, or keep existing images when editing without new uploads
+    const fallbackImages = mode === 'edit' ? existingImages : [];
+    const validImages = imageUrls.length > 0 ? imageUrls : fallbackImages;
 
     // Validate onlineLink is a proper URL or set to undefined
     const onlineLink = locationType === 'online' && formData.onlineLink && 
@@ -700,6 +706,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       shortDescription: formData.description.substring(0, 200) || 'Event description',
       longDescription: formData.description || undefined,
       organizerId,
+      status: 'draft',
+      visibility: formData.visibility,
       dateType: 'one_time' as const,
       startAt: startAt.toISOString(),
       endAt: endAt.toISOString(),
@@ -1341,28 +1349,67 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
             )}
 
             {/* Image Previews Grid */}
-            {formData.eventImages.length > 0 && (
+            {(formData.eventImages.length > 0 || existingImages.length > 0) && (
               <div className="mt-4">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {/* Existing images from the backend */}
+                  {existingImages.map((url, index) => (
+                    <div
+                      key={url}
+                      className="relative group rounded-lg overflow-hidden border-2 border-light-gray hover:border-primary transition-all"
+                    >
+                      {/* Cover Badge */}
+                      {index === 0 && formData.eventImages.length === 0 && (
+                        <div className="absolute top-2 start-2 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
+                          {t('createEvent.form.coverBadge')}
+                        </div>
+                      )}
+
+                      <img
+                        src={url}
+                        alt={`Existing event image ${index + 1}`}
+                        className="w-full h-32 object-cover"
+                      />
+
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(url)}
+                          className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                          title="Delete image"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <div className="absolute bottom-2 end-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
+                        {index + 1}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Newly uploaded images */}
                   {formData.eventImages.map((image, index) => (
                     <div
                       key={image.id}
                       className="relative group rounded-lg overflow-hidden border-2 border-light-gray hover:border-primary transition-all"
                     >
                       {/* Cover Badge */}
-                      {index === 0 && (
+                      {index === 0 && existingImages.length === 0 && (
                         <div className="absolute top-2 start-2 z-10 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-md">
                           {t('createEvent.form.coverBadge')}
                         </div>
                       )}
-                      
+
                       {/* Image */}
                       <img
                         src={image.preview}
-                        alt={`Event image ${index + 1}`}
+                        alt={`Event image ${existingImages.length + index + 1}`}
                         className="w-full h-32 object-cover"
                       />
-                      
+
                       {/* Overlay with Actions */}
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                         {/* Move Left */}
@@ -1378,7 +1425,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                             </svg>
                           </button>
                         )}
-                        
+
                         {/* Delete */}
                         <button
                           type="button"
@@ -1390,7 +1437,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                           </svg>
                         </button>
-                        
+
                         {/* Move Right */}
                         {index < formData.eventImages.length - 1 && (
                           <button
@@ -1405,10 +1452,10 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           </button>
                         )}
                       </div>
-                      
+
                       {/* Image Number */}
                       <div className="absolute bottom-2 end-2 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
-                        {index + 1}
+                        {existingImages.length + index + 1}
                       </div>
                     </div>
                   ))}
@@ -1907,7 +1954,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           </div>
           <button
             type="button"
-            onClick={mode === 'edit' ? onSaveChanges : handlePublish}
+            onClick={mode === 'edit' ? handleSaveDraft : handlePublish}
             disabled={isSubmitting}
             className="w-full sm:w-auto ps-5 pe-5 py-2 bg-[#FF4000] hover:bg-[#E63900] text-white font-medium text-sm rounded-full transition-all whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ boxShadow: '0 4px 12px rgba(255, 64, 0, 0.25)' }}

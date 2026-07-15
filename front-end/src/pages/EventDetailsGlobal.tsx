@@ -110,6 +110,8 @@ const EventDetailsGlobal = () => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('6:30 PM – 7:30 PM');
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [trendingPage, setTrendingPage] = useState<number>(1);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   // API-driven state
   const [eventData, setEventData] = useState<EventData | null>(null);
@@ -388,6 +390,42 @@ const EventDetailsGlobal = () => {
     setSelectedTimeSlot(timeSlot);
   };
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = eventData?.title || document.title;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        alert(t('eventDetails.alerts.copiedLink', 'Event link copied to clipboard'));
+      }
+    } catch {
+      // User cancelled or sharing not supported — ignore.
+    }
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = newsletterEmail.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setNewsletterStatus('error');
+      return;
+    }
+    // Store locally as a best-effort subscription until a backend endpoint exists.
+    try {
+      const existing = JSON.parse(localStorage.getItem('ormeetNewsletterEmails') || '[]');
+      if (!existing.includes(email)) {
+        existing.push(email);
+        localStorage.setItem('ormeetNewsletterEmails', JSON.stringify(existing));
+      }
+    } catch {
+      // Ignore localStorage errors.
+    }
+    setNewsletterStatus('success');
+    setNewsletterEmail('');
+  };
+
   const renderCalendarDays = () => {
     const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
     const firstDayOfMonth = new Date(selectedYear, selectedMonth - 1, 1).getDay();
@@ -420,14 +458,14 @@ const EventDetailsGlobal = () => {
     return days;
   };
 
-  // Generate time slots from actual event times
+  // Generate time slots from the actual event start/end timestamps.
   const generateTimeSlots = () => {
     if (!eventData) return [];
-    const start = new Date(eventData.date);
-    const slots = [];
-    // Use actual event time as the primary slot
-    slots.push(eventData.time);
-    return slots;
+    const start = new Date(eventData.startAtRaw);
+    const end = new Date(eventData.endAtRaw);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return [];
+    const timeStr = `${start.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })} – ${end.toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    return [timeStr];
   };
   const timeSlots = generateTimeSlots();
 
@@ -605,6 +643,7 @@ const EventDetailsGlobal = () => {
                     )}
                   </button>
                   <button 
+                    onClick={handleShare}
                     className="hover:scale-105 transition-transform cursor-pointer"
                     aria-label={t('eventDetails.actions.shareEvent')}
                   >
@@ -730,7 +769,7 @@ const EventDetailsGlobal = () => {
                   <div className="mt-4 bg-white border border-[#EEEEEE] rounded-2xl overflow-hidden">
                     <div className="relative w-full h-[400px] lg:h-[500px]">
                       <iframe
-                        src={`https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodeURIComponent(eventData.address)}`}
+                        src={`https://www.google.com/maps?q=${encodeURIComponent(eventData.address || eventData.venue)}&output=embed`}
                         width="100%"
                         height="100%"
                         style={{ border: 0 }}
@@ -1355,20 +1394,28 @@ const EventDetailsGlobal = () => {
 
               {/* Right Side - Email Input with Button */}
               <div className="flex-1 max-w-xl w-full">
-                <div className="relative flex items-center bg-white border border-[#EEEEEE] rounded-full p-1 h-12">
+                <form onSubmit={handleNewsletterSubmit} className="relative flex items-center bg-white border border-[#EEEEEE] rounded-full p-1 h-12">
                   <input
                     type="email"
+                    value={newsletterEmail}
+                    onChange={(e) => { setNewsletterEmail(e.target.value); setNewsletterStatus('idle'); }}
                     placeholder={t('eventDetails.newsletter.emailPlaceholder')}
                     className="flex-1 min-w-0 px-4 bg-transparent text-sm focus:outline-none"
                   />
-                  <button className="shrink-0 inline-flex items-center gap-1.5 px-5 h-10 bg-[#FF4000] text-white font-semibold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full">
+                  <button type="submit" className="shrink-0 inline-flex items-center gap-1.5 px-5 h-10 bg-[#FF4000] text-white font-semibold hover:bg-[#E63900] transition-colors text-sm whitespace-nowrap rounded-full">
                     <span>{t('eventDetails.newsletter.ctaButton')}</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 rtl:scale-x-[-1]">
                       <line x1="7" y1="17" x2="17" y2="7" />
                       <polyline points="7 7 17 7 17 17" />
                     </svg>
                   </button>
-                </div>
+                </form>
+                {newsletterStatus === 'success' && (
+                  <p className="mt-2 text-xs text-green-600">{t('eventDetails.newsletter.success', 'You are subscribed!')}</p>
+                )}
+                {newsletterStatus === 'error' && (
+                  <p className="mt-2 text-xs text-red-500">{t('eventDetails.newsletter.error', 'Please enter a valid email address.')}</p>
+                )}
               </div>
             </div>
           </div>

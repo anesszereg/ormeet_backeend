@@ -22,6 +22,7 @@ import {
   UpdateInterestsDto,
   UpdateHostingTypesDto,
 } from './dto';
+import { JwtService } from '@nestjs/jwt';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('Users')
@@ -29,7 +30,10 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
@@ -87,7 +91,13 @@ export class UsersController {
   @ApiResponse({ status: 400, description: 'User already has organizer role' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async addOrganizerRole(@Request() req) {
-    return this.usersService.addOrganizerRole(req.user.id);
+    const user = await this.usersService.addOrganizerRole(req.user.id);
+    const token = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    });
+    return { user, token };
   }
 
   @Patch('me/interests')

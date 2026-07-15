@@ -135,5 +135,28 @@
   },
   "languageSwitcher": {
     "label": "Changer de langue"
+  },
+  "legal": {
+    "meta": {
+      "title": "Mentions légales | Ormeet",
+      "description": "Conditions d'utilisation, politique de confidentialité, politique des cookies et politique de remboursement d'Ormeet."
+    },
+    "pageTitle": "Informations légales",
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "content": "En accédant à la plateforme Ormeet ou en l'utilisant, vous acceptez d'être lié par les présentes Conditions d'utilisation. Ormeet fournit une marketplace pour découvrir, réserver et organiser des événements. Les utilisateurs doivent être âgés d'au moins 18 ans ou disposer du consentement d'un responsable légal. Les organisateurs sont responsables de l'exactitude des listes d'événements, de la disponibilité des billets et du respect des lois applicables. Les participants sont responsables de consulter les détails de l'événement avant l'achat. Ormeet se réserve le droit de suspendre les comptes qui violent ces conditions, se livrent à une activité frauduleuse ou nuisent à la communauté. Les prix et frais sont affichés lors du paiement et peuvent inclure des frais de service. Toutes les ventes de billets sont soumises à la politique de remboursement de l'organisateur.\n\nOrmeet n'est pas responsable des annulations, modifications ou litiges entre organisateurs et participants, sauf obligation légale. Nous pouvons mettre à jour ces conditions de temps à autre, et l'utilisation continue de la plateforme constitue l'acceptation des conditions révisées."
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "content": "Ormeet s'engage à protéger vos informations personnelles. Nous collectons les données que vous fournissez directement (nom, e-mail, téléphone, photo de profil), les données collectées automatiquement (adresse IP, informations sur l'appareil, cookies) et les données des services tiers lorsque vous vous connectez via OAuth. Nous utilisons ces informations pour fournir et améliorer nos services, traiter les transactions, envoyer des mises à jour d'événements et personnaliser votre expérience.\n\nNous ne vendons pas vos informations personnelles. Nous pouvons partager des données avec les organisateurs d'événements, les processeurs de paiement et les fournisseurs de services dans le cadre d'accords de confidentialité stricts. Vous avez le droit d'accéder, de corriger ou de supprimer vos données personnelles. Pour exercer ces droits, contactez-nous à privacy@ormeet.com."
+    },
+    "cookies": {
+      "title": "Politique des cookies",
+      "content": "Ormeet utilise des cookies et des technologies similaires pour faire fonctionner la plateforme, mémoriser vos préférences, authentifier les utilisateurs et analyser le trafic. Les cookies essentiels sont nécessaires aux fonctionnalités principales telles que la connexion et le paiement. Les cookies d'analyse nous aident à améliorer l'expérience utilisateur et peuvent être désactivés dans les paramètres de votre navigateur.\n\nEn continuant à utiliser Ormeet, vous consentez à l'utilisation des cookies telle que décrite dans cette politique. Vous pouvez gérer ou désactiver les cookies dans les paramètres de votre navigateur ; cependant, certaines fonctionnalités peuvent ne pas fonctionner correctement sans eux."
+    },
+    "refund": {
+      "title": "Politique de remboursement et d'annulation",
+      "content": "Les politiques de remboursement sont définies par chaque organisateur d'événement et sont affichées sur la page de chaque événement avant l'achat. Sauf indication contraire de l'événement, toutes les ventes de billets sont définitives. Si un événement est annulé ou reporté par l'organisateur, les participants seront informés par e-mail et pourront bénéficier d'un remboursement ou d'un transfert de billet selon la politique de l'organisateur.\n\nLes frais de service ne sont généralement pas remboursables, sauf en cas d'annulation de l'événement. Pour demander un remboursement, contactez directement l'organisateur de l'événement via la page de l'événement ou contactez le support d'Ormeet à support@ormeet.com. Les demandes de remboursement sont généralement examinées sous 5 à 7 jours ouvrables."
+    }
   }
 }

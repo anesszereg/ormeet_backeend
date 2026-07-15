@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Event, EventStatus, EventDateType, LocationType, TicketType } from '../entities';
+import { Event, EventStatus, EventDateType, LocationType, EventVisibility, TicketType } from '../entities';
 import { CreateEventDto, UpdateEventDto, CreateEventEnhancedDto } from './dto';
 
 @Injectable()
@@ -19,10 +19,12 @@ export class EventsService {
 
   // Legacy method - kept for backward compatibility
   async create(createEventDto: CreateEventDto): Promise<Event> {
+    const { tickets: _tickets, ...eventData } = createEventDto as any;
     const event = this.eventRepository.create({
-      ...createEventDto,
+      ...eventData,
       status: createEventDto.status || EventStatus.DRAFT,
-    });
+      visibility: createEventDto.visibility || EventVisibility.PUBLIC,
+    } as any) as unknown as Event;
 
     return await this.eventRepository.save(event);
   }
@@ -47,6 +49,11 @@ export class EventsService {
     if (filters?.organizerId) {
       query.andWhere('event.organizerId = :organizerId', {
         organizerId: filters.organizerId,
+      });
+    } else if (filters?.status === EventStatus.PUBLISHED) {
+      // Public listings only show public events; private events are accessible via direct link.
+      query.andWhere('event.visibility = :visibility', {
+        visibility: EventVisibility.PUBLIC,
       });
     }
 
@@ -75,9 +82,48 @@ export class EventsService {
   async update(id: string, updateEventDto: UpdateEventDto): Promise<Event> {
     const event = await this.findOne(id);
 
-    Object.assign(event, updateEventDto);
+    const { tickets, ...eventUpdates } = updateEventDto as any;
+    Object.assign(event, eventUpdates);
 
-    return await this.eventRepository.save(event);
+    const savedEvent = await this.eventRepository.save(event);
+
+    // Replace ticket types when editing tickets
+    if (tickets && Array.isArray(tickets)) {
+      await this.ticketTypeRepository.delete({ eventId: id });
+      if (tickets.length > 0) {
+        const newTickets = tickets.map((ticketDto) =>
+          this.ticketTypeRepository.create({
+            eventId: savedEvent.id,
+            title: ticketDto.name,
+            type: ticketDto.type,
+            description: ticketDto.description,
+            price: ticketDto.price,
+            currency: ticketDto.currency || 'USD',
+            quantityTotal: ticketDto.quantityTotal,
+            quantitySold: 0,
+            maxPerOrder: ticketDto.maxPerOrder,
+            ticketBenefits: ticketDto.ticketBenefits,
+            salesStart: ticketDto.salesStart,
+            salesEnd: ticketDto.salesEnd,
+            isVisible: ticketDto.isVisible !== undefined ? ticketDto.isVisible : true,
+            isFree: ticketDto.isFree || false,
+          }),
+        );
+        await this.ticketTypeRepository.save(newTickets);
+      }
+    }
+
+    // Return event with relations
+    const eventWithRelations = await this.eventRepository.findOne({
+      where: { id: savedEvent.id },
+      relations: ['ticketTypes', 'organizer', 'venue'],
+    });
+
+    if (!eventWithRelations) {
+      throw new NotFoundException('Event not found after update');
+    }
+
+    return eventWithRelations;
   }
 
   async remove(id: string): Promise<void> {
@@ -175,7 +221,9 @@ export class EventsService {
       
       capacity: createEventDto.capacity,
       guidelines: createEventDto.guidelines,
-      
+      requiresApproval: createEventDto.requiresApproval,
+      visibility: createEventDto.visibility || EventVisibility.PUBLIC,
+
       // Participants
       speakers: createEventDto.speakers,
       performers: createEventDto.performers,
