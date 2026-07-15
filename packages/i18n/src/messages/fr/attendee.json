@@ -124,7 +124,8 @@
     },
     "alerts": {
       "favoriteFailed": "Impossible de mettre à jour les favoris",
-      "followFailed": "Impossible de mettre à jour les abonnements"
+      "followFailed": "Impossible de mettre à jour les abonnements",
+      "copiedLink": "Lien de l'événement copié dans le presse-papiers"
     },
     "guidelines": {
       "sectionTitle": "Règles et consignes",
@@ -213,7 +214,9 @@
       "titleSuffix": "ne ratez plus aucun événement !",
       "description": "Recevez les nouveautés exclusives, l'accès en avant-première et une sélection d'événements directement dans votre boîte mail.",
       "emailPlaceholder": "Votre adresse e-mail",
-      "ctaButton": "Me tenir informé"
+      "ctaButton": "Me tenir informé",
+      "success": "Vous êtes abonné !",
+      "error": "Veuillez saisir une adresse e-mail valide."
     },
     "price": {
       "from": "À partir de"
@@ -229,12 +232,19 @@
     "orderSummary": {
       "title": "Récapitulatif",
       "serviceCharge": "Frais de service",
+      "discount": "Réduction",
       "total": "Total"
     },
     "badges": {
       "soldOut": "Complet",
       "onlyFewLeft": "Derniers billets",
       "almostFull": "Bientôt complet"
+    },
+    "promo": {
+      "placeholder": "Code promo",
+      "apply": "Appliquer",
+      "remove": "Retirer",
+      "invalid": "Code promo invalide"
     },
     "error": {
       "goBack": "Retour"

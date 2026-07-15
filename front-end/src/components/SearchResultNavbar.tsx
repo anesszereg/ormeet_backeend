@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import Logo from '../assets/Svgs/navbar/Logo.svg';
@@ -88,9 +88,11 @@ const SearchResultNavbar = () => {
   return (
     <nav className="w-full h-14 md:h-16 bg-white px-3 sm:px-4 md:px-8 flex items-center justify-between shadow-md border-b border-[#D0D0D0] gap-2 md:gap-4">
       {/* Section 1: Logo */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
-        <span className="text-lg md:text-xl font-bold text-black">Ormeet</span>
+      <div className="flex items-center gap-2 flex-shrink-0 cursor-pointer" onClick={() => navigate('/browse-events')}>
+        <Link to="/browse-events">
+          <img src={Logo} alt="Ormeet Logo" className="w-6 h-8" />
+          <span className="text-lg md:text-xl font-bold text-black">Ormeet</span>
+        </Link>
       </div>
 
       {/* Section 2: Search bar (centered via flex, no position absolute) */}

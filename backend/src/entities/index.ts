@@ -22,7 +22,7 @@ export { UserRole, EventCategory } from './user.entity';
 export { OrganizationMemberRole } from './organization.entity';
 export { InvitationStatus } from './organization-invitation.entity';
 export { VerificationType, VerificationPurpose } from './verification-code.entity';
-export { EventStatus, EventDateType, RecurringPattern, LocationType } from './event.entity';
+export { EventStatus, EventDateType, RecurringPattern, LocationType, EventVisibility } from './event.entity';
 export { TicketTypeEnum } from './ticket-type.entity';
 export { OrderStatus, PaymentMethod } from './order.entity';
 export { TicketStatus } from './ticket.entity';

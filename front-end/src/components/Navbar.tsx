@@ -147,42 +147,53 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
                   )}
                 </div>
               )}
-              <a
-                href="/profile"
-                className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); navigate('/profile'); }}
+                className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
               >
                 {t('userMenu.profile')}
-              </a>
+              </button>
               {/* Role-based Dashboard Links */}
               {user?.role === 'attendee' && (
-                <a
-                  href="/dashboard-attendee"
-                  className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+                <button
+                  onClick={() => { setIsProfileMenuOpen(false); navigate('/dashboard-attendee'); }}
+                  className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
                 >
                   {t('userMenu.attendeeDashboard')}
-                </a>
+                </button>
               )}
               {user?.role === 'organizer' && (
-                <a
-                  href="/dashboard-organizer"
-                  className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+                <button
+                  onClick={() => { setIsProfileMenuOpen(false); navigate('/dashboard-organizer'); }}
+                  className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
                 >
                   {t('userMenu.organizerDashboard')}
-                </a>
+                </button>
               )}
-              
-              <a
-                href="/settings"
-                className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); navigate('/dashboard-attendee'); }}
+                className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
+              >
+                {t('userMenu.myTickets')}
+              </button>
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); navigate('/settings'); }}
+                className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
               >
                 {t('userMenu.settings')}
-              </a>
-              <a
-                href="/help"
-                className="block px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors"
+              </button>
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); navigate('/dashboard-attendee'); }}
+                className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
+              >
+                {t('userMenu.accountOptions')}
+              </button>
+              <button
+                onClick={() => { setIsProfileMenuOpen(false); navigate('/support'); }}
+                className="w-full text-start px-4 py-2.5 text-sm text-[#4F4F4F] hover:bg-[#F8F8F8] hover:text-[#FF4000] transition-colors cursor-pointer"
               >
                 {t('userMenu.helpSupport')}
-              </a>
+              </button>
               <div className="border-t border-[#EEEEEE] my-1"></div>
               <button
                 onClick={handleLogout}

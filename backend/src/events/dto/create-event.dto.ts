@@ -13,7 +13,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EventStatus } from '../../entities';
+import { EventStatus, EventVisibility } from '../../entities';
+import { CreateEventTicketTypeDto } from './create-event-ticket-type.dto';
 
 class EventGuidelinesDto {
   @ApiPropertyOptional({ example: '18+' })
@@ -173,6 +174,11 @@ export class CreateEventDto {
   @IsBoolean()
   refundsAllowed?: boolean;
 
+  @ApiPropertyOptional({ enum: EventVisibility, default: EventVisibility.PUBLIC, description: 'Event visibility' })
+  @IsOptional()
+  @IsEnum(EventVisibility)
+  visibility?: EventVisibility;
+
   @ApiPropertyOptional({ example: false, default: false, description: 'Require manual approval before confirming reservations' })
   @IsOptional()
   @IsBoolean()
@@ -197,4 +203,14 @@ export class CreateEventDto {
   @ValidateNested()
   @Type(() => EventGuidelinesDto)
   guidelines?: EventGuidelinesDto;
+
+  @ApiPropertyOptional({
+    type: [CreateEventTicketTypeDto],
+    description: 'Tickets for the event',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateEventTicketTypeDto)
+  tickets?: CreateEventTicketTypeDto[];
 }

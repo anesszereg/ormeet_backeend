@@ -120,7 +120,8 @@
     },
     "alerts": {
       "favoriteFailed": "Failed to update favorites",
-      "followFailed": "Failed to update following status"
+      "followFailed": "Failed to update following status",
+      "copiedLink": "Event link copied to clipboard"
     },
     "guidelines": {
       "sectionTitle": "Event rules & guidelines",
@@ -209,7 +210,9 @@
       "titleSuffix": "never miss an event again!",
       "description": "Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.",
       "emailPlaceholder": "Enter your email",
-      "ctaButton": "Keep Me Updated"
+      "ctaButton": "Keep Me Updated",
+      "success": "You are subscribed!",
+      "error": "Please enter a valid email address."
     },
     "price": {
       "from": "From"
@@ -225,12 +228,19 @@
     "orderSummary": {
       "title": "Order Summary",
       "serviceCharge": "Service charge",
+      "discount": "Discount",
       "total": "Total"
     },
     "badges": {
       "soldOut": "Sold out",
       "onlyFewLeft": "Only few left",
       "almostFull": "Almost full"
+    },
+    "promo": {
+      "placeholder": "Promo code",
+      "apply": "Apply",
+      "remove": "Remove",
+      "invalid": "Invalid promo code"
     },
     "error": {
       "goBack": "Go Back"

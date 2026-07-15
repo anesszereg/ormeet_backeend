@@ -47,6 +47,7 @@ interface FullEventData {
   tickets: TicketData[];
   faqs: FAQData[];
   visibility: 'public' | 'private';
+  requiresApproval: boolean;
 }
 
 interface EventsTableProps {
@@ -128,6 +129,10 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             status = 'completed';
           }
 
+          const customLocation = (event as any).customLocation;
+          const ticketTypes = (event as any).ticketTypes || [];
+          const guidelines = (event as any).guidelines;
+
           return {
             id: event.id,
             name: event.title,
@@ -137,14 +142,13 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             dateRange: [new Date(event.startAt), new Date(event.endAt)] as [Date | null, Date | null],
             startTime: new Date(event.startAt).toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
             endTime: new Date(event.endAt).toLocaleTimeString(localeMap[i18n.language] || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true }),
-            location: event.locationType === 'online' ? 'Online Event' : 'TBA',
-            country: '',
-            state: '',
-            mapAddress: '',
-            onlineLink: '',
+            location: event.locationType === 'online' ? 'Online Event' : customLocation?.address || 'TBA',
+            country: customLocation?.country || '',
+            state: customLocation?.state || '',
+            mapAddress: customLocation?.address || '',
+            onlineLink: (event as any).onlineLink || '',
             status,
             sold: (() => {
-              const ticketTypes = (event as any).ticketTypes || [];
               const totalSold = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantitySold || 0), 0);
               const totalCapacity = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantityTotal || 0), 0);
               return `${totalSold}/${totalCapacity}`;
@@ -152,9 +156,20 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             category: event.type || 'Other',
             eventType: event.locationType === 'online' ? 'online' : event.locationType === 'physical' ? 'in-person' : 'hybrid',
             description: event.description || event.shortDescription || '',
-            tickets: [],
-            faqs: [],
-            visibility: 'public' as const,
+            tickets: ticketTypes.map((t: any) => ({
+              id: t.id || `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              type: t.title || t.name || t.type || '',
+              priceType: (t.price === 0 || t.isFree) ? 'free' : 'paid',
+              price: t.price ? String(t.price) : '',
+              quantity: t.quantityTotal ? String(t.quantityTotal) : '',
+            })),
+            faqs: guidelines?.faqs?.map((faq: any) => ({
+              id: `faq-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              question: faq.question || '',
+              answer: faq.answer || '',
+            })) || [],
+            visibility: (event as any).visibility || 'public',
+            requiresApproval: (event as any).requiresApproval ?? false,
           };
         });
         

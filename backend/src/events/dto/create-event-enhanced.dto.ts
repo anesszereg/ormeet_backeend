@@ -15,7 +15,7 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { EventStatus, EventDateType, RecurringPattern, LocationType } from '../../entities';
+import { EventStatus, EventDateType, RecurringPattern, LocationType, EventVisibility } from '../../entities';
 import { CreateEventTicketTypeDto } from './create-event-ticket-type.dto';
 
 // Sub-DTOs for nested objects
@@ -165,6 +165,16 @@ export class CreateEventEnhancedDto {
   @IsOptional()
   @IsEnum(EventStatus)
   status?: EventStatus;
+
+  @ApiPropertyOptional({ enum: EventVisibility, default: EventVisibility.PUBLIC, description: 'Event visibility' })
+  @IsOptional()
+  @IsEnum(EventVisibility)
+  visibility?: EventVisibility;
+
+  @ApiPropertyOptional({ example: false, default: false, description: 'Require manual approval before confirming reservations' })
+  @IsOptional()
+  @IsBoolean()
+  requiresApproval?: boolean;
 
   // Media
   @ApiPropertyOptional({ example: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'] })

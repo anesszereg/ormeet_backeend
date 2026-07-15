@@ -25,6 +25,7 @@ interface EventDataForEdit {
   tickets: { id: string; type: string; priceType: 'free' | 'paid' | ''; price: string; quantity: string; }[];
   faqs: { id: string; question: string; answer: string; }[];
   visibility: 'public' | 'private';
+  requiresApproval?: boolean;
   images?: string[];
 }
 
@@ -89,6 +90,7 @@ const DashboardOrganizer = () => {
       tickets: event.tickets,
       faqs: event.faqs,
       visibility: event.visibility,
+      requiresApproval: (event as any).requiresApproval,
       images: event.images
     });
     setShowCreateEvent(true);
@@ -111,6 +113,7 @@ const DashboardOrganizer = () => {
       tickets: event.tickets.map(t => ({ ...t, id: `ticket-${Date.now()}-${Math.random()}` })),
       faqs: event.faqs.map(f => ({ ...f, id: `faq-${Date.now()}-${Math.random()}` })),
       visibility: event.visibility,
+      requiresApproval: (event as any).requiresApproval,
       images: event.images
     });
     setShowCreateEvent(true);

@@ -135,6 +135,29 @@
   },
   "languageSwitcher": {
     "label": "Change language"
+  },
+  "legal": {
+    "meta": {
+      "title": "Legal | Ormeet",
+      "description": "Terms of Service, Privacy Policy, Cookie Policy, and Refund Policy for Ormeet."
+    },
+    "pageTitle": "Legal Information",
+    "terms": {
+      "title": "Terms of Service",
+      "content": "By accessing or using the Ormeet platform, you agree to be bound by these Terms of Service. Ormeet provides a marketplace for discovering, booking, and hosting events. Users must be at least 18 years old or have the consent of a legal guardian. Organizers are responsible for the accuracy of event listings, ticket availability, and compliance with applicable laws. Attendees are responsible for reviewing event details before purchasing tickets. Ormeet reserves the right to suspend accounts that violate these terms, engage in fraudulent activity, or harm the community. Prices and fees are displayed at checkout and may include service charges. All ticket sales are subject to the organizer's refund policy.\n\nOrmeet is not liable for event cancellations, changes, or disputes between organizers and attendees, except where required by law. We may update these terms from time to time, and continued use of the platform constitutes acceptance of the revised terms."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "content": "Ormeet is committed to protecting your personal information. We collect data you provide directly (name, email, phone, profile photo), data collected automatically (IP address, device information, cookies), and data from third-party services when you sign in via OAuth. We use this information to provide and improve our services, process transactions, send event updates, and personalize your experience.\n\nWe do not sell your personal information. We may share data with event organizers, payment processors, and service providers under strict confidentiality agreements. You have the right to access, correct, or delete your personal data. To exercise these rights, contact us at privacy@ormeet.com."
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "content": "Ormeet uses cookies and similar technologies to operate the platform, remember your preferences, authenticate users, and analyze traffic. Essential cookies are required for core functionality such as login and checkout. Analytics cookies help us improve the user experience and may be disabled through your browser settings.\n\nBy continuing to use Ormeet, you consent to the use of cookies as described in this policy. You can manage or disable cookies through your browser settings; however, some features may not function properly without them."
+    },
+    "refund": {
+      "title": "Refund & Cancellation Policy",
+      "content": "Refund policies are set by individual event organizers and are displayed on each event page before purchase. Unless an event explicitly states otherwise, all ticket sales are final. If an event is canceled or rescheduled by the organizer, attendees will be notified by email and eligible for a refund or ticket transfer according to the organizer's policy.\n\nService fees are generally non-refundable unless the event is canceled. To request a refund, contact the event organizer directly through the event page or reach out to Ormeet support at support@ormeet.com. Refund requests are typically reviewed within 5-7 business days."
+    }
   }
 }
 

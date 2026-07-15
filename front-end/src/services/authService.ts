@@ -302,15 +302,15 @@ class AuthService {
     return response.data;
   }
 
-  async addOrganizerRole(): Promise<User> {
-    const response = await api.patch<User>('/users/me/add-organizer-role');
-    // Update local storage with new roles
-    const currentUser = this.getCurrentUser();
-    if (currentUser) {
-      const updatedUser = { ...currentUser, ...response.data };
-      const sanitizedUser = this.sanitizeUserForStorage(updatedUser);
-      localStorage.setItem('user', JSON.stringify(sanitizedUser));
-    }
+  async addOrganizerRole(): Promise<{ user: User; token: string }> {
+    const response = await api.patch<{ user: User; token: string }>('/users/me/add-organizer-role');
+    const { user, token } = response.data;
+    // Persist the new organizer account and token so subsequent API calls are authenticated correctly.
+    localStorage.setItem('token', token);
+    const sanitizedUser = this.sanitizeUserForStorage(user);
+    localStorage.setItem('user', JSON.stringify(sanitizedUser));
+    // Update the axios default header for the current session.
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     return response.data;
   }
 

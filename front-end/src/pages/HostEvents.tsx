@@ -24,10 +24,11 @@ const HostEvents = () => {
     // Attendee wants to become organizer - add organizer role
     try {
       setIsUpgrading(true);
-      const updatedUser = await authService.addOrganizerRole();
+      const { user: updatedUser } = await authService.addOrganizerRole();
       setUser(updatedUser);
       console.log('✅ Successfully added organizer role');
-      navigate('/dashboard-organizer');
+      const needsOnboarding = !updatedUser?.hostingEventTypes || updatedUser.hostingEventTypes.length === 0;
+      navigate(needsOnboarding ? '/onboarding-brand-info' : '/dashboard-organizer');
     } catch (error: any) {
       console.error('❌ Failed to add organizer role:', error);
       alert(error.response?.data?.message || t('hostEvents.alertMessage'));

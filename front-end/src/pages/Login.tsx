@@ -108,11 +108,19 @@ const Login = () => {
   const location = useLocation();
   const from = (location.state as any)?.from?.pathname || '/';
 
-  // After a successful login, bounce through the landing page so its localStorage
-  // gets populated with the auth state before arriving at the dashboard.
-  // This ensures the landing page always hides Login/Signup on the next visit.
+  // After a successful login, redirect back to the page the user came from
+  // (passed via ProtectedRoute in location.state.from). If there is no return
+  // target, fall back to the role-based dashboard, optionally bouncing through
+  // the landing page so it can hide its Login/Signup buttons via the auth cookie.
   const redirectAfterLogin = (user: ReturnType<typeof authService.getCurrentUser>) => {
     const dashboardPath = user?.role === 'organizer' ? '/dashboard-organizer' : '/dashboard-attendee';
+    const returnPath = (location.state as any)?.from?.pathname;
+
+    if (returnPath && returnPath !== '/login') {
+      navigate(returnPath, { replace: true });
+      return;
+    }
+
     const landingUrl = (import.meta.env.VITE_LANDING_URL as string) || '';
     if (landingUrl) {
       try {
