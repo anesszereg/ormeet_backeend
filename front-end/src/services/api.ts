@@ -27,10 +27,9 @@ api.interceptors.response.use(
   (response: any) => response,
   (error: any) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized - clear token and redirect to login
+      // Clear an invalid session; protected routes will handle authentication redirects.
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
