@@ -20,14 +20,14 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('User Preferences')
 @Controller('user-preferences')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth('JWT-auth')
 export class UserPreferencesController {
   constructor(private readonly userPreferencesService: UserPreferencesService) {}
 
   // ========== Favorite Events ==========
 
   @Get('favorites/events')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get user favorite events' })
   @ApiResponse({ status: 200, description: 'Returns list of favorite events' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -36,6 +36,8 @@ export class UserPreferencesController {
   }
 
   @Post('favorites/events/:eventId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Add event to favorites' })
   @ApiParam({ name: 'eventId', description: 'Event UUID' })
   @ApiResponse({ status: 201, description: 'Event added to favorites' })
@@ -51,6 +53,8 @@ export class UserPreferencesController {
   }
 
   @Delete('favorites/events/:eventId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Remove event from favorites' })
   @ApiParam({ name: 'eventId', description: 'Event UUID' })
   @ApiResponse({ status: 200, description: 'Event removed from favorites' })
@@ -65,6 +69,8 @@ export class UserPreferencesController {
   }
 
   @Get('favorites/events/:eventId/check')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Check if event is favorited' })
   @ApiParam({ name: 'eventId', description: 'Event UUID' })
   @ApiResponse({ status: 200, description: 'Returns favorite status' })
@@ -80,6 +86,8 @@ export class UserPreferencesController {
   // ========== Following Organizers ==========
 
   @Get('following/organizers')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get organizers user is following' })
   @ApiResponse({ status: 200, description: 'Returns list of followed organizers' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -88,6 +96,8 @@ export class UserPreferencesController {
   }
 
   @Post('following/organizers/:organizerId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Follow an organizer' })
   @ApiParam({ name: 'organizerId', description: 'Organizer UUID' })
   @ApiResponse({ status: 201, description: 'Now following organizer' })
@@ -103,6 +113,8 @@ export class UserPreferencesController {
   }
 
   @Delete('following/organizers/:organizerId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Unfollow an organizer' })
   @ApiParam({ name: 'organizerId', description: 'Organizer UUID' })
   @ApiResponse({ status: 200, description: 'Unfollowed organizer' })
@@ -117,6 +129,8 @@ export class UserPreferencesController {
   }
 
   @Get('following/organizers/:organizerId/check')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Check if following organizer' })
   @ApiParam({ name: 'organizerId', description: 'Organizer UUID' })
   @ApiResponse({ status: 200, description: 'Returns following status' })
