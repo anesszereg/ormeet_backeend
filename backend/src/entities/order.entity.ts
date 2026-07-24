@@ -76,7 +76,7 @@ export class Order {
   @Column({ type: 'decimal', precision: 10, scale: 2, name: 'amount_total' })
   amountTotal: number; // Final total (subtotal - discount + fees)
 
-  @Column({ default: 'USD' })
+  @Column({ default: 'DZD' })
   currency: string;
 
   @Column({

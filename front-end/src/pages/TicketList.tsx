@@ -6,6 +6,7 @@ import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import ticketTypeService, { TicketType as ApiTicketType } from '../services/ticketTypeService';
 import eventService from '../services/eventService';
 import promotionService, { PromotionType } from '../services/promotionService';
+import { formatCurrency } from '../utils/formatters';
 
 // Import SVG icons (used as fallback based on ticket type)
 import GeneralAdmissionIcon from '../assets/Svgs/eventDetails/generalAdmission.svg';
@@ -306,7 +307,7 @@ const TicketList: React.FC = () => {
                             </span>
                           )}
                         </div>
-                        <span className="text-lg font-bold text-black">${ticket.price.toFixed(2)}</span>
+                        <span className="text-lg font-bold text-black">{formatCurrency(ticket.price)}</span>
                       </div>
 
                       {/* Features */}
@@ -392,20 +393,20 @@ const TicketList: React.FC = () => {
                       {ticket.quantity} x {ticket.name}
                     </span>
                     <span className="text-sm font-semibold text-black">
-                      ${(ticket.price * ticket.quantity).toFixed(2)}
+                      {formatCurrency(ticket.price * ticket.quantity)}
                     </span>
                   </div>
                 ))}
                 {appliedPromo && calculateDiscount() > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[#34A853]">{t('ticketList.orderSummary.discount', 'Discount')} ({appliedPromo.code})</span>
-                    <span className="text-sm font-semibold text-[#34A853]">-${calculateDiscount().toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-[#34A853]">-{formatCurrency(calculateDiscount())}</span>
                   </div>
                 )}
                 {getOrderSummaryItems().length > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[#4F4F4F]">{t('ticketList.orderSummary.serviceCharge')}</span>
-                    <span className="text-sm font-semibold text-black">${serviceCharge.toFixed(2)}</span>
+                    <span className="text-sm font-semibold text-black">{formatCurrency(serviceCharge)}</span>
                   </div>
                 )}
               </div>
@@ -447,7 +448,7 @@ const TicketList: React.FC = () => {
               <div className="pt-4 border-t border-[#EEEEEE] mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-base font-bold text-black">{t('ticketList.orderSummary.total')}</span>
-                  <span className="text-xl font-bold text-black">${calculateTotal().toFixed(2)}</span>
+                  <span className="text-xl font-bold text-black">{formatCurrency(calculateTotal())}</span>
                 </div>
               </div>
 
@@ -468,7 +469,7 @@ const TicketList: React.FC = () => {
         <div className="flex flex-col min-w-0">
           <span className="text-xs text-[#757575] leading-tight">{t('ticketList.orderSummary.total')}</span>
           <span className="text-lg font-bold text-black leading-tight">
-            <bdi>${calculateTotal().toFixed(2)}</bdi>
+            <bdi>{formatCurrency(calculateTotal())}</bdi>
           </span>
         </div>
         <button

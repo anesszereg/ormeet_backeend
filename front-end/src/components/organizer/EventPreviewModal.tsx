@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../../utils/formatters';
 import NextImageIcon from '../../assets/Svgs/eventDetails/nextImage.svg';
 import PastImageIcon from '../../assets/Svgs/eventDetails/pastImage.svg';
 import StarIcon from '../../assets/Svgs/eventDetails/star.svg';
@@ -89,7 +90,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
     return price < min ? price : min;
   }, Infinity);
 
-  const displayPrice = lowestPrice === Infinity ? t('organizer:eventPreview.ticketFree') : `$${lowestPrice.toFixed(2)}`;
+  const displayPrice = lowestPrice === Infinity ? t('organizer:eventPreview.ticketFree') : formatCurrency(lowestPrice);
   const hasImages = eventData.eventImages.length > 0;
 
   return (
@@ -312,7 +313,7 @@ const EventPreviewModal = ({ isOpen, onClose, eventData }: EventPreviewModalProp
                             </div>
                             <div className="text-end">
                               <p className="text-base font-bold text-black">
-                                {ticket.priceType === 'free' ? t('organizer:eventPreview.ticketFree') : `$${parseFloat(ticket.price || '0').toFixed(2)}`}
+                                {ticket.priceType === 'free' ? t('organizer:eventPreview.ticketFree') : formatCurrency(parseFloat(ticket.price || '0'))}
                               </p>
                             </div>
                           </div>

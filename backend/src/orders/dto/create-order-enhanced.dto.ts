@@ -132,7 +132,7 @@ export class CreateOrderEnhancedDto {
   customerNotes?: string;
 
   // Currency
-  @ApiPropertyOptional({ example: 'USD', default: 'USD' })
+  @ApiPropertyOptional({ example: 'DZD', default: 'DZD' })
   @IsOptional()
   @IsString()
   currency?: string;

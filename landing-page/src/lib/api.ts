@@ -70,7 +70,7 @@ const formatPrice = (
   if (prices.length === 0) return "";
   const min = Math.min(...prices);
   if (min === 0) return "Free";
-  return `$${min.toFixed(2)}`;
+  return new Intl.NumberFormat('fr-DZ', { style: 'currency', currency: 'DZD' }).format(min);
 };
 
 const resolveVenue = (e: BackendEvent): { venue: string; city: string } => {
