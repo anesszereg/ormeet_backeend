@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface EventListCardProps {
@@ -29,18 +29,9 @@ const EventListCard = ({
   availableSpots,
 }: EventListCardProps) => {
   const { t } = useTranslation('attendee');
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    if (eventId) {
-      navigate(`/event/${eventId}`);
-    }
-  };
-
-  return (
-    <div 
-      onClick={handleClick}
-      className={`bg-white rounded-2xl overflow-hidden transition-all cursor-pointer flex w-full border border-[#EEEEEE] ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.01]'}`}
+  const content = (
+    <div
+      className={`bg-white rounded-2xl overflow-hidden transition-all flex w-full border border-[#EEEEEE] ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.01]'}`}
     >
       {/* Event image - Left side */}
       <div className="relative w-32 sm:w-40 md:w-[200px] lg:w-[240px] xl:w-[280px] 2xl:w-[320px] h-24 sm:h-32 md:h-[160px] lg:h-[180px] shrink-0">
@@ -95,6 +86,12 @@ const EventListCard = ({
       </div>
     </div>
   );
+
+  return eventId ? (
+    <Link to={`/event/${eventId}`} className="block w-full cursor-pointer">
+      {content}
+    </Link>
+  ) : content;
 };
 
 export default EventListCard;
