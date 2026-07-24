@@ -63,6 +63,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user]);
 
+  // Cross-tab session sync: when another tab logs in/out, mirror the localStorage change.
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        if (!e.newValue) {
+          // Logged out in another tab — clear local auth state so protected routes redirect.
+          setUser(null);
+        } else if (!user) {
+          // Logged in in another tab — refresh user from localStorage.
+          const currentUser = authService.getCurrentUser();
+          setUser(currentUser);
+        }
+      } else if (e.key === 'user') {
+        if (!e.newValue) {
+          setUser(null);
+        } else {
+          try {
+            setUser(JSON.parse(e.newValue));
+          } catch {
+            setUser(null);
+          }
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [user]);
+
   const login = async (data: LoginDto) => {
     const response = await authService.login(data);
     setUser(response.user);

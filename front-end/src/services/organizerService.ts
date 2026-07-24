@@ -46,6 +46,7 @@ export interface CreateEventDto {
   longDescription?: string;
   organizerId: string;
   status?: 'draft' | 'published' | 'cancelled';
+  visibility?: 'public' | 'private';
   dateType: 'one_time' | 'multiple';
   tags?: string[];
   images?: string[];
@@ -110,6 +111,7 @@ export interface Event {
   endAt: string;
   locationType: string;
   status: 'draft' | 'published' | 'cancelled' | 'completed';
+  visibility?: 'public' | 'private';
   images?: string[];
   viewCount: number;
   favoriteCount: number;

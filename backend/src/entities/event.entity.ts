@@ -42,6 +42,11 @@ export enum LocationType {
   TO_BE_ANNOUNCED = 'to_be_announced',
 }
 
+export enum EventVisibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+}
+
 @Entity('events')
 @Index(['title'])
 @Index(['organizerId', 'startAt'])
@@ -176,6 +181,14 @@ export class Event {
 
   @Column({ type: 'boolean', default: false, name: 'requires_approval' })
   requiresApproval: boolean;
+
+  @Column({
+    type: 'enum',
+    enum: EventVisibility,
+    default: EventVisibility.PUBLIC,
+    name: 'visibility',
+  })
+  visibility: EventVisibility;
 
   // Event Guidelines
   @Column({ type: 'jsonb', nullable: true })

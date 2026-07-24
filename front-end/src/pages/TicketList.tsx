@@ -134,6 +134,13 @@ const TicketList: React.FC = () => {
 
   const serviceCharge = 20.00;
 
+  useEffect(() => {
+    if (appliedPromo && calculateSubtotal() <= 0) {
+      setAppliedPromo(null);
+      setPromoCode('');
+    }
+  }, [tickets, appliedPromo]);
+
   const updateQuantity = (ticketId: string, change: number) => {
     setTickets(tickets.map(ticket => {
       if (ticket.id === ticketId) {
@@ -152,8 +159,9 @@ const TicketList: React.FC = () => {
   const calculateDiscount = () => {
     if (!appliedPromo) return 0;
     const subtotal = calculateSubtotal();
+    if (appliedPromo.type === 'free-ticket') return subtotal;
     if (appliedPromo.type === 'percent') {
-      return (subtotal * appliedPromo.value) / 100;
+      return Math.min((subtotal * appliedPromo.value) / 100, subtotal);
     }
     if (appliedPromo.type === 'fixed') {
       return Math.min(appliedPromo.value, subtotal);
@@ -162,7 +170,9 @@ const TicketList: React.FC = () => {
   };
 
   const calculateTotal = () => {
-    return Math.max(0, calculateSubtotal() - calculateDiscount()) + serviceCharge;
+    const subtotal = calculateSubtotal();
+    if (subtotal <= 0) return 0;
+    return Math.max(0, subtotal - calculateDiscount()) + serviceCharge;
   };
 
   const handleApplyPromo = async () => {
@@ -171,7 +181,7 @@ const TicketList: React.FC = () => {
     setPromoLoading(true);
     setPromoError(null);
     try {
-      const result = await promotionService.validate(code, eventId);
+      const result = await promotionService.validate(code.toUpperCase(), eventId);
       if (result.valid && result.discountType && result.discountValue != null) {
         setAppliedPromo({ code, type: result.discountType, value: Number(result.discountValue) });
       } else {
@@ -386,16 +396,18 @@ const TicketList: React.FC = () => {
                     </span>
                   </div>
                 ))}
-                {appliedPromo && (
+                {appliedPromo && calculateDiscount() > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-[#34A853]">{t('ticketList.orderSummary.discount', 'Discount')} ({appliedPromo.code})</span>
                     <span className="text-sm font-semibold text-[#34A853]">-${calculateDiscount().toFixed(2)}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-[#4F4F4F]">{t('ticketList.orderSummary.serviceCharge')}</span>
-                  <span className="text-sm font-semibold text-black">${serviceCharge.toFixed(2)}</span>
-                </div>
+                {getOrderSummaryItems().length > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#4F4F4F]">{t('ticketList.orderSummary.serviceCharge')}</span>
+                    <span className="text-sm font-semibold text-black">${serviceCharge.toFixed(2)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Promo code */}

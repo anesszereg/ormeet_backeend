@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 interface EventCardProps {
@@ -16,18 +16,9 @@ interface EventCardProps {
 
 const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CAF50', eventId, isPast = false, availableSpots }: EventCardProps) => {
   const { t } = useTranslation('attendee');
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    if (eventId) {
-      navigate(`/event/${eventId}`);
-    }
-  };
-
-  return (
-    <div 
-      onClick={handleClick}
-      className={`bg-white rounded-2xl overflow-hidden transition-all w-full border border-[#EEEEEE] cursor-pointer ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.02]'}`}
+  const content = (
+    <div
+      className={`bg-white rounded-2xl overflow-hidden transition-all w-full border border-[#EEEEEE] ${isPast ? 'opacity-60 grayscale' : 'hover:shadow-lg hover:scale-[1.02]'}`}
     >
       {/* Event image */}
       <div className="relative w-full h-48 md:h-56">
@@ -75,6 +66,12 @@ const EventCard = ({ image, title, date, venue, price, badge, badgeColor = '#4CA
       </div>
     </div>
   );
+
+  return eventId ? (
+    <Link to={`/event/${eventId}`} className="block w-full cursor-pointer">
+      {content}
+    </Link>
+  ) : content;
 };
 
 export default EventCard;
