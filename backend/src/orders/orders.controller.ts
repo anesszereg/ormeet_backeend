@@ -80,7 +80,7 @@ export class OrdersController {
 Subtotal = Σ (quantity × unitPrice)
 Discount = From promo code
 Service Fee = Subtotal × 5%
-Processing Fee = (Subtotal - Discount) × 2.9% + $0.30
+Processing Fee = (Subtotal - Discount) × 2.9% + 0.30 DZD
 Total = Subtotal - Discount + Service Fee + Processing Fee
 \`\`\`
     `
@@ -99,7 +99,7 @@ Total = Subtotal - Discount + Service Fee + Processing Fee
         serviceFee: 8.00,
         processingFee: 4.50,
         amountTotal: 157.48,
-        currency: 'USD',
+        currency: 'DZD',
         status: 'pending',
         paymentMethod: 'credit_card',
         billingName: 'John Doe',

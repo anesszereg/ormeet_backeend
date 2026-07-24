@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatCurrency } from '../../utils/formatters';
 import organizerService, { Event as ApiEvent } from '../../services/organizerService';
 import promotionService, { Promotion, PromotionType } from '../../services/promotionService';
 import { useAuth } from '../../context/AuthContext';
@@ -146,7 +147,7 @@ const PromotionsTable = () => {
   };
 
   const formatDiscount = (promo: Promotion) =>
-    promo.type === 'percent' ? `${Number(promo.value)}%` : `$${Number(promo.value).toFixed(2)}`;
+    promo.type === 'percent' ? `${Number(promo.value)}%` : formatCurrency(Number(promo.value));
 
   const formatDate = (iso: string) => (iso ? new Date(iso).toLocaleDateString() : '—');
 

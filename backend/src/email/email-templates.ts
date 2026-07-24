@@ -278,12 +278,13 @@ export function orderConfirmationEmailHtml(orderData: {
   total: number;
   currency: string;
 }): string {
+  const currency = 'DZD';
   const ticketsHtml = orderData.tickets.map(t => `
     <div style="background:#FFF4F3;border-radius:8px;padding:16px 20px;margin-bottom:12px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr>
           <td style="font-size:14px;font-weight:600;color:#000000;">${t.ticketType}</td>
-          <td align="right" style="font-size:15px;font-weight:700;color:#E0234E;">${orderData.currency} ${t.price.toFixed(2)}</td>
+          <td align="right" style="font-size:15px;font-weight:700;color:#E0234E;">${currency} ${t.price.toFixed(2)}</td>
         </tr>
         <tr>
           <td colspan="2" style="padding-top:8px;">
@@ -295,7 +296,7 @@ export function orderConfirmationEmailHtml(orderData: {
   `).join('');
 
   const discountRow = orderData.discount > 0
-    ? `<tr><td style="padding:6px 0;font-size:13px;color:#34A853;">Discount</td><td align="right" style="padding:6px 0;font-size:13px;color:#34A853;">-${orderData.currency} ${orderData.discount.toFixed(2)}</td></tr>`
+    ? `<tr><td style="padding:6px 0;font-size:13px;color:#34A853;">Discount</td><td align="right" style="padding:6px 0;font-size:13px;color:#34A853;">-${currency} ${orderData.discount.toFixed(2)}</td></tr>`
     : '';
 
   return baseLayout('Order Confirmation', `
@@ -316,12 +317,12 @@ export function orderConfirmationEmailHtml(orderData: {
     <div style="background:#F8F8F8;border-radius:8px;padding:16px 20px;margin:20px 0;">
       <p style="margin:0 0 12px 0;font-size:14px;font-weight:600;color:#000000;">Payment Summary</p>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Subtotal</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${orderData.currency} ${orderData.subtotal.toFixed(2)}</td></tr>
+        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Subtotal</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${currency} ${orderData.subtotal.toFixed(2)}</td></tr>
         ${discountRow}
-        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Service Fee</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${orderData.currency} ${orderData.serviceFee.toFixed(2)}</td></tr>
-        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Processing Fee</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${orderData.currency} ${orderData.processingFee.toFixed(2)}</td></tr>
+        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Service Fee</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${currency} ${orderData.serviceFee.toFixed(2)}</td></tr>
+        <tr><td style="padding:6px 0;font-size:13px;color:#4F4F4F;">Processing Fee</td><td align="right" style="padding:6px 0;font-size:13px;color:#000000;">${currency} ${orderData.processingFee.toFixed(2)}</td></tr>
         <tr><td colspan="2" style="border-top:1px solid #EEEEEE;padding-top:10px;"></td></tr>
-        <tr><td style="padding:6px 0;font-size:15px;font-weight:700;color:#000000;">Total</td><td align="right" style="padding:6px 0;font-size:15px;font-weight:700;color:#E0234E;">${orderData.currency} ${orderData.total.toFixed(2)}</td></tr>
+        <tr><td style="padding:6px 0;font-size:15px;font-weight:700;color:#000000;">Total</td><td align="right" style="padding:6px 0;font-size:15px;font-weight:700;color:#E0234E;">${currency} ${orderData.total.toFixed(2)}</td></tr>
       </table>
     </div>
 

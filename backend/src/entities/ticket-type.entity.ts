@@ -46,7 +46,7 @@ export class TicketType {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ default: 'USD' })
+  @Column({ default: 'DZD' })
   currency: string;
 
   @Column({ type: 'int', name: 'quantity_total' })

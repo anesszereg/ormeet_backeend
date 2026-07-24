@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import organizerService, { Order as ApiOrder, Event as ApiEvent } from '../../services/organizerService';
 import { useAuth } from '../../context/AuthContext';
 import { exportToCsv } from '../../utils/csvExport';
+import { formatCurrency } from '../../utils/formatters';
 import SearchIcon from '../../assets/Svgs/recherche.svg';
 import NewestIcon from '../../assets/Svgs/newest.svg';
 import AllDateIcon from '../../assets/Svgs/organiser/dashboard/Events/allDate.svg';
@@ -478,7 +479,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
             <div>
               <p className="text-xs lg:text-sm text-gray mb-1">{t('orders.stats.totalRevenue')}</p>
               <h3 className="text-2xl lg:text-3xl font-bold text-black">
-                {isLoading ? '...' : `$${apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
+                {isLoading ? '...' : formatCurrency(apiOrders.filter(o => o.payment === 'paid').reduce((sum, o) => sum + o.totalPrice, 0))}
               </h3>
             </div>
             <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 flex items-center justify-center">
@@ -740,7 +741,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                 <div className="flex items-center justify-between pt-3 border-t border-light-gray">
                   <span className="text-xs text-gray">{t('orders.table.headers.totalPrice')}</span>
                   <span className="text-sm font-bold text-black">
-                    <bdi>${order.totalPrice}</bdi>
+                    <bdi>{formatCurrency(order.totalPrice)}</bdi>
                   </span>
                 </div>
               </div>
@@ -780,7 +781,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
 
               {/* Desktop: Total Price */}
               <div className="hidden md:flex md:col-span-1 items-center">
-                <span className="text-xs lg:text-sm text-gray"><bdi>${order.totalPrice}</bdi></span>
+                <span className="text-xs lg:text-sm text-gray"><bdi>{formatCurrency(order.totalPrice)}</bdi></span>
               </div>
 
               {/* Desktop: Payment */}
@@ -965,7 +966,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
                   {/* Total Price */}
                   <div>
                     <p className="text-xs text-gray mb-1">{t('orders.detailsModal.totalPrice')}</p>
-                    <p className="text-sm font-semibold text-black">${selectedOrder.totalPrice}</p>
+                    <p className="text-sm font-semibold text-black">{formatCurrency(selectedOrder.totalPrice)}</p>
                   </div>
 
                   {/* Payment Status */}

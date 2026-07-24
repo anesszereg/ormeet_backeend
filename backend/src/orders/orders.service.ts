@@ -45,7 +45,7 @@ export class OrdersService {
     const order = this.orderRepository.create({
       ...createOrderDto,
       amountTotal,
-      currency: 'USD',
+      currency: 'DZD',
       status: OrderStatus.PENDING,
     });
 
@@ -263,7 +263,7 @@ export class OrdersService {
       serviceFee,
       processingFee,
       amountTotal,
-      currency: createOrderDto.currency || 'USD',
+      currency: createOrderDto.currency || 'DZD',
       status: OrderStatus.PENDING,
       paymentMethod: createOrderDto.paymentMethod,
       paymentProvider: createOrderDto.paymentProvider,
@@ -497,7 +497,7 @@ export class OrdersService {
       serviceFee: 0,
       processingFee: 0,
       amountTotal: 0,
-      currency: 'USD',
+      currency: 'DZD',
       status: OrderStatus.PENDING,
       paymentMethod: PaymentMethod.CASH,
       billingName: dto.name,

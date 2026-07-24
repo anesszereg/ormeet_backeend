@@ -256,7 +256,7 @@
     },
     "ticketStatus": {
       "free": "Free",
-      "price": "${{price}}"
+      "price": "{{price}} DZD"
     }
   },
 

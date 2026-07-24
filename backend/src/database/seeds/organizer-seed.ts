@@ -321,7 +321,7 @@ async function seed() {
         amountSubtotal: subtotal,
         serviceFee: serviceFee,
         amountTotal: total,
-        currency: 'USD',
+        currency: 'DZD',
         status: orderStatuses[i % orderStatuses.length],
         paymentMethod: PaymentMethod.CREDIT_CARD,
         billingName: attendee.name,
@@ -330,7 +330,7 @@ async function seed() {
       });
       await orderRepo.save(order);
       orders.push(order);
-      console.log(`  ✅ Created order for ${attendee.name} - ${event.title} ($${total.toFixed(2)})`);
+      console.log(`  ✅ Created order for ${attendee.name} - ${event.title} (${total.toFixed(2)} DZD)`);
 
       // Create tickets for paid orders
       if (order.status === OrderStatus.PAID) {

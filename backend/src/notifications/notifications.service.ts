@@ -129,7 +129,7 @@ export class NotificationsService {
       userId,
       NotificationType.REFUND_PROCESSED,
       'Refund Processed',
-      `Your refund of $${amount.toFixed(2)} for ${eventName} has been processed.`,
+      `Your refund of ${amount.toFixed(2)} DZD for ${eventName} has been processed.`,
       eventId,
       { amount },
     );
