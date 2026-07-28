@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -105,6 +105,12 @@ const EventDetailsGlobal = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const reviewsSectionRef = useRef<HTMLDivElement>(null);
+
+  /** Amène à la section des avis depuis la barre sous la description (ORM-020). */
+  const scrollToReviews = () => {
+    reviewsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const [isTogglingFollow, setIsTogglingFollow] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('6:30 PM – 7:30 PM');
@@ -596,12 +602,18 @@ const EventDetailsGlobal = () => {
 
               {/* Rating and Actions Row */}
               <div className="flex items-center flex-wrap gap-3 md:gap-4 mb-8">
-                {/* Rating */}
-                <div className="flex items-center gap-1.5">
-                  <img src={StarIcon} alt="Rating" className="w-5 h-5" />
+                {/* Rating — mène à la section des avis (ORM-020) */}
+                <button
+                  type="button"
+                  onClick={scrollToReviews}
+                  className="flex items-center gap-1.5 cursor-pointer rounded hover:opacity-70 transition-opacity"
+                  aria-label={t('eventDetails.stats.goToReviews')}
+                  title={t('eventDetails.stats.goToReviews')}
+                >
+                  <img src={StarIcon} alt="" className="w-5 h-5" />
                   <span className="text-sm font-semibold text-black">{eventData.rating.toFixed(1)}</span>
-                  <span className="text-sm text-[#757575]">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
-                </div>
+                  <span className="text-sm text-[#757575] underline decoration-dotted underline-offset-2">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
+                </button>
                 
                 {/* Available Spots */}
                 <div className="flex items-center gap-1.5">
@@ -617,13 +629,20 @@ const EventDetailsGlobal = () => {
                   )}
                 </div>
                 
-                {/* Favorites */}
-                <div className="flex items-center gap-1.5">
-                  <svg className="w-5 h-5 text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
+                {/* Favorites — le compteur bascule le favori (ORM-020) */}
+                <button
+                  type="button"
+                  onClick={handleToggleFavorite}
+                  disabled={!user || isTogglingFavorite}
+                  className="flex items-center gap-1.5 cursor-pointer rounded hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-pressed={isFavorite}
+                  title={!user ? t('eventDetails.actions.loginToFavorite') : (isFavorite ? t('eventDetails.actions.removeFromFavorites') : t('eventDetails.actions.addToFavorites'))}
+                >
+                  <svg className="w-5 h-5 text-[#FF4000]" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                   <span className="text-sm text-[#757575]">{eventData.favorites.toLocaleString()} {t('eventDetails.stats.favorites')}</span>
-                </div>
+                </button>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
@@ -1028,8 +1047,8 @@ const EventDetailsGlobal = () => {
                 </div>
               </div>
 
-              {/* Reviews Section */}
-              <div className="mb-6">
+              {/* Reviews Section — cible du raccourci « avis » de la barre (ORM-020) */}
+              <div className="mb-6" id="reviews-section" ref={reviewsSectionRef}>
                 <div className="flex items-center gap-2 mb-6">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
