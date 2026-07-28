@@ -43,7 +43,7 @@ export default async function LegalPage({
     <div className="min-h-screen bg-white" dir={dir}>
       <header className="w-full border-b border-light-gray">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={`/${locale}`} className="flex items-center gap-2">
             <Image
               src="/svgs/Logo.svg"
               alt="Ormeet"

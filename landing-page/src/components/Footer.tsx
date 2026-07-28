@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 
 const Footer = () => {
   const t = useTranslations("landing.footer");
+  const locale = useLocale();
   const year = new Date().getFullYear();
 
   const browseCategories = [
@@ -30,10 +31,12 @@ const Footer = () => {
   const hostHref = () => appUrl("/host-events");
   const supportHref = () => appUrl("/support");
   const ticketsHref = () => appUrl("/browse-events");
-  const legalHref = (key: string) => `/legal#${key}`;
+  // Les liens internes doivent porter le préfixe de langue : le middleware est en
+  // `localePrefix: 'always'` et redirigerait sinon vers la langue par défaut.
+  const legalHref = (key: string) => `/${locale}/legal#${key}`;
   const companyHref = (key: string) => {
     if (key === "contact") return supportHref();
-    return "/";
+    return `/${locale}`;
   };
 
   return (
