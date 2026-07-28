@@ -245,9 +245,18 @@ const EventDetailsGlobal = () => {
         }));
         setAllReviews(mappedReviews);
 
-        // Map trending events (similar category, excluding current)
-        const trending: TrendingEventItem[] = allEvents
-          .filter((e: ApiEvent) => e.id !== eventId)
+        // Événements de la MÊME catégorie, hors événement courant. Le filtre par
+        // catégorie manquait : la section affichait n'importe quel événement
+        // publié malgré son titre (ORM-023). Si la catégorie ne remonte pas assez
+        // d'événements, on complète avec les autres plutôt que d'afficher un vide.
+        const others = allEvents.filter((e: ApiEvent) => e.id !== eventId);
+        const sameCategory = event.category
+          ? others.filter((e: ApiEvent) => e.category === event.category)
+          : [];
+        const trending: TrendingEventItem[] = [
+          ...sameCategory,
+          ...others.filter((e: ApiEvent) => !sameCategory.includes(e)),
+        ]
           .slice(0, 10)
           .map((e: ApiEvent, i: number) => {
             const ePrice = e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free';
@@ -1371,7 +1380,14 @@ const EventDetailsGlobal = () => {
               {currentTrendingEvents.map((event, index) => {
                 const displayNumber = startIndex + index + 1;
                 return (
-                  <div key={event.id} className="relative group cursor-pointer transition-transform duration-300 hover:scale-105">
+                  <div
+                    key={event.id}
+                    onClick={() => navigate(`/event/${event.id}`)}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/event/${event.id}`); }}
+                    className="relative group cursor-pointer transition-transform duration-300 hover:scale-105"
+                  >
                     <div className="relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
                       <img 
                         src={event.image} 
