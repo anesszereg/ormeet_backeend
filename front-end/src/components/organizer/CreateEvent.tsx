@@ -362,9 +362,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
+  /** Minuit aujourd'hui : un événement ne peut pas commencer dans le passé. */
+  const startOfToday = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const isPastDay = (day: number) =>
+    new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day) < startOfToday();
+
   const handleDateSelect = (day: number) => {
     const selected = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    
+    if (isPastDay(day)) return;
+
     if (!formData.dateRange[0] || (formData.dateRange[0] && formData.dateRange[1])) {
       // Start new selection
       handleDateRangeChange([selected, null]);
@@ -380,8 +391,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   };
 
   const handleMonthSelect = () => {
-    const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+    const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
     const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+    // Sur le mois en cours, on démarre à aujourd'hui plutôt qu'au 1er (ORM-016).
+    const startOfMonth = firstOfMonth < startOfToday() ? startOfToday() : firstOfMonth;
+    if (endOfMonth < startOfToday()) return;
     handleDateRangeChange([startOfMonth, endOfMonth]);
     setShowDatePicker(false);
   };
@@ -422,16 +436,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     for (let day = 1; day <= daysInMonth; day++) {
       const inRange = isDateInRange(day);
       const isEdge = isDateRangeEdge(day);
+      const isPast = isPastDay(day);
 
       days.push(
         <button
           key={day}
           type="button"
           onClick={() => handleDateSelect(day)}
+          disabled={isPast}
+          aria-disabled={isPast}
           className={`h-8 flex items-center justify-center text-sm font-normal rounded-full transition-colors
-            ${isEdge ? 'bg-primary text-white font-medium' : ''}
-            ${inRange && !isEdge ? 'bg-[#FFE8E3] text-black' : ''}
-            ${!inRange ? 'text-black hover:bg-gray-100' : ''}
+            ${isPast ? 'text-[#CCCCCC] cursor-not-allowed' : ''}
+            ${!isPast && isEdge ? 'bg-primary text-white font-medium' : ''}
+            ${!isPast && inRange && !isEdge ? 'bg-[#FFE8E3] text-black' : ''}
+            ${!isPast && !inRange ? 'text-black hover:bg-gray-100' : ''}
           `}
         >
           {day}
@@ -586,7 +604,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     if (!formData.title.trim()) newErrors.title = t('createEvent.validation.titleRequired');
     if (!formData.category) newErrors.category = t('createEvent.validation.categoryRequired');
     if (!formData.eventType) newErrors.eventType = t('createEvent.validation.eventTypeRequired');
-    if (!formData.dateRange[0] || !formData.dateRange[1]) newErrors.dateRange = t('createEvent.validation.dateRequired');
+    if (!formData.dateRange[0] || !formData.dateRange[1]) {
+      newErrors.dateRange = t('createEvent.validation.dateRequired');
+    } else if (formData.dateRange[0] < startOfToday()) {
+      // Filet de sécurité : le calendrier bloque déjà les dates passées, mais une
+      // date peut venir d'un brouillon plus ancien (ORM-016).
+      newErrors.dateRange = t('createEvent.validation.datePast');
+    }
     if (!formData.startTime) newErrors.startTime = t('createEvent.validation.startTimeRequired');
     if (!formData.endTime) newErrors.endTime = t('createEvent.validation.endTimeRequired');
     

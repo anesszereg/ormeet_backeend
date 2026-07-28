@@ -68,6 +68,7 @@
       "categoryRequired": "اختر فئة",
       "eventTypeRequired": "اختر نوع الفعالية",
       "dateRequired": "نطاق التاريخ مطلوب",
+      "datePast": "لا يمكن أن يكون تاريخ الفعالية في الماضي",
       "startTimeRequired": "وقت البداية مطلوب",
       "endTimeRequired": "وقت النهاية مطلوب",
       "countryRequired": "البلد مطلوب",

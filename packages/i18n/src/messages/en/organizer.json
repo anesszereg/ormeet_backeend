@@ -68,6 +68,7 @@
       "categoryRequired": "Please select a category",
       "eventTypeRequired": "Please select an event type",
       "dateRequired": "Date range is required",
+      "datePast": "The event date cannot be in the past",
       "startTimeRequired": "Start time is required",
       "endTimeRequired": "End time is required",
       "countryRequired": "Country is required",

@@ -70,6 +70,7 @@
       "categoryRequired": "Veuillez choisir une catégorie",
       "eventTypeRequired": "Veuillez choisir le type d'événement",
       "dateRequired": "La plage de dates est requise",
+      "datePast": "La date de l'événement ne peut pas être dans le passé",
       "startTimeRequired": "L'heure de début est requise",
       "endTimeRequired": "L'heure de fin est requise",
       "countryRequired": "Le pays est requis",
