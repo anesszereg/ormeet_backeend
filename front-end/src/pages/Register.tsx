@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import { useAuth } from '../context/AuthContext';
 import PhoneInput from '../components/PhoneInput';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
@@ -117,7 +118,7 @@ const Register = () => {
       
       setShowSuccess(true);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      const errorMessage = getAuthErrorMessage(err, t, 'errors.registrationFailed');
       console.log('Setting error:', errorMessage);
       setError(errorMessage);
       console.error('Registration error:', err);

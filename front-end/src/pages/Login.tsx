@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import PhoneInput from '../components/PhoneInput';
@@ -15,6 +16,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -71,10 +73,10 @@ const Login = () => {
     try {
       await authService.sendVerificationCode({ phone, type: 'phone', purpose: 'login' });
       setPhoneStep('otp');
-      setSuccessMessage('Code sent! Check your phone.');
+      setSuccessMessage(t('login.codeSent'));
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send code. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.sendCodeFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +100,7 @@ const Login = () => {
         redirectAfterLogin(user);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid or expired code. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.invalidCode'));
     } finally {
       setIsLoading(false);
     }
@@ -213,16 +215,17 @@ const Login = () => {
         return;
       }
 
-      const rawMessage = data?.message ?? err.message ?? 'Login failed. Please try again.';
-      const errorMessage = typeof rawMessage === 'string' ? rawMessage : (rawMessage?.message || 'Login failed.');
+      const rawMessage = data?.message ?? err.message ?? '';
+      const rawText = typeof rawMessage === 'string' ? rawMessage : (rawMessage?.message || '');
 
-      // Check if error is due to unverified email
-      if (errorMessage.toLowerCase().includes('verify') || errorMessage.toLowerCase().includes('verification')) {
+      // Le test porte sur le message BRUT du back : le traduire d'abord
+      // casserait cette détection.
+      if (rawText.toLowerCase().includes('verify') || rawText.toLowerCase().includes('verification')) {
         setShowVerificationError(true);
         setUnverifiedEmail(email || '');
         setError('');
       } else {
-        setError(errorMessage);
+        setError(getAuthErrorMessage(err, t, 'errors.loginFailed'));
         setShowVerificationError(false);
       }
       console.error('Login error:', err);
@@ -241,7 +244,7 @@ const Login = () => {
       setShowVerificationError(false);
       setTimeout(() => setSuccessMessage(''), 10000); // Clear after 10 seconds
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to resend verification email. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.resendEmailFailed'));
     } finally {
       setIsResending(false);
     }
@@ -411,15 +414,36 @@ const Login = () => {
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="password" className="text-sm font-medium text-black">{t('login.fields.passwordLabel')}</label>
-                <input
-                  type="password"
-                  id="password"
-                  placeholder={t('login.fields.passwordPlaceholder')}
-                  value={password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
-                  required
-                  className="px-4 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    placeholder={t('login.fields.passwordPlaceholder')}
+                    value={password}
+                    onChange={(e) => handleInputChange('password', e.target.value)}
+                    required
+                    className="w-full px-4 py-3.5 pe-12 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black placeholder:text-[#BCBCBC] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={t(showPassword ? 'login.fields.hidePassword' : 'login.fields.showPassword')}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#4F4F4F] transition-colors"
+                  >
+                    {showPassword ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
+                        <path d="M2.5 10s3-6 7.5-6 7.5 6 7.5 6-3 6-7.5 6S2.5 10 2.5 10z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                        <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="w-5 h-5">
+                        <path d="M2.5 10s3-6 7.5-6 7.5 6 7.5 6-3 6-7.5 6S2.5 10 2.5 10z" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                        <circle cx="10" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+                        <line x1="3" y1="3" x2="17" y2="17" stroke="currentColor" strokeWidth="1.5"/>
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                 <label className="flex items-center gap-2 text-sm text-[#4F4F4F] cursor-pointer">

@@ -29,15 +29,13 @@ const OnboardingChoice = () => {
   };
 
   const handleContinue = () => {
-    if (selectedType === 'organize') {
-      // Store user type in localStorage for login
-      localStorage.setItem('userType', 'organize');
-      navigate('/login');
-    } else if (selectedType === 'attend') {
-      // Store user type in localStorage for login
-      localStorage.setItem('userType', 'attend');
-      navigate('/login');
-    }
+    if (!selectedType) return;
+    // Relu par /onboarding-signup pour déterminer le rôle à l'inscription.
+    localStorage.setItem('userType', selectedType);
+    // Le formulaire d'inscription gère lui-même le choix email / téléphone :
+    // les deux profils y vont directement, en 2 étapes comme l'indique la
+    // barre de progression.
+    navigate('/onboarding-signup');
   };
 
   return (

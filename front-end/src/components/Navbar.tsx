@@ -19,6 +19,10 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
+  // Top bar : prénom seul. Le nom complet reste affiché dans le menu déroulant.
+  // Retombe sur le nom complet si celui-ci n'est pas décomposable.
+  const firstName = user?.name?.trim().split(/\s+/)[0] || user?.name;
+
   // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -125,7 +129,7 @@ const Navbar = ({ onMenuToggle, showNotifications = false }: NavbarProps) => {
               </div>
             )}
             <span className="hidden sm:block text-sm font-medium text-black max-w-[120px] truncate">
-              {user?.name || 'User'}
+              {firstName || 'User'}
             </span>
           </button>
 

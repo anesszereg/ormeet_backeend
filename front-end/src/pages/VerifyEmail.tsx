@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import authService from '../services/authService';
 import { useAuth } from '../context/AuthContext';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
@@ -35,7 +36,7 @@ const VerifyEmail = () => {
           navigate('/login');
         }, 3000);
       } catch (err: any) {
-        const errorMessage = err.response?.data?.message || err.message || 'Email verification failed.';
+        const errorMessage = getAuthErrorMessage(err, t, 'errors.verifyEmailFailed');
         setError(errorMessage);
         console.error('Email verification error:', err);
       } finally {
