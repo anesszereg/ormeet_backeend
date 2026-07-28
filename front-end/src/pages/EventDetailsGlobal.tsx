@@ -160,6 +160,7 @@ const EventDetailsGlobal = () => {
         let organizerPhone = '';
         let organizerSocials: Record<string, string> = {};
         let organizerFollowers = 0;
+        let organizationName = '';
         const organizerEventsCount = event.organizerId
           ? allEvents.filter((e: ApiEvent) => e.organizerId === event.organizerId).length
           : 0;
@@ -171,6 +172,8 @@ const EventDetailsGlobal = () => {
           ]);
           if (orgResult.status === 'fulfilled' && orgResult.value) {
             const org = orgResult.value;
+            // Raison sociale de l'organisation, et non le nom du compte (ORM-022).
+            organizationName = org.name || '';
             organizerWebsite = org.website || '';
             organizerEmail = org.contactEmail || '';
             organizerPhone = org.contactPhone || '';
@@ -207,7 +210,9 @@ const EventDetailsGlobal = () => {
           venue: event.venue?.name || event.customLocation?.city || 'TBA',
           address: venueAddress,
           organizerId: event.organizerId || '',
-          organizerName: event.organizer?.name || '',
+          // Raison sociale en priorité ; le nom du compte ne sert que de repli
+          // pour les organisateurs sans organisation renseignée (ORM-022).
+          organizerName: organizationName || event.organizer?.name || '',
           organizerWebsite,
           organizerEmail,
           organizerPhone,

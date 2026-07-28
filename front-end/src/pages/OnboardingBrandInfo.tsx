@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
+import organizerService from '../services/organizerService';
 import Logo from '../assets/Svgs/Logo.svg';
 import LoginImage from '../assets/imges/login.jpg';
 
@@ -41,7 +42,7 @@ const eventTypeKeys: Record<string, string> = {
 const OnboardingBrandInfo = () => {
   const { t } = useTranslation('organizer');
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [organisationName, setOrganisationName] = useState('');
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
   const [eventsPerYear, setEventsPerYear] = useState('');
@@ -68,10 +69,20 @@ const OnboardingBrandInfo = () => {
         hostingEventTypes: selectedEventTypes,
       });
 
-      // Optionally save organization name and other metadata
-      if (organisationName) {
+      // Le nom saisi est la raison sociale : il doit aller sur l'organisation,
+      // pas dans la bio de l'utilisateur. Sans ça, l'organisation gardait le nom
+      // auto-généré par le back (« X's Organization »), visible sur la page
+      // événement (ORM-022).
+      if (organisationName && user?.organizationId) {
+        await organizerService.updateOrganization(user.organizationId, {
+          name: organisationName,
+        });
+      }
+
+      // Les volumes déclarés n'ont pas encore de champ dédié : conservés en bio.
+      if (eventsPerYear || averageAttendees) {
         await authService.updateProfile({
-          bio: `${organisationName} - Events per year: ${eventsPerYear}, Avg attendees: ${averageAttendees}`,
+          bio: `Events per year: ${eventsPerYear}, Avg attendees: ${averageAttendees}`,
         });
       }
 
