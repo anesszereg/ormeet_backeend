@@ -84,6 +84,9 @@ const PRESET_CATEGORIES = [
   'Other',
 ];
 
+/** Pays pré-sélectionné à la création d'un événement. */
+const DEFAULT_COUNTRY = 'Algérie';
+
 const ticketTypes = [
   'General Admission',
   'VIP',
@@ -150,7 +153,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       dateRange: [null, null],
       startTime: '',
       endTime: '',
-      country: '',
+      // Marché principal de la plateforme, modifiable par l'organisateur.
+      country: DEFAULT_COUNTRY,
       state: '',
       mapAddress: '',
       onlineLink: '',
