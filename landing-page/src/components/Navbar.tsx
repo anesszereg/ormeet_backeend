@@ -152,7 +152,7 @@ const Navbar = () => {
             <>
               {/* Log In — desktop only */}
               <a
-                href={`${MAIN_APP_URL}/onboarding-choice`}
+                href={`${MAIN_APP_URL}/login`}
                 className="hidden md:inline-flex px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >
                 {t("login")}
@@ -267,7 +267,7 @@ const Navbar = () => {
           ) : (
             <>
               <a
-                href={`${MAIN_APP_URL}/onboarding-choice`}
+                href={`${MAIN_APP_URL}/login`}
                 onClick={closeDrawer}
                 className="flex items-center justify-center h-12 w-full text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >
