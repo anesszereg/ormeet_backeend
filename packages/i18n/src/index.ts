@@ -1,6 +1,7 @@
 export * from './config';
 export * from './utils';
 export * from './cookies';
+export * from './wilayas';
 
 // Exports des messages (chargement statique)
 import enCommon from './messages/en/common.json';
