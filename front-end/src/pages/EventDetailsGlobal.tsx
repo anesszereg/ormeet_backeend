@@ -83,6 +83,16 @@ interface TrendingEventItem {
   image: string;
 }
 
+/** Autre événement du même organisateur, affiché sous « Plus de … ». */
+interface OrganizerEventItem {
+  id: string;
+  title: string;
+  date: string;
+  venue: string;
+  price: string;
+  image: string;
+}
+
 const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
 
 const EventDetailsGlobal = () => {
@@ -123,6 +133,7 @@ const EventDetailsGlobal = () => {
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
   const [trendingEvents, setTrendingEvents] = useState<TrendingEventItem[]>([]);
+  const [moreFromOrganizerEvents, setMoreFromOrganizerEvents] = useState<OrganizerEventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -270,6 +281,23 @@ const EventDetailsGlobal = () => {
             };
           });
         setTrendingEvents(trending);
+
+        // Événements du même organisateur uniquement, événement courant exclu.
+        setMoreFromOrganizerEvents(
+          event.organizerId
+            ? others
+                .filter((e: ApiEvent) => e.organizerId === event.organizerId)
+                .slice(0, 5)
+                .map((e: ApiEvent, i: number) => ({
+                  id: e.id,
+                  title: e.title,
+                  date: e.startAt,
+                  venue: e.venue?.name || e.customLocation?.city || 'TBA',
+                  price: e.ticketTypes?.[0] ? Number(e.ticketTypes[0].price).toFixed(2) : '0.00',
+                  image: e.images?.[0] || fallbackImages[i % fallbackImages.length],
+                }))
+            : [],
+        );
 
         // Check if event is favorited and if organizer is followed
         if (user) {
@@ -489,38 +517,9 @@ const EventDetailsGlobal = () => {
   };
   const timeSlots = generateTimeSlots();
 
-  const moreFromOrganizerEvents = [
-    {
-      id: 1,
-      image: Event2,
-      title: "New York's Best Croissant - The 2025 Finale",
-      date: '2026-04-20',
-      venue: 'ABC Cooking School',
-      price: '65.99',
-      badgeKey: 'salesEndSoon',
-      badgeColor: 'orange',
-    },
-    {
-      id: 2,
-      image: Event3,
-      title: 'Epic Esports Championship',
-      date: '2026-04-20',
-      venue: 'Mercedes-Benz Arena',
-      price: '65.99',
-      badgeKey: 'almostFull',
-      badgeColor: 'blue',
-    },
-    {
-      id: 3,
-      image: Event4,
-      title: 'Global Tech Innovators Summit 2025',
-      date: '2026-04-20',
-      venue: 'Marina Convention Center',
-      price: '65.99',
-      badgeKey: 'onlyFewLeft',
-      badgeColor: 'orange',
-    },
-  ];
+  // La liste était fictive : trois événements écrits en dur, sans rapport avec
+  // l'organisateur. Elle vient maintenant des vrais événements de cet
+  // organisateur, l'événement courant exclu (ORM-024).
 
   if (isLoading) {
     return (
@@ -1255,7 +1254,8 @@ const EventDetailsGlobal = () => {
                 </div>
               </div>
 
-              {/* More from Pulsewave Entertainment Section */}
+              {/* Autres événements de cet organisateur — masqué s'il n'en a pas d'autre */}
+              {moreFromOrganizerEvents.length > 0 && (
               <div className="mt-12 mb-8">
                 <h2 className="text-xl text-black mb-6">
                   {t('eventDetails.moreFromOrganizer')} <span className="font-bold">{eventData.organizerName || t('eventDetails.moreFromOrganizerFallback')}</span>
@@ -1263,7 +1263,14 @@ const EventDetailsGlobal = () => {
                 
                 <div className="space-y-4">
                   {moreFromOrganizerEvents.map((event) => (
-                    <div key={event.id} className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
+                    <div
+                      key={event.id}
+                      onClick={() => navigate(`/event/${event.id}`)}
+                      role="link"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/event/${event.id}`); }}
+                      className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+                    >
                       <img
                         src={event.image}
                         alt={event.title}
@@ -1278,23 +1285,15 @@ const EventDetailsGlobal = () => {
                           <span>•</span>
                           <span>{event.venue}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-black">
-                            {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
-                          </span>
-                          <span className={`text-xs font-medium px-2 py-1 rounded ${
-                            event.badgeColor === 'blue'
-                              ? 'text-[#00A3FF] bg-[#E6F7FF]'
-                              : 'text-[#FF4000] bg-[#FFF4F3]'
-                          }`}>
-                            {t(`eventDetails.badges.${event.badgeKey}`)}
-                          </span>
-                        </div>
+                        <span className="text-sm font-semibold text-black">
+                          {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+              )}
             </div>
 
             {/* Right Column - Price and CTA */}
