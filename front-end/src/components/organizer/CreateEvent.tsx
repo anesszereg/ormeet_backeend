@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { wilayas, wilayaLabel, type Locale } from '@ormeet/i18n';
 import organizerService, { CreateEventDto } from '../../services/organizerService';
 import authService from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
@@ -99,7 +100,8 @@ const ticketTypes = [
 ];
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
-  const { t } = useTranslation('organizer');
+  const { t, i18n } = useTranslation('organizer');
+  const locale = (i18n.language as Locale) || 'fr';
   const { user, setUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -201,7 +203,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const startTimeRef = useRef<HTMLDivElement>(null);
   const endTimeRef = useRef<HTMLDivElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     let processedValue = value;
     
@@ -1243,16 +1247,23 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     <label className="block text-sm font-medium text-black mb-2">
                       {t('createEvent.form.state')} <span className="text-[#FF3425]">*</span>
                     </label>
-                    <input
-                      type="text"
+                    {/* Liste des 58 wilayas — même référentiel que la recherche,
+                        pour garantir des données homogènes (ORM-018). */}
+                    <select
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      placeholder={t('createEvent.form.statePlaceholder')}
-                      className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
-                        errors.state ? 'border-[#FF3425]' : 'border-light-gray'
-                      }`}
-                    />
+                      className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:border-primary transition-all ${
+                        formData.state ? 'text-black' : 'text-[#9CA3AF]'
+                      } ${errors.state ? 'border-[#FF3425]' : 'border-light-gray'}`}
+                    >
+                      <option value="">{t('createEvent.form.statePlaceholder')}</option>
+                      {wilayas.map((wilaya) => (
+                        <option key={wilaya.code} value={wilaya[locale]} className="text-black">
+                          {wilayaLabel(wilaya, locale)}
+                        </option>
+                      ))}
+                    </select>
                     {errors.state && (
                       <p className="mt-1 text-xs text-[#FF3425]">{errors.state}</p>
                     )}
