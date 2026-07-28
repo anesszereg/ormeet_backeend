@@ -107,7 +107,6 @@ const AccountSettings = () => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -787,24 +786,9 @@ const AccountSettings = () => {
                 <p className="text-sm text-black">••••••••</p>
               </div>
               
-              {/* Two-factor Authentication Section */}
-              <div className="pt-6 border-t border-[#EEEEEE] mb-8">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
-                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer ms-6 shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={twoFactorEnabled}
-                      onChange={(e) => setTwoFactorEnabled(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
-                  </label>
-                </div>
-              </div>
+              {/* Authentification à deux facteurs — hors périmètre de cette version
+                  (ORM-015). Masquée côté interface, le code back reste en place
+                  pour une réactivation ultérieure. */}
 
               {/* Danger Zone */}
               <div className="pt-6 border-t border-red-100">

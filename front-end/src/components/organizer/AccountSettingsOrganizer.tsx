@@ -53,7 +53,6 @@ const AccountSettingsOrganizer = () => {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [isEditPasswordOpen, setIsEditPasswordOpen] = useState(false);
   const [isEditEmailSecurityOpen, setIsEditEmailSecurityOpen] = useState(false);
-  const [isEdit2FAOpen, setIsEdit2FAOpen] = useState(false);
   
   // Success message states
   const [showProfileSuccess, setShowProfileSuccess] = useState(false);
@@ -62,7 +61,6 @@ const AccountSettingsOrganizer = () => {
   const [showLocationSuccess, setShowLocationSuccess] = useState(false);
   const [showPasswordSuccess, setShowPasswordSuccess] = useState(false);
   const [showEmailSecuritySuccess, setShowEmailSecuritySuccess] = useState(false);
-  const [show2FASuccess, setShow2FASuccess] = useState(false);
   
   // Delete confirmation states
   const [isDeleteRoleConfirmOpen, setIsDeleteRoleConfirmOpen] = useState(false);
@@ -134,7 +132,6 @@ const AccountSettingsOrganizer = () => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   
   // About Organization states
   const [organizationData, setOrganizationData] = useState({
@@ -2151,24 +2148,9 @@ const AccountSettingsOrganizer = () => {
                 <p className="text-sm text-black">••••••••</p>
               </div>
               
-              {/* Two-factor Authentication Section */}
-              <div className="pt-6 border-t border-[#EEEEEE]">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
-                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer ms-6">
-                    <input
-                      type="checkbox"
-                      checked={twoFactorEnabled}
-                      onChange={(e) => setTwoFactorEnabled(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
-                  </label>
-                </div>
-              </div>
+              {/* Authentification à deux facteurs — hors périmètre de cette version
+                  (ORM-015). Masquée côté interface, le code back reste en place
+                  pour une réactivation ultérieure. */}
             </div>
           )}
         </div>

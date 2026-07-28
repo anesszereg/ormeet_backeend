@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -83,6 +83,16 @@ interface TrendingEventItem {
   image: string;
 }
 
+/** Autre événement du même organisateur, affiché sous « Plus de … ». */
+interface OrganizerEventItem {
+  id: string;
+  title: string;
+  date: string;
+  venue: string;
+  price: string;
+  image: string;
+}
+
 const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
 
 const EventDetailsGlobal = () => {
@@ -105,6 +115,12 @@ const EventDetailsGlobal = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
+  const reviewsSectionRef = useRef<HTMLDivElement>(null);
+
+  /** Amène à la section des avis depuis la barre sous la description (ORM-020). */
+  const scrollToReviews = () => {
+    reviewsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   const [isTogglingFollow, setIsTogglingFollow] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(2025);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('6:30 PM – 7:30 PM');
@@ -117,6 +133,7 @@ const EventDetailsGlobal = () => {
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
   const [trendingEvents, setTrendingEvents] = useState<TrendingEventItem[]>([]);
+  const [moreFromOrganizerEvents, setMoreFromOrganizerEvents] = useState<OrganizerEventItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -154,6 +171,7 @@ const EventDetailsGlobal = () => {
         let organizerPhone = '';
         let organizerSocials: Record<string, string> = {};
         let organizerFollowers = 0;
+        let organizationName = '';
         const organizerEventsCount = event.organizerId
           ? allEvents.filter((e: ApiEvent) => e.organizerId === event.organizerId).length
           : 0;
@@ -165,6 +183,8 @@ const EventDetailsGlobal = () => {
           ]);
           if (orgResult.status === 'fulfilled' && orgResult.value) {
             const org = orgResult.value;
+            // Raison sociale de l'organisation, et non le nom du compte (ORM-022).
+            organizationName = org.name || '';
             organizerWebsite = org.website || '';
             organizerEmail = org.contactEmail || '';
             organizerPhone = org.contactPhone || '';
@@ -201,7 +221,9 @@ const EventDetailsGlobal = () => {
           venue: event.venue?.name || event.customLocation?.city || 'TBA',
           address: venueAddress,
           organizerId: event.organizerId || '',
-          organizerName: event.organizer?.name || '',
+          // Raison sociale en priorité ; le nom du compte ne sert que de repli
+          // pour les organisateurs sans organisation renseignée (ORM-022).
+          organizerName: organizationName || event.organizer?.name || '',
           organizerWebsite,
           organizerEmail,
           organizerPhone,
@@ -234,9 +256,18 @@ const EventDetailsGlobal = () => {
         }));
         setAllReviews(mappedReviews);
 
-        // Map trending events (similar category, excluding current)
-        const trending: TrendingEventItem[] = allEvents
-          .filter((e: ApiEvent) => e.id !== eventId)
+        // Événements de la MÊME catégorie, hors événement courant. Le filtre par
+        // catégorie manquait : la section affichait n'importe quel événement
+        // publié malgré son titre (ORM-023). Si la catégorie ne remonte pas assez
+        // d'événements, on complète avec les autres plutôt que d'afficher un vide.
+        const others = allEvents.filter((e: ApiEvent) => e.id !== eventId);
+        const sameCategory = event.category
+          ? others.filter((e: ApiEvent) => e.category === event.category)
+          : [];
+        const trending: TrendingEventItem[] = [
+          ...sameCategory,
+          ...others.filter((e: ApiEvent) => !sameCategory.includes(e)),
+        ]
           .slice(0, 10)
           .map((e: ApiEvent, i: number) => {
             const ePrice = e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free';
@@ -250,6 +281,23 @@ const EventDetailsGlobal = () => {
             };
           });
         setTrendingEvents(trending);
+
+        // Événements du même organisateur uniquement, événement courant exclu.
+        setMoreFromOrganizerEvents(
+          event.organizerId
+            ? others
+                .filter((e: ApiEvent) => e.organizerId === event.organizerId)
+                .slice(0, 5)
+                .map((e: ApiEvent, i: number) => ({
+                  id: e.id,
+                  title: e.title,
+                  date: e.startAt,
+                  venue: e.venue?.name || e.customLocation?.city || 'TBA',
+                  price: e.ticketTypes?.[0] ? Number(e.ticketTypes[0].price).toFixed(2) : '0.00',
+                  image: e.images?.[0] || fallbackImages[i % fallbackImages.length],
+                }))
+            : [],
+        );
 
         // Check if event is favorited and if organizer is followed
         if (user) {
@@ -469,38 +517,9 @@ const EventDetailsGlobal = () => {
   };
   const timeSlots = generateTimeSlots();
 
-  const moreFromOrganizerEvents = [
-    {
-      id: 1,
-      image: Event2,
-      title: "New York's Best Croissant - The 2025 Finale",
-      date: '2026-04-20',
-      venue: 'ABC Cooking School',
-      price: '65.99',
-      badgeKey: 'salesEndSoon',
-      badgeColor: 'orange',
-    },
-    {
-      id: 2,
-      image: Event3,
-      title: 'Epic Esports Championship',
-      date: '2026-04-20',
-      venue: 'Mercedes-Benz Arena',
-      price: '65.99',
-      badgeKey: 'almostFull',
-      badgeColor: 'blue',
-    },
-    {
-      id: 3,
-      image: Event4,
-      title: 'Global Tech Innovators Summit 2025',
-      date: '2026-04-20',
-      venue: 'Marina Convention Center',
-      price: '65.99',
-      badgeKey: 'onlyFewLeft',
-      badgeColor: 'orange',
-    },
-  ];
+  // La liste était fictive : trois événements écrits en dur, sans rapport avec
+  // l'organisateur. Elle vient maintenant des vrais événements de cet
+  // organisateur, l'événement courant exclu (ORM-024).
 
   if (isLoading) {
     return (
@@ -596,12 +615,18 @@ const EventDetailsGlobal = () => {
 
               {/* Rating and Actions Row */}
               <div className="flex items-center flex-wrap gap-3 md:gap-4 mb-8">
-                {/* Rating */}
-                <div className="flex items-center gap-1.5">
-                  <img src={StarIcon} alt="Rating" className="w-5 h-5" />
+                {/* Rating — mène à la section des avis (ORM-020) */}
+                <button
+                  type="button"
+                  onClick={scrollToReviews}
+                  className="flex items-center gap-1.5 cursor-pointer rounded hover:opacity-70 transition-opacity"
+                  aria-label={t('eventDetails.stats.goToReviews')}
+                  title={t('eventDetails.stats.goToReviews')}
+                >
+                  <img src={StarIcon} alt="" className="w-5 h-5" />
                   <span className="text-sm font-semibold text-black">{eventData.rating.toFixed(1)}</span>
-                  <span className="text-sm text-[#757575]">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
-                </div>
+                  <span className="text-sm text-[#757575] underline decoration-dotted underline-offset-2">• {eventData.reviewCount} {t('eventDetails.stats.reviews')}</span>
+                </button>
                 
                 {/* Available Spots */}
                 <div className="flex items-center gap-1.5">
@@ -617,13 +642,20 @@ const EventDetailsGlobal = () => {
                   )}
                 </div>
                 
-                {/* Favorites */}
-                <div className="flex items-center gap-1.5">
-                  <svg className="w-5 h-5 text-[#FF4000]" fill="currentColor" viewBox="0 0 24 24">
+                {/* Favorites — le compteur bascule le favori (ORM-020) */}
+                <button
+                  type="button"
+                  onClick={handleToggleFavorite}
+                  disabled={!user || isTogglingFavorite}
+                  className="flex items-center gap-1.5 cursor-pointer rounded hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                  aria-pressed={isFavorite}
+                  title={!user ? t('eventDetails.actions.loginToFavorite') : (isFavorite ? t('eventDetails.actions.removeFromFavorites') : t('eventDetails.actions.addToFavorites'))}
+                >
+                  <svg className="w-5 h-5 text-[#FF4000]" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                   </svg>
                   <span className="text-sm text-[#757575]">{eventData.favorites.toLocaleString()} {t('eventDetails.stats.favorites')}</span>
-                </div>
+                </button>
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-2">
@@ -1028,8 +1060,8 @@ const EventDetailsGlobal = () => {
                 </div>
               </div>
 
-              {/* Reviews Section */}
-              <div className="mb-6">
+              {/* Reviews Section — cible du raccourci « avis » de la barre (ORM-020) */}
+              <div className="mb-6" id="reviews-section" ref={reviewsSectionRef}>
                 <div className="flex items-center gap-2 mb-6">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M10 1.66699L12.575 6.88366L18.3333 7.72533L14.1667 11.7837L15.15 17.517L10 14.8087L4.85 17.517L5.83333 11.7837L1.66667 7.72533L7.425 6.88366L10 1.66699Z" fill="#FFA500" stroke="#FFA500" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1222,7 +1254,8 @@ const EventDetailsGlobal = () => {
                 </div>
               </div>
 
-              {/* More from Pulsewave Entertainment Section */}
+              {/* Autres événements de cet organisateur — masqué s'il n'en a pas d'autre */}
+              {moreFromOrganizerEvents.length > 0 && (
               <div className="mt-12 mb-8">
                 <h2 className="text-xl text-black mb-6">
                   {t('eventDetails.moreFromOrganizer')} <span className="font-bold">{eventData.organizerName || t('eventDetails.moreFromOrganizerFallback')}</span>
@@ -1230,7 +1263,14 @@ const EventDetailsGlobal = () => {
                 
                 <div className="space-y-4">
                   {moreFromOrganizerEvents.map((event) => (
-                    <div key={event.id} className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow">
+                    <div
+                      key={event.id}
+                      onClick={() => navigate(`/event/${event.id}`)}
+                      role="link"
+                      tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/event/${event.id}`); }}
+                      className="flex gap-4 p-4 bg-white border border-[#EEEEEE] rounded-xl hover:shadow-md transition-shadow cursor-pointer"
+                    >
                       <img
                         src={event.image}
                         alt={event.title}
@@ -1245,23 +1285,15 @@ const EventDetailsGlobal = () => {
                           <span>•</span>
                           <span>{event.venue}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-semibold text-black">
-                            {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
-                          </span>
-                          <span className={`text-xs font-medium px-2 py-1 rounded ${
-                            event.badgeColor === 'blue'
-                              ? 'text-[#00A3FF] bg-[#E6F7FF]'
-                              : 'text-[#FF4000] bg-[#FFF4F3]'
-                          }`}>
-                            {t(`eventDetails.badges.${event.badgeKey}`)}
-                          </span>
-                        </div>
+                        <span className="text-sm font-semibold text-black">
+                          {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
+              )}
             </div>
 
             {/* Right Column - Price and CTA */}
@@ -1347,7 +1379,14 @@ const EventDetailsGlobal = () => {
               {currentTrendingEvents.map((event, index) => {
                 const displayNumber = startIndex + index + 1;
                 return (
-                  <div key={event.id} className="relative group cursor-pointer transition-transform duration-300 hover:scale-105">
+                  <div
+                    key={event.id}
+                    onClick={() => navigate(`/event/${event.id}`)}
+                    role="link"
+                    tabIndex={0}
+                    onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/event/${event.id}`); }}
+                    className="relative group cursor-pointer transition-transform duration-300 hover:scale-105"
+                  >
                     <div className="relative overflow-hidden rounded-lg shadow-sm hover:shadow-xl transition-shadow duration-300">
                       <img 
                         src={event.image} 

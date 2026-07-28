@@ -12,6 +12,16 @@
       "images": "Images de l'événement",
       "tickets": "Billetterie et tarifs"
     },
+    "ticketTypes": {
+      "General Admission": "Entrée générale",
+      "VIP": "VIP",
+      "Early Bird": "Tarif préventif",
+      "Student": "Étudiant",
+      "Group": "Groupe",
+      "Premium": "Premium",
+      "Standard": "Standard",
+      "Other": "Autre"
+    },
     "form": {
       "eventTitle": "Titre de l'événement",
       "eventTitlePlaceholder": "Saisissez le titre de votre événement",
@@ -52,8 +62,8 @@
       "deleteImage": "Supprimer l'image",
       "ticketLabel": "Billet {{number}}",
       "ticketType": "Type de billet",
-      "ticketTypePlaceholder": "ex. : VIP, Entrée standard, Early Bird",
-      "ticketTypeHint": "Saisissez un nom de type de billet personnalisé",
+      "ticketTypePlaceholder": "Choisissez un type de billet",
+      "ticketTypeHint": "Types acceptés par la plateforme",
       "priceType": "Type de tarif",
       "priceTypePlaceholder": "Choisissez le type de tarif",
       "priceTypeFree": "Gratuit",
@@ -70,6 +80,7 @@
       "categoryRequired": "Veuillez choisir une catégorie",
       "eventTypeRequired": "Veuillez choisir le type d'événement",
       "dateRequired": "La plage de dates est requise",
+      "datePast": "La date de l'événement ne peut pas être dans le passé",
       "startTimeRequired": "L'heure de début est requise",
       "endTimeRequired": "L'heure de fin est requise",
       "countryRequired": "Le pays est requis",

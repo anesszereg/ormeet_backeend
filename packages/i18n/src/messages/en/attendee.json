@@ -106,6 +106,7 @@
     },
     "stats": {
       "reviews": "reviews",
+      "goToReviews": "See reviews",
       "views": "views",
       "favorites": "favorites"
     },

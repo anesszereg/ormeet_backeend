@@ -10,6 +10,16 @@
       "images": "Event Images",
       "tickets": "Tickets & Pricing"
     },
+    "ticketTypes": {
+      "General Admission": "General Admission",
+      "VIP": "VIP",
+      "Early Bird": "Early Bird",
+      "Student": "Student",
+      "Group": "Group",
+      "Premium": "Premium",
+      "Standard": "Standard",
+      "Other": "Other"
+    },
     "form": {
       "eventTitle": "Event Title",
       "eventTitlePlaceholder": "Enter your event title",
@@ -50,8 +60,8 @@
       "deleteImage": "Delete image",
       "ticketLabel": "Ticket {{number}}",
       "ticketType": "Ticket Type",
-      "ticketTypePlaceholder": "e.g., VIP, General Admission, Early Bird",
-      "ticketTypeHint": "Enter a custom ticket type name",
+      "ticketTypePlaceholder": "Choose a ticket type",
+      "ticketTypeHint": "Ticket types accepted by the platform",
       "priceType": "Price Type",
       "priceTypePlaceholder": "Select price type",
       "priceTypeFree": "Free",
@@ -68,6 +78,7 @@
       "categoryRequired": "Please select a category",
       "eventTypeRequired": "Please select an event type",
       "dateRequired": "Date range is required",
+      "datePast": "The event date cannot be in the past",
       "startTimeRequired": "Start time is required",
       "endTimeRequired": "End time is required",
       "countryRequired": "Country is required",

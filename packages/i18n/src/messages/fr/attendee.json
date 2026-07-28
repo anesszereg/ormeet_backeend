@@ -110,6 +110,7 @@
     },
     "stats": {
       "reviews": "avis",
+      "goToReviews": "Voir les avis",
       "views": "vues",
       "favorites": "favoris"
     },
