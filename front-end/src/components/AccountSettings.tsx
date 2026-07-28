@@ -79,6 +79,8 @@ const AccountSettings = () => {
   // Payment Methods states
   const [savedCards, setSavedCards] = useState<PaymentCard[]>([]);
   const [newCard, setNewCard] = useState({
+    firstName: '',
+    lastName: '',
     cardNumber: '',
     expiryMonth: '',
     expiryYear: '',
@@ -219,17 +221,25 @@ const AccountSettings = () => {
   
   // Handlers for Payment Methods
   const handleAddCard = () => {
-    if (newCard.cardNumber && newCard.expiryMonth && newCard.expiryYear && newCard.cvv) {
+    if (
+      newCard.firstName.trim() &&
+      newCard.lastName.trim() &&
+      newCard.cardNumber &&
+      newCard.expiryMonth &&
+      newCard.expiryYear &&
+      newCard.cvv
+    ) {
       const card: PaymentCard = {
         id: Date.now().toString(),
         cardNumber: newCard.cardNumber,
-        cardHolder: 'CHARLOTTE JOHNSON',
+        // Les cartes affichent le titulaire en capitales, comme sur le support.
+        cardHolder: `${newCard.firstName.trim()} ${newCard.lastName.trim()}`.toUpperCase(),
         expiryMonth: newCard.expiryMonth,
         expiryYear: newCard.expiryYear,
         cvv: newCard.cvv
       };
       setSavedCards([...savedCards, card]);
-      setNewCard({ cardNumber: '', expiryMonth: '', expiryYear: '', cvv: '' });
+      setNewCard({ firstName: '', lastName: '', cardNumber: '', expiryMonth: '', expiryYear: '', cvv: '' });
       setShowAddCardForm(false);
     }
   };
@@ -520,6 +530,31 @@ const AccountSettings = () => {
                   </div>
                   <div className="max-w-2xl">
                     <div className="space-y-4">
+                      {/* Identité du titulaire — exigée par les prestataires de paiement */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.firstName')}</label>
+                          <input
+                            type="text"
+                            value={newCard.firstName}
+                            onChange={(e) => setNewCard({ ...newCard, firstName: e.target.value })}
+                            placeholder={t('accountSettings.paymentMethods.firstNamePlaceholder')}
+                            className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
+                            required
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.lastName')}</label>
+                          <input
+                            type="text"
+                            value={newCard.lastName}
+                            onChange={(e) => setNewCard({ ...newCard, lastName: e.target.value })}
+                            placeholder={t('accountSettings.paymentMethods.lastNamePlaceholder')}
+                            className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
+                            required
+                          />
+                        </div>
+                      </div>
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.cardNumber')}</label>
                         <input
