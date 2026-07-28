@@ -521,6 +521,12 @@
         "description": "Securely save a payment method to make ticket purchases quick and easy. You can update it anytime.",
         "addButton": "Add Payment Method"
       },
+      "deleteCard": {
+        "trigger": "Delete this card",
+        "title": "Delete this card?",
+        "message": "The card {{card}} will be removed from your account. This action cannot be undone.",
+        "confirm": "Delete"
+      },
       "savedCards": "Saved Cards",
       "addMore": "Add more",
       "addPaymentTitle": "Add Payment method",

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
+import ConfirmDialog from './ConfirmDialog';
 import PersonalInfoIcon from '../assets/Svgs/personalInfo.svg';
 import PaymentIcon from '../assets/Svgs/payment.svg';
 import EmailIcon from '../assets/Svgs/email.svg';
@@ -86,6 +87,8 @@ const AccountSettings = () => {
     expiryYear: '',
     cvv: ''
   });
+  // Carte en attente de confirmation de suppression (null = aucune).
+  const [cardPendingDelete, setCardPendingDelete] = useState<PaymentCard | null>(null);
   
   // Email Preferences states
   const [attendeePrefs, setAttendeePrefs] = useState({
@@ -243,9 +246,16 @@ const AccountSettings = () => {
       setShowAddCardForm(false);
     }
   };
-  
-  const handleDeleteCard = (id: string) => {
-    setSavedCards(savedCards.filter(card => card.id !== id));
+
+  // Suppression en deux temps : la carte est mise en attente, la modale confirme.
+  const handleDeleteCard = (card: PaymentCard) => {
+    setCardPendingDelete(card);
+  };
+
+  const confirmDeleteCard = () => {
+    if (!cardPendingDelete) return;
+    setSavedCards(savedCards.filter(card => card.id !== cardPendingDelete.id));
+    setCardPendingDelete(null);
   };
   
   const formatCardNumber = (value: string) => {
@@ -482,7 +492,8 @@ const AccountSettings = () => {
                               <div className="flex justify-between items-start">
                                 <img src={CardIcon} alt="Card" className="w-12 h-12" />
                                 <button
-                                  onClick={() => handleDeleteCard(card.id)}
+                                  onClick={() => handleDeleteCard(card)}
+                                  aria-label={t('accountSettings.paymentMethods.deleteCard.trigger')}
                                   className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors cursor-pointer"
                                 >
                                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -1322,6 +1333,18 @@ const AccountSettings = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation avant suppression d'une carte — action irréversible */}
+      <ConfirmDialog
+        isOpen={cardPendingDelete !== null}
+        title={t('accountSettings.paymentMethods.deleteCard.title')}
+        message={t('accountSettings.paymentMethods.deleteCard.message', {
+          card: cardPendingDelete ? getMaskedCardNumber(cardPendingDelete.cardNumber) : ''
+        })}
+        confirmText={t('accountSettings.paymentMethods.deleteCard.confirm')}
+        onConfirm={confirmDeleteCard}
+        onCancel={() => setCardPendingDelete(null)}
+      />
     </div>
   );
 };

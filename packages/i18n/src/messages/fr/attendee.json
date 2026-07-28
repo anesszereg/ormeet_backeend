@@ -524,6 +524,12 @@
         "description": "Enregistrez un moyen de paiement en toute sécurité pour réserver vos billets rapidement. Vous pouvez le modifier à tout moment.",
         "addButton": "Ajouter un moyen de paiement"
       },
+      "deleteCard": {
+        "trigger": "Supprimer cette carte",
+        "title": "Supprimer cette carte ?",
+        "message": "La carte {{card}} sera retirée de votre compte. Cette action est irréversible.",
+        "confirm": "Supprimer"
+      },
       "savedCards": "Cartes enregistrées",
       "addMore": "Ajouter",
       "addPaymentTitle": "Ajouter un moyen de paiement",
