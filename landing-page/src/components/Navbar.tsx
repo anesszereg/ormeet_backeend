@@ -121,12 +121,6 @@ const Navbar = () => {
           {/* Nav Links — desktop only */}
           <div className="hidden md:flex items-center gap-6">
             <a
-              href={`${MAIN_APP_URL}/browse-events`}
-              className="text-sm font-medium text-black hover:text-primary transition-colors"
-            >
-              {t("browseEvents")}
-            </a>
-            <a
               href={`${MAIN_APP_URL}/host-events`}
               className="text-sm font-medium text-black hover:text-primary transition-colors"
             >
@@ -235,13 +229,6 @@ const Navbar = () => {
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
           {/* Nav links */}
           <nav className="flex flex-col gap-1">
-            <a
-              href={`${MAIN_APP_URL}/browse-events`}
-              onClick={closeDrawer}
-              className="flex items-center py-3 px-4 rounded-xl text-sm font-medium text-black hover:bg-secondary-light hover:text-primary transition-colors"
-            >
-              {t("browseEvents")}
-            </a>
             <a
               href={`${MAIN_APP_URL}/host-events`}
               onClick={closeDrawer}
