@@ -121,12 +121,6 @@ const Navbar = () => {
           {/* Nav Links — desktop only */}
           <div className="hidden md:flex items-center gap-6">
             <a
-              href={`${MAIN_APP_URL}/browse-events`}
-              className="text-sm font-medium text-black hover:text-primary transition-colors"
-            >
-              {t("browseEvents")}
-            </a>
-            <a
               href={`${MAIN_APP_URL}/host-events`}
               className="text-sm font-medium text-black hover:text-primary transition-colors"
             >
@@ -158,7 +152,7 @@ const Navbar = () => {
             <>
               {/* Log In — desktop only */}
               <a
-                href={`${MAIN_APP_URL}/onboarding-choice`}
+                href={`${MAIN_APP_URL}/login`}
                 className="hidden md:inline-flex px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >
                 {t("login")}
@@ -236,13 +230,6 @@ const Navbar = () => {
           {/* Nav links */}
           <nav className="flex flex-col gap-1">
             <a
-              href={`${MAIN_APP_URL}/browse-events`}
-              onClick={closeDrawer}
-              className="flex items-center py-3 px-4 rounded-xl text-sm font-medium text-black hover:bg-secondary-light hover:text-primary transition-colors"
-            >
-              {t("browseEvents")}
-            </a>
-            <a
               href={`${MAIN_APP_URL}/host-events`}
               onClick={closeDrawer}
               className="flex items-center py-3 px-4 rounded-xl text-sm font-medium text-black hover:bg-secondary-light hover:text-primary transition-colors"
@@ -280,7 +267,7 @@ const Navbar = () => {
           ) : (
             <>
               <a
-                href={`${MAIN_APP_URL}/onboarding-choice`}
+                href={`${MAIN_APP_URL}/login`}
                 onClick={closeDrawer}
                 className="flex items-center justify-center h-12 w-full text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >
