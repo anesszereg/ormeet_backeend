@@ -10,25 +10,12 @@ const Footer = () => {
   const locale = useLocale();
   const year = new Date().getFullYear();
 
-  const browseCategories = [
-    "music",
-    "sports",
-    "business",
-    "fitness",
-    "nightlife",
-    "holiday",
-    "dating",
-    "festival",
-  ] as const;
-  const hostLinks = ["createEvents", "features", "pricing"] as const;
   const supportLinks = ["helpCenter", "findTickets", "contactOrganizer"] as const;
   const companyLinks = ["about", "contact", "blog"] as const;
   const legalLinks = ["terms", "privacy", "cookies", "refund"] as const;
 
   const appUrl = (path: string) => `${FRONTEND_ORIGIN}${path}`;
 
-  const browseHref = (cat: string) => appUrl(`/browse-events?category=${encodeURIComponent(cat)}`);
-  const hostHref = () => appUrl("/host-events");
   const supportHref = () => appUrl("/support");
   const ticketsHref = () => appUrl("/browse-events");
   // Les liens internes doivent porter le préfixe de langue : le middleware est en
@@ -44,7 +31,7 @@ const Footer = () => {
       <footer className="w-full bg-white border-t border-light-gray">
         {/* Main Footer Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 py-10 md:py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Logo and Description */}
             <div className="lg:col-span-1">
               {/* Logo */}
@@ -93,34 +80,9 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Browse Events Column */}
+            {/* Support Column */}
             <div>
-              <h3 className="text-base font-semibold text-black mb-4">{t("browseEvents")}</h3>
-              <ul className="space-y-2">
-                {browseCategories.map((cat) => (
-                  <li key={cat}>
-                    <a href={browseHref(cat)} className="text-sm text-muted hover:text-primary transition-colors">
-                      {t(`categories.${cat}`)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Host Events + Support Column */}
-            <div>
-              <h3 className="text-base font-semibold text-black mb-4">{t("hostEvents")}</h3>
-              <ul className="space-y-2">
-                {hostLinks.map((k) => (
-                  <li key={k}>
-                    <a href={hostHref()} className="text-sm text-muted hover:text-primary transition-colors">
-                      {t(`host.${k}`)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="text-base font-semibold text-black mb-4 mt-6">{t("support")}</h3>
+              <h3 className="text-base font-semibold text-black mb-4">{t("support")}</h3>
               <ul className="space-y-2">
                 {supportLinks.map((k) => (
                   <li key={k}>
