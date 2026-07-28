@@ -3,27 +3,13 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
+import { popularWilayas, type Locale, type Wilaya } from "@ormeet/i18n";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 
 /* ------------------------------------------------------------------ */
 /*  Static data                                                        */
 /* ------------------------------------------------------------------ */
-
-const CITIES = [
-  "California",
-  "New York",
-  "London",
-  "Paris",
-  "Tokyo",
-  "Dubai",
-  "Sydney",
-  "Toronto",
-  "Berlin",
-  "Barcelona",
-] as const;
-
-type City = (typeof CITIES)[number];
 
 const CATEGORIES = [
   { key: "all", label: "All Categories" },
@@ -48,8 +34,8 @@ interface DiscoverSectionProps {
   events: LandingEvent[];
   /** True after the fetch settled. */
   hasLoaded: boolean;
-  /** Callback when user selects a different city */
-  onCityChange?: (city: string) => void;
+  /** Callback when user selects a different wilaya */
+  onWilayaChange?: (wilaya: Wilaya) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -91,12 +77,13 @@ const bucketFor = (raw: string): Category => {
 const DiscoverSection = ({
   events,
   hasLoaded,
-  onCityChange,
+  onWilayaChange,
 }: DiscoverSectionProps) => {
   const t = useTranslations("landing.discover");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
-  const [selectedCity, setSelectedCity] = useState<City>("California");
+  // Alger par défaut : marché principal de la plateforme.
+  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya>(popularWilayas[0]);
   const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("all");
   const activeCategory = useMemo<Category>(
     () => CATEGORIES.find((c) => c.key === activeCategoryKey)!.label,
@@ -116,13 +103,13 @@ const DiscoverSection = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleCitySelect = useCallback(
-    (city: City) => {
-      setSelectedCity(city);
+  const handleWilayaSelect = useCallback(
+    (wilaya: Wilaya) => {
+      setSelectedWilaya(wilaya);
       setIsCityDropdownOpen(false);
-      onCityChange?.(city);
+      onWilayaChange?.(wilaya);
     },
-    [onCityChange]
+    [onWilayaChange]
   );
 
   /**
@@ -141,7 +128,7 @@ const DiscoverSection = ({
       {/* Heading — city name is dynamic */}
       <h2 className="text-2xl md:text-3xl text-center text-black mb-8">
         <span className="font-bold">{t("headingPrefix")}</span> {t("headingMiddle")}{" "}
-        <span className="font-bold">{selectedCity}</span>
+        <span className="font-bold">{selectedWilaya[locale]}</span>
       </h2>
 
       {/* Location + Categories Row */}
@@ -163,7 +150,7 @@ const DiscoverSection = ({
               className="shrink-0 -ms-1"
             />
             <span className="text-sm font-medium text-black flex-1 text-start">
-              {selectedCity}
+              {selectedWilaya[locale]}
             </span>
             <svg
               width="16"
@@ -190,19 +177,19 @@ const DiscoverSection = ({
               role="listbox"
               className="absolute top-full start-0 mt-2 w-full bg-white border border-light-gray rounded-xl shadow-lg z-30 py-1 max-h-[280px] overflow-y-auto"
             >
-              {CITIES.map((city) => (
+              {popularWilayas.map((wilaya) => (
                 <li
-                  key={city}
+                  key={wilaya.code}
                   role="option"
-                  aria-selected={city === selectedCity}
-                  onClick={() => handleCitySelect(city)}
+                  aria-selected={wilaya.code === selectedWilaya.code}
+                  onClick={() => handleWilayaSelect(wilaya)}
                   className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                    city === selectedCity
+                    wilaya.code === selectedWilaya.code
                       ? "bg-primary-light text-primary font-semibold"
                       : "text-black hover:bg-secondary-light"
                   }`}
                 >
-                  {city}
+                  {wilaya[locale]}
                 </li>
               ))}
             </ul>

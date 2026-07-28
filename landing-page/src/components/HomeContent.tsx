@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { popularWilayas, type Wilaya } from "@ormeet/i18n";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import EventCarousel from "@/components/EventCarousel";
@@ -15,7 +16,8 @@ import Footer from "@/components/Footer";
 import { useLandingEvents } from "@/hooks/useLandingEvents";
 
 export default function HomeContent() {
-  const [selectedCity, setSelectedCity] = useState("California");
+  // Alger par défaut : marché principal de la plateforme.
+  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya>(popularWilayas[0]);
   // One backend call shared by every event-listing section below.
   const { events, isLoading, hasLoaded } = useLandingEvents();
 
@@ -27,13 +29,13 @@ export default function HomeContent() {
       <DiscoverSection
         events={events}
         hasLoaded={hasLoaded}
-        onCityChange={setSelectedCity}
+        onWilayaChange={setSelectedWilaya}
       />
       <TrendingEvents events={events} hasLoaded={hasLoaded} />
       <EventsInCalifornia
         events={events}
         hasLoaded={hasLoaded}
-        selectedCity={selectedCity}
+        selectedWilaya={selectedWilaya}
       />
       <FindYourVibe />
       <BigCities />
