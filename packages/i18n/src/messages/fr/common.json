@@ -107,5 +107,22 @@
     "accountOptions": "Options du compte",
     "helpSupport": "Aide",
     "verified": "Vérifié"
+  },
+  "eventCategories": {
+    "music": "Musique & Concerts",
+    "sports": "Sport & Football",
+    "comedy": "Humour & Stand-up",
+    "theater": "Théâtre & Spectacles",
+    "cinema": "Cinéma & Projections",
+    "conference": "Conférences & Séminaires",
+    "workshop": "Formations & Ateliers",
+    "expo": "Salons & Foires",
+    "business": "Entrepreneuriat & Business",
+    "tech": "Tech & Numérique",
+    "art": "Art & Expositions",
+    "books": "Livres & Lecture",
+    "food": "Gastronomie",
+    "outdoor": "Randonnée & Plein air",
+    "gaming": "Gaming & E-sport"
   }
 }

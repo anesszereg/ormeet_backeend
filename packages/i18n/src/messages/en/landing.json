@@ -54,24 +54,7 @@
   "vibe": {
     "titleStart": "Find events that match",
     "titleHighlight": "your vibe",
-    "description": "Browse events by category and find what you love — from music and fitness to food, business, art, and more. Ormeet has something for everyone!",
-    "categories": {
-      "fitness": "Fitness",
-      "music": "Music",
-      "dating": "Dating",
-      "nightlife": "Nightlife",
-      "holiday": "Holiday",
-      "foodDrink": "Food & Drink",
-      "art": "Art",
-      "sports": "Sports",
-      "business": "Business",
-      "wellness": "Wellness",
-      "comedy": "Comedy",
-      "theater": "Theater",
-      "outdoor": "Outdoor",
-      "tech": "Tech",
-      "fashion": "Fashion"
-    }
+    "description": "Browse events by category and find what you love — concerts, sports, stand-up, training, expos, outdoors and more. Ormeet has something for everyone!"
   },
   "bigCities": {
     "titleStart": "Big cities. bigger events.",
@@ -160,4 +143,3 @@
     }
   }
 }
-
