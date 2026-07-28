@@ -10,6 +10,16 @@
       "images": "صور الفعالية",
       "tickets": "التذاكر والأسعار"
     },
+    "ticketTypes": {
+      "General Admission": "دخول عام",
+      "VIP": "كبار الشخصيات",
+      "Early Bird": "حجز مبكر",
+      "Student": "طالب",
+      "Group": "مجموعة",
+      "Premium": "مميّزة",
+      "Standard": "عادية",
+      "Other": "أخرى"
+    },
     "form": {
       "eventTitle": "عنوان الفعالية",
       "eventTitlePlaceholder": "أدخل عنوان فعاليتك",
@@ -50,8 +60,8 @@
       "deleteImage": "حذف الصورة",
       "ticketLabel": "تذكرة {{number}}",
       "ticketType": "نوع التذكرة",
-      "ticketTypePlaceholder": "مثل: VIP، عادية، Early Bird",
-      "ticketTypeHint": "أدخل اسمًا مخصّصًا لنوع التذكرة",
+      "ticketTypePlaceholder": "اختر نوع التذكرة",
+      "ticketTypeHint": "أنواع التذاكر المقبولة في المنصة",
       "priceType": "نوع التسعير",
       "priceTypePlaceholder": "اختر نوع التسعير",
       "priceTypeFree": "مجانية",

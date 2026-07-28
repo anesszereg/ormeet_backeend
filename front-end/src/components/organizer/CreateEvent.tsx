@@ -85,10 +85,13 @@ const PRESET_CATEGORIES = [
   'Other',
 ];
 
-/** Pays pré-sélectionné à la création d'un événement. */
-const DEFAULT_COUNTRY = 'Algérie';
-
-const ticketTypes = [
+/**
+ * Types de billets acceptés par l'API. Ces valeurs sont contraintes par un enum
+ * PostgreSQL (backend/src/entities/ticket-type.entity.ts) : on stocke la valeur
+ * anglaise et on affiche un libellé traduit. Ajouter un type impose une
+ * migration côté back.
+ */
+const TICKET_TYPES = [
   'General Admission',
   'VIP',
   'Early Bird',
@@ -96,8 +99,11 @@ const ticketTypes = [
   'Group',
   'Premium',
   'Standard',
-  'Other'
-];
+  'Other',
+] as const;
+
+/** Pays pré-sélectionné à la création d'un événement. */
+const DEFAULT_COUNTRY = 'Algérie';
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
   const { t, i18n } = useTranslation('organizer');
@@ -189,7 +195,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isDragging, setIsDragging] = useState(false);
-  const [openTicketTypeDropdown, setOpenTicketTypeDropdown] = useState<string | null>(null);
   const [openPriceTypeDropdown, setOpenPriceTypeDropdown] = useState<string | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [faqErrors, setFaqErrors] = useState<Record<string, Partial<Record<keyof FAQData, string>>>>({});
@@ -1544,9 +1549,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   <label className="block text-sm font-medium text-black mb-2">
                     {t('createEvent.form.ticketType')} <span className="text-[#FF3425]">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder={t('createEvent.form.ticketTypePlaceholder')}
+                  {/* Valeurs imposées par l'enum PostgreSQL : on stocke l'anglais
+                      et on affiche un libellé traduit (ORM-019). */}
+                  <select
                     value={ticket.type}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -1556,7 +1561,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           t.id === ticket.id ? { ...t, type: value } : t
                         )
                       }));
-                      // Clear error when typing
                       if (ticketErrors[ticket.id]?.type) {
                         setTicketErrors(prev => ({
                           ...prev,
@@ -1564,10 +1568,17 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         }));
                       }
                     }}
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary transition-all ${
-                      ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'
-                    }`}
-                  />
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:border-primary transition-all ${
+                      ticket.type ? 'text-black' : 'text-[#9CA3AF]'
+                    } ${ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'}`}
+                  >
+                    <option value="">{t('createEvent.form.ticketTypePlaceholder')}</option>
+                    {TICKET_TYPES.map((type) => (
+                      <option key={type} value={type} className="text-black">
+                        {t(`createEvent.ticketTypes.${type}`, type)}
+                      </option>
+                    ))}
+                  </select>
                   {ticketErrors[ticket.id]?.type && (
                     <p className="mt-1 text-xs text-[#FF3425]">{ticketErrors[ticket.id].type}</p>
                   )}
