@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import authService from '../services/authService';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -21,7 +22,7 @@ const ForgotPassword = () => {
       await authService.forgotPassword({ email });
       setSuccess(true);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to send reset email. Please try again.';
+      const errorMessage = getAuthErrorMessage(err, t, 'errors.resetEmailFailed');
       setError(errorMessage);
       console.error('Forgot password error:', err);
     } finally {

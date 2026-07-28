@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import authService from '../services/authService';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -52,7 +53,7 @@ const ResetPassword = () => {
         navigate('/login');
       }, 3000);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to reset password. Please try again.';
+      const errorMessage = getAuthErrorMessage(err, t, 'errors.resetPasswordFailed');
       setError(errorMessage);
       console.error('Reset password error:', err);
     } finally {

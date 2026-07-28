@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { getAuthErrorMessage } from '../utils/authErrors';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import PhoneInput from '../components/PhoneInput';
@@ -72,10 +73,10 @@ const Login = () => {
     try {
       await authService.sendVerificationCode({ phone, type: 'phone', purpose: 'login' });
       setPhoneStep('otp');
-      setSuccessMessage('Code sent! Check your phone.');
+      setSuccessMessage(t('login.codeSent'));
       setTimeout(() => setSuccessMessage(''), 5000);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to send code. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.sendCodeFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -99,7 +100,7 @@ const Login = () => {
         redirectAfterLogin(user);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Invalid or expired code. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.invalidCode'));
     } finally {
       setIsLoading(false);
     }
@@ -214,16 +215,17 @@ const Login = () => {
         return;
       }
 
-      const rawMessage = data?.message ?? err.message ?? 'Login failed. Please try again.';
-      const errorMessage = typeof rawMessage === 'string' ? rawMessage : (rawMessage?.message || 'Login failed.');
+      const rawMessage = data?.message ?? err.message ?? '';
+      const rawText = typeof rawMessage === 'string' ? rawMessage : (rawMessage?.message || '');
 
-      // Check if error is due to unverified email
-      if (errorMessage.toLowerCase().includes('verify') || errorMessage.toLowerCase().includes('verification')) {
+      // Le test porte sur le message BRUT du back : le traduire d'abord
+      // casserait cette détection.
+      if (rawText.toLowerCase().includes('verify') || rawText.toLowerCase().includes('verification')) {
         setShowVerificationError(true);
         setUnverifiedEmail(email || '');
         setError('');
       } else {
-        setError(errorMessage);
+        setError(getAuthErrorMessage(err, t, 'errors.loginFailed'));
         setShowVerificationError(false);
       }
       console.error('Login error:', err);
@@ -242,7 +244,7 @@ const Login = () => {
       setShowVerificationError(false);
       setTimeout(() => setSuccessMessage(''), 10000); // Clear after 10 seconds
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to resend verification email. Please try again.');
+      setError(getAuthErrorMessage(err, t, 'errors.resendEmailFailed'));
     } finally {
       setIsResending(false);
     }
