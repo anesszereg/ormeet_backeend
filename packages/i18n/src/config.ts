@@ -25,8 +25,8 @@ export const localeFullCodes: Record<Locale, string> = {
 };
 
 export const currencyByLocale: Record<Locale, string> = {
-  en: 'USD',
-  fr: 'EUR',
+  en: 'DZD',
+  fr: 'DZD',
   ar: 'DZD'
 };
 

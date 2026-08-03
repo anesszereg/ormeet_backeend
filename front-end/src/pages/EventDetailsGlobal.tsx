@@ -8,6 +8,7 @@ import eventService, { Event as ApiEvent } from '../services/eventService';
 import reviewService, { Review as ApiReview } from '../services/reviewService';
 import userPreferencesService from '../services/userPreferencesService';
 import organizerService from '../services/organizerService';
+import { formatCurrency } from '../utils/formatters';
 
 import NextImageIcon from '../assets/Svgs/eventDetails/nextImage.svg';
 import StarIcon from '../assets/Svgs/eventDetails/star.svg';
@@ -210,7 +211,7 @@ const EventDetailsGlobal = () => {
           title: event.title,
           description: event.longDescription || event.shortDescription || '',
           images: event.images && event.images.length > 0 ? event.images : fallbackImages,
-          price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
+          price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : formatCurrency(lowestPrice),
           rating: avgRating.average || 0,
           reviewCount: avgRating.count > 1000 ? `${(avgRating.count / 1000).toFixed(1)}K` : String(avgRating.count || 0),
           views: event.views || 0,
@@ -270,7 +271,7 @@ const EventDetailsGlobal = () => {
         ]
           .slice(0, 10)
           .map((e: ApiEvent, i: number) => {
-            const ePrice = e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free';
+            const ePrice = e.ticketTypes?.[0] ? formatCurrency(Number(e.ticketTypes[0].price)) : 'Free';
             return {
               id: e.id,
               title: e.title,
@@ -1285,9 +1286,18 @@ const EventDetailsGlobal = () => {
                           <span>•</span>
                           <span>{event.venue}</span>
                         </div>
-                        <span className="text-sm font-semibold text-black">
-                          {t('eventDetails.trending.fromPrice')} <bdi>${event.price}</bdi>
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-black">
+                            {t('eventDetails.trending.fromPrice')} <bdi>{event.price}</bdi>
+                          </span>
+                          <span className={`text-xs font-medium px-2 py-1 rounded ${
+                            event.badgeColor === 'blue'
+                              ? 'text-[#00A3FF] bg-[#E6F7FF]'
+                              : 'text-[#FF4000] bg-[#FFF4F3]'
+                          }`}>
+                            {t(`eventDetails.badges.${event.badgeKey}`)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}

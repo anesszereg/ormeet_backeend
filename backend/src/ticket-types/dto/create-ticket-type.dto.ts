@@ -30,7 +30,7 @@ export class CreateTicketTypeDto {
   @Min(0)
   price: number;
 
-  @ApiProperty({ example: 'USD' })
+  @ApiProperty({ example: 'DZD' })
   @IsString()
   currency: string;
 

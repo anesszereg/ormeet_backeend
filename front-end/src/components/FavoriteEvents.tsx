@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import userPreferencesService from '../services/userPreferencesService';
 import { Event } from '../services/eventService';
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
+import { formatCurrency } from '../utils/formatters';
 
 interface FavoriteEventsProps {
   onEventSelect?: (event: any) => void;
@@ -98,7 +99,7 @@ const FavoriteEvents = ({ onEventSelect }: FavoriteEventsProps) => {
             const eventDate = new Date(event.startAt);
             const imageUrl = event.images?.[0] || EventImageFallback;
             const lowestPrice = event.ticketTypes?.reduce((min, tt) => Math.min(min, Number(tt.price)), Infinity) ?? 0;
-            const priceDisplay = lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`;
+            const priceDisplay = lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : formatCurrency(lowestPrice);
 
             return (
               <div key={event.id} className="bg-white rounded-2xl shadow-sm border border-[#EEEEEE] overflow-hidden hover:shadow-md transition-shadow">
