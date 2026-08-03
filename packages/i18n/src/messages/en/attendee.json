@@ -106,6 +106,7 @@
     },
     "stats": {
       "reviews": "reviews",
+      "goToReviews": "See reviews",
       "views": "views",
       "favorites": "favorites"
     },
@@ -521,10 +522,20 @@
         "description": "Securely save a payment method to make ticket purchases quick and easy. You can update it anytime.",
         "addButton": "Add Payment Method"
       },
+      "deleteCard": {
+        "trigger": "Delete this card",
+        "title": "Delete this card?",
+        "message": "The card {{card}} will be removed from your account. This action cannot be undone.",
+        "confirm": "Delete"
+      },
       "savedCards": "Saved Cards",
       "addMore": "Add more",
       "addPaymentTitle": "Add Payment method",
       "addPaymentSubtitle": "Add your card to enjoy smooth and hassle-free booking.",
+      "firstName": "Cardholder first name",
+      "firstNamePlaceholder": "First name as shown on the card",
+      "lastName": "Cardholder last name",
+      "lastNamePlaceholder": "Last name as shown on the card",
       "cardNumber": "Card Number",
       "cardNumberPlaceholder": "0000    0000    0000    0000",
       "expireMonth": "Expire Month",

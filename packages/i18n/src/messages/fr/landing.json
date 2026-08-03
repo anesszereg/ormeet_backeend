@@ -54,24 +54,7 @@
   "vibe": {
     "titleStart": "Trouvez des événements qui vous",
     "titleHighlight": "ressemblent",
-    "description": "Parcourez les événements par catégorie et trouvez ce qui vous plaît — musique, fitness, gastronomie, business, art… Ormeet a quelque chose pour chacun.",
-    "categories": {
-      "fitness": "Fitness",
-      "music": "Musique",
-      "dating": "Rencontres",
-      "nightlife": "Nightlife",
-      "holiday": "Vacances",
-      "foodDrink": "Restauration",
-      "art": "Art",
-      "sports": "Sport",
-      "business": "Business",
-      "wellness": "Bien-être",
-      "comedy": "Humour",
-      "theater": "Théâtre",
-      "outdoor": "Plein air",
-      "tech": "Tech",
-      "fashion": "Mode"
-    }
+    "description": "Parcourez les événements par catégorie et trouvez ce qui vous plaît — concerts, sport, stand-up, formations, salons, plein air… Ormeet a quelque chose pour chacun."
   },
   "bigCities": {
     "titleStart": "Grandes villes, grands événements.",

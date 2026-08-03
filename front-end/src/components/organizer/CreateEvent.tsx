@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { wilayas, wilayaLabel, type Locale } from '@ormeet/i18n';
 import organizerService, { CreateEventDto } from '../../services/organizerService';
 import authService from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
@@ -84,7 +85,13 @@ const PRESET_CATEGORIES = [
   'Other',
 ];
 
-const ticketTypes = [
+/**
+ * Types de billets acceptés par l'API. Ces valeurs sont contraintes par un enum
+ * PostgreSQL (backend/src/entities/ticket-type.entity.ts) : on stocke la valeur
+ * anglaise et on affiche un libellé traduit. Ajouter un type impose une
+ * migration côté back.
+ */
+const TICKET_TYPES = [
   'General Admission',
   'VIP',
   'Early Bird',
@@ -92,11 +99,15 @@ const ticketTypes = [
   'Group',
   'Premium',
   'Standard',
-  'Other'
-];
+  'Other',
+] as const;
+
+/** Pays pré-sélectionné à la création d'un événement. */
+const DEFAULT_COUNTRY = 'Algérie';
 
 const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'create', initialData, source = 'events' }: CreateEventProps) => {
-  const { t } = useTranslation('organizer');
+  const { t, i18n } = useTranslation('organizer');
+  const locale = (i18n.language as Locale) || 'fr';
   const { user, setUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -150,7 +161,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       dateRange: [null, null],
       startTime: '',
       endTime: '',
-      country: '',
+      // Marché principal de la plateforme, modifiable par l'organisateur.
+      country: DEFAULT_COUNTRY,
       state: '',
       mapAddress: '',
       onlineLink: '',
@@ -183,7 +195,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isDragging, setIsDragging] = useState(false);
-  const [openTicketTypeDropdown, setOpenTicketTypeDropdown] = useState<string | null>(null);
   const [openPriceTypeDropdown, setOpenPriceTypeDropdown] = useState<string | null>(null);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [faqErrors, setFaqErrors] = useState<Record<string, Partial<Record<keyof FAQData, string>>>>({});
@@ -197,7 +208,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const startTimeRef = useRef<HTMLDivElement>(null);
   const endTimeRef = useRef<HTMLDivElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     let processedValue = value;
     
@@ -362,9 +375,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
   };
 
+  /** Minuit aujourd'hui : un événement ne peut pas commencer dans le passé. */
+  const startOfToday = () => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+
+  const isPastDay = (day: number) =>
+    new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day) < startOfToday();
+
   const handleDateSelect = (day: number) => {
     const selected = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    
+    if (isPastDay(day)) return;
+
     if (!formData.dateRange[0] || (formData.dateRange[0] && formData.dateRange[1])) {
       // Start new selection
       handleDateRangeChange([selected, null]);
@@ -380,8 +404,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   };
 
   const handleMonthSelect = () => {
-    const startOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+    const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
     const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+    // Sur le mois en cours, on démarre à aujourd'hui plutôt qu'au 1er (ORM-016).
+    const startOfMonth = firstOfMonth < startOfToday() ? startOfToday() : firstOfMonth;
+    if (endOfMonth < startOfToday()) return;
     handleDateRangeChange([startOfMonth, endOfMonth]);
     setShowDatePicker(false);
   };
@@ -422,16 +449,20 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     for (let day = 1; day <= daysInMonth; day++) {
       const inRange = isDateInRange(day);
       const isEdge = isDateRangeEdge(day);
+      const isPast = isPastDay(day);
 
       days.push(
         <button
           key={day}
           type="button"
           onClick={() => handleDateSelect(day)}
+          disabled={isPast}
+          aria-disabled={isPast}
           className={`h-8 flex items-center justify-center text-sm font-normal rounded-full transition-colors
-            ${isEdge ? 'bg-primary text-white font-medium' : ''}
-            ${inRange && !isEdge ? 'bg-[#FFE8E3] text-black' : ''}
-            ${!inRange ? 'text-black hover:bg-gray-100' : ''}
+            ${isPast ? 'text-[#CCCCCC] cursor-not-allowed' : ''}
+            ${!isPast && isEdge ? 'bg-primary text-white font-medium' : ''}
+            ${!isPast && inRange && !isEdge ? 'bg-[#FFE8E3] text-black' : ''}
+            ${!isPast && !inRange ? 'text-black hover:bg-gray-100' : ''}
           `}
         >
           {day}
@@ -586,7 +617,13 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     if (!formData.title.trim()) newErrors.title = t('createEvent.validation.titleRequired');
     if (!formData.category) newErrors.category = t('createEvent.validation.categoryRequired');
     if (!formData.eventType) newErrors.eventType = t('createEvent.validation.eventTypeRequired');
-    if (!formData.dateRange[0] || !formData.dateRange[1]) newErrors.dateRange = t('createEvent.validation.dateRequired');
+    if (!formData.dateRange[0] || !formData.dateRange[1]) {
+      newErrors.dateRange = t('createEvent.validation.dateRequired');
+    } else if (formData.dateRange[0] < startOfToday()) {
+      // Filet de sécurité : le calendrier bloque déjà les dates passées, mais une
+      // date peut venir d'un brouillon plus ancien (ORM-016).
+      newErrors.dateRange = t('createEvent.validation.datePast');
+    }
     if (!formData.startTime) newErrors.startTime = t('createEvent.validation.startTimeRequired');
     if (!formData.endTime) newErrors.endTime = t('createEvent.validation.endTimeRequired');
     
@@ -1215,16 +1252,23 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     <label className="block text-sm font-medium text-black mb-2">
                       {t('createEvent.form.state')} <span className="text-[#FF3425]">*</span>
                     </label>
-                    <input
-                      type="text"
+                    {/* Liste des 58 wilayas — même référentiel que la recherche,
+                        pour garantir des données homogènes (ORM-018). */}
+                    <select
                       name="state"
                       value={formData.state}
                       onChange={handleInputChange}
-                      placeholder={t('createEvent.form.statePlaceholder')}
-                      className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary  transition-all ${
-                        errors.state ? 'border-[#FF3425]' : 'border-light-gray'
-                      }`}
-                    />
+                      className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:border-primary transition-all ${
+                        formData.state ? 'text-black' : 'text-[#9CA3AF]'
+                      } ${errors.state ? 'border-[#FF3425]' : 'border-light-gray'}`}
+                    >
+                      <option value="">{t('createEvent.form.statePlaceholder')}</option>
+                      {wilayas.map((wilaya) => (
+                        <option key={wilaya.code} value={wilaya[locale]} className="text-black">
+                          {wilayaLabel(wilaya, locale)}
+                        </option>
+                      ))}
+                    </select>
                     {errors.state && (
                       <p className="mt-1 text-xs text-[#FF3425]">{errors.state}</p>
                     )}
@@ -1505,9 +1549,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   <label className="block text-sm font-medium text-black mb-2">
                     {t('createEvent.form.ticketType')} <span className="text-[#FF3425]">*</span>
                   </label>
-                  <input
-                    type="text"
-                    placeholder={t('createEvent.form.ticketTypePlaceholder')}
+                  {/* Valeurs imposées par l'enum PostgreSQL : on stocke l'anglais
+                      et on affiche un libellé traduit (ORM-019). */}
+                  <select
                     value={ticket.type}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -1517,7 +1561,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           t.id === ticket.id ? { ...t, type: value } : t
                         )
                       }));
-                      // Clear error when typing
                       if (ticketErrors[ticket.id]?.type) {
                         setTicketErrors(prev => ({
                           ...prev,
@@ -1525,10 +1568,17 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                         }));
                       }
                     }}
-                    className={`w-full px-4 py-2.5 border rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary transition-all ${
-                      ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'
-                    }`}
-                  />
+                    className={`w-full px-4 py-2.5 border rounded-lg text-sm bg-white focus:outline-none focus:border-primary transition-all ${
+                      ticket.type ? 'text-black' : 'text-[#9CA3AF]'
+                    } ${ticketErrors[ticket.id]?.type ? 'border-[#FF3425]' : 'border-light-gray'}`}
+                  >
+                    <option value="">{t('createEvent.form.ticketTypePlaceholder')}</option>
+                    {TICKET_TYPES.map((type) => (
+                      <option key={type} value={type} className="text-black">
+                        {t(`createEvent.ticketTypes.${type}`, type)}
+                      </option>
+                    ))}
+                  </select>
                   {ticketErrors[ticket.id]?.type && (
                     <p className="mt-1 text-xs text-[#FF3425]">{ticketErrors[ticket.id].type}</p>
                   )}

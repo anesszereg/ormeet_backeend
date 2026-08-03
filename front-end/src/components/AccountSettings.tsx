@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
+import ConfirmDialog from './ConfirmDialog';
 import PersonalInfoIcon from '../assets/Svgs/personalInfo.svg';
 import PaymentIcon from '../assets/Svgs/payment.svg';
 import EmailIcon from '../assets/Svgs/email.svg';
@@ -79,11 +80,15 @@ const AccountSettings = () => {
   // Payment Methods states
   const [savedCards, setSavedCards] = useState<PaymentCard[]>([]);
   const [newCard, setNewCard] = useState({
+    firstName: '',
+    lastName: '',
     cardNumber: '',
     expiryMonth: '',
     expiryYear: '',
     cvv: ''
   });
+  // Carte en attente de confirmation de suppression (null = aucune).
+  const [cardPendingDelete, setCardPendingDelete] = useState<PaymentCard | null>(null);
   
   // Email Preferences states
   const [attendeePrefs, setAttendeePrefs] = useState({
@@ -102,7 +107,6 @@ const AccountSettings = () => {
     newPassword: '',
     confirmPassword: ''
   });
-  const [twoFactorEnabled, setTwoFactorEnabled] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -219,23 +223,38 @@ const AccountSettings = () => {
   
   // Handlers for Payment Methods
   const handleAddCard = () => {
-    if (newCard.cardNumber && newCard.expiryMonth && newCard.expiryYear && newCard.cvv) {
+    if (
+      newCard.firstName.trim() &&
+      newCard.lastName.trim() &&
+      newCard.cardNumber &&
+      newCard.expiryMonth &&
+      newCard.expiryYear &&
+      newCard.cvv
+    ) {
       const card: PaymentCard = {
         id: Date.now().toString(),
         cardNumber: newCard.cardNumber,
-        cardHolder: 'CHARLOTTE JOHNSON',
+        // Les cartes affichent le titulaire en capitales, comme sur le support.
+        cardHolder: `${newCard.firstName.trim()} ${newCard.lastName.trim()}`.toUpperCase(),
         expiryMonth: newCard.expiryMonth,
         expiryYear: newCard.expiryYear,
         cvv: newCard.cvv
       };
       setSavedCards([...savedCards, card]);
-      setNewCard({ cardNumber: '', expiryMonth: '', expiryYear: '', cvv: '' });
+      setNewCard({ firstName: '', lastName: '', cardNumber: '', expiryMonth: '', expiryYear: '', cvv: '' });
       setShowAddCardForm(false);
     }
   };
-  
-  const handleDeleteCard = (id: string) => {
-    setSavedCards(savedCards.filter(card => card.id !== id));
+
+  // Suppression en deux temps : la carte est mise en attente, la modale confirme.
+  const handleDeleteCard = (card: PaymentCard) => {
+    setCardPendingDelete(card);
+  };
+
+  const confirmDeleteCard = () => {
+    if (!cardPendingDelete) return;
+    setSavedCards(savedCards.filter(card => card.id !== cardPendingDelete.id));
+    setCardPendingDelete(null);
   };
   
   const formatCardNumber = (value: string) => {
@@ -472,7 +491,8 @@ const AccountSettings = () => {
                               <div className="flex justify-between items-start">
                                 <img src={CardIcon} alt="Card" className="w-12 h-12" />
                                 <button
-                                  onClick={() => handleDeleteCard(card.id)}
+                                  onClick={() => handleDeleteCard(card)}
+                                  aria-label={t('accountSettings.paymentMethods.deleteCard.trigger')}
                                   className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors cursor-pointer"
                                 >
                                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -520,6 +540,31 @@ const AccountSettings = () => {
                   </div>
                   <div className="max-w-2xl">
                     <div className="space-y-4">
+                      {/* Identité du titulaire — exigée par les prestataires de paiement */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.firstName')}</label>
+                          <input
+                            type="text"
+                            value={newCard.firstName}
+                            onChange={(e) => setNewCard({ ...newCard, firstName: e.target.value })}
+                            placeholder={t('accountSettings.paymentMethods.firstNamePlaceholder')}
+                            className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
+                            required
+                          />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.lastName')}</label>
+                          <input
+                            type="text"
+                            value={newCard.lastName}
+                            onChange={(e) => setNewCard({ ...newCard, lastName: e.target.value })}
+                            placeholder={t('accountSettings.paymentMethods.lastNamePlaceholder')}
+                            className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-input-gray focus:outline-none focus:border-primary transition-all"
+                            required
+                          />
+                        </div>
+                      </div>
                       <div className="flex flex-col gap-2">
                         <label className="text-sm font-medium text-black">{t('accountSettings.paymentMethods.cardNumber')}</label>
                         <input
@@ -741,24 +786,9 @@ const AccountSettings = () => {
                 <p className="text-sm text-black">••••••••</p>
               </div>
               
-              {/* Two-factor Authentication Section */}
-              <div className="pt-6 border-t border-[#EEEEEE] mb-8">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-base font-semibold text-black mb-1">{t('accountSettings.loginSecurity.twoFactor.title')}</h3>
-                    <p className="text-sm text-[#4F4F4F]">{t('accountSettings.loginSecurity.twoFactor.description')}</p>
-                  </div>
-                  <label className="relative inline-flex items-center cursor-pointer ms-6 shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={twoFactorEnabled}
-                      onChange={(e) => setTwoFactorEnabled(e.target.checked)}
-                      className="sr-only peer"
-                    />
-                    <div className="w-11 h-6 bg-[#BCBCBC] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000] hover:shadow-md hover:ring-2 hover:ring-[#FF4000]/20"></div>
-                  </label>
-                </div>
-              </div>
+              {/* Authentification à deux facteurs — hors périmètre de cette version
+                  (ORM-015). Masquée côté interface, le code back reste en place
+                  pour une réactivation ultérieure. */}
 
               {/* Danger Zone */}
               <div className="pt-6 border-t border-red-100">
@@ -1287,6 +1317,18 @@ const AccountSettings = () => {
           </div>
         </div>
       )}
+
+      {/* Confirmation avant suppression d'une carte — action irréversible */}
+      <ConfirmDialog
+        isOpen={cardPendingDelete !== null}
+        title={t('accountSettings.paymentMethods.deleteCard.title')}
+        message={t('accountSettings.paymentMethods.deleteCard.message', {
+          card: cardPendingDelete ? getMaskedCardNumber(cardPendingDelete.cardNumber) : ''
+        })}
+        confirmText={t('accountSettings.paymentMethods.deleteCard.confirm')}
+        onConfirm={confirmDeleteCard}
+        onCancel={() => setCardPendingDelete(null)}
+      />
     </div>
   );
 };

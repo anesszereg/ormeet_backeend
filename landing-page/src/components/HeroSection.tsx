@@ -1,16 +1,49 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import {
+  popularWilayas,
+  searchWilayas,
+  wilayaLabel,
+  type Locale,
+} from "@ormeet/i18n";
 
 import { FRONTEND_ORIGIN } from "@/lib/constants";
+
+/** Nombre de wilayas proposées à la fois, pour garder la liste lisible. */
+const MAX_SUGGESTIONS = 10;
 
 const HeroSection = () => {
   const tHero = useTranslations("landing.hero");
   const tSearch = useTranslations("landing.search");
+  const locale = useLocale() as Locale;
   const [where, setWhere] = useState("");
   const [what, setWhat] = useState("");
+  const [showWilayas, setShowWilayas] = useState(false);
+  const whereRef = useRef<HTMLDivElement>(null);
+
+  // Avant toute saisie : les 10 wilayas principales. Dès la première frappe :
+  // recherche sur les 58, par numéro ou par nom dans les trois langues.
+  const wilayaSuggestions = useMemo(
+    () =>
+      where.trim()
+        ? searchWilayas(where, locale).slice(0, MAX_SUGGESTIONS)
+        : popularWilayas,
+    [where, locale]
+  );
+
+  /** Referme la liste au clic en dehors du champ */
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (whereRef.current && !whereRef.current.contains(e.target as Node)) {
+        setShowWilayas(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   /** Build the search URL and redirect to the front-end search-results page */
   const handleSearch = useCallback(() => {
@@ -26,7 +59,12 @@ const HeroSection = () => {
   /** Allow pressing Enter in either input to trigger search */
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === "Enter") handleSearch();
+      if (e.key === "Enter") {
+        setShowWilayas(false);
+        handleSearch();
+      } else if (e.key === "Escape") {
+        setShowWilayas(false);
+      }
     },
     [handleSearch]
   );
@@ -59,18 +97,52 @@ const HeroSection = () => {
           </div>
 
           {/* Where Section */}
-          <div className="flex flex-col flex-1 min-w-0 ps-2">
+          <div className="relative flex flex-col flex-1 min-w-0 ps-2" ref={whereRef}>
             <span className="text-xs font-semibold text-black leading-tight">
               {tSearch("whereLabel")}
             </span>
             <input
               type="text"
               value={where}
-              onChange={(e) => setWhere(e.target.value)}
+              onChange={(e) => {
+                setWhere(e.target.value);
+                setShowWilayas(true);
+              }}
+              onFocus={() => setShowWilayas(true)}
               onKeyDown={handleKeyDown}
               placeholder={tSearch("wherePlaceholder")}
               className="text-sm font-medium text-black bg-transparent outline-none placeholder:text-input-gray placeholder:font-normal w-full"
+              role="combobox"
+              aria-expanded={showWilayas}
+              aria-controls="wilaya-listbox"
+              aria-autocomplete="list"
+              autoComplete="off"
             />
+
+            {showWilayas && wilayaSuggestions.length > 0 && (
+              <ul
+                id="wilaya-listbox"
+                role="listbox"
+                className="absolute start-0 top-full mt-3 w-[240px] max-w-[80vw] max-h-[380px] overflow-y-auto bg-white border border-light-gray rounded-2xl shadow-lg py-2 z-50"
+              >
+                {wilayaSuggestions.map((wilaya) => (
+                  <li key={wilaya.code}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={where === wilaya[locale]}
+                      onClick={() => {
+                        setWhere(wilaya[locale]);
+                        setShowWilayas(false);
+                      }}
+                      className="w-full px-4 py-2 text-start text-sm text-black hover:bg-secondary-light transition-colors cursor-pointer"
+                    >
+                      {wilayaLabel(wilaya, locale)}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Divider */}

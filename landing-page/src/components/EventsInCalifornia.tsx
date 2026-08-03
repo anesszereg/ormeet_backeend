@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
+import { type Locale, type Wilaya } from "@ormeet/i18n";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
@@ -17,29 +18,31 @@ interface EventsInCaliforniaProps {
   events: LandingEvent[];
   /** True after the fetch settled. */
   hasLoaded: boolean;
-  /** City selected in the DiscoverSection dropdown */
-  selectedCity?: string;
+  /** Wilaya selected in the DiscoverSection dropdown */
+  selectedWilaya: Wilaya;
 }
 
 const EventsInCalifornia = ({
   events,
   hasLoaded,
-  selectedCity = "California",
+  selectedWilaya,
 }: EventsInCaliforniaProps) => {
   const t = useTranslations("landing.city");
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
-  // Filter to events whose city/venue matches the selected city.
+  // Filter to events whose city/venue matches the selected wilaya. On compare
+  // sur les trois graphies (le back peut stocker « Alger » comme « Algiers »).
   // If no match, show every event (still real data).
   const filtered = useMemo(() => {
-    const needle = selectedCity.toLowerCase();
-    const matches = events.filter(
-      (e) =>
-        e.city.toLowerCase().includes(needle) ||
-        e.venue.toLowerCase().includes(needle),
+    const needles = [selectedWilaya.fr, selectedWilaya.en, selectedWilaya.ar].map((n) =>
+      n.toLowerCase(),
     );
+    const matches = events.filter((e) => {
+      const haystack = `${e.city} ${e.venue}`.toLowerCase();
+      return needles.some((n) => haystack.includes(n));
+    });
     return matches.length > 0 ? matches : events;
-  }, [events, selectedCity]);
+  }, [events, selectedWilaya]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
   const { page, handlePrev, handleNext } = usePagination({ totalPages });
@@ -54,7 +57,7 @@ const EventsInCalifornia = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          {t("headingPrefix")} <span className="font-bold">{selectedCity}</span>
+          {t("headingPrefix")} <span className="font-bold">{selectedWilaya[locale]}</span>
         </h2>
         <PaginationControls
           page={page}

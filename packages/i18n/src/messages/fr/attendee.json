@@ -110,6 +110,7 @@
     },
     "stats": {
       "reviews": "avis",
+      "goToReviews": "Voir les avis",
       "views": "vues",
       "favorites": "favoris"
     },
@@ -524,10 +525,20 @@
         "description": "Enregistrez un moyen de paiement en toute sécurité pour réserver vos billets rapidement. Vous pouvez le modifier à tout moment.",
         "addButton": "Ajouter un moyen de paiement"
       },
+      "deleteCard": {
+        "trigger": "Supprimer cette carte",
+        "title": "Supprimer cette carte ?",
+        "message": "La carte {{card}} sera retirée de votre compte. Cette action est irréversible.",
+        "confirm": "Supprimer"
+      },
       "savedCards": "Cartes enregistrées",
       "addMore": "Ajouter",
       "addPaymentTitle": "Ajouter un moyen de paiement",
       "addPaymentSubtitle": "Ajoutez votre carte pour profiter d'une expérience de réservation fluide.",
+      "firstName": "Prénom du titulaire",
+      "firstNamePlaceholder": "Prénom tel qu'inscrit sur la carte",
+      "lastName": "Nom du titulaire",
+      "lastNamePlaceholder": "Nom tel qu'inscrit sur la carte",
       "cardNumber": "Numéro de carte",
       "cardNumberPlaceholder": "0000    0000    0000    0000",
       "expireMonth": "Mois d'expiration",
