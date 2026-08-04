@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
@@ -47,8 +47,11 @@ interface EventData {
   badge: string;
   date: string;
   time: string;
+  dateType: "one_time" | "multiple";
   venue: string;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   organizerId: string;
   organizerName: string;
   organizerWebsite: string;
@@ -261,8 +264,11 @@ const EventDetailsGlobal = () => {
           badge: event.status === "published" ? "trending" : "",
           date: dateStr,
           time: timeStr,
+          dateType: event.dateType,
           venue: event.venue?.name || event.customLocation?.city || "TBA",
           address: venueAddress,
+          latitude: event.venue?.latitude ?? null,
+          longitude: event.venue?.longitude ?? null,
           organizerId: event.organizerId || "",
           // Raison sociale en priorité ; le nom du compte ne sert que de repli
           // pour les organisateurs sans organisation renseignée (ORM-022).
@@ -378,6 +384,69 @@ const EventDetailsGlobal = () => {
     };
     fetchEventData();
   }, [eventId, user]);
+
+  /** Récupère à nouveau les avis et la note moyenne sans recharger toute la
+   * page. Permet de garder la section "Reviews" à jour (nouvel avis approuvé,
+   * avis publié depuis un autre onglet, etc.) sans forcer un rafraîchissement
+   * complet de l'événement. */
+  const refreshReviews = useCallback(async () => {
+    if (!eventId) return;
+    try {
+      const [reviews, avgRating] = await Promise.all([
+        reviewService.getByEvent(eventId).catch(() => [] as ApiReview[]),
+        reviewService
+          .getEventAverageRating(eventId)
+          .catch(() => ({ average: 0, count: 0 })),
+      ]);
+
+      const mappedReviews: ReviewItem[] = reviews.map(
+        (r: ApiReview, i: number) => ({
+          id: r.id || i + 1,
+          name: r.user?.name || "Anonymous",
+          avatar:
+            r.user?.profilePhoto ||
+            `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
+          date: new Date(r.createdAt).toLocaleDateString(
+            localeMap[i18n.language] || "en-US",
+            { year: "numeric", month: "long", day: "numeric" },
+          ),
+          rating: r.rating,
+          comment: r.comment || "",
+        }),
+      );
+      setAllReviews(mappedReviews);
+      setEventData((prev) =>
+        prev
+          ? {
+              ...prev,
+              rating: avgRating.average || 0,
+              reviewCount:
+                avgRating.count > 1000
+                  ? `${(avgRating.count / 1000).toFixed(1)}K`
+                  : String(avgRating.count || 0),
+            }
+          : prev,
+      );
+    } catch (err) {
+      console.error("Failed to refresh reviews:", err);
+    }
+  }, [eventId, i18n.language]);
+
+  // Garde les avis à jour : à chaque fois que l'onglet redevient visible ou
+  // reprend le focus (ex: retour depuis la page "Écrire un avis"), on
+  // recharge les avis sans attendre un rechargement complet de la page.
+  useEffect(() => {
+    const handleFocusOrVisible = () => {
+      if (document.visibilityState === "hidden") return;
+      refreshReviews();
+    };
+    window.addEventListener("focus", handleFocusOrVisible);
+    document.addEventListener("visibilitychange", handleFocusOrVisible);
+    return () => {
+      window.removeEventListener("focus", handleFocusOrVisible);
+      document.removeEventListener("visibilitychange", handleFocusOrVisible);
+    };
+  }, [refreshReviews]);
 
   const cardsPerPage = 5;
   const totalPages = Math.ceil(trendingEvents.length / cardsPerPage);
@@ -512,20 +581,60 @@ const EventDetailsGlobal = () => {
     setSelectedTimeSlot(timeSlot);
   };
 
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch {
+      // Fall through to the legacy fallback below.
+    }
+    // Legacy fallback for browsers/insecure contexts without the Clipboard API.
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      const copied = document.execCommand("copy");
+      document.body.removeChild(textarea);
+      return copied;
+    } catch {
+      return false;
+    }
+  };
+
   const handleShare = async () => {
     const url = window.location.href;
     const title = eventData?.title || document.title;
-    try {
-      if (navigator.share) {
+
+    if (navigator.share) {
+      try {
         await navigator.share({ title, url });
-      } else if (navigator.clipboard) {
-        await navigator.clipboard.writeText(url);
-        alert(
-          t("eventDetails.alerts.copiedLink", "Event link copied to clipboard"),
-        );
+        return;
+      } catch (err: any) {
+        // User cancelled the native share sheet — nothing else to do.
+        if (err?.name === "AbortError") return;
+        // Any other failure (e.g. unsupported target) falls back to copy below.
       }
-    } catch {
-      // User cancelled or sharing not supported — ignore.
+    }
+
+    const copied = await copyToClipboard(url);
+    if (copied) {
+      alert(
+        t("eventDetails.alerts.copiedLink", "Event link copied to clipboard"),
+      );
+    } else {
+      alert(
+        t(
+          "eventDetails.alerts.copyFailed",
+          "Couldn't copy the link automatically. Here it is: {{url}}",
+          { url },
+        ),
+      );
     }
   };
 
@@ -859,17 +968,19 @@ const EventDetailsGlobal = () => {
                   <span className="text-[#757575] mx-2">|</span>{" "}
                   {eventData.time}
                 </p>
-                <button
-                  onClick={() => setShowDateTimeSection(!showDateTimeSection)}
-                  className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
-                >
-                  {showDateTimeSection
-                    ? t("eventDetails.dateTime.closeCalendar")
-                    : t("eventDetails.dateTime.changeDate")}
-                </button>
+                {eventData.dateType === "multiple" && (
+                  <button
+                    onClick={() => setShowDateTimeSection(!showDateTimeSection)}
+                    className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
+                  >
+                    {showDateTimeSection
+                      ? t("eventDetails.dateTime.closeCalendar")
+                      : t("eventDetails.dateTime.changeDate")}
+                  </button>
+                )}
 
                 {/* Inline Calendar Section */}
-                {showDateTimeSection && (
+                {eventData.dateType === "multiple" && showDateTimeSection && (
                   <div className="mt-4 bg-white border border-[#EEEEEE] rounded-2xl p-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {/* Calendar */}
@@ -1040,7 +1151,12 @@ const EventDetailsGlobal = () => {
                   <div className="mt-4 bg-white border border-[#EEEEEE] rounded-2xl overflow-hidden">
                     <div className="relative w-full h-[400px] lg:h-[500px]">
                       <iframe
-                        src={`https://www.google.com/maps?q=${encodeURIComponent(eventData.address || eventData.venue)}&output=embed`}
+                        src={
+                          eventData.latitude != null &&
+                          eventData.longitude != null
+                            ? `https://www.google.com/maps?q=${eventData.latitude},${eventData.longitude}&z=16&output=embed`
+                            : `https://www.google.com/maps?q=${encodeURIComponent(eventData.address || eventData.venue)}&output=embed`
+                        }
                         width="100%"
                         height="100%"
                         style={{ border: 0 }}

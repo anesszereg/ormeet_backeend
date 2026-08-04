@@ -1,5 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import authService, { User, LoginDto, RegisterDto, LoginWithCodeDto } from '../services/authService';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import authService, {
+  User,
+  LoginDto,
+  RegisterDto,
+  LoginWithCodeDto,
+} from "../services/authService";
 
 interface AuthContextType {
   user: User | null;
@@ -8,7 +19,9 @@ interface AuthContextType {
   isLoading: boolean;
   login: (data: LoginDto) => Promise<void>;
   loginWithCode: (data: LoginWithCodeDto) => Promise<void>;
-  register: (data: RegisterDto) => Promise<{ user: User; token: string; message?: string }>;
+  register: (
+    data: RegisterDto,
+  ) => Promise<{ user: User; token: string; message?: string }>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -28,17 +41,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initAuth = async () => {
       const currentUser = authService.getCurrentUser();
       const token = authService.getToken();
-      
+
       if (currentUser && token) {
         setUser(currentUser);
         // Fetch fresh profile from the server in the background
         try {
           const freshUser = await authService.getCurrentUserFromServer();
           setUser(freshUser);
-        } catch (err) {
-          // Token may be expired — clear auth state
-          authService.logout();
-          setUser(null);
+        } catch (err: any) {
+          // Only clear auth state if the token is actually invalid/expired
+          // (401/403). Transient failures (network hiccup, timeout, 5xx,
+          // temporary CORS issue) must NOT log the user out — keep the
+          // cached user from localStorage instead.
+          const status = err?.response?.status;
+          if (status === 401 || status === 403) {
+            authService.logout();
+            setUser(null);
+          }
         }
       }
       setIsLoading(false);
@@ -52,9 +71,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // On localhost → omits domain so it stays shared across all local ports.
   useEffect(() => {
     const hostname = window.location.hostname;
-    const parts = hostname.split('.');
-    const parentDomain = parts.length >= 2 ? '.' + parts.slice(-2).join('.') : '';
-    const domainAttr = parentDomain ? `; domain=${parentDomain}` : '';
+    const parts = hostname.split(".");
+    const parentDomain =
+      parts.length >= 2 ? "." + parts.slice(-2).join(".") : "";
+    const domainAttr = parentDomain ? `; domain=${parentDomain}` : "";
 
     if (user) {
       document.cookie = `ormeet_auth=${user.role}; path=/${domainAttr}; max-age=${7 * 24 * 3600}; SameSite=Lax`;
@@ -66,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Cross-tab session sync: when another tab logs in/out, mirror the localStorage change.
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === 'token') {
+      if (e.key === "token") {
         if (!e.newValue) {
           // Logged out in another tab — clear local auth state so protected routes redirect.
           setUser(null);
@@ -75,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const currentUser = authService.getCurrentUser();
           setUser(currentUser);
         }
-      } else if (e.key === 'user') {
+      } else if (e.key === "user") {
         if (!e.newValue) {
           setUser(null);
         } else {
@@ -87,8 +107,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, [user]);
 
   const login = async (data: LoginDto) => {
@@ -143,7 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
