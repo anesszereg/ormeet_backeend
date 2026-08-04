@@ -134,14 +134,19 @@ function signOff(): string {
 
 // ─── EXPORTED TEMPLATE BUILDERS ─────────────────────────────────────────────
 
-export function welcomeEmailHtml(name: string, verificationUrl: string): string {
-  return baseLayout('Welcome to Ormeet', `
-    ${heading('Welcome to Ormeet!')}
-    ${subheading('Your event journey starts here.')}
+export function welcomeEmailHtml(
+  name: string,
+  verificationUrl: string,
+): string {
+  return baseLayout(
+    "Welcome to Ormeet",
+    `
+    ${heading("Welcome to Ormeet!")}
+    ${subheading("Your event journey starts here.")}
     ${greeting(name)}
-    ${paragraph('Thank you for joining <strong>Ormeet</strong> — your all-in-one platform for discovering, creating, and managing events.')}
-    ${paragraph('To get started, please verify your email address:')}
-    ${primaryButton('Verify Email Address', verificationUrl)}
+    ${paragraph("Thank you for joining <strong>Ormeet</strong> — your all-in-one platform for discovering, creating, and managing events.")}
+    ${paragraph("To get started, please verify your email address:")}
+    ${primaryButton("Verify Email Address", verificationUrl)}
     ${linkText(verificationUrl)}
     ${infoBox(`
       <p style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:#E0234E;">What you can do with Ormeet:</p>
@@ -153,46 +158,61 @@ export function welcomeEmailHtml(name: string, verificationUrl: string): string 
         ⭐ Share reviews and ratings
       </p>
     `)}
-    ${paragraph('If you didn\'t create this account, please ignore this email.')}
+    ${paragraph("If you didn't create this account, please ignore this email.")}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
-export function verificationEmailHtml(name: string, verificationUrl: string): string {
-  return baseLayout('Verify Your Email', `
-    ${heading('Verify Your Email')}
-    ${subheading('One quick step to activate your account.')}
+export function verificationEmailHtml(
+  name: string,
+  verificationUrl: string,
+): string {
+  return baseLayout(
+    "Verify Your Email",
+    `
+    ${heading("Verify Your Email")}
+    ${subheading("One quick step to activate your account.")}
     ${greeting(name)}
-    ${paragraph('Please verify your email address to complete your registration on Ormeet.')}
-    ${primaryButton('Verify Email Address', verificationUrl)}
+    ${paragraph("Please verify your email address to complete your registration on Ormeet.")}
+    ${primaryButton("Verify Email Address", verificationUrl)}
     ${linkText(verificationUrl)}
     ${paragraph('<span style="color:#BCBCBC;font-size:12px;">This link will expire in 24 hours.</span>')}
-    ${paragraph('If you didn\'t request this, please ignore this email.')}
+    ${paragraph("If you didn't request this, please ignore this email.")}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
 export function passwordResetEmailHtml(name: string, resetUrl: string): string {
-  return baseLayout('Reset Your Password', `
-    ${heading('Reset Your Password')}
-    ${subheading('We received a request to reset your password.')}
+  return baseLayout(
+    "Reset Your Password",
+    `
+    ${heading("Reset Your Password")}
+    ${subheading("We received a request to reset your password.")}
     ${greeting(name)}
-    ${paragraph('Click the button below to choose a new password for your Ormeet account.')}
-    ${primaryButton('Reset Password', resetUrl)}
+    ${paragraph("Click the button below to choose a new password for your Ormeet account.")}
+    ${primaryButton("Reset Password", resetUrl)}
     ${linkText(resetUrl)}
     ${warningBox(`
       <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:#FF3425;">⚠️ Important</p>
       <p style="margin:0;font-size:13px;color:#434343;line-height:1.6;">This link will expire in 1 hour. If you didn't request a password reset, please ignore this email or contact support.</p>
     `)}
-    ${paragraph('For security reasons, never share this link with anyone.')}
+    ${paragraph("For security reasons, never share this link with anyone.")}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
-export function passwordChangedEmailHtml(name: string, supportEmail: string): string {
-  return baseLayout('Password Changed', `
-    ${heading('Password Changed Successfully')}
-    ${subheading('Your account password has been updated.')}
+export function passwordChangedEmailHtml(
+  name: string,
+  supportEmail: string,
+): string {
+  return baseLayout(
+    "Password Changed",
+    `
+    ${heading("Password Changed Successfully")}
+    ${subheading("Your account password has been updated.")}
     ${greeting(name)}
     ${successBox(`
       <p style="margin:0;font-size:13px;color:#0F9335;font-weight:600;">✓ Your password was changed successfully.</p>
@@ -201,52 +221,66 @@ export function passwordChangedEmailHtml(name: string, supportEmail: string): st
       <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:#FF3425;">🔐 Wasn't you?</p>
       <p style="margin:0;font-size:13px;color:#434343;line-height:1.6;">If you didn't make this change, contact our support team immediately at <a href="mailto:${supportEmail}" style="color:#E0234E;font-weight:600;">${supportEmail}</a></p>
     `)}
-    ${paragraph('<strong>Security Tips:</strong>')}
+    ${paragraph("<strong>Security Tips:</strong>")}
     <ul style="margin:0 0 16px 0;padding-left:20px;font-size:13px;color:#434343;line-height:2;">
       <li>Never share your password with anyone</li>
       <li>Use a unique password for each account</li>
       <li>Enable two-factor authentication when available</li>
     </ul>
     ${signOff()}
-  `);
+  `,
+  );
 }
 
-export function loginNotificationEmailHtml(name: string, loginTime: string, ipAddress: string, userAgent: string): string {
-  return baseLayout('New Login Detected', `
-    ${heading('New Login Detected')}
-    ${subheading('We noticed a new sign-in to your account.')}
+export function loginNotificationEmailHtml(
+  name: string,
+  loginTime: string,
+  ipAddress: string,
+  userAgent: string,
+): string {
+  return baseLayout(
+    "New Login Detected",
+    `
+    ${heading("New Login Detected")}
+    ${subheading("We noticed a new sign-in to your account.")}
     ${greeting(name)}
     ${infoBox(`
       <p style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:#E0234E;">Login Details</p>
       ${detailTable(
-        detailRow('Time', loginTime) +
-        detailRow('IP Address', ipAddress) +
-        detailRow('Device', userAgent)
+        detailRow("Time", loginTime) +
+          detailRow("IP Address", ipAddress) +
+          detailRow("Device", userAgent),
       )}
     `)}
-    ${paragraph('If this was you, you can safely ignore this email.')}
+    ${paragraph("If this was you, you can safely ignore this email.")}
     ${warningBox(`
       <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:#FF3425;">Not you?</p>
       <p style="margin:0;font-size:13px;color:#434343;line-height:1.6;">Change your password immediately and review your recent account activity.</p>
     `)}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
-export function verificationCodeEmailHtml(code: string, purpose: string): string {
+export function verificationCodeEmailHtml(
+  code: string,
+  purpose: string,
+): string {
   const purposeLabels: Record<string, string> = {
-    login: 'Login',
-    registration: 'Registration',
-    email_verification: 'Email Verification',
-    phone_verification: 'Phone Verification',
-    password_reset: 'Password Reset',
+    login: "Login",
+    registration: "Registration",
+    email_verification: "Email Verification",
+    phone_verification: "Phone Verification",
+    password_reset: "Password Reset",
   };
   const purposeLabel = purposeLabels[purpose] || purpose;
 
-  return baseLayout('Your Verification Code', `
-    ${heading('Your Verification Code')}
+  return baseLayout(
+    "Your Verification Code",
+    `
+    ${heading("Your Verification Code")}
     ${subheading(`For: ${purposeLabel}`)}
-    ${paragraph('Use the code below to continue. It expires in <strong>10 minutes</strong>.')}
+    ${paragraph("Use the code below to continue. It expires in <strong>10 minutes</strong>.")}
     <div style="background:#FFF4F3;border:2px dashed #E0234E;border-radius:12px;padding:24px;text-align:center;margin:24px 0;">
       <p style="margin:0 0 8px 0;font-size:12px;color:#4F4F4F;text-transform:uppercase;letter-spacing:1px;">Verification Code</p>
       <p style="margin:0;font-size:40px;font-weight:700;color:#E0234E;letter-spacing:10px;font-family:'Courier New',monospace;">${code}</p>
@@ -259,9 +293,10 @@ export function verificationCodeEmailHtml(code: string, purpose: string): string
         <li>Valid for 10 minutes only (3 attempts max)</li>
       </ul>
     `)}
-    ${paragraph('If you didn\'t request this code, please ignore this email.')}
+    ${paragraph("If you didn't request this code, please ignore this email.")}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
 export function orderConfirmationEmailHtml(orderData: {
@@ -278,8 +313,10 @@ export function orderConfirmationEmailHtml(orderData: {
   total: number;
   currency: string;
 }): string {
-  const currency = 'DZD';
-  const ticketsHtml = orderData.tickets.map(t => `
+  const currency = "DZD";
+  const ticketsHtml = orderData.tickets
+    .map(
+      (t) => `
     <div style="background:#FFF4F3;border-radius:8px;padding:16px 20px;margin-bottom:12px;">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
         <tr>
@@ -293,15 +330,20 @@ export function orderConfirmationEmailHtml(orderData: {
         </tr>
       </table>
     </div>
-  `).join('');
+  `,
+    )
+    .join("");
 
-  const discountRow = orderData.discount > 0
-    ? `<tr><td style="padding:6px 0;font-size:13px;color:#34A853;">Discount</td><td align="right" style="padding:6px 0;font-size:13px;color:#34A853;">-${currency} ${orderData.discount.toFixed(2)}</td></tr>`
-    : '';
+  const discountRow =
+    orderData.discount > 0
+      ? `<tr><td style="padding:6px 0;font-size:13px;color:#34A853;">Discount</td><td align="right" style="padding:6px 0;font-size:13px;color:#34A853;">-${currency} ${orderData.discount.toFixed(2)}</td></tr>`
+      : "";
 
-  return baseLayout('Order Confirmation', `
-    ${heading('Order Confirmed!')}
-    ${subheading('Your tickets are ready.')}
+  return baseLayout(
+    "Order Confirmation",
+    `
+    ${heading("Order Confirmed!")}
+    ${subheading("Your tickets are ready.")}
     ${greeting(orderData.customerName)}
     ${successBox(`<p style="margin:0;font-size:14px;color:#0F9335;font-weight:600;">✓ Payment successful — your order is confirmed.</p>`)}
 
@@ -328,7 +370,8 @@ export function orderConfirmationEmailHtml(orderData: {
 
     <p style="margin:0;font-size:12px;color:#BCBCBC;">Order ID: ${orderData.orderId}</p>
     ${signOff()}
-  `);
+  `,
+  );
 }
 
 export function teamInviteEmailHtml(
@@ -338,24 +381,30 @@ export function teamInviteEmailHtml(
   inviteCode: string,
   inviteUrl: string,
 ): string {
-  return baseLayout(`You're Invited to ${organizationName}`, `
+  return baseLayout(
+    `You're Invited to ${organizationName}`,
+    `
     ${heading("You're Invited!")}
     ${subheading(`Join ${organizationName} on Ormeet.`)}
     ${paragraph(`<strong style="color:#000000;">${inviterName}</strong> has invited you to join <strong style="color:#000000;">${organizationName}</strong> as a <strong style="color:#E0234E;">${roleName}</strong>.`)}
 
     ${infoBox(`
       ${detailTable(
-        detailRow('Organization', organizationName) +
-        detailRow('Role', roleName) +
-        detailRow('Invite Code', `<code style="background:#FFF4F3;padding:2px 8px;border-radius:4px;color:#E0234E;font-weight:600;">${inviteCode}</code>`)
+        detailRow("Organization", organizationName) +
+          detailRow("Role", roleName) +
+          detailRow(
+            "Invite Code",
+            `<code style="background:#FFF4F3;padding:2px 8px;border-radius:4px;color:#E0234E;font-weight:600;">${inviteCode}</code>`,
+          ),
       )}
     `)}
 
-    ${primaryButton('Accept Invitation', inviteUrl)}
+    ${primaryButton("Accept Invitation", inviteUrl)}
     ${paragraph(`Or use invite code <strong style="color:#E0234E;">${inviteCode}</strong> when signing up.`)}
     ${paragraph('<span style="color:#BCBCBC;font-size:12px;">This invitation expires in 7 days.</span>')}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
 export function eventReminderEmailHtml(reminderData: {
@@ -368,25 +417,28 @@ export function eventReminderEmailHtml(reminderData: {
   hoursUntilEvent: number;
   frontendUrl: string;
 }): string {
-  const timeLabel = reminderData.hoursUntilEvent >= 24
-    ? `${Math.round(reminderData.hoursUntilEvent / 24)} day(s)`
-    : reminderData.hoursUntilEvent === 0
-      ? 'now'
-      : `${reminderData.hoursUntilEvent} hour(s)`;
+  const timeLabel =
+    reminderData.hoursUntilEvent >= 24
+      ? `${Math.round(reminderData.hoursUntilEvent / 24)} day(s)`
+      : reminderData.hoursUntilEvent === 0
+        ? "now"
+        : `${reminderData.hoursUntilEvent} hour(s)`;
 
   const ticketHtml = reminderData.ticketCode
     ? `<div style="background:#FFF4F3;border:2px dashed #E0234E;border-radius:10px;padding:16px;text-align:center;margin:20px 0;">
         <p style="margin:0 0 4px 0;font-size:11px;color:#4F4F4F;text-transform:uppercase;letter-spacing:1px;">Your Ticket Code</p>
         <p style="margin:0;font-size:24px;font-weight:700;color:#E0234E;letter-spacing:5px;font-family:'Courier New',monospace;">${reminderData.ticketCode}</p>
-        ${reminderData.ticketType ? `<p style="margin:6px 0 0 0;font-size:12px;color:#4F4F4F;">${reminderData.ticketType}</p>` : ''}
+        ${reminderData.ticketType ? `<p style="margin:6px 0 0 0;font-size:12px;color:#4F4F4F;">${reminderData.ticketType}</p>` : ""}
       </div>`
-    : '';
+    : "";
 
-  return baseLayout('Event Reminder', `
-    ${heading('Your Event is Coming Up!')}
+  return baseLayout(
+    "Event Reminder",
+    `
+    ${heading("Your Event is Coming Up!")}
     ${subheading(`Starting in ${timeLabel}`)}
     ${greeting(reminderData.attendeeName)}
-    ${paragraph('This is a friendly reminder about your upcoming event.')}
+    ${paragraph("This is a friendly reminder about your upcoming event.")}
 
     ${infoBox(`
       <p style="margin:0 0 4px 0;font-size:15px;font-weight:600;color:#E0234E;">📅 ${reminderData.eventTitle}</p>
@@ -408,10 +460,11 @@ export function eventReminderEmailHtml(reminderData: {
       <li>Bring a valid ID if required</li>
     </ul>
 
-    ${primaryButton('View Event Details', reminderData.frontendUrl)}
-    ${paragraph('We hope you have an amazing time!')}
+    ${primaryButton("View Event Details", reminderData.frontendUrl)}
+    ${paragraph("We hope you have an amazing time!")}
     ${signOff()}
-  `);
+  `,
+  );
 }
 
 export function checkInConfirmationEmailHtml(checkInData: {
@@ -426,10 +479,14 @@ export function checkInConfirmationEmailHtml(checkInData: {
   seatInfo?: string;
   supportEmail: string;
 }): string {
-  const seatRow = checkInData.seatInfo ? detailRow('Seat', checkInData.seatInfo) : '';
+  const seatRow = checkInData.seatInfo
+    ? detailRow("Seat", checkInData.seatInfo)
+    : "";
 
-  return baseLayout('Check-In Confirmed', `
-    ${heading('Check-In Confirmed!')}
+  return baseLayout(
+    "Check-In Confirmed",
+    `
+    ${heading("Check-In Confirmed!")}
     ${subheading("You're all set — enjoy the event.")}
     ${greeting(checkInData.attendeeName)}
 
@@ -447,14 +504,56 @@ export function checkInConfirmationEmailHtml(checkInData: {
     <div style="background:#F8F8F8;border-radius:8px;padding:16px 20px;margin:20px 0;">
       <p style="margin:0 0 12px 0;font-size:14px;font-weight:600;color:#000000;">Check-In Details</p>
       ${detailTable(
-        detailRow('Ticket Code', `<code style="background:#FFF4F3;padding:2px 8px;border-radius:4px;color:#E0234E;font-weight:600;">${checkInData.ticketCode}</code>`) +
-        detailRow('Ticket Type', checkInData.ticketType) +
-        detailRow('Method', checkInData.checkInMethod.toUpperCase()) +
-        seatRow
+        detailRow(
+          "Ticket Code",
+          `<code style="background:#FFF4F3;padding:2px 8px;border-radius:4px;color:#E0234E;font-weight:600;">${checkInData.ticketCode}</code>`,
+        ) +
+          detailRow("Ticket Type", checkInData.ticketType) +
+          detailRow("Method", checkInData.checkInMethod.toUpperCase()) +
+          seatRow,
       )}
     </div>
 
     ${paragraph(`Need help? Contact us at <a href="mailto:${checkInData.supportEmail}" style="color:#E0234E;font-weight:600;">${checkInData.supportEmail}</a>`)}
     ${signOff()}
-  `);
+  `,
+  );
+}
+
+export function newsletterSubscriptionEmailHtml(locale: string = "en"): string {
+  const messages: Record<
+    string,
+    { title: string; headline: string; body: string; cta: string }
+  > = {
+    en: {
+      title: "Welcome to the Ormeet Newsletter",
+      headline: "You're subscribed!",
+      body: "Thanks for joining our newsletter. You will be the first to know about upcoming events, exclusive offers, and the latest updates from Ormeet.",
+      cta: "Explore Events",
+    },
+    fr: {
+      title: "Bienvenue à la newsletter Ormeet",
+      headline: "Vous êtes abonné !",
+      body: "Merci de vous être inscrit à notre newsletter. Vous serez le premier informé des événements à venir, des offres exclusives et des dernières actualités d'Ormeet.",
+      cta: "Explorer les événements",
+    },
+    ar: {
+      title: "مرحبًا بك في نشرة أورميت الإخبارية",
+      headline: "لقد تم اشتراكك!",
+      body: "شكرًا لانضمامك إلى نشرتنا الإخبارية. ستكون أول من يعرف بالفعاليات القادمة والعروض الحصرية وأحدث تحديثات أورميت.",
+      cta: "استكشف الفعاليات",
+    },
+  };
+
+  const m = messages[locale] || messages.en;
+
+  return baseLayout(
+    m.title,
+    `
+    ${heading(m.headline)}
+    ${subheading(m.body)}
+    ${paragraph("If you ever want to stop receiving these emails, you can unsubscribe at any time by contacting our support team.")}
+    ${signOff()}
+  `,
+  );
 }
