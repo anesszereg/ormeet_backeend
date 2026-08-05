@@ -3,7 +3,8 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
-import { popularWilayas, type Locale, type Wilaya } from "@ormeet/i18n";
+import { eventCategories, popularWilayas, type Locale, type Wilaya } from "@ormeet/i18n";
+import { matchesCategory, matchesWilaya, upcomingOnly, bySoonest } from "@/lib/eventFilters";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 
@@ -11,16 +12,8 @@ import type { LandingEvent } from "@/lib/api";
 /*  Static data                                                        */
 /* ------------------------------------------------------------------ */
 
-const CATEGORIES = [
-  { key: "all", label: "All Categories" },
-  { key: "music", label: "Music" },
-  { key: "sports", label: "Sports" },
-  { key: "foodDrink", label: "Food & Drink" },
-  { key: "artPerformance", label: "Art & Performance" },
-] as const;
-
-type CategoryKey = (typeof CATEGORIES)[number]["key"];
-type Category = (typeof CATEGORIES)[number]["label"];
+/** Nombre d'événements affichés sans filtre de catégorie. */
+const MAX_EVENTS = 6;
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop";
@@ -34,45 +27,13 @@ interface DiscoverSectionProps {
   events: LandingEvent[];
   /** True after the fetch settled. */
   hasLoaded: boolean;
-  /** Callback when user selects a different wilaya */
-  onWilayaChange?: (wilaya: Wilaya) => void;
+  /** Wilaya sélectionnée, ou null pour « toutes les wilayas ». */
+  onWilayaChange?: (wilaya: Wilaya | null) => void;
 }
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
 /* ------------------------------------------------------------------ */
-
-/**
- * Map a free-form backend category (e.g. "Music", "music",
- * "Open-mic night") onto one of our pill buckets. Anything that doesn't
- * match a known bucket falls into "Art & Performance" so it still shows
- * up under at least one filter.
- */
-const bucketFor = (raw: string): Category => {
-  const c = raw.trim().toLowerCase();
-  if (!c) return "Art & Performance";
-  if (
-    c.includes("music") ||
-    c.includes("concert") ||
-    c.includes("dj") ||
-    c.includes("party")
-  ) return "Music";
-  if (
-    c.includes("sport") ||
-    c.includes("marathon") ||
-    c.includes("game") ||
-    c.includes("football") ||
-    c.includes("soccer")
-  ) return "Sports";
-  if (
-    c.includes("food") ||
-    c.includes("drink") ||
-    c.includes("wine") ||
-    c.includes("dine") ||
-    c.includes("tasting")
-  ) return "Food & Drink";
-  return "Art & Performance";
-};
 
 const DiscoverSection = ({
   events,
@@ -80,15 +41,13 @@ const DiscoverSection = ({
   onWilayaChange,
 }: DiscoverSectionProps) => {
   const t = useTranslations("landing.discover");
+  const tCategories = useTranslations("common.eventCategories");
   const locale = useLocale() as Locale;
   const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
-  // Alger par défaut : marché principal de la plateforme.
-  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya>(popularWilayas[0]);
-  const [activeCategoryKey, setActiveCategoryKey] = useState<CategoryKey>("all");
-  const activeCategory = useMemo<Category>(
-    () => CATEGORIES.find((c) => c.key === activeCategoryKey)!.label,
-    [activeCategoryKey]
-  );
+  // null = toutes les wilayas, valeur par défaut : on montre tout le catalogue
+  // avant que l'utilisateur ne restreigne à une wilaya.
+  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya | null>(null);
+  const [activeCategoryKey, setActiveCategoryKey] = useState<string>("all");
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -104,7 +63,7 @@ const DiscoverSection = ({
   }, []);
 
   const handleWilayaSelect = useCallback(
-    (wilaya: Wilaya) => {
+    (wilaya: Wilaya | null) => {
       setSelectedWilaya(wilaya);
       setIsCityDropdownOpen(false);
       onWilayaChange?.(wilaya);
@@ -116,19 +75,34 @@ const DiscoverSection = ({
    * "All Categories" shows up to 6 most-recent real events; selecting
    * a specific bucket filters by its mapped category.
    */
+  /**
+   * La section annonce « les événements à {wilaya} » : elle doit donc filtrer
+   * sur le lieu, ce qu'elle ne faisait pas — seul le titre changeait. On croise
+   * maintenant wilaya ET catégorie, en écartant les événements passés.
+   */
   const filteredEvents = useMemo(() => {
-    if (activeCategory === "All Categories") {
-      return events.slice(0, 6);
-    }
-    return events.filter((e) => bucketFor(e.category) === activeCategory);
-  }, [events, activeCategory]);
+    const inWilaya = upcomingOnly(events)
+      .filter((e) => (selectedWilaya ? matchesWilaya(e, selectedWilaya) : true))
+      .sort(bySoonest);
+    if (activeCategoryKey === "all") return inWilaya.slice(0, MAX_EVENTS);
+    const category = eventCategories.find((c) => c.key === activeCategoryKey);
+    if (!category) return [];
+    return inWilaya
+      .filter((e) => matchesCategory(e, category.key, category.searchTerm))
+      .slice(0, MAX_EVENTS);
+  }, [events, activeCategoryKey, selectedWilaya]);
 
   return (
     <section className="w-full flex flex-col items-center pt-10 pb-6 bg-white">
       {/* Heading — city name is dynamic */}
       <h2 className="text-2xl md:text-3xl text-center text-black mb-8">
-        <span className="font-bold">{t("headingPrefix")}</span> {t("headingMiddle")}{" "}
-        <span className="font-bold">{selectedWilaya[locale]}</span>
+        {/* Sans wilaya, on emploie la variante sans préposition : « les
+            événements à » ne se dit pas devant « partout en Algérie ». */}
+        <span className="font-bold">{t("headingPrefix")}</span>{" "}
+        {selectedWilaya ? t("headingMiddle") : t("headingMiddleEverywhere")}{" "}
+        <span className="font-bold">
+          {selectedWilaya ? selectedWilaya[locale] : t("headingEverywhere")}
+        </span>
       </h2>
 
       {/* Location + Categories Row */}
@@ -150,7 +124,7 @@ const DiscoverSection = ({
               className="shrink-0 -ms-1"
             />
             <span className="text-sm font-medium text-black flex-1 text-start">
-              {selectedWilaya[locale]}
+              {selectedWilaya ? selectedWilaya[locale] : t("allWilayas")}
             </span>
             <svg
               width="16"
@@ -177,14 +151,27 @@ const DiscoverSection = ({
               role="listbox"
               className="absolute top-full start-0 mt-2 w-full bg-white border border-light-gray rounded-xl shadow-lg z-30 py-1 max-h-[280px] overflow-y-auto"
             >
+              {/* Choix par défaut : tout le catalogue, sans restriction de lieu */}
+              <li
+                role="option"
+                aria-selected={selectedWilaya === null}
+                onClick={() => handleWilayaSelect(null)}
+                className={`px-4 py-2.5 text-sm cursor-pointer transition-colors border-b border-light-gray ${
+                  selectedWilaya === null
+                    ? "bg-primary-light text-primary font-semibold"
+                    : "text-black hover:bg-secondary-light"
+                }`}
+              >
+                {t("allWilayas")}
+              </li>
               {popularWilayas.map((wilaya) => (
                 <li
                   key={wilaya.code}
                   role="option"
-                  aria-selected={wilaya.code === selectedWilaya.code}
+                  aria-selected={wilaya.code === selectedWilaya?.code}
                   onClick={() => handleWilayaSelect(wilaya)}
                   className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                    wilaya.code === selectedWilaya.code
+                    wilaya.code === selectedWilaya?.code
                       ? "bg-primary-light text-primary font-semibold"
                       : "text-black hover:bg-secondary-light"
                   }`}
@@ -199,9 +186,20 @@ const DiscoverSection = ({
         {/* Divider */}
         <div className="w-px h-8 bg-light-gray hidden md:block" />
 
-        {/* Category Pills */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {CATEGORIES.map((category) => (
+        {/* Pastilles de catégories — issues du référentiel partagé, pour que le
+            filtre corresponde à ce que l'organisateur a réellement choisi. */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          <button
+            onClick={() => setActiveCategoryKey("all")}
+            className={`px-5 py-2.5 text-sm font-medium rounded-full transition-colors duration-200 cursor-pointer ${
+              activeCategoryKey === "all"
+                ? "bg-black text-white"
+                : "bg-white text-black border border-light-gray hover:bg-secondary-light"
+            }`}
+          >
+            {t("categories.all")}
+          </button>
+          {eventCategories.map((category) => (
             <button
               key={category.key}
               onClick={() => setActiveCategoryKey(category.key)}
@@ -211,7 +209,7 @@ const DiscoverSection = ({
                   : "bg-white text-black border border-light-gray hover:bg-secondary-light"
               }`}
             >
-              {t(`categories.${category.key}`)}
+              {tCategories(category.key)}
             </button>
           ))}
         </div>
@@ -271,7 +269,9 @@ const DiscoverSection = ({
         {/* Empty state */}
         {hasLoaded && filteredEvents.length === 0 && (
           <p className="text-center text-medium-gray py-12 text-sm">
-            {t("empty")}
+            {selectedWilaya
+              ? t("empty", { wilaya: selectedWilaya[locale] })
+              : t("emptyEverywhere")}
           </p>
         )}
       </div>

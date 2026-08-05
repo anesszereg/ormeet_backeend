@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useMemo } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { type Locale, type Wilaya } from "@ormeet/i18n";
+import { matchesWilaya, upcomingOnly, bySoonest } from "@/lib/eventFilters";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
 import { usePagination } from "@/hooks/usePagination";
@@ -18,8 +19,8 @@ interface EventsInCaliforniaProps {
   events: LandingEvent[];
   /** True after the fetch settled. */
   hasLoaded: boolean;
-  /** Wilaya selected in the DiscoverSection dropdown */
-  selectedWilaya: Wilaya;
+  /** Wilaya sélectionnée, ou null pour « toutes les wilayas ». */
+  selectedWilaya: Wilaya | null;
 }
 
 const EventsInCalifornia = ({
@@ -27,21 +28,17 @@ const EventsInCalifornia = ({
   hasLoaded,
   selectedWilaya,
 }: EventsInCaliforniaProps) => {
-  const t = useTranslations("landing.city");
+  const t = useTranslations("landing.city");
   const locale = useLocale() as Locale;
   const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
-  // Filter to events whose city/venue matches the selected wilaya. On compare
-  // sur les trois graphies (le back peut stocker « Alger » comme « Algiers »).
-  // If no match, show every event (still real data).
+  // Événements à venir de la wilaya choisie, les plus proches en premier.
+  // Sans wilaya sélectionnée, tout le catalogue à venir.
   const filtered = useMemo(() => {
-    const needles = [selectedWilaya.fr, selectedWilaya.en, selectedWilaya.ar].map((n) =>
-      n.toLowerCase(),
-    );
-    const matches = events.filter((e) => {
-      const haystack = `${e.city} ${e.venue}`.toLowerCase();
-      return needles.some((n) => haystack.includes(n));
-    });
-    return matches.length > 0 ? matches : events;
+    const upcoming = upcomingOnly(events);
+    const scoped = selectedWilaya
+      ? upcoming.filter((e) => matchesWilaya(e, selectedWilaya))
+      : upcoming;
+    return [...scoped].sort(bySoonest);
   }, [events, selectedWilaya]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
@@ -57,7 +54,13 @@ const EventsInCalifornia = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl text-black">
-          {t("headingPrefix")} <span className="font-bold">{selectedWilaya[locale]}</span>
+          {selectedWilaya ? (
+            <>
+              {t("headingPrefix")} <span className="font-bold">{selectedWilaya[locale]}</span>
+            </>
+          ) : (
+            <span className="font-bold">{t("headingEverywhere")}</span>
+          )}
         </h2>
         <PaginationControls
           page={page}

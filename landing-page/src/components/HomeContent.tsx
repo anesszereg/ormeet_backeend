@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { popularWilayas, type Wilaya } from "@ormeet/i18n";
+import { type Wilaya } from "@ormeet/i18n";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import EventCarousel from "@/components/EventCarousel";
@@ -16,8 +16,8 @@ import Footer from "@/components/Footer";
 import { useLandingEvents } from "@/hooks/useLandingEvents";
 
 export default function HomeContent() {
-  // Alger par défaut : marché principal de la plateforme.
-  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya>(popularWilayas[0]);
+  // null = toutes les wilayas (choix par défaut).
+  const [selectedWilaya, setSelectedWilaya] = useState<Wilaya | null>(null);
   // One backend call shared by every event-listing section below.
   const { events, isLoading, hasLoaded } = useLandingEvents();
 
