@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import countries from "../data/countries";
 
 interface Country {
   name: string;
@@ -10,68 +11,39 @@ interface Country {
 
 interface PhoneInputProps {
   value: string;
-  onChange: (fullPhone: string, countryCode: string, phoneNumber: string) => void;
+  onChange: (
+    fullPhone: string,
+    countryCode: string,
+    phoneNumber: string,
+  ) => void;
   required?: boolean;
   placeholder?: string;
   className?: string;
 }
 
-const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone number', className = '' }: PhoneInputProps) => {
-  const { t } = useTranslation('common');
-  const [countries, setCountries] = useState<Country[]>([]);
-  const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
+const PhoneInput = ({
+  value,
+  onChange,
+  required = false,
+  placeholder = "Phone number",
+  className = "",
+}: PhoneInputProps) => {
+  const { t } = useTranslation("common");
+  const [selectedCountry, setSelectedCountry] = useState<Country | null>(
+    countries.find((c) => c.code === "DZ") || countries[0] || null,
+  );
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Fetch countries from REST Countries API
-  useEffect(() => {
-    const fetchCountries = async () => {
-      try {
-        const response = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2,idd,flag');
-        const data = await response.json();
-        
-        const formattedCountries: Country[] = data
-          .map((country: any) => ({
-            name: country.name.common,
-            code: country.cca2,
-            dialCode: country.idd.root + (country.idd.suffixes?.[0] || ''),
-            flag: country.flag,
-          }))
-          .filter((c: Country) => c.dialCode && c.dialCode !== '+')
-          .sort((a: Country, b: Country) => a.name.localeCompare(b.name));
-
-        setCountries(formattedCountries);
-        
-        // Set default to Algeria (DZ) or first country
-        const defaultCountry = formattedCountries.find(c => c.code === 'DZ') || formattedCountries[0];
-        setSelectedCountry(defaultCountry);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch countries:', error);
-        // Fallback to a basic list with Algeria as default
-        const fallbackCountries: Country[] = [
-          { name: 'Algeria', code: 'DZ', dialCode: '+213', flag: '🇩🇿' },
-          { name: 'Morocco', code: 'MA', dialCode: '+212', flag: '��' },
-          { name: 'Tunisia', code: 'TN', dialCode: '+216', flag: '��' },
-          { name: 'France', code: 'FR', dialCode: '+33', flag: '��' },
-        ];
-        setCountries(fallbackCountries);
-        setSelectedCountry(fallbackCountries[0]); // Algeria
-        setIsLoading(false);
-      }
-    };
-
-    fetchCountries();
-  }, []);
 
   // Parse initial value
   useEffect(() => {
     if (value && countries.length > 0 && !phoneNumber) {
       // Try to extract country code from value
-      const matchedCountry = countries.find(c => value.startsWith(c.dialCode));
+      const matchedCountry = countries.find((c) =>
+        value.startsWith(c.dialCode),
+      );
       if (matchedCountry) {
         setSelectedCountry(matchedCountry);
         setPhoneNumber(value.substring(matchedCountry.dialCode.length));
@@ -82,14 +54,17 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
-        setSearchQuery('');
+        setSearchQuery("");
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +73,11 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
     if (/^\d*$/.test(value)) {
       setPhoneNumber(value);
       if (selectedCountry) {
-        onChange(selectedCountry.dialCode + value, selectedCountry.dialCode, value);
+        onChange(
+          selectedCountry.dialCode + value,
+          selectedCountry.dialCode,
+          value,
+        );
       }
     }
   };
@@ -107,22 +86,14 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
     setSelectedCountry(country);
     onChange(country.dialCode + phoneNumber, country.dialCode, phoneNumber);
     setShowDropdown(false);
-    setSearchQuery('');
+    setSearchQuery("");
   };
 
-  const filteredCountries = countries.filter(country =>
-    country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    country.dialCode.includes(searchQuery)
+  const filteredCountries = countries.filter(
+    (country) =>
+      country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      country.dialCode.includes(searchQuery),
   );
-
-  if (isLoading) {
-    return (
-      <div className="flex gap-2">
-        <div className="w-32 h-[46px] bg-gray-100 animate-pulse rounded-lg"></div>
-        <div className="flex-1 h-[46px] bg-gray-100 animate-pulse rounded-lg"></div>
-      </div>
-    );
-  }
 
   return (
     <div className={`flex gap-2 ${className}`}>
@@ -133,13 +104,25 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
           onClick={() => setShowDropdown(!showDropdown)}
           className="flex items-center gap-2 px-3 py-3.5 border-[1.5px] border-[#EEEEEE] rounded-lg text-sm text-black hover:border-[#FF4000] focus:outline-none focus:border-[#FF4000] focus:ring-[3px] focus:ring-[#FF4000]/10 transition-all bg-white whitespace-nowrap"
         >
-          <span className="text-lg">{selectedCountry?.flag || '🌍'}</span>
-          <span className="font-medium">{selectedCountry?.dialCode || '+1'}</span>
-          <svg className="w-4 h-4 text-[#BCBCBC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <span className="text-lg">{selectedCountry?.flag || "🌍"}</span>
+          <span className="font-medium">
+            {selectedCountry?.dialCode || "+1"}
+          </span>
+          <svg
+            className="w-4 h-4 text-[#BCBCBC]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
-        
+
         {/* Dropdown */}
         {showDropdown && (
           <div className="absolute top-full start-0 mt-1 w-[280px] max-w-[calc(100vw-2rem)] bg-white border border-[#EEEEEE] rounded-lg shadow-lg z-50">
@@ -147,13 +130,13 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
             <div className="p-3 border-b border-[#EEEEEE]">
               <input
                 type="text"
-                placeholder={t('phoneInput.searchPlaceholder')}
+                placeholder={t("phoneInput.searchPlaceholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm focus:outline-none focus:border-[#FF4000] focus:ring-2 focus:ring-[#FF4000]/10"
               />
             </div>
-            
+
             {/* Country List */}
             <div className="max-h-60 overflow-y-auto">
               {filteredCountries.length > 0 ? (
@@ -163,24 +146,30 @@ const PhoneInput = ({ value, onChange, required = false, placeholder = 'Phone nu
                     type="button"
                     onClick={() => handleCountrySelect(country)}
                     className={`w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#FFF4F3] text-start transition-colors ${
-                      selectedCountry?.code === country.code ? 'bg-[#FFF4F3]' : ''
+                      selectedCountry?.code === country.code
+                        ? "bg-[#FFF4F3]"
+                        : ""
                     }`}
                   >
                     <span className="text-lg">{country.flag}</span>
-                    <span className="text-sm text-black flex-1 truncate">{country.name}</span>
-                    <span className="text-sm text-[#757575] font-medium">{country.dialCode}</span>
+                    <span className="text-sm text-black flex-1 truncate">
+                      {country.name}
+                    </span>
+                    <span className="text-sm text-[#757575] font-medium">
+                      {country.dialCode}
+                    </span>
                   </button>
                 ))
               ) : (
                 <div className="px-4 py-8 text-center text-sm text-[#757575]">
-                  {t('phoneInput.noCountriesFound')}
+                  {t("phoneInput.noCountriesFound")}
                 </div>
               )}
             </div>
           </div>
         )}
       </div>
-      
+
       {/* Phone Number Input */}
       <input
         type="tel"

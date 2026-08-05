@@ -1,24 +1,25 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ScheduleModule } from '@nestjs/schedule';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { EventsModule } from './events/events.module';
-import { OrganizationsModule } from './organizations/organizations.module';
-import { VenuesModule } from './venues/venues.module';
-import { ReviewsModule } from './reviews/reviews.module';
-import { TicketTypesModule } from './ticket-types/ticket-types.module';
-import { OrdersModule } from './orders/orders.module';
-import { TicketsModule } from './tickets/tickets.module';
-import { PromotionsModule } from './promotions/promotions.module';
-import { AttendanceModule } from './attendance/attendance.module';
-import { UsersModule } from './users/users.module';
-import { UploadModule } from './upload/upload.module';
-import { UserPreferencesModule } from './user-preferences/user-preferences.module';
-import { NotificationsModule } from './notifications/notifications.module';
-import { BankAccountsModule } from './bank-accounts/bank-accounts.module';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ScheduleModule } from "@nestjs/schedule";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { AuthModule } from "./auth/auth.module";
+import { EventsModule } from "./events/events.module";
+import { OrganizationsModule } from "./organizations/organizations.module";
+import { VenuesModule } from "./venues/venues.module";
+import { ReviewsModule } from "./reviews/reviews.module";
+import { TicketTypesModule } from "./ticket-types/ticket-types.module";
+import { OrdersModule } from "./orders/orders.module";
+import { TicketsModule } from "./tickets/tickets.module";
+import { PromotionsModule } from "./promotions/promotions.module";
+import { AttendanceModule } from "./attendance/attendance.module";
+import { UsersModule } from "./users/users.module";
+import { UploadModule } from "./upload/upload.module";
+import { UserPreferencesModule } from "./user-preferences/user-preferences.module";
+import { NotificationsModule } from "./notifications/notifications.module";
+import { BankAccountsModule } from "./bank-accounts/bank-accounts.module";
+import { NewsletterModule } from "./newsletter/newsletter.module";
 import {
   User,
   Organization,
@@ -37,28 +38,30 @@ import {
   UserFollowingOrganizer,
   Notification,
   BankAccount,
-} from './entities';
+  NewsletterSubscriber,
+} from "./entities";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ".env",
     }),
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        const databaseUrl = configService.get('DATABASE_URL');
-        const isProduction = configService.get('NODE_ENV') === 'production';
+        const databaseUrl = configService.get("DATABASE_URL");
+        const isProduction = configService.get("NODE_ENV") === "production";
         // Allow explicit override — set DATABASE_SYNCHRONIZE=true on Render when deploying schema changes
-        const syncEnv = configService.get<string>('DATABASE_SYNCHRONIZE');
-        const shouldSync = syncEnv !== undefined ? syncEnv === 'true' : !isProduction;
-        
+        const syncEnv = configService.get<string>("DATABASE_SYNCHRONIZE");
+        const shouldSync =
+          syncEnv !== undefined ? syncEnv === "true" : !isProduction;
+
         // Support both DATABASE_URL and individual variables
         if (databaseUrl) {
           return {
-            type: 'postgres',
+            type: "postgres",
             url: databaseUrl,
             entities: [
               User,
@@ -78,6 +81,7 @@ import {
               UserFollowingOrganizer,
               Notification,
               BankAccount,
+              NewsletterSubscriber,
             ],
             synchronize: shouldSync,
             logging: !isProduction,
@@ -87,14 +91,14 @@ import {
             },
           };
         }
-        
+
         return {
-          type: 'postgres',
-          host: configService.get('DATABASE_HOST'),
-          port: configService.get('DATABASE_PORT'),
-          username: configService.get('DATABASE_USERNAME'),
-          password: configService.get('DATABASE_PASSWORD'),
-          database: configService.get('DATABASE_NAME'),
+          type: "postgres",
+          host: configService.get("DATABASE_HOST"),
+          port: configService.get("DATABASE_PORT"),
+          username: configService.get("DATABASE_USERNAME"),
+          password: configService.get("DATABASE_PASSWORD"),
+          database: configService.get("DATABASE_NAME"),
           entities: [
             User,
             Organization,
@@ -113,6 +117,7 @@ import {
             UserFollowingOrganizer,
             Notification,
             BankAccount,
+            NewsletterSubscriber,
           ],
           synchronize: shouldSync,
           logging: !isProduction,
@@ -136,6 +141,7 @@ import {
     UserPreferencesModule,
     NotificationsModule,
     BankAccountsModule,
+    NewsletterModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -27,7 +27,7 @@ export const formatDateTime = (date: string | Date, locale = 'en-US'): string =>
 /**
  * Format currency
  */
-export const formatCurrency = (amount: number, currency: string = 'USD', locale = 'en-US'): string => {
+export const formatCurrency = (amount: number, currency: string = 'DZD', locale = 'fr-DZ'): string => {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,

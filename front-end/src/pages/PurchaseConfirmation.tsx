@@ -5,6 +5,7 @@ import EventDetailsNavbar from '../components/EventDetailsNavbar';
 import orderService, { CreateOrderDto, Order } from '../services/orderService';
 import eventService from '../services/eventService';
 import { useAuth } from '../context/AuthContext';
+import { formatCurrency } from '../utils/formatters';
 
 // Fallback event image
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
@@ -128,7 +129,7 @@ const PurchaseConfirmation: React.FC = () => {
               title: e.title,
               date: startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
               venue: e.venue?.name || '',
-              price: e.ticketTypes?.[0] ? `$${Number(e.ticketTypes[0].price).toFixed(2)}` : 'Free',
+              price: e.ticketTypes?.[0] ? formatCurrency(Number(e.ticketTypes[0].price)) : 'Free',
             };
           });
         setRecommendedEvents(filtered);

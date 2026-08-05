@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from "next-intl";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // Main app URL - update this for production
-const MAIN_APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5173';
+const MAIN_APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5173";
 
 const Navbar = () => {
   const t = useTranslations("common.nav");
@@ -21,7 +21,9 @@ const Navbar = () => {
   /** Body scroll lock */
   useEffect(() => {
     document.body.style.overflow = drawerOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [drawerOpen]);
 
   /** Close on Escape */
@@ -34,27 +36,36 @@ const Navbar = () => {
   }, [closeDrawer]);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [dashboardUrl, setDashboardUrl] = useState(`${MAIN_APP_URL}/dashboard-attendee`);
+  const [dashboardUrl, setDashboardUrl] = useState(
+    `${MAIN_APP_URL}/dashboard-attendee`,
+  );
 
   useEffect(() => {
-    const LS_KEY = 'ormeet_lp_auth';
+    const LS_KEY = "ormeet_lp_auth";
     const params = new URLSearchParams(window.location.search);
 
     // Helper: apply role and persist to localStorage for back-button survival
     const applyAuth = (role: string) => {
       setIsLoggedIn(true);
-      if (role === 'organizer') setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
+      if (role === "organizer")
+        setDashboardUrl(`${MAIN_APP_URL}/dashboard-organizer`);
       try {
         localStorage.setItem(LS_KEY, JSON.stringify({ role, ts: Date.now() }));
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     };
 
     // 0. Logout signal — clear any persisted state and show login/signup
-    if (params.get('logout') === '1') {
-      try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+    if (params.get("logout") === "1") {
+      try {
+        localStorage.removeItem(LS_KEY);
+      } catch {
+        /* ignore */
+      }
       const clean = new URL(window.location.href);
-      clean.searchParams.delete('logout');
-      window.history.replaceState({}, '', clean.toString());
+      clean.searchParams.delete("logout");
+      window.history.replaceState({}, "", clean.toString());
       return;
     }
 
@@ -66,10 +77,10 @@ const Navbar = () => {
     }
 
     // 2. URL params (passed by handleLogoClick / redirectAfterLogin on cross-origin navigation)
-    const authParam = params.get('auth');
-    const roleParam = params.get('role') || 'attendee';
-    const redirectUrl = params.get('redirect');
-    if (authParam === '1') {
+    const authParam = params.get("auth");
+    const roleParam = params.get("role") || "attendee";
+    const redirectUrl = params.get("redirect");
+    if (authParam === "1") {
       applyAuth(roleParam);
       if (redirectUrl) {
         // Login flow: bounce through landing page to set localStorage, then forward to dashboard
@@ -77,9 +88,9 @@ const Navbar = () => {
         return;
       }
       const clean = new URL(window.location.href);
-      clean.searchParams.delete('auth');
-      clean.searchParams.delete('role');
-      window.history.replaceState({}, '', clean.toString());
+      clean.searchParams.delete("auth");
+      clean.searchParams.delete("role");
+      window.history.replaceState({}, "", clean.toString());
       return;
     }
 
@@ -97,7 +108,11 @@ const Navbar = () => {
         }
       }
     } catch {
-      try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+      try {
+        localStorage.removeItem(LS_KEY);
+      } catch {
+        /* ignore */
+      }
     }
   }, []);
 
@@ -152,7 +167,7 @@ const Navbar = () => {
             <>
               {/* Log In — desktop only */}
               <a
-                href={`${MAIN_APP_URL}/login`}
+                href={`${MAIN_APP_URL}/onboarding-choice`}
                 className="hidden md:inline-flex px-5 py-2 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >
                 {t("login")}
@@ -176,8 +191,19 @@ const Navbar = () => {
             aria-expanded={drawerOpen}
             aria-controls="mobile-drawer"
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-              <path d="M3 6h16M3 11h16M3 16h16" stroke="#181818" strokeWidth="1.8" strokeLinecap="round" />
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 22 22"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M3 6h16M3 11h16M3 16h16"
+                stroke="#181818"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
@@ -201,7 +227,9 @@ const Navbar = () => {
         aria-modal="true"
         aria-label={t("openMenu")}
         className={`fixed inset-y-0 end-0 z-50 w-[280px] max-w-[85vw] bg-white flex flex-col shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
-          drawerOpen ? "translate-x-0" : "translate-x-full rtl:-translate-x-full"
+          drawerOpen
+            ? "translate-x-0"
+            : "translate-x-full rtl:-translate-x-full"
         }`}
       >
         {/* Drawer header */}
@@ -211,7 +239,12 @@ const Navbar = () => {
             onClick={closeDrawer}
             className="flex items-center gap-2"
           >
-            <Image src="/svgs/Logo.svg" alt="Ormeet Logo" width={24} height={32} />
+            <Image
+              src="/svgs/Logo.svg"
+              alt="Ormeet Logo"
+              width={24}
+              height={32}
+            />
             <span className="text-lg font-bold text-black">Ormeet</span>
           </Link>
           <button
@@ -219,8 +252,19 @@ const Navbar = () => {
             className="w-11 h-11 flex items-center justify-center rounded-lg hover:bg-secondary-light transition-colors cursor-pointer"
             aria-label={t("closeMenu")}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-              <path d="M5 5l10 10M15 5L5 15" stroke="#181818" strokeWidth="1.8" strokeLinecap="round" />
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M5 5l10 10M15 5L5 15"
+                stroke="#181818"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
@@ -267,7 +311,7 @@ const Navbar = () => {
           ) : (
             <>
               <a
-                href={`${MAIN_APP_URL}/login`}
+                href={`${MAIN_APP_URL}/onboarding-choice`}
                 onClick={closeDrawer}
                 className="flex items-center justify-center h-12 w-full text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
               >

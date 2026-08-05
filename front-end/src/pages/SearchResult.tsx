@@ -5,6 +5,7 @@ import SearchResultNavbar from '../components/SearchResultNavbar';
 import EventCard from '../components/EventCard';
 import EventListCard from '../components/EventListCard';
 import eventService, { Event as ApiEvent } from '../services/eventService';
+import { formatCurrency } from '../utils/formatters';
 
 import EventImageFallback from '../assets/imges/event myticket 1.jpg';
 
@@ -76,7 +77,7 @@ const SearchResult = () => {
             title: e.title,
             date: startDate.toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric' }),
             venue: e.venue?.name || (e as any).customLocation?.city || '',
-            price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : `$${lowestPrice.toFixed(2)}`,
+            price: lowestPrice === Infinity || lowestPrice === 0 ? 'Free' : formatCurrency(lowestPrice),
             description: e.shortDescription || '',
             isPast,
             availableSpots,

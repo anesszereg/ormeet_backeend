@@ -9,22 +9,22 @@ import PaginationControls from "@/components/ui/PaginationControls";
 
 const allCityPages: CityCard[][] = [
   [
-    { id: 1, name: "California", price: "$49.99", image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&h=900&fit=crop" },
-    { id: 2, name: "Tehran", price: "$49.99", image: "https://images.unsplash.com/photo-1562979314-bee7453e911c?w=600&h=900&fit=crop" },
-    { id: 3, name: "Los Angeles", price: "$49.99", image: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=600&h=900&fit=crop" },
-    { id: 4, name: "Oran", price: "$49.99", image: "https://images.unsplash.com/photo-1597953601374-1ff2d5640c85?w=600&h=900&fit=crop" },
+    { id: 1, name: "California", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=600&h=900&fit=crop" },
+    { id: 2, name: "Tehran", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1562979314-bee7453e911c?w=600&h=900&fit=crop" },
+    { id: 3, name: "Los Angeles", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1534190760961-74e8c1c5c3da?w=600&h=900&fit=crop" },
+    { id: 4, name: "Oran", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1597953601374-1ff2d5640c85?w=600&h=900&fit=crop" },
   ],
   [
-    { id: 5, name: "New York", price: "$49.99", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&h=900&fit=crop" },
-    { id: 6, name: "Paris", price: "$49.99", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=900&fit=crop" },
-    { id: 7, name: "London", price: "$49.99", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=900&fit=crop" },
-    { id: 8, name: "Dubai", price: "$49.99", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=900&fit=crop" },
+    { id: 5, name: "New York", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&h=900&fit=crop" },
+    { id: 6, name: "Paris", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&h=900&fit=crop" },
+    { id: 7, name: "London", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=600&h=900&fit=crop" },
+    { id: 8, name: "Dubai", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&h=900&fit=crop" },
   ],
   [
-    { id: 9, name: "Tokyo", price: "$49.99", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=900&fit=crop" },
-    { id: 10, name: "Barcelona", price: "$49.99", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&h=900&fit=crop" },
-    { id: 11, name: "Istanbul", price: "$49.99", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=600&h=900&fit=crop" },
-    { id: 12, name: "Sydney", price: "$49.99", image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&h=900&fit=crop" },
+    { id: 9, name: "Tokyo", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&h=900&fit=crop" },
+    { id: 10, name: "Barcelona", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&h=900&fit=crop" },
+    { id: 11, name: "Istanbul", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=600&h=900&fit=crop" },
+    { id: 12, name: "Sydney", price: "49.99 DZD", image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=600&h=900&fit=crop" },
   ],
 ];
 

@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 // ========== Types ==========
 
@@ -14,7 +14,7 @@ export interface Review {
   user?: {
     id: string;
     name: string;
-    profilePhoto?: string;
+    avatarUrl?: string;
   };
   event?: {
     id: string;
@@ -42,8 +42,12 @@ export interface AverageRating {
 // ========== Service ==========
 
 class ReviewService {
-  async getAll(params?: { eventId?: string; userId?: string; approved?: boolean }): Promise<Review[]> {
-    const response = await api.get<Review[]>('/reviews', { params });
+  async getAll(params?: {
+    eventId?: string;
+    userId?: string;
+    approved?: boolean;
+  }): Promise<Review[]> {
+    const response = await api.get<Review[]>("/reviews", { params });
     return response.data;
   }
 
@@ -53,7 +57,9 @@ class ReviewService {
   }
 
   async getEventAverageRating(eventId: string): Promise<AverageRating> {
-    const response = await api.get<AverageRating>(`/reviews/event/${eventId}/average`);
+    const response = await api.get<AverageRating>(
+      `/reviews/event/${eventId}/average`,
+    );
     return response.data;
   }
 
@@ -63,7 +69,7 @@ class ReviewService {
   }
 
   async create(data: CreateReviewDto): Promise<Review> {
-    const response = await api.post<Review>('/reviews', data);
+    const response = await api.post<Review>("/reviews", data);
     return response.data;
   }
 

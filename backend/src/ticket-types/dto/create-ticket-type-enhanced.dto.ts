@@ -41,7 +41,7 @@ export class CreateTicketTypeEnhancedDto {
   @Min(0)
   price: number;
 
-  @ApiPropertyOptional({ example: 'USD', default: 'USD' })
+  @ApiPropertyOptional({ example: 'DZD', default: 'DZD' })
   @IsOptional()
   @IsString()
   currency?: string;

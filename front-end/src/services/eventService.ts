@@ -1,4 +1,4 @@
-import api from './api';
+import api from "./api";
 
 export interface Event {
   id: string;
@@ -11,12 +11,12 @@ export interface Event {
     name: string;
     logo?: string;
   };
-  status: 'draft' | 'published' | 'cancelled';
+  status: "draft" | "published" | "cancelled";
   category?: string;
   tags?: string[];
   images?: string[];
   videos?: string[];
-  locationType: 'physical' | 'online' | 'to_be_announced';
+  locationType: "physical" | "online" | "to_be_announced";
   venueId?: string;
   venue?: {
     id: string;
@@ -25,6 +25,8 @@ export interface Event {
     city: string;
     state?: string;
     country: string;
+    latitude?: number;
+    longitude?: number;
   };
   customLocation?: {
     address: string;
@@ -36,11 +38,11 @@ export interface Event {
   };
   onlineLink?: string;
   onlineInstructions?: string;
-  dateType: 'one_time' | 'multiple';
+  dateType: "one_time" | "multiple";
   startAt: string;
   endAt: string;
   timezone?: string;
-  recurringPattern?: 'daily' | 'weekly' | 'monthly' | 'custom';
+  recurringPattern?: "daily" | "weekly" | "monthly" | "custom";
   recurringCount?: number;
   recurringEndDate?: string;
   sessions?: Array<{
@@ -107,7 +109,7 @@ export interface CreateEventDto {
   venueId?: string;
   capacity?: number;
   images?: string[];
-  locationType?: 'physical' | 'online' | 'to_be_announced';
+  locationType?: "physical" | "online" | "to_be_announced";
 }
 
 class EventService {
@@ -116,7 +118,7 @@ class EventService {
     category?: string;
     organizerId?: string;
   }) {
-    const response = await api.get<Event[]>('/events', { params });
+    const response = await api.get<Event[]>("/events", { params });
     return response.data;
   }
 
@@ -126,7 +128,7 @@ class EventService {
   }
 
   async createEvent(data: CreateEventDto) {
-    const response = await api.post<Event>('/events', data);
+    const response = await api.post<Event>("/events", data);
     return response.data;
   }
 
@@ -161,7 +163,9 @@ class EventService {
   }
 
   async sendReminders(id: string) {
-    const response = await api.post<{ message: string }>(`/events/${id}/send-reminders`);
+    const response = await api.post<{ message: string }>(
+      `/events/${id}/send-reminders`,
+    );
     return response.data;
   }
 }

@@ -22,6 +22,7 @@ export class PdfTicketService {
     total: number;
     currency: string;
   }): Promise<Buffer> {
+    const currency = 'DZD';
     return new Promise(async (resolve, reject) => {
       try {
         const doc = new PDFDocument({
@@ -183,7 +184,7 @@ export class PdfTicketService {
             .fontSize(18)
             .fillColor('#FF4000')
             .font('Helvetica-Bold')
-            .text(`${orderData.currency} ${ticket.price.toFixed(2)}`, 400, ticketY + 18, {
+            .text(`${currency} ${ticket.price.toFixed(2)}`, 400, ticketY + 18, {
               align: 'right',
               width: 115,
             });
@@ -283,7 +284,7 @@ export class PdfTicketService {
         let currentY = summaryBoxY + 20;
 
         doc.text(`Subtotal:`, 70, currentY);
-        doc.text(`${orderData.currency} ${orderData.subtotal.toFixed(2)}`, summaryX, currentY, {
+        doc.text(`${currency} ${orderData.subtotal.toFixed(2)}`, summaryX, currentY, {
           align: 'right',
           width: 145,
         });
@@ -292,7 +293,7 @@ export class PdfTicketService {
         if (orderData.discount > 0) {
           doc.fillColor('#27ae60').font('Helvetica-Bold');
           doc.text(`Discount:`, 70, currentY);
-          doc.text(`-${orderData.currency} ${orderData.discount.toFixed(2)}`, summaryX, currentY, {
+          doc.text(`-${currency} ${orderData.discount.toFixed(2)}`, summaryX, currentY, {
             align: 'right',
             width: 145,
           });
@@ -301,14 +302,14 @@ export class PdfTicketService {
         }
 
         doc.text(`Service Fee:`, 70, currentY);
-        doc.text(`${orderData.currency} ${orderData.serviceFee.toFixed(2)}`, summaryX, currentY, {
+        doc.text(`${currency} ${orderData.serviceFee.toFixed(2)}`, summaryX, currentY, {
           align: 'right',
           width: 145,
         });
         currentY += 20;
 
         doc.text(`Processing Fee:`, 70, currentY);
-        doc.text(`${orderData.currency} ${orderData.processingFee.toFixed(2)}`, summaryX, currentY, {
+        doc.text(`${currency} ${orderData.processingFee.toFixed(2)}`, summaryX, currentY, {
           align: 'right',
           width: 145,
         });
@@ -328,7 +329,7 @@ export class PdfTicketService {
           .fillColor('#27ae60')
           .font('Helvetica-Bold')
           .text(`Total Paid:`, 70, currentY);
-        doc.text(`${orderData.currency} ${orderData.total.toFixed(2)}`, summaryX, currentY, {
+        doc.text(`${currency} ${orderData.total.toFixed(2)}`, summaryX, currentY, {
           align: 'right',
           width: 145,
         });

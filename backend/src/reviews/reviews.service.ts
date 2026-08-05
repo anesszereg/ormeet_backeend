@@ -3,11 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Review } from '../entities';
-import { CreateReviewDto, UpdateReviewDto } from './dto';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { Review } from "../entities";
+import { CreateReviewDto, UpdateReviewDto } from "./dto";
 
 @Injectable()
 export class ReviewsService {
@@ -27,11 +27,16 @@ export class ReviewsService {
 
     if (existingReview) {
       throw new BadRequestException(
-        'You have already reviewed this event. Please update your existing review.',
+        "You have already reviewed this event. Please update your existing review.",
       );
     }
 
-    const review = this.reviewRepository.create(createReviewDto);
+    // Auto-approve reviews so users see their own review immediately after
+    // posting. Moderators can still reject inappropriate ones via /reject.
+    const review = this.reviewRepository.create({
+      ...createReviewDto,
+      approved: true,
+    });
     return await this.reviewRepository.save(review);
   }
 
@@ -40,28 +45,28 @@ export class ReviewsService {
     userId?: string;
     approved?: boolean;
   }): Promise<Review[]> {
-    const query = this.reviewRepository.createQueryBuilder('review');
+    const query = this.reviewRepository.createQueryBuilder("review");
 
     if (filters?.eventId) {
-      query.andWhere('review.eventId = :eventId', {
+      query.andWhere("review.eventId = :eventId", {
         eventId: filters.eventId,
       });
     }
 
     if (filters?.userId) {
-      query.andWhere('review.userId = :userId', { userId: filters.userId });
+      query.andWhere("review.userId = :userId", { userId: filters.userId });
     }
 
     if (filters?.approved !== undefined) {
-      query.andWhere('review.approved = :approved', {
+      query.andWhere("review.approved = :approved", {
         approved: filters.approved,
       });
     }
 
     query
-      .leftJoinAndSelect('review.user', 'user')
-      .leftJoinAndSelect('review.event', 'event')
-      .orderBy('review.createdAt', 'DESC');
+      .leftJoinAndSelect("review.user", "user")
+      .leftJoinAndSelect("review.event", "event")
+      .orderBy("review.createdAt", "DESC");
 
     return await query.getMany();
   }
@@ -69,7 +74,7 @@ export class ReviewsService {
   async findOne(id: string): Promise<Review> {
     const review = await this.reviewRepository.findOne({
       where: { id },
-      relations: ['user', 'event'],
+      relations: ["user", "event"],
     });
 
     if (!review) {
@@ -82,17 +87,17 @@ export class ReviewsService {
   async findByEvent(eventId: string): Promise<Review[]> {
     return await this.reviewRepository.find({
       where: { eventId, approved: true },
-      relations: ['user'],
-      order: { createdAt: 'DESC' },
+      relations: ["user"],
+      order: { createdAt: "DESC" },
     });
   }
 
   async getEventAverageRating(eventId: string): Promise<number> {
     const result = await this.reviewRepository
-      .createQueryBuilder('review')
-      .select('AVG(review.rating)', 'average')
-      .where('review.eventId = :eventId', { eventId })
-      .andWhere('review.approved = :approved', { approved: true })
+      .createQueryBuilder("review")
+      .select("AVG(review.rating)", "average")
+      .where("review.eventId = :eventId", { eventId })
+      .andWhere("review.approved = :approved", { approved: true })
       .getRawOne();
 
     return result.average ? parseFloat(result.average) : 0;
@@ -108,7 +113,7 @@ export class ReviewsService {
     // Check if user owns this review
     if (review.userId !== userId) {
       throw new ForbiddenException(
-        'You do not have permission to update this review',
+        "You do not have permission to update this review",
       );
     }
 
@@ -134,7 +139,7 @@ export class ReviewsService {
     // Only owner or admin can delete
     if (review.userId !== userId && !isAdmin) {
       throw new ForbiddenException(
-        'You do not have permission to delete this review',
+        "You do not have permission to delete this review",
       );
     }
 

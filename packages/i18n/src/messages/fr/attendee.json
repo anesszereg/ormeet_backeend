@@ -94,9 +94,9 @@
         "dec": "Déc"
       },
       "alerts": {
-  "favoriteFailed": "Échec de la mise à jour des favoris",
-  "followFailed": "Échec de la mise à jour de l'abonnement"
-   },
+        "favoriteFailed": "Échec de la mise à jour des favoris",
+        "followFailed": "Échec de la mise à jour de l'abonnement"
+      },
       "timeSlotsAvailable_one": "{{count}} créneau disponible le {{date}}",
       "timeSlotsAvailable_other": "{{count}} créneaux disponibles le {{date}}",
       "selectTime": "Choisissez un créneau qui vous convient parmi les options ci-dessous.",
@@ -216,8 +216,10 @@
       "description": "Recevez les nouveautés exclusives, l'accès en avant-première et une sélection d'événements directement dans votre boîte mail.",
       "emailPlaceholder": "Votre adresse e-mail",
       "ctaButton": "Me tenir informé",
+      "submitting": "Inscription en cours...",
       "success": "Vous êtes abonné !",
-      "error": "Veuillez saisir une adresse e-mail valide."
+      "error": "Veuillez saisir une adresse e-mail valide.",
+      "invalidEmail": "Veuillez saisir une adresse e-mail valide."
     },
     "price": {
       "from": "À partir de"

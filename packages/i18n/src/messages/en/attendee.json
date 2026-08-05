@@ -212,8 +212,10 @@
       "description": "Get exclusive updates, early bird access, and handpicked events — delivered straight to your inbox.",
       "emailPlaceholder": "Enter your email",
       "ctaButton": "Keep Me Updated",
+      "submitting": "Subscribing...",
       "success": "You are subscribed!",
-      "error": "Please enter a valid email address."
+      "error": "Please enter a valid email address.",
+      "invalidEmail": "Please enter a valid email address."
     },
     "price": {
       "from": "From"
