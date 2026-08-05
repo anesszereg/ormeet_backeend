@@ -167,6 +167,12 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({});
   const [ticketErrors, setTicketErrors] = useState<Record<string, Partial<Record<keyof TicketData, string>>>>({});
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  // formData.category stocke la valeur envoyée au back (« Sports ») ; le champ
+  // doit afficher le libellé traduit correspondant (« Sport & Football »).
+  const selectedCategoryLabel = (() => {
+    const match = eventCategories.find((c) => c.searchTerm === formData.category);
+    return match ? tCategories(match.key) : formData.category;
+  })();
   const [isEventTypeDropdownOpen, setIsEventTypeDropdownOpen] = useState(false);
   const [mapLocation, setMapLocation] = useState<string>('');
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
@@ -851,7 +857,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     errors.category ? 'border-[#FF3425]' : 'border-light-gray'
                   } ${formData.category ? 'text-black' : 'text-[#9CA3AF]'}`}
                 >
-                  {formData.category || t('createEvent.form.eventCategoryPlaceholder')}
+                  {selectedCategoryLabel || t('createEvent.form.eventCategoryPlaceholder')}
                   <svg className="w-4 h-4 text-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
