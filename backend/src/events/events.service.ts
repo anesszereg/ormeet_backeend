@@ -2,11 +2,18 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Event, EventStatus, EventDateType, LocationType, EventVisibility, TicketType } from '../entities';
-import { CreateEventDto, UpdateEventDto, CreateEventEnhancedDto } from './dto';
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { In, Repository } from "typeorm";
+import {
+  Event,
+  EventStatus,
+  EventDateType,
+  LocationType,
+  EventVisibility,
+  TicketType,
+} from "../entities";
+import { CreateEventDto, UpdateEventDto, CreateEventEnhancedDto } from "./dto";
 
 @Injectable()
 export class EventsService {
@@ -34,34 +41,34 @@ export class EventsService {
     category?: string;
     organizerId?: string;
   }): Promise<Event[]> {
-    const query = this.eventRepository.createQueryBuilder('event');
+    const query = this.eventRepository.createQueryBuilder("event");
 
     if (filters?.status) {
-      query.andWhere('event.status = :status', { status: filters.status });
+      query.andWhere("event.status = :status", { status: filters.status });
     }
 
     if (filters?.category) {
-      query.andWhere('event.category = :category', {
+      query.andWhere("event.category = :category", {
         category: filters.category,
       });
     }
 
     if (filters?.organizerId) {
-      query.andWhere('event.organizerId = :organizerId', {
+      query.andWhere("event.organizerId = :organizerId", {
         organizerId: filters.organizerId,
       });
     } else if (filters?.status === EventStatus.PUBLISHED) {
       // Public listings only show public events; private events are accessible via direct link.
-      query.andWhere('event.visibility = :visibility', {
+      query.andWhere("event.visibility = :visibility", {
         visibility: EventVisibility.PUBLIC,
       });
     }
 
     query
-      .leftJoinAndSelect('event.organizer', 'organizer')
-      .leftJoinAndSelect('event.venue', 'venue')
-      .leftJoinAndSelect('event.ticketTypes', 'ticketTypes')
-      .orderBy('event.startAt', 'ASC');
+      .leftJoinAndSelect("event.organizer", "organizer")
+      .leftJoinAndSelect("event.venue", "venue")
+      .leftJoinAndSelect("event.ticketTypes", "ticketTypes")
+      .orderBy("event.startAt", "ASC");
 
     return await query.getMany();
   }
@@ -69,7 +76,7 @@ export class EventsService {
   async findOne(id: string): Promise<Event> {
     const event = await this.eventRepository.findOne({
       where: { id },
-      relations: ['organizer', 'venue', 'ticketTypes'],
+      relations: ["organizer", "venue", "ticketTypes"],
     });
 
     if (!event) {
@@ -87,9 +94,23 @@ export class EventsService {
 
     const savedEvent = await this.eventRepository.save(event);
 
-    // Replace ticket types when editing tickets
+    // Replace ticket types when editing tickets.
+    // Ticket types that already have sold tickets are protected by a
+    // foreign key (tickets.ticket_type_id) — deleting them would throw an
+    // uncaught DB error (500). Only remove/recreate the ones that have no
+    // sales yet; leave already-sold ticket types untouched.
     if (tickets && Array.isArray(tickets)) {
-      await this.ticketTypeRepository.delete({ eventId: id });
+      const existingTicketTypes = await this.ticketTypeRepository.find({
+        where: { eventId: id },
+      });
+      const deletableIds = existingTicketTypes
+        .filter((tt) => tt.quantitySold === 0)
+        .map((tt) => tt.id);
+
+      if (deletableIds.length > 0) {
+        await this.ticketTypeRepository.delete({ id: In(deletableIds) });
+      }
+
       if (tickets.length > 0) {
         const newTickets = tickets.map((ticketDto) =>
           this.ticketTypeRepository.create({
@@ -98,14 +119,15 @@ export class EventsService {
             type: ticketDto.type,
             description: ticketDto.description,
             price: ticketDto.price,
-            currency: ticketDto.currency || 'DZD',
+            currency: ticketDto.currency || "DZD",
             quantityTotal: ticketDto.quantityTotal,
             quantitySold: 0,
             maxPerOrder: ticketDto.maxPerOrder,
             ticketBenefits: ticketDto.ticketBenefits,
             salesStart: ticketDto.salesStart,
             salesEnd: ticketDto.salesEnd,
-            isVisible: ticketDto.isVisible !== undefined ? ticketDto.isVisible : true,
+            isVisible:
+              ticketDto.isVisible !== undefined ? ticketDto.isVisible : true,
             isFree: ticketDto.isFree || false,
           }),
         );
@@ -116,11 +138,11 @@ export class EventsService {
     // Return event with relations
     const eventWithRelations = await this.eventRepository.findOne({
       where: { id: savedEvent.id },
-      relations: ['ticketTypes', 'organizer', 'venue'],
+      relations: ["ticketTypes", "organizer", "venue"],
     });
 
     if (!eventWithRelations) {
-      throw new NotFoundException('Event not found after update');
+      throw new NotFoundException("Event not found after update");
     }
 
     return eventWithRelations;
@@ -135,7 +157,7 @@ export class EventsService {
     const event = await this.findOne(id);
 
     if (event.status === EventStatus.PUBLISHED) {
-      throw new BadRequestException('Event is already published');
+      throw new BadRequestException("Event is already published");
     }
 
     event.status = EventStatus.PUBLISHED;
@@ -153,11 +175,11 @@ export class EventsService {
   }
 
   async incrementViews(id: string): Promise<void> {
-    await this.eventRepository.increment({ id }, 'views', 1);
+    await this.eventRepository.increment({ id }, "views", 1);
   }
 
   async incrementFavorites(id: string): Promise<void> {
-    await this.eventRepository.increment({ id }, 'favorites', 1);
+    await this.eventRepository.increment({ id }, "favorites", 1);
   }
 
   // Enhanced event creation with validation
@@ -166,7 +188,7 @@ export class EventsService {
     if (createEventDto.dateType === EventDateType.MULTIPLE) {
       if (!createEventDto.recurringPattern || !createEventDto.recurringCount) {
         throw new BadRequestException(
-          'Recurring pattern and count are required for multiple date type events',
+          "Recurring pattern and count are required for multiple date type events",
         );
       }
     }
@@ -175,7 +197,7 @@ export class EventsService {
     if (createEventDto.locationType === LocationType.PHYSICAL) {
       if (!createEventDto.venueId && !createEventDto.customLocation) {
         throw new BadRequestException(
-          'Either venueId or customLocation is required for physical events',
+          "Either venueId or customLocation is required for physical events",
         );
       }
     }
@@ -183,7 +205,7 @@ export class EventsService {
     if (createEventDto.locationType === LocationType.ONLINE) {
       if (!createEventDto.onlineLink) {
         throw new BadRequestException(
-          'Online link is required for online events',
+          "Online link is required for online events",
         );
       }
     }
@@ -202,23 +224,23 @@ export class EventsService {
       tags: createEventDto.tags,
       images: createEventDto.images,
       videos: createEventDto.videos,
-      
+
       // Date configuration
       dateType: createEventDto.dateType,
       startAt: createEventDto.startAt,
       endAt: createEventDto.endAt,
-      timezone: createEventDto.timezone || 'UTC',
+      timezone: createEventDto.timezone || "UTC",
       recurringPattern: createEventDto.recurringPattern,
       recurringCount: createEventDto.recurringCount,
       recurringEndDate: createEventDto.recurringEndDate,
-      
+
       // Location configuration
       locationType: createEventDto.locationType,
       venueId: createEventDto.venueId,
       customLocation: createEventDto.customLocation,
       onlineLink: createEventDto.onlineLink,
       onlineInstructions: createEventDto.onlineInstructions,
-      
+
       capacity: createEventDto.capacity,
       guidelines: createEventDto.guidelines,
       requiresApproval: createEventDto.requiresApproval,
@@ -241,14 +263,15 @@ export class EventsService {
           type: ticketDto.type,
           description: ticketDto.description,
           price: ticketDto.price,
-          currency: ticketDto.currency || 'DZD',
+          currency: ticketDto.currency || "DZD",
           quantityTotal: ticketDto.quantityTotal,
           quantitySold: 0,
           maxPerOrder: ticketDto.maxPerOrder,
           ticketBenefits: ticketDto.ticketBenefits,
           salesStart: ticketDto.salesStart,
           salesEnd: ticketDto.salesEnd,
-          isVisible: ticketDto.isVisible !== undefined ? ticketDto.isVisible : true,
+          isVisible:
+            ticketDto.isVisible !== undefined ? ticketDto.isVisible : true,
           isFree: ticketDto.isFree || false,
         });
       });
@@ -259,11 +282,11 @@ export class EventsService {
     // Return event with tickets
     const eventWithRelations = await this.eventRepository.findOne({
       where: { id: savedEvent.id },
-      relations: ['ticketTypes', 'organizer', 'venue'],
+      relations: ["ticketTypes", "organizer", "venue"],
     });
 
     if (!eventWithRelations) {
-      throw new NotFoundException('Event not found after creation');
+      throw new NotFoundException("Event not found after creation");
     }
 
     return eventWithRelations;

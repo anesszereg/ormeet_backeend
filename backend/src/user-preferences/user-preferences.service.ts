@@ -1,7 +1,16 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserFavoriteEvent, UserFollowingOrganizer, Event, Organization } from '../entities';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import {
+  UserFavoriteEvent,
+  UserFollowingOrganizer,
+  Event,
+  Organization,
+} from "../entities";
 
 @Injectable()
 export class UserPreferencesService {
@@ -18,11 +27,16 @@ export class UserPreferencesService {
 
   // ========== Favorite Events ==========
 
-  async addFavoriteEvent(userId: string, eventId: string): Promise<UserFavoriteEvent> {
+  async addFavoriteEvent(
+    userId: string,
+    eventId: string,
+  ): Promise<UserFavoriteEvent> {
     // Check if event exists
-    const event = await this.eventRepository.findOne({ where: { id: eventId } });
+    const event = await this.eventRepository.findOne({
+      where: { id: eventId },
+    });
     if (!event) {
-      throw new NotFoundException('Event not found');
+      throw new NotFoundException("Event not found");
     }
 
     // Check if already favorited
@@ -30,11 +44,13 @@ export class UserPreferencesService {
       where: { userId, eventId },
     });
     if (existing) {
-      throw new ConflictException('Event already in favorites');
+      throw new ConflictException("Event already in favorites");
     }
 
     const favorite = this.favoriteEventRepository.create({ userId, eventId });
-    return await this.favoriteEventRepository.save(favorite);
+    const saved = await this.favoriteEventRepository.save(favorite);
+    await this.syncEventFavoritesCount(eventId);
+    return saved;
   }
 
   async removeFavoriteEvent(userId: string, eventId: string): Promise<void> {
@@ -42,18 +58,35 @@ export class UserPreferencesService {
       where: { userId, eventId },
     });
     if (!favorite) {
-      throw new NotFoundException('Favorite not found');
+      throw new NotFoundException("Favorite not found");
     }
     await this.favoriteEventRepository.remove(favorite);
+    await this.syncEventFavoritesCount(eventId);
+  }
+
+  // Recomputes Event.favorites from the actual UserFavoriteEvent rows so the
+  // stored counter can never drift/desync from the real per-user favorites
+  // (previously this counter was never updated by add/removeFavoriteEvent,
+  // so it always reset to 0 on refresh).
+  private async syncEventFavoritesCount(eventId: string): Promise<void> {
+    const count = await this.favoriteEventRepository.count({
+      where: { eventId },
+    });
+    await this.eventRepository.update(eventId, { favorites: count });
   }
 
   async getFavoriteEvents(userId: string): Promise<Event[]> {
     const favorites = await this.favoriteEventRepository.find({
       where: { userId },
-      relations: ['event', 'event.venue', 'event.organizer', 'event.ticketTypes'],
-      order: { createdAt: 'DESC' },
+      relations: [
+        "event",
+        "event.venue",
+        "event.organizer",
+        "event.ticketTypes",
+      ],
+      order: { createdAt: "DESC" },
     });
-    return favorites.map(f => f.event);
+    return favorites.map((f) => f.event);
   }
 
   async isFavoriteEvent(userId: string, eventId: string): Promise<boolean> {
@@ -65,11 +98,16 @@ export class UserPreferencesService {
 
   // ========== Following Organizers ==========
 
-  async followOrganizer(userId: string, organizerId: string): Promise<UserFollowingOrganizer> {
+  async followOrganizer(
+    userId: string,
+    organizerId: string,
+  ): Promise<UserFollowingOrganizer> {
     // Check if organizer exists
-    const organizer = await this.organizationRepository.findOne({ where: { id: organizerId } });
+    const organizer = await this.organizationRepository.findOne({
+      where: { id: organizerId },
+    });
     if (!organizer) {
-      throw new NotFoundException('Organizer not found');
+      throw new NotFoundException("Organizer not found");
     }
 
     // Check if already following
@@ -77,10 +115,13 @@ export class UserPreferencesService {
       where: { userId, organizerId },
     });
     if (existing) {
-      throw new ConflictException('Already following this organizer');
+      throw new ConflictException("Already following this organizer");
     }
 
-    const following = this.followingOrganizerRepository.create({ userId, organizerId });
+    const following = this.followingOrganizerRepository.create({
+      userId,
+      organizerId,
+    });
     return await this.followingOrganizerRepository.save(following);
   }
 
@@ -89,7 +130,7 @@ export class UserPreferencesService {
       where: { userId, organizerId },
     });
     if (!following) {
-      throw new NotFoundException('Not following this organizer');
+      throw new NotFoundException("Not following this organizer");
     }
     await this.followingOrganizerRepository.remove(following);
   }
@@ -97,13 +138,16 @@ export class UserPreferencesService {
   async getFollowingOrganizers(userId: string): Promise<Organization[]> {
     const following = await this.followingOrganizerRepository.find({
       where: { userId },
-      relations: ['organizer'],
-      order: { createdAt: 'DESC' },
+      relations: ["organizer"],
+      order: { createdAt: "DESC" },
     });
-    return following.map(f => f.organizer);
+    return following.map((f) => f.organizer);
   }
 
-  async isFollowingOrganizer(userId: string, organizerId: string): Promise<boolean> {
+  async isFollowingOrganizer(
+    userId: string,
+    organizerId: string,
+  ): Promise<boolean> {
     const following = await this.followingOrganizerRepository.findOne({
       where: { userId, organizerId },
     });
