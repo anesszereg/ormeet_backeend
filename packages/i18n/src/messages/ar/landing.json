@@ -16,15 +16,20 @@
     "locationAlt": "الموقع"
   },
   "carousel": {
+    "seeAll": "عرض كل الفعاليات",
     "previousAria": "الفعالية السابقة",
     "nextAria": "الفعالية التالية"
   },
   "discover": {
     "headingPrefix": "اكتشف",
     "headingMiddle": "الفعاليات في",
+    "headingMiddleEverywhere": "الفعاليات",
+    "allWilayas": "كل الولايات",
+    "headingEverywhere": "في كل الولايات",
+    "emptyEverywhere": "لا توجد فعاليات قادمة تطابق هذا البحث.",
     "locationAlt": "الموقع",
     "fromPrice": "ابتداءً من <bdi>{price}</bdi>",
-    "empty": "لا توجد فعاليات في هذه الفئة.",
+    "empty": "لا توجد فعاليات قادمة تطابق هذا البحث في {wilaya}.",
     "categories": {
       "all": "كل الفئات",
       "music": "موسيقى",
@@ -45,6 +50,7 @@
   },
   "city": {
     "headingPrefix": "فعاليات",
+    "headingEverywhere": "فعاليات في كل الولايات",
     "fromPrice": "ابتداءً من <bdi>{price}</bdi>",
     "badges": {
       "trending": "رائج",

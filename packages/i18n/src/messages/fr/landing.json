@@ -16,15 +16,20 @@
     "locationAlt": "Lieu"
   },
   "carousel": {
+    "seeAll": "Voir tous les événements",
     "previousAria": "Événement précédent",
     "nextAria": "Événement suivant"
   },
   "discover": {
     "headingPrefix": "Découvrez",
     "headingMiddle": "les événements à",
+    "headingMiddleEverywhere": "les événements",
+    "allWilayas": "Toutes les wilayas",
+    "headingEverywhere": "partout en Algérie",
+    "emptyEverywhere": "Aucun événement à venir ne correspond à cette recherche.",
     "locationAlt": "Lieu",
     "fromPrice": "à partir de <bdi>{price}</bdi>",
-    "empty": "Aucun événement trouvé dans cette catégorie.",
+    "empty": "Aucun événement à venir ne correspond à cette recherche à {wilaya}.",
     "categories": {
       "all": "Toutes les catégories",
       "music": "Musique",
@@ -45,6 +50,7 @@
   },
   "city": {
     "headingPrefix": "Événements à",
+    "headingEverywhere": "Événements partout en Algérie",
     "fromPrice": "à partir de <bdi>{price}</bdi>",
     "badges": {
       "trending": "Tendance",

@@ -37,6 +37,8 @@ export interface LandingEvent {
   title: string;
   /** Short month + day, e.g. "Apr 20". Empty string if no startAt. */
   date: string;
+  /** Date de début brute (ISO), nécessaire pour trier et écarter le passé. */
+  startAt: string;
   /** Human-readable venue/city or "TBA". */
   venue: string;
   city: string;
@@ -98,6 +100,7 @@ export const normalizeEvent = (e: BackendEvent): LandingEvent => {
     id: e.id,
     title: e.title,
     date: formatDate(e.startAt),
+    startAt: e.startAt || "",
     venue,
     city,
     category: e.category || "",

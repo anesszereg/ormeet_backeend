@@ -16,15 +16,20 @@
     "locationAlt": "Location"
   },
   "carousel": {
+    "seeAll": "See all events",
     "previousAria": "Previous event",
     "nextAria": "Next event"
   },
   "discover": {
     "headingPrefix": "Discover",
     "headingMiddle": "events in",
+    "headingMiddleEverywhere": "events",
+    "allWilayas": "All wilayas",
+    "headingEverywhere": "across Algeria",
+    "emptyEverywhere": "No upcoming events match this search.",
     "locationAlt": "Location",
     "fromPrice": "from <bdi>{price}</bdi>",
-    "empty": "No events found in this category.",
+    "empty": "No upcoming events match this search in {wilaya}.",
     "categories": {
       "all": "All Categories",
       "music": "Music",
@@ -45,6 +50,7 @@
   },
   "city": {
     "headingPrefix": "Events in",
+    "headingEverywhere": "Events across Algeria",
     "fromPrice": "from <bdi>{price}</bdi>",
     "badges": {
       "trending": "Trending",

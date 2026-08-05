@@ -5,6 +5,14 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { FRONTEND_ORIGIN } from "@/lib/constants";
 import type { LandingEvent } from "@/lib/api";
+import { upcomingOnly, bySoonest } from "@/lib/eventFilters";
+
+/**
+ * Nombre d'événements mis en avant. Le carrousel affichait auparavant *tous*
+ * les événements publiés, y compris ceux déjà passés : illisible dès quelques
+ * dizaines d'événements. Tout reste accessible via la recherche.
+ */
+const MAX_FEATURED = 8;
 
 interface EventCarouselProps {
   events: LandingEvent[];
@@ -22,12 +30,18 @@ const SkeletonCard = ({ size }: { size: "sm" | "lg" }) => (
   />
 );
 
-const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
+const EventCarousel = ({ events: allEvents, isLoading }: EventCarouselProps) => {
   const t = useTranslations("landing.carousel");
   const locale = useLocale();
   const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
 
-  const [currentIndex, setCurrentIndex] = useState(events.length > 1 ? 1 : 0);
+  // À la une : les prochains événements, les plus proches en premier.
+  const events = useMemo(
+    () => upcomingOnly(allEvents).sort(bySoonest).slice(0, MAX_FEATURED),
+    [allEvents],
+  );
+
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrev = useCallback(() => {
     setCurrentIndex((prev) => (prev === 0 ? events.length - 1 : prev - 1));
@@ -187,6 +201,20 @@ const EventCarousel = ({ events, isLoading }: EventCarouselProps) => {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Le carrousel ne montre que les prochains événements : ce lien garantit
+          que tous les autres restent accessibles depuis l'accueil. */}
+      <div className="flex justify-center mt-6">
+        <a
+          href={`${FRONTEND_ORIGIN}/browse-events`}
+          className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-primary border border-primary rounded-full hover:bg-primary-light transition-colors"
+        >
+          {t("seeAll")}
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="rtl:scale-x-[-1]" aria-hidden="true">
+            <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </a>
       </div>
     </section>
   );
