@@ -14,7 +14,7 @@ const EventDetailsNavbar = ({
   isLoggedIn = false,
 }: EventDetailsNavbarProps) => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: isAuthLoading } = useAuth();
   const { t } = useTranslation();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -76,8 +76,13 @@ const EventDetailsNavbar = ({
           <LanguageSwitcher />
         </span>
 
-        {/* Conditional: Profile icon with dropdown or Auth buttons */}
-        {isLoggedIn && user ? (
+        {/* Conditional: Profile icon with dropdown or Auth buttons.
+            Rely on the AuthContext user directly (source of truth) rather
+            than the isLoggedIn prop — this prevents a parent that hasn't
+            re-rendered from wrongly showing Login/Sign Up after login. */}
+        {isAuthLoading ? (
+          <div className="w-10 h-10 rounded-full bg-[#F5F5F5] animate-pulse" />
+        ) : user ? (
           <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
@@ -290,7 +295,7 @@ const EventDetailsNavbar = ({
                 {t("header.needAssistance")}
               </button>
 
-              {!(isLoggedIn && user) && (
+              {!user && !isAuthLoading && (
                 <>
                   <Link
                     to="/onboarding-choice"

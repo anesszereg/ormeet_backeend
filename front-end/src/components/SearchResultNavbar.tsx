@@ -27,7 +27,7 @@ const eventTypeSuggestions = [
 const SearchResultNavbar = () => {
   const [searchParams] = useSearchParams();
 
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -243,7 +243,9 @@ const SearchResultNavbar = () => {
         <LanguageSwitcher />
 
         {/* Auth section */}
-        {user ? (
+        {isAuthLoading ? (
+          <div className="w-10 h-10 rounded-full bg-[#F5F5F5] animate-pulse" />
+        ) : user ? (
           <div className="relative" ref={profileMenuRef}>
             <button
               onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}

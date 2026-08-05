@@ -59,6 +59,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setUser(null);
           }
         }
+      } else if (token && !currentUser) {
+        // Token is present but the user cache in localStorage is missing
+        // (browser cleared storage partially, quota-recovery earlier, or a
+        // cross-tab race). Rehydrate the session from the server so the
+        // navbar doesn't wrongly show Login/Sign Up.
+        try {
+          const freshUser = await authService.getCurrentUserFromServer();
+          setUser(freshUser);
+        } catch (err: any) {
+          const status = err?.response?.status;
+          if (status === 401 || status === 403) {
+            authService.logout();
+            setUser(null);
+          }
+        }
       }
       setIsLoading(false);
     };
