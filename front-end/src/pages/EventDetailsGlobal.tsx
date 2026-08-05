@@ -116,11 +116,8 @@ const EventDetailsGlobal = () => {
   };
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showDateTimeSection, setShowDateTimeSection] = useState(false);
   const [showLocationSection, setShowLocationSection] = useState(false);
   const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<number>(17);
-  const [selectedMonth, setSelectedMonth] = useState<number>(4);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isTogglingFavorite, setIsTogglingFavorite] = useState(false);
@@ -134,9 +131,6 @@ const EventDetailsGlobal = () => {
     });
   };
   const [isTogglingFollow, setIsTogglingFollow] = useState(false);
-  const [selectedYear, setSelectedYear] = useState<number>(2025);
-  const [selectedTimeSlot, setSelectedTimeSlot] =
-    useState<string>("6:30 PM – 7:30 PM");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [trendingPage, setTrendingPage] = useState<number>(1);
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -289,19 +283,17 @@ const EventDetailsGlobal = () => {
           guidelines: event.guidelines,
         });
 
-        // Initialize calendar to event start date
-        setSelectedMonth(startDate.getMonth() + 1);
-        setSelectedYear(startDate.getFullYear());
-        setSelectedDate(startDate.getDate());
-
         // Map reviews
         const mappedReviews: ReviewItem[] = reviews.map(
           (r: ApiReview, i: number) => ({
             id: r.id || i + 1,
-            name: r.user?.name || "Anonymous",
+            name:
+              r.user?.name || t("eventDetails.reviews.anonymous", "Anonymous"),
             avatar:
-              r.user?.profilePhoto ||
-              `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
+              r.user?.avatarUrl ||
+              `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+                r.user?.name || "Anonymous",
+              )}`,
             date: new Date(r.createdAt).toLocaleDateString(
               localeMap[i18n.language] || "en-US",
               { year: "numeric", month: "long", day: "numeric" },
@@ -402,10 +394,13 @@ const EventDetailsGlobal = () => {
       const mappedReviews: ReviewItem[] = reviews.map(
         (r: ApiReview, i: number) => ({
           id: r.id || i + 1,
-          name: r.user?.name || "Anonymous",
+          name:
+            r.user?.name || t("eventDetails.reviews.anonymous", "Anonymous"),
           avatar:
-            r.user?.profilePhoto ||
-            `https://i.pravatar.cc/40?img=${(i % 70) + 1}`,
+            r.user?.avatarUrl ||
+            `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+              r.user?.name || "Anonymous",
+            )}`,
           date: new Date(r.createdAt).toLocaleDateString(
             localeMap[i18n.language] || "en-US",
             { year: "numeric", month: "long", day: "numeric" },
@@ -430,7 +425,7 @@ const EventDetailsGlobal = () => {
     } catch (err) {
       console.error("Failed to refresh reviews:", err);
     }
-  }, [eventId, i18n.language]);
+  }, [eventId, i18n.language, t]);
 
   // Garde les avis à jour : à chaque fois que l'onglet redevient visible ou
   // reprend le focus (ex: retour depuis la page "Écrire un avis"), on
@@ -474,43 +469,6 @@ const EventDetailsGlobal = () => {
 
   const goToImage = (index: number) => {
     setCurrentImageIndex(index);
-  };
-
-  const monthNames = [
-    t("eventDetails.dateTime.calendarDays.jan", "January"),
-    t("eventDetails.dateTime.calendarDays.feb", "February"),
-    t("eventDetails.dateTime.calendarDays.mar", "March"),
-    t("eventDetails.dateTime.calendarDays.apr", "April"),
-    t("eventDetails.dateTime.calendarDays.may", "May"),
-    t("eventDetails.dateTime.calendarDays.jun", "June"),
-    t("eventDetails.dateTime.calendarDays.jul", "July"),
-    t("eventDetails.dateTime.calendarDays.aug", "August"),
-    t("eventDetails.dateTime.calendarDays.sep", "September"),
-    t("eventDetails.dateTime.calendarDays.oct", "October"),
-    t("eventDetails.dateTime.calendarDays.nov", "November"),
-    t("eventDetails.dateTime.calendarDays.dec", "December"),
-  ];
-
-  const handlePrevMonth = () => {
-    if (selectedMonth === 1) {
-      setSelectedMonth(12);
-      setSelectedYear(selectedYear - 1);
-    } else {
-      setSelectedMonth(selectedMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (selectedMonth === 12) {
-      setSelectedMonth(1);
-      setSelectedYear(selectedYear + 1);
-    } else {
-      setSelectedMonth(selectedMonth + 1);
-    }
-  };
-
-  const handleDateSelect = (day: number) => {
-    setSelectedDate(day);
   };
 
   const handleToggleFavorite = async () => {
@@ -575,10 +533,6 @@ const EventDetailsGlobal = () => {
     } finally {
       setIsTogglingFollow(false);
     }
-  };
-
-  const handleTimeSlotSelect = (timeSlot: string) => {
-    setSelectedTimeSlot(timeSlot);
   };
 
   const copyToClipboard = async (text: string): Promise<boolean> => {
@@ -668,53 +622,6 @@ const EventDetailsGlobal = () => {
       setIsSubmittingNewsletter(false);
     }
   };
-
-  const renderCalendarDays = () => {
-    const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
-    const firstDayOfMonth = new Date(
-      selectedYear,
-      selectedMonth - 1,
-      1,
-    ).getDay();
-    const days = [];
-    const totalCells = Math.ceil((firstDayOfMonth + daysInMonth) / 7) * 7;
-
-    for (let i = 0; i < totalCells; i++) {
-      const dayNumber = i - firstDayOfMonth + 1;
-      const isValidDay = dayNumber > 0 && dayNumber <= daysInMonth;
-      const isSelected = isValidDay && dayNumber === selectedDate;
-
-      days.push(
-        <button
-          key={i}
-          onClick={() => isValidDay && handleDateSelect(dayNumber)}
-          disabled={!isValidDay}
-          className={`h-10 flex items-center justify-center text-sm font-medium rounded-full transition-colors cursor-pointer ${
-            isSelected
-              ? "bg-[#FF4000] text-white"
-              : isValidDay
-                ? "text-black hover:bg-[#F5F5F5]"
-                : "text-transparent cursor-default"
-          }`}
-        >
-          {isValidDay ? dayNumber : ""}
-        </button>,
-      );
-    }
-
-    return days;
-  };
-
-  // Generate time slots from the actual event start/end timestamps.
-  const generateTimeSlots = () => {
-    if (!eventData) return [];
-    const start = new Date(eventData.startAtRaw);
-    const end = new Date(eventData.endAtRaw);
-    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return [];
-    const timeStr = `${start.toLocaleTimeString(localeMap[i18n.language] || "en-US", { hour: "numeric", minute: "2-digit" })} – ${end.toLocaleTimeString(localeMap[i18n.language] || "en-US", { hour: "numeric", minute: "2-digit" })}`;
-    return [timeStr];
-  };
-  const timeSlots = generateTimeSlots();
 
   // La liste était fictive : trois événements écrits en dur, sans rapport avec
   // l'organisateur. Elle vient maintenant des vrais événements de cet
@@ -968,163 +875,6 @@ const EventDetailsGlobal = () => {
                   <span className="text-[#757575] mx-2">|</span>{" "}
                   {eventData.time}
                 </p>
-                {eventData.dateType === "multiple" && (
-                  <button
-                    onClick={() => setShowDateTimeSection(!showDateTimeSection)}
-                    className="text-sm font-medium text-[#FF4000] hover:underline mt-2 cursor-pointer"
-                  >
-                    {showDateTimeSection
-                      ? t("eventDetails.dateTime.closeCalendar")
-                      : t("eventDetails.dateTime.changeDate")}
-                  </button>
-                )}
-
-                {/* Inline Calendar Section */}
-                {eventData.dateType === "multiple" && showDateTimeSection && (
-                  <div className="mt-4 bg-white border border-[#EEEEEE] rounded-2xl p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {/* Calendar */}
-                      <div>
-                        {/* Month Navigation */}
-                        <div className="flex items-center justify-between mb-6">
-                          <button
-                            onClick={handlePrevMonth}
-                            className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
-                          >
-                            <svg
-                              className="rtl:scale-x-[-1]"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                            >
-                              <path
-                                d="M12.5 15L7.5 10L12.5 5"
-                                stroke="#181818"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </button>
-                          <div className="flex items-center gap-2">
-                            <span className="text-base font-semibold text-black">
-                              {monthNames[selectedMonth - 1]} {selectedYear}
-                            </span>
-                            <button className="w-11 h-11 flex items-center justify-center rounded-full bg-black text-white cursor-pointer">
-                              <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                              >
-                                <path
-                                  d="M8 4V12M4 8H12"
-                                  stroke="white"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                />
-                              </svg>
-                            </button>
-                          </div>
-                          <button
-                            onClick={handleNextMonth}
-                            className="w-11 h-11 flex items-center justify-center rounded-full hover:bg-[#F5F5F5] transition-colors cursor-pointer"
-                          >
-                            <svg
-                              className="rtl:scale-x-[-1]"
-                              width="20"
-                              height="20"
-                              viewBox="0 0 20 20"
-                              fill="none"
-                            >
-                              <path
-                                d="M7.5 15L12.5 10L7.5 5"
-                                stroke="#181818"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-
-                        {/* Calendar Grid */}
-                        <div>
-                          {/* Day Headers */}
-                          <div className="grid grid-cols-7 gap-1 mb-2">
-                            {[
-                              t("eventDetails.dateTime.calendarDays.sun"),
-                              t("eventDetails.dateTime.calendarDays.mon"),
-                              t("eventDetails.dateTime.calendarDays.tue"),
-                              t("eventDetails.dateTime.calendarDays.wed"),
-                              t("eventDetails.dateTime.calendarDays.thu"),
-                              t("eventDetails.dateTime.calendarDays.fri"),
-                              t("eventDetails.dateTime.calendarDays.sat"),
-                            ].map((day) => (
-                              <div
-                                key={day}
-                                className="h-10 flex items-center justify-center text-xs font-medium text-[#757575]"
-                              >
-                                {day}
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Calendar Days */}
-                          <div className="grid grid-cols-7 gap-1">
-                            {renderCalendarDays()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Time Slots */}
-                      <div>
-                        <div className="bg-[#F8F8F8] rounded-xl p-4">
-                          <h3 className="text-sm font-semibold text-black mb-2">
-                            {t("eventDetails.dateTime.timeSlotsAvailable", {
-                              count: timeSlots.length,
-                              date: new Date(
-                                selectedYear,
-                                selectedMonth - 1,
-                                selectedDate,
-                              ).toLocaleDateString(
-                                localeMap[i18n.language] || "en-US",
-                                {
-                                  weekday: "short",
-                                  month: "short",
-                                  day: "numeric",
-                                },
-                              ),
-                            })}
-                          </h3>
-                          <p className="text-xs text-[#757575] mb-4">
-                            {timeSlots.length > 0
-                              ? t("eventDetails.dateTime.selectTime")
-                              : t("eventDetails.dateTime.noTimeSlots")}
-                          </p>
-
-                          {/* Time Slot Options */}
-                          <div className="space-y-2">
-                            {timeSlots.map((slot) => (
-                              <button
-                                key={slot}
-                                onClick={() => handleTimeSlotSelect(slot)}
-                                className={`w-full px-4 py-3 rounded-lg text-sm font-medium text-start transition-colors ${
-                                  selectedTimeSlot === slot
-                                    ? "bg-white text-black border-2 border-[#FF4000]"
-                                    : "bg-white text-black hover:bg-[#EEEEEE]"
-                                }`}
-                              >
-                                {slot}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Location Section */}
@@ -1962,15 +1712,6 @@ const EventDetailsGlobal = () => {
                             <span className="text-sm font-semibold text-black">
                               {t("eventDetails.trending.fromPrice")}{" "}
                               <bdi>{event.price}</bdi>
-                            </span>
-                            <span
-                              className={`text-xs font-medium px-2 py-1 rounded ${
-                                event.badgeColor === "blue"
-                                  ? "text-[#00A3FF] bg-[#E6F7FF]"
-                                  : "text-[#FF4000] bg-[#FFF4F3]"
-                              }`}
-                            >
-                              {t(`eventDetails.badges.${event.badgeKey}`)}
                             </span>
                           </div>
                         </div>
