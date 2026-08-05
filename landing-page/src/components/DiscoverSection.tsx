@@ -15,6 +15,23 @@ import type { LandingEvent } from "@/lib/api";
 /** Nombre d'événements affichés sans filtre de catégorie. */
 const MAX_EVENTS = 6;
 
+/**
+ * Catégories mises en avant dans cette section, dans l'ordre voulu. Le
+ * référentiel complet (15 catégories) reste disponible via la recherche et la
+ * section « Trouvez des événements qui vous ressemblent ».
+ */
+const DISCOVER_CATEGORY_KEYS = [
+  "business",
+  "tech",
+  "conference",
+  "comedy",
+  "workshop",
+] as const;
+
+const DISCOVER_CATEGORIES = DISCOVER_CATEGORY_KEYS.map(
+  (key) => eventCategories.find((c) => c.key === key),
+).filter((c): c is (typeof eventCategories)[number] => Boolean(c));
+
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop";
 
@@ -199,7 +216,7 @@ const DiscoverSection = ({
           >
             {t("categories.all")}
           </button>
-          {eventCategories.map((category) => (
+          {DISCOVER_CATEGORIES.map((category) => (
             <button
               key={category.key}
               onClick={() => setActiveCategoryKey(category.key)}
