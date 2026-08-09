@@ -108,7 +108,8 @@
       "imageFormatError": "Seules les images PNG et JPG sont acceptées",
       "faqQuestionRequired": "La question est requise",
       "faqAnswerRequired": "La réponse est requise",
-      "sessionDateRequired": "Ajoutez au moins la date de la première session"
+      "sessionDateRequired": "Ajoutez au moins la date de la première session",
+      "invitedEmailsRequired": "Ajoutez au moins un email invité pour un événement privé"
     },
     "publicationSection": "Publication et visibilité",
     "faq": {
@@ -146,6 +147,14 @@
       "Education": "Éducation",
       "Community": "Communauté",
       "Other": "Autre"
+    },
+    "visibility": {
+      "publicHint": "Votre événement sera visible par tout le monde.",
+      "privateHint": "Événement privé : visible uniquement par les personnes que vous invitez ci-dessous.",
+      "invitedLabel": "Emails des invités",
+      "invitedPlaceholder": "Saisissez un email et Entrée…",
+      "invitedHint": "{{count}} invité(s). Ils recevront une invitation par email.",
+      "removeEmail": "Retirer cet email"
     }
   },
   "dashboard": {

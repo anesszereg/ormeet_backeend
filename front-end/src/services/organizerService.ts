@@ -86,6 +86,8 @@ export interface CreateEventDto {
   tickets?: TicketTypeDto[];
   /** Sessions vendables (inscription par session). Absent = événement global. */
   sessions?: EventSessionDto[];
+  /** Emails autorisés pour un événement privé (invitation par email). */
+  invitedEmails?: string[];
   guidelines?: {
     ageRequirement?: string;
     refundPolicy?: string;

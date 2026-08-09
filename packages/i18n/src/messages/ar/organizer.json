@@ -106,7 +106,8 @@
       "imageFormatError": "صيغ الصور المسموحة: PNG و JPG فقط",
       "faqQuestionRequired": "السؤال مطلوب",
       "faqAnswerRequired": "الإجابة مطلوبة",
-      "sessionDateRequired": "أضِف تاريخ الحصة الأولى على الأقل"
+      "sessionDateRequired": "أضِف تاريخ الحصة الأولى على الأقل",
+      "invitedEmailsRequired": "أضِف بريدًا إلكترونيًا واحدًا على الأقل للحدث الخاص"
     },
     "publicationSection": "النشر والظهور",
     "faq": {
@@ -144,6 +145,14 @@
       "Education": "تعليم",
       "Community": "مجتمع",
       "Other": "أخرى"
+    },
+    "visibility": {
+      "publicHint": "سيكون حدثك مرئيًا للجميع.",
+      "privateHint": "حدث خاص: مرئي فقط للأشخاص الذين تدعوهم أدناه.",
+      "invitedLabel": "بريد المدعوّين الإلكتروني",
+      "invitedPlaceholder": "أدخل بريدًا إلكترونيًا ثم اضغط Enter…",
+      "invitedHint": "{{count}} مدعوّ. سيتلقّون دعوة عبر البريد الإلكتروني.",
+      "removeEmail": "إزالة هذا البريد"
     }
   },
   "dashboard": {

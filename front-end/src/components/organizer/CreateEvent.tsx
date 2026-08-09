@@ -71,6 +71,8 @@ interface EventFormData {
   faqs: FAQData[];
   status: 'draft' | 'publish';
   visibility: 'public' | 'private';
+  // Événement privé : emails autorisés à voir/réserver (invitation par email).
+  invitedEmails: string[];
   requiresApproval: boolean;
   // Inscription par session (OFF par défaut = comportement global inchangé).
   // Chaque session = une date ; les heures (startTime/endTime) sont partagées.
@@ -137,6 +139,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         faqs: initialData.faqs,
         status: 'draft',
         visibility: initialData.visibility,
+        invitedEmails: (initialData as any).invitedEmails ?? [],
         requiresApproval: (initialData as any).requiresApproval ?? false,
         perSession: (initialData as any).perSession ?? false,
         sessionDates: (initialData as any).sessionDates ?? [null],
@@ -166,6 +169,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       faqs: [],
       status: 'draft',
       visibility: 'public',
+      invitedEmails: [],
       requiresApproval: false,
       perSession: false,
       sessionDates: [null],
@@ -177,6 +181,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
   const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({});
   const [ticketErrors, setTicketErrors] = useState<Record<string, Partial<Record<keyof TicketData, string>>>>({});
+  const [emailInput, setEmailInput] = useState('');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   // formData.category stocke la valeur envoyée au back (« Sports ») ; le champ
   // doit afficher le libellé traduit correspondant (« Sport & Football »).
@@ -596,6 +601,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     
     if (formData.eventImages.length === 0 && existingImages.length === 0) newErrors.eventImages = t('createEvent.validation.imagesRequired');
     if (!formData.description.trim()) newErrors.description = t('createEvent.validation.descriptionRequired');
+
+    // Événement privé : au moins un email invité (sinon personne ne le verrait).
+    if (formData.visibility === 'private' && formData.invitedEmails.length === 0) {
+      newErrors.invitedEmails = t('createEvent.validation.invitedEmailsRequired');
+    }
     
     // Validate tickets
     const newTicketErrors: Record<string, Partial<Record<keyof TicketData, string>>> = {};
@@ -640,6 +650,30 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setTicketErrors(newTicketErrors);
     setFaqErrors(newFaqErrors);
     return Object.keys(newErrors).length === 0 && Object.keys(newTicketErrors).length === 0 && Object.keys(newFaqErrors).length === 0;
+  };
+
+  // --- Emails invités (événement privé) ----------------------------------
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  /** Ajoute un ou plusieurs emails (saisie ou collage), validés et dédoublonnés. */
+  const addInvitedEmails = (raw: string) => {
+    const candidates = raw.split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean);
+    if (candidates.length === 0) return;
+    setFormData((prev) => {
+      const next = [...prev.invitedEmails];
+      candidates.forEach((e) => {
+        if (isValidEmail(e) && !next.includes(e)) next.push(e);
+      });
+      return { ...prev, invitedEmails: next };
+    });
+    if (errors.invitedEmails) setErrors((prev) => ({ ...prev, invitedEmails: '' }));
+  };
+
+  const removeInvitedEmail = (email: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      invitedEmails: prev.invitedEmails.filter((e) => e !== email),
+    }));
   };
 
   // --- Inscription par session -------------------------------------------
@@ -787,6 +821,10 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       tickets: tickets.length > 0 ? tickets : undefined,
       // Inscription par session : envoyée seulement si activée et renseignée.
       sessions: formData.perSession ? (buildSessionsPayload().length > 0 ? buildSessionsPayload() : undefined) : undefined,
+      // Emails invités : uniquement pour un événement privé.
+      invitedEmails: formData.visibility === 'private' && formData.invitedEmails.length > 0
+        ? formData.invitedEmails
+        : undefined,
       tags: formData.category ? [formData.category.toLowerCase()] : undefined,
       guidelines: formData.faqs.length > 0 ? {
         ageRequirement: '',
@@ -1973,10 +2011,71 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               </button>
             </div>
             <p className="mt-2 text-xs text-input-gray">
-              {formData.visibility === 'public' 
-                ? 'Your event will be visible to everyone' 
-                : 'Your event will only be accessible via direct link'}
+              {formData.visibility === 'public'
+                ? t('createEvent.visibility.publicHint')
+                : t('createEvent.visibility.privateHint')}
             </p>
+
+            {/* Liste des emails invités (événement privé) */}
+            {formData.visibility === 'private' && (
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-black mb-2">
+                  {t('createEvent.visibility.invitedLabel')} <span className="text-[#FF3425]">*</span>
+                </label>
+                <div
+                  className={`flex flex-wrap items-center gap-2 w-full px-3 py-2 border rounded-lg focus-within:border-primary transition-all ${
+                    errors.invitedEmails ? 'border-[#FF3425]' : 'border-light-gray'
+                  }`}
+                >
+                  {formData.invitedEmails.map((email) => (
+                    <span
+                      key={email}
+                      className="inline-flex items-center gap-1.5 bg-primary-light text-primary text-xs font-medium px-2.5 py-1 rounded-full"
+                    >
+                      {email}
+                      <button
+                        type="button"
+                        onClick={() => removeInvitedEmail(email)}
+                        className="hover:text-primary-dark"
+                        aria-label={t('createEvent.visibility.removeEmail')}
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    type="text"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        addInvitedEmails(emailInput);
+                        setEmailInput('');
+                      } else if (e.key === 'Backspace' && !emailInput && formData.invitedEmails.length > 0) {
+                        removeInvitedEmail(formData.invitedEmails[formData.invitedEmails.length - 1]);
+                      }
+                    }}
+                    onPaste={(e) => {
+                      e.preventDefault();
+                      addInvitedEmails(e.clipboardData.getData('text'));
+                    }}
+                    onBlur={() => { if (emailInput.trim()) { addInvitedEmails(emailInput); setEmailInput(''); } }}
+                    placeholder={formData.invitedEmails.length === 0 ? t('createEvent.visibility.invitedPlaceholder') : ''}
+                    className="flex-1 min-w-[160px] text-sm text-black bg-transparent outline-none placeholder:text-[#9CA3AF] py-1"
+                  />
+                </div>
+                {errors.invitedEmails ? (
+                  <p className="mt-1 text-xs text-[#FF3425]">{errors.invitedEmails}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-input-gray">
+                    {t('createEvent.visibility.invitedHint', { count: formData.invitedEmails.length })}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Reservation Approval */}
