@@ -1,5 +1,19 @@
 {
   "createEvent": {
+    "sessions": {
+      "title": "Session-based registration",
+      "help": "Sell tickets for each session. Attendees can register for one or several sessions.",
+      "duration": "Duration of each session (hours)",
+      "durationPlaceholder": "e.g. 8",
+      "sessionLabel": "Session {{number}}",
+      "name": "Session name",
+      "namePlaceholder": "e.g. Day 1 — Fundamentals",
+      "date": "Date",
+      "startTime": "Start time",
+      "add": "Add a session",
+      "remove": "Remove session",
+      "priceNote": "The price and capacity set below apply to each session."
+    },
     "pageTitle": "{{mode}} Event",
     "pageSubtitle": "Fill in the essential information to {{mode}} your event quickly",
     "backToDashboard": "Back to Dashboard",
