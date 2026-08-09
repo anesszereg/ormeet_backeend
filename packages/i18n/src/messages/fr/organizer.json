@@ -2,17 +2,14 @@
   "createEvent": {
     "sessions": {
       "title": "Inscription par session",
-      "help": "Vendez des billets pour chaque session. Les participants pourront s'inscrire à une ou plusieurs sessions.",
-      "duration": "Durée de chaque session (heures)",
-      "durationPlaceholder": "ex. 8",
+      "help": "Vendez des billets pour chaque session. Le participant choisira la ou les sessions qui l’intéressent (3 sessions maximum).",
       "sessionLabel": "Session {{number}}",
-      "name": "Nom de la session",
-      "namePlaceholder": "ex. Jour 1 — Fondamentaux",
-      "date": "Date",
-      "startTime": "Heure de début",
+      "date1": "Date de la première session",
+      "date2": "Date de la deuxième session",
+      "date3": "Date de la troisième session",
       "add": "Ajouter une session",
       "remove": "Supprimer la session",
-      "priceNote": "Le prix et la capacité définis ci-dessous en billetterie s’appliquent à chaque session."
+      "ticketNote": "Le nombre de billets s’applique à chaque session. Ex. : 100 billets = 100 places par session. Types et tarifs identiques pour toutes les sessions."
     },
     "pageTitle": "{{mode}} un événement",
     "pageSubtitle": "Renseignez les informations essentielles pour {{mode}} votre événement rapidement",
@@ -110,7 +107,8 @@
       "imageSizeError": "Chaque image ne doit pas dépasser 10 Mo",
       "imageFormatError": "Seules les images PNG et JPG sont acceptées",
       "faqQuestionRequired": "La question est requise",
-      "faqAnswerRequired": "La réponse est requise"
+      "faqAnswerRequired": "La réponse est requise",
+      "sessionDateRequired": "Ajoutez au moins la date de la première session"
     },
     "publicationSection": "Publication et visibilité",
     "faq": {
@@ -150,7 +148,6 @@
       "Other": "Autre"
     }
   },
-
   "dashboard": {
     "title": "Tableau de bord",
     "createEvent": "Créer un événement",
@@ -204,7 +201,6 @@
     "loading": "Chargement des données…",
     "error": "Échec du chargement des données"
   },
-
   "events": {
     "title": "Événements",
     "createEvent": "Créer un événement",
@@ -286,7 +282,6 @@
       "price": "{{price}} DZD"
     }
   },
-
   "attendees": {
     "title": "Participants",
     "export": "Exporter",
@@ -368,7 +363,6 @@
       "clear": "Effacer"
     }
   },
-
   "orders": {
     "title": "Commandes",
     "export": "Exporter",
@@ -735,7 +729,6 @@
       }
     }
   },
-
   "onboarding": {
     "brandInfo": {
       "title": "Bienvenue sur Ormeet !",
@@ -784,7 +777,6 @@
       "errorFallback": "Failed to save brand info. Please try again."
     }
   },
-
   "bankAccount": {
     "sectionTitle": "Compte bancaire",
     "sectionSubtitle": "Gérez le compte bancaire qui recevra les paiements de vos événements",
@@ -840,7 +832,6 @@
       "success": "Compte bancaire supprimé avec succès"
     }
   },
-
   "export": {
     "title": "Exporter les données",
     "description": "Sélectionnez l'événement dont vous souhaitez exporter les données.",
@@ -848,7 +839,6 @@
     "allEvents": "Tous les événements",
     "confirm": "Confirmer"
   },
-
   "addAttendee": {
     "title": "Ajouter un participant",
     "description": "Renseignez les informations pour ajouter un nouveau participant à un événement.",
@@ -868,7 +858,6 @@
     "confirm": "Confirmer",
     "success": "Participant ajouté avec succès"
   },
-
   "eventPreview": {
     "modalTitle": "Aperçu de l'événement",
     "modalSubtitle": "Voici comment votre événement apparaîtra aux participants",
@@ -901,11 +890,9 @@
     "visibilityPublic": "Événement public",
     "visibilityPrivate": "Événement privé"
   },
-
   "timePicker": {
     "selectTimeLabel": "CHOISIR L'HEURE"
   },
-
   "dateTimeModal": {
     "title": "Date et heure",
     "closeCalendar": "Fermer le calendrier",
