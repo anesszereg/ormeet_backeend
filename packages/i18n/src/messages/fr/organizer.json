@@ -184,7 +184,8 @@
         "up": "Hausse",
         "down": "Baisse",
         "noChange": "Stable"
-      }
+      },
+      "unknownType": "Type de billet"
     },
     "recentActivities": {
       "title": "Activités récentes",

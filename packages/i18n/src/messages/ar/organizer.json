@@ -182,7 +182,8 @@
         "up": "ارتفاع",
         "down": "انخفاض",
         "noChange": "ثابت"
-      }
+      },
+      "unknownType": "نوع التذكرة"
     },
     "recentActivities": {
       "title": "آخر النشاطات",

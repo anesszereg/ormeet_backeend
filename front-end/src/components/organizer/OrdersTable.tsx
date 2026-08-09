@@ -29,6 +29,8 @@ interface Order {
   totalPrice: number;
   payment: 'paid' | 'pending' | 'failed';
   orderDate: string;
+  /** Timestamp brut pour le tri et le filtre par date. */
+  createdAtRaw: string;
   ticketStatus: 'sent' | 'not-sent';
   status: 'active' | 'draft' | 'in-transit' | 'completed' | 'cancelled';
 }
@@ -121,6 +123,7 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
               totalPrice: typeof order.amountTotal === 'string' ? parseFloat(order.amountTotal) : (order.amountTotal || 0),
               payment,
               orderDate: new Date(order.createdAt).toLocaleDateString(localeMap[i18n.language] || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              createdAtRaw: order.createdAt,
               ticketStatus: order.status === 'paid' ? 'sent' : 'not-sent',
               status,
             };
@@ -220,15 +223,33 @@ const OrdersTable = ({ onCreateOrder }: OrdersTableProps) => {
   // Use only API orders - no mock data fallback
   const ordersToDisplay = apiOrders;
 
-  const filteredOrders = ordersToDisplay.filter(order => {
-    const matchesSearch = order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         order.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         order.buyerName.toLowerCase().includes(searchQuery.toLowerCase());
+  // Bornes du filtre par date (jour inclus de bout en bout).
+  const dateFrom = selectedStartDate ? new Date(new Date(selectedStartDate).setHours(0, 0, 0, 0)) : null;
+  const dateTo = selectedEndDate ? new Date(new Date(selectedEndDate).setHours(23, 59, 59, 999)) : null;
 
-    const matchesFilter = activeFilter === 'all' || order.status === activeFilter;
+  const filteredOrders = ordersToDisplay
+    .filter(order => {
+      const matchesSearch = order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           order.eventName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           order.buyerName.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesSearch && matchesFilter;
-  });
+      const matchesFilter = activeFilter === 'all' || order.status === activeFilter;
+
+      const created = new Date(order.createdAtRaw);
+      const matchesDate = (!dateFrom || created >= dateFrom) && (!dateTo || created <= dateTo);
+
+      return matchesSearch && matchesFilter && matchesDate;
+    })
+    .sort((a, b) => {
+      if (sortOption === t('orders.sortOptions.oldest')) {
+        return new Date(a.createdAtRaw).getTime() - new Date(b.createdAtRaw).getTime();
+      }
+      if (sortOption === t('orders.sortOptions.az')) {
+        return a.buyerName.localeCompare(b.buyerName);
+      }
+      // Par défaut : plus récents d'abord.
+      return new Date(b.createdAtRaw).getTime() - new Date(a.createdAtRaw).getTime();
+    });
 
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
   const startIndex = (currentPage - 1) * ordersPerPage;

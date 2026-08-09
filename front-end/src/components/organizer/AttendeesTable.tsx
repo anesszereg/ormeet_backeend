@@ -27,6 +27,8 @@ interface Attendee {
   email: string;
   eventName: string;
   registrationDate: string;
+  /** Timestamp brut pour le tri et le filtre par date. */
+  registeredAtRaw: string;
   ticketType: string;
   status: 'checked-in' | 'not-checked-in';
 }
@@ -128,6 +130,7 @@ const AttendeesTable = () => {
               email: attendee.ticket?.owner?.email || 'unknown@email.com',
               eventName: eventMap.get(event.id) || 'Unknown Event',
               registrationDate: new Date(attendee.checkedInAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+              registeredAtRaw: attendee.checkedInAt,
               ticketType: attendee.ticket?.ticketType?.name || 'General',
               status: 'checked-in' as const,
             }));
@@ -205,24 +208,36 @@ const AttendeesTable = () => {
   const attendeesToDisplay = apiAttendees;
   const eventsToDisplay = apiEvents;
 
-  const filteredAttendees = attendeesToDisplay.filter(attendee => {
-    const matchesSearch = attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         attendee.email.toLowerCase().includes(searchQuery.toLowerCase());
+  // Bornes du filtre par date (jour inclus de bout en bout).
+  const dateFrom = selectedStartDate ? new Date(new Date(selectedStartDate).setHours(0, 0, 0, 0)) : null;
+  const dateTo = selectedEndDate ? new Date(new Date(selectedEndDate).setHours(23, 59, 59, 999)) : null;
 
-    const matchesEvent = !selectedEvent || attendee.eventName === selectedEvent;
+  const filteredAttendees = attendeesToDisplay
+    .filter(attendee => {
+      const matchesSearch = attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           attendee.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-    if (selectedFilters.length === 0) {
-      return matchesSearch && matchesEvent;
-    }
+      const matchesEvent = !selectedEvent || attendee.eventName === selectedEvent;
 
-    const ticketTypeFilters = selectedFilters.filter(f => ['VIP', 'General', 'Early Bird'].includes(f));
-    const statusFilters = selectedFilters.filter(f => ['checked-in', 'not-checked-in'].includes(f));
+      const created = new Date(attendee.registeredAtRaw);
+      const matchesDate = (!dateFrom || created >= dateFrom) && (!dateTo || created <= dateTo);
 
-    const matchesTicketType = ticketTypeFilters.length === 0 || ticketTypeFilters.includes(attendee.ticketType);
-    const matchesStatus = statusFilters.length === 0 || statusFilters.includes(attendee.status);
+      const ticketTypeFilters = selectedFilters.filter(f => ['VIP', 'General', 'Early Bird'].includes(f));
+      const statusFilters = selectedFilters.filter(f => ['checked-in', 'not-checked-in'].includes(f));
+      const matchesTicketType = ticketTypeFilters.length === 0 || ticketTypeFilters.includes(attendee.ticketType);
+      const matchesStatus = statusFilters.length === 0 || statusFilters.includes(attendee.status);
 
-    return matchesSearch && matchesTicketType && matchesStatus && matchesEvent;
-  });
+      return matchesSearch && matchesEvent && matchesDate && matchesTicketType && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortOption === t('attendees.sortOptions.oldest')) {
+        return new Date(a.registeredAtRaw).getTime() - new Date(b.registeredAtRaw).getTime();
+      }
+      if (sortOption === t('attendees.sortOptions.az')) {
+        return a.name.localeCompare(b.name);
+      }
+      return new Date(b.registeredAtRaw).getTime() - new Date(a.registeredAtRaw).getTime();
+    });
 
   const totalPages = Math.ceil(filteredAttendees.length / attendeesPerPage);
   const startIndex = (currentPage - 1) * attendeesPerPage;

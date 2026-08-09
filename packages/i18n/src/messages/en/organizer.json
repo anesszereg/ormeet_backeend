@@ -182,7 +182,8 @@
         "up": "Up",
         "down": "Down",
         "noChange": "No Change"
-      }
+      },
+      "unknownType": "Ticket type"
     },
     "recentActivities": {
       "title": "Recent Activities",

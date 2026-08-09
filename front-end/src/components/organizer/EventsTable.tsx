@@ -238,21 +238,38 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
   // Use only API events - no mock data fallback
   const eventsToDisplay = apiEvents;
 
+  // Bornes du filtre par date (sur la date de l'événement, jour inclus).
+  const dateFrom = selectedStartDate ? new Date(new Date(selectedStartDate).setHours(0, 0, 0, 0)) : null;
+  const dateTo = selectedEndDate ? new Date(new Date(selectedEndDate).setHours(23, 59, 59, 999)) : null;
+
   // Filter events based on active filter and search query
-  const filteredEvents = eventsToDisplay.filter(event => {
-    const matchesFilter = 
-      activeFilter === 'all' ? true :
-      activeFilter === 'ongoing' ? event.status === 'ongoing' :
-      activeFilter === 'upcoming' ? event.status === 'upcoming' :
-      activeFilter === 'past' ? event.status === 'completed' :
-      activeFilter === 'drafts' ? event.status === 'draft' :
-      false;
+  const filteredEvents = eventsToDisplay
+    .filter(event => {
+      const matchesFilter =
+        activeFilter === 'all' ? true :
+        activeFilter === 'ongoing' ? event.status === 'ongoing' :
+        activeFilter === 'upcoming' ? event.status === 'upcoming' :
+        activeFilter === 'past' ? event.status === 'completed' :
+        activeFilter === 'drafts' ? event.status === 'draft' :
+        false;
 
-    const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.location.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           event.location.toLowerCase().includes(searchQuery.toLowerCase());
 
-    return matchesFilter && matchesSearch;
-  });
+      const eventDate = event.dateRange[0];
+      const matchesDate = !eventDate
+        ? !dateFrom && !dateTo
+        : (!dateFrom || eventDate >= dateFrom) && (!dateTo || eventDate <= dateTo);
+
+      return matchesFilter && matchesSearch && matchesDate;
+    })
+    .sort((a, b) => {
+      const ta = a.dateRange[0]?.getTime() ?? 0;
+      const tb = b.dateRange[0]?.getTime() ?? 0;
+      if (sortOption === t('events.sortOptions.oldest')) return ta - tb;
+      if (sortOption === t('events.sortOptions.az')) return a.name.localeCompare(b.name);
+      return tb - ta; // Plus récents d'abord.
+    });
 
   // Pagination logic
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);

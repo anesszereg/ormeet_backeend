@@ -165,6 +165,19 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
     yearly: t('dashboard.topSelling.period.yearly'),
   };
 
+  // Table id de type de billet → libellé lisible, construite depuis les
+  // ticketTypes des événements (l'API expose `title`, parfois `name`).
+  const ticketTypeNames = useMemo(() => {
+    const map = new Map<string, string>();
+    events.forEach((e) =>
+      e.ticketTypes?.forEach((tt) => {
+        const label = (tt as any).title || tt.name || tt.type;
+        if (label) map.set(tt.id, label);
+      }),
+    );
+    return map;
+  }, [events]);
+
   // Generate ticket data from real orders within the selected period
   const getTicketData = () => {
     const { currentStart } = getPeriodWindows(selectedPeriod);
@@ -198,7 +211,7 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
     return entries.map(([typeId, stat]) => {
       const salesPercent = totalSold > 0 ? Math.round((stat.sold / totalSold) * 100) : 0;
       return {
-        type: typeId,
+        type: ticketTypeNames.get(typeId) || t('dashboard.topSelling.unknownType'),
         sold: stat.sold,
         conversion: '-',
         totalSales: `${salesPercent}%`,
@@ -491,8 +504,8 @@ const Dashboard = ({ onCreateEvent }: DashboardProps) => {
           </div>
         </div>
 
-        {/* Right Column - Alert Panels */}
-        <div className="flex flex-col justify-between gap-6">
+        {/* Right Column - Alert Panels (empilés en haut, pas répartis sur la hauteur) */}
+        <div className="flex flex-col justify-start gap-6">
           {/* Important Alerts Panel */}
           <div className="bg-white border border-light-gray rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
