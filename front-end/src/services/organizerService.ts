@@ -39,6 +39,17 @@ export interface CustomLocation {
   country: string;
 }
 
+/** Une session vendable de l'événement (inscription par session).
+ *  Forme alignée sur Event.sessions (backend) : title/description/speakers. */
+export interface EventSessionDto {
+  id: string;
+  title: string;
+  description: string;
+  startAt: string;
+  endAt: string;
+  speakers: string[];
+}
+
 export interface CreateEventDto {
   title: string;
   type: string;
@@ -73,6 +84,8 @@ export interface CreateEventDto {
   refundsAllowed?: boolean;
   requiresApproval?: boolean;
   tickets?: TicketTypeDto[];
+  /** Sessions vendables (inscription par session). Absent = événement global. */
+  sessions?: EventSessionDto[];
   guidelines?: {
     ageRequirement?: string;
     refundPolicy?: string;

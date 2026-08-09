@@ -51,6 +51,14 @@ interface FAQData {
   answer: string;
 }
 
+/** Une session vendable, saisie par l'organisateur (inscription par session). */
+interface SessionData {
+  id: string;
+  label: string;
+  date: Date | null;
+  startTime: string;
+}
+
 interface EventFormData {
   title: string;
   category: string;
@@ -69,6 +77,10 @@ interface EventFormData {
   status: 'draft' | 'publish';
   visibility: 'public' | 'private';
   requiresApproval: boolean;
+  // Inscription par session (OFF par défaut = comportement global inchangé).
+  perSession: boolean;
+  sessionDurationHours: string;
+  sessions: SessionData[];
 }
 
 
@@ -131,6 +143,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         status: 'draft',
         visibility: initialData.visibility,
         requiresApproval: (initialData as any).requiresApproval ?? false,
+        perSession: (initialData as any).perSession ?? false,
+        sessionDurationHours: (initialData as any).sessionDurationHours ?? '',
+        sessions: (initialData as any).sessions ?? [],
       };
     }
     return {
@@ -158,6 +173,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       status: 'draft',
       visibility: 'public',
       requiresApproval: false,
+      perSession: false,
+      sessionDurationHours: '',
+      sessions: [],
     };
   };
 
@@ -624,6 +642,53 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   };
 
   // Helper to convert form data to API format
+  // --- Inscription par session -------------------------------------------
+  const addSession = () => {
+    setFormData((prev) => ({
+      ...prev,
+      sessions: [
+        ...prev.sessions,
+        { id: `session-${Date.now()}`, label: '', date: null, startTime: '' },
+      ],
+    }));
+  };
+
+  const updateSession = (id: string, patch: Partial<SessionData>) => {
+    setFormData((prev) => ({
+      ...prev,
+      sessions: prev.sessions.map((s) => (s.id === id ? { ...s, ...patch } : s)),
+    }));
+  };
+
+  const removeSession = (id: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      sessions: prev.sessions.filter((s) => s.id !== id),
+    }));
+  };
+
+  /** Construit les sessions à envoyer : début = date+heure, fin = début + durée. */
+  const buildSessionsPayload = () => {
+    const duration = parseFloat(formData.sessionDurationHours) || 0;
+    return formData.sessions
+      .filter((s) => s.date && s.startTime)
+      .map((s) => {
+        const start = new Date(s.date as Date);
+        const [h, m] = s.startTime.split(':').map((n) => parseInt(n, 10));
+        start.setHours(h || 0, m || 0, 0, 0);
+        const end = new Date(start.getTime() + duration * 3600 * 1000);
+        // Forme alignée sur Event.sessions côté back (title/description/speakers).
+        return {
+          id: s.id,
+          title: s.label.trim(),
+          description: '',
+          startAt: start.toISOString(),
+          endAt: end.toISOString(),
+          speakers: [],
+        };
+      });
+  };
+
   const convertToApiFormat = (status: 'draft' | 'publish', imageUrls: string[] = []): CreateEventDto => {
     // Parse start and end times
     const parseTime = (timeStr: string): { hours: number; minutes: number } => {
@@ -702,6 +767,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       onlineLink,
       images: validImages.length > 0 ? validImages : undefined,
       tickets: tickets.length > 0 ? tickets : undefined,
+      // Inscription par session : envoyée seulement si activée et renseignée.
+      sessions: formData.perSession ? (buildSessionsPayload().length > 0 ? buildSessionsPayload() : undefined) : undefined,
       tags: formData.category ? [formData.category.toLowerCase()] : undefined,
       guidelines: formData.faqs.length > 0 ? {
         ageRequirement: '',
@@ -1391,6 +1458,109 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
               </div>
             )}
           </div>
+        </div>
+
+        {/* Inscription par session */}
+        <div className="bg-white border border-light-gray rounded-xl p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold text-black">{t('createEvent.sessions.title')}</h2>
+              <p className="text-sm text-[#4F4F4F] mt-1">{t('createEvent.sessions.help')}</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-1">
+              <input
+                type="checkbox"
+                checked={formData.perSession}
+                onChange={(e) => setFormData((prev) => ({ ...prev, perSession: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-[#BCBCBC] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#FF4000]"></div>
+            </label>
+          </div>
+
+          {formData.perSession && (
+            <div className="mt-5 space-y-4">
+              {/* Durée commune à toutes les sessions */}
+              <div className="max-w-[220px]">
+                <label className="block text-sm font-medium text-black mb-2">
+                  {t('createEvent.sessions.duration')} <span className="text-[#FF3425]">*</span>
+                </label>
+                <input
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  value={formData.sessionDurationHours}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, sessionDurationHours: e.target.value }))}
+                  placeholder={t('createEvent.sessions.durationPlaceholder')}
+                  className="w-full px-4 py-2.5 border border-light-gray rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary transition-all"
+                />
+              </div>
+
+              {/* Liste des sessions */}
+              {formData.sessions.map((session, index) => (
+                <div key={session.id} className="border border-light-gray rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-black">
+                      {t('createEvent.sessions.sessionLabel', { number: index + 1 })}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => removeSession(session.id)}
+                      className="text-red-500 hover:text-red-600 transition-colors"
+                      aria-label={t('createEvent.sessions.remove')}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="sm:col-span-1">
+                      <label className="block text-xs font-medium text-black mb-1.5">{t('createEvent.sessions.name')}</label>
+                      <input
+                        type="text"
+                        value={session.label}
+                        onChange={(e) => updateSession(session.id, { label: e.target.value })}
+                        placeholder={t('createEvent.sessions.namePlaceholder')}
+                        className="w-full px-3 py-2 border border-light-gray rounded-lg text-sm text-black placeholder:text-[#9CA3AF] focus:outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-black mb-1.5">{t('createEvent.sessions.date')}</label>
+                      <input
+                        type="date"
+                        value={session.date ? session.date.toISOString().slice(0, 10) : ''}
+                        min={new Date().toISOString().slice(0, 10)}
+                        onChange={(e) => updateSession(session.id, { date: e.target.value ? new Date(e.target.value) : null })}
+                        className="w-full px-3 py-2 border border-light-gray rounded-lg text-sm text-black focus:outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-black mb-1.5">{t('createEvent.sessions.startTime')}</label>
+                      <input
+                        type="time"
+                        value={session.startTime}
+                        onChange={(e) => updateSession(session.id, { startTime: e.target.value })}
+                        className="w-full px-3 py-2 border border-light-gray rounded-lg text-sm text-black focus:outline-none focus:border-primary transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addSession}
+                className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+              >
+                + {t('createEvent.sessions.add')}
+              </button>
+
+              <p className="text-xs text-[#757575] border-t border-light-gray pt-3">
+                {t('createEvent.sessions.priceNote')}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* 4. Tickets & Pricing */}

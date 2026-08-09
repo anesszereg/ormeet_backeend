@@ -1,5 +1,19 @@
 {
   "createEvent": {
+    "sessions": {
+      "title": "Inscription par session",
+      "help": "Vendez des billets pour chaque session. Les participants pourront s'inscrire à une ou plusieurs sessions.",
+      "duration": "Durée de chaque session (heures)",
+      "durationPlaceholder": "ex. 8",
+      "sessionLabel": "Session {{number}}",
+      "name": "Nom de la session",
+      "namePlaceholder": "ex. Jour 1 — Fondamentaux",
+      "date": "Date",
+      "startTime": "Heure de début",
+      "add": "Ajouter une session",
+      "remove": "Supprimer la session",
+      "priceNote": "Le prix et la capacité définis ci-dessous en billetterie s’appliquent à chaque session."
+    },
     "pageTitle": "{{mode}} un événement",
     "pageSubtitle": "Renseignez les informations essentielles pour {{mode}} votre événement rapidement",
     "backToDashboard": "Retour au tableau de bord",
