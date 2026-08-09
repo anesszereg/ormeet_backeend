@@ -677,11 +677,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         const [h, m] = s.startTime.split(':').map((n) => parseInt(n, 10));
         start.setHours(h || 0, m || 0, 0, 0);
         const end = new Date(start.getTime() + duration * 3600 * 1000);
+        // Forme alignée sur Event.sessions côté back (title/description/speakers).
         return {
           id: s.id,
-          label: s.label.trim(),
+          title: s.label.trim(),
+          description: '',
           startAt: start.toISOString(),
           endAt: end.toISOString(),
+          speakers: [],
         };
       });
   };

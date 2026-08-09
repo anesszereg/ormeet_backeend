@@ -39,12 +39,15 @@ export interface CustomLocation {
   country: string;
 }
 
-/** Une session vendable de l'événement (inscription par session). */
+/** Une session vendable de l'événement (inscription par session).
+ *  Forme alignée sur Event.sessions (backend) : title/description/speakers. */
 export interface EventSessionDto {
   id: string;
-  label: string;
+  title: string;
+  description: string;
   startAt: string;
   endAt: string;
+  speakers: string[];
 }
 
 export interface CreateEventDto {
