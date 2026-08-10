@@ -24,7 +24,12 @@ i18n
     detection: {
       order: ['cookie', 'navigator', 'htmlTag'],
       lookupCookie: LOCALE_COOKIE_NAME,
-      caches: ['cookie'],
+      // Don't let the detector write its own cookie: it would create a
+      // host-only cookie (no `domain`) that shadows the shared
+      // `.ormeet.com` cookie set explicitly by setLocaleCookie() in
+      // LanguageSwitcher, making language changes on the landing page
+      // appear to not carry over to the app.
+      caches: [],
     },
     interpolation: { escapeValue: false },
   });
