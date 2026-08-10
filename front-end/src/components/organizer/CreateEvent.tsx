@@ -2109,16 +2109,19 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 : t('createEvent.visibility.privateHint')}
             </p>
 
-            {/* Liste des emails invités (événement privé) */}
-            {formData.visibility === 'private' && (
-              <div className="mt-4">
+          </div>
+
+          {/* Liste des emails invités (événement privé) — hors du conteneur
+              étroit ci-dessus pour laisser respirer le champ et le bouton. */}
+          {formData.visibility === 'private' && (
+            <div className="mt-5">
                 <label className="block text-sm font-medium text-black mb-2">
                   {t('createEvent.visibility.invitedLabel')} <span className="text-[#FF3425]">*</span>
                 </label>
                 {/* Champ + bouton d'import sur la même ligne */}
                 <div className="flex items-start gap-3">
                 <div
-                  className={`flex-1 min-w-0 flex flex-wrap items-center gap-2 px-3 py-2 border rounded-lg focus-within:border-primary transition-all ${
+                  className={`flex-1 min-w-0 flex flex-wrap items-center gap-2 min-h-[42px] px-4 py-2 border rounded-lg focus-within:border-primary transition-all ${
                     errors.invitedEmails ? 'border-[#FF3425]' : 'border-light-gray'
                   }`}
                 >
@@ -2182,12 +2185,11 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     {t('createEvent.visibility.invitedHint', { count: formData.invitedEmails.length })}
                   </p>
                 )}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Reservation Approval */}
-          <div>
+          <div className="mt-6">
             <label className="block text-sm font-medium text-black mb-2">
               Reservation Approval
             </label>
