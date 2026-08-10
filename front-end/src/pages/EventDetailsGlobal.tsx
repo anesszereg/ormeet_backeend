@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import EventDetailsNavbar from "../components/EventDetailsNavbar";
@@ -107,8 +107,15 @@ const localeMap: Record<string, string> = {
 const EventDetailsGlobal = () => {
   const { t, i18n } = useTranslation("attendee");
   const navigate = useNavigate();
+  const location = useLocation();
   const { eventId } = useParams();
   const { user } = useAuth();
+
+  /** Sends the visitor to /login, remembering this page so Login can send
+   * them back here (or to /register, if they choose to sign up instead)
+   * once they've authenticated. Mirrors the `state.from` pattern used by
+   * ProtectedRoute. */
+  const redirectToLogin = () => navigate("/login", { state: { from: location } });
 
   const handleGoBack = () => {
     if (window.history.length > 1) navigate(-1);
@@ -473,7 +480,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      alert(t("eventDetails.actions.loginToFavorite"));
+      redirectToLogin();
       return;
     }
     if (!eventId) return;
@@ -507,7 +514,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFollow = async () => {
     if (!user) {
-      alert(t("eventDetails.organizer.loginToFollow"));
+      redirectToLogin();
       return;
     }
     if (!eventData?.organizerId) return;
@@ -790,7 +797,7 @@ const EventDetailsGlobal = () => {
                 <button
                   type="button"
                   onClick={handleToggleFavorite}
-                  disabled={!user || isTogglingFavorite}
+                  disabled={isTogglingFavorite}
                   className="flex items-center gap-1.5 cursor-pointer rounded hover:opacity-70 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-pressed={isFavorite}
                   title={
@@ -820,7 +827,7 @@ const EventDetailsGlobal = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleToggleFavorite}
-                    disabled={!user || isTogglingFavorite}
+                    disabled={isTogglingFavorite}
                     className="hover:scale-105 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label={
                       isFavorite
@@ -1253,7 +1260,7 @@ const EventDetailsGlobal = () => {
                       <button
                         onClick={handleToggleFollow}
                         disabled={
-                          !user || isTogglingFollow || !eventData.organizerId
+                          isTogglingFollow || !eventData.organizerId
                         }
                         className={`shrink-0 px-6 py-2.5 min-h-[44px] text-sm font-medium rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
                           isFollowing
