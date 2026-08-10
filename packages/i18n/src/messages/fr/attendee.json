@@ -184,7 +184,8 @@
       "delete": "Supprimer",
       "deleting": "Suppression…",
       "deleteTitle": "Supprimer cet avis ?",
-      "deleteMessage": "Voulez-vous vraiment supprimer cet avis ? Cette action est irréversible."
+      "deleteMessage": "Voulez-vous vraiment supprimer cet avis ? Cette action est irréversible.",
+      "writeReview": "Donner mon avis"
     },
     "faq": {
       "sectionTitle": "Des",

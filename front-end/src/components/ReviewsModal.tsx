@@ -97,7 +97,7 @@ const ReviewsModal = ({ isOpen, onClose, reviews }: ReviewsModalProps) => {
                   <img 
                     src={review.avatar} 
                     alt={review.name} 
-                    className="w-10 h-10 rounded-full shrink-0" 
+                    className="w-10 h-10 rounded-full object-cover shrink-0"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">

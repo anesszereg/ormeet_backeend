@@ -1523,10 +1523,12 @@ const EventDetailsGlobal = () => {
                       className="p-4 bg-white border border-[#EEEEEE] rounded-xl"
                     >
                       <div className="flex items-start gap-3">
+                        {/* object-cover + shrink-0 : sans ça une photo non carrée
+                            est déformée et l'avatar s'écrase si le nom est long. */}
                         <img
                           src={review.avatar}
                           alt={review.name}
-                          className="w-10 h-10 rounded-full"
+                          className="w-10 h-10 rounded-full object-cover shrink-0"
                         />
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-1">
@@ -1600,15 +1602,16 @@ const EventDetailsGlobal = () => {
 
                 {/* Reviews Actions */}
                 <div className="flex flex-wrap items-center gap-3">
+                  {/* Hauteur commune aux deux boutons (h-12) pour les aligner. */}
                   <button
                     onClick={() => setIsReviewsModalOpen(true)}
-                    className="flex items-center justify-between gap-3 ps-6 pe-2 py-2 bg-white text-black text-base font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors"
+                    className="flex items-center justify-between gap-3 h-12 ps-6 pe-1.5 bg-white text-black text-sm font-semibold rounded-full border-2 border-black hover:bg-[#F5F5F5] transition-colors"
                   >
                     <span>{t("eventDetails.reviews.viewAll")}</span>
-                    <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center transition-colors">
+                    <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center shrink-0">
                       <img
                         src={AllReviewsIcon}
-                        alt="View all"
+                        alt=""
                         className="w-9 h-9"
                       />
                     </div>
@@ -1616,7 +1619,7 @@ const EventDetailsGlobal = () => {
                   {user && (
                     <button
                       onClick={openAddReview}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-colors"
+                      className="flex items-center gap-2 h-12 px-6 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-colors"
                     >
                       <svg
                         width="16"
