@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -22,6 +22,11 @@ type UserType = 'attend' | 'organize' | null;
 const OnboardingChoice = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const location = useLocation();
+  // Page the visitor was sent here from (e.g. buying a ticket or favoriting
+  // an event while logged out) — forwarded through signup/login so they can
+  // land back where they started once they've authenticated.
+  const from = (location.state as any)?.from;
   const [selectedType, setSelectedType] = useState<UserType>(null);
 
   const handleSelection = (type: UserType) => {
@@ -35,7 +40,7 @@ const OnboardingChoice = () => {
     // Le formulaire d'inscription gère lui-même le choix email / téléphone :
     // les deux profils y vont directement, en 2 étapes comme l'indique la
     // barre de progression.
-    navigate('/onboarding-signup');
+    navigate('/onboarding-signup', { state: { from } });
   };
 
   return (
