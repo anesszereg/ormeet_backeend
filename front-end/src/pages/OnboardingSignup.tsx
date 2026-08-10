@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAuthErrorMessage } from '../utils/authErrors';
 import authService, { RegisterDto } from '../services/authService';
@@ -10,6 +10,10 @@ import LoginImage from '../assets/imges/login.jpg';
 const OnboardingSignup = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const location = useLocation();
+  // Forwarded from /onboarding-choice — the page to return to once signup
+  // (or login, if the visitor already has an account) completes.
+  const from = (location.state as any)?.from;
   const [searchParams] = useSearchParams();
   const methodParam = searchParams.get('method') as 'email' | 'phone' | null;
   const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>(methodParam === 'phone' ? 'phone' : 'email');
@@ -40,7 +44,7 @@ const OnboardingSignup = () => {
   };
 
   const handleLoginRedirect = () => {
-    navigate('/login');
+    navigate('/login', { state: { from } });
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,9 +83,9 @@ const OnboardingSignup = () => {
       }
       
       if (userType === 'organize') {
-        navigate('/onboarding-brand-info');
+        navigate('/onboarding-brand-info', { state: { from } });
       } else {
-        navigate('/onboarding-interests');
+        navigate('/onboarding-interests', { state: { from } });
       }
     } catch (err: any) {
       const errorMessage = getAuthErrorMessage(err, t, 'errors.registrationFailed');

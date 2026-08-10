@@ -24,7 +24,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/onboarding-choice" state={{ from: location }} replace />;
   }
 
   if (requiredRole && user?.role !== requiredRole) {

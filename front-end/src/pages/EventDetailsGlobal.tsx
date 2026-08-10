@@ -111,11 +111,11 @@ const EventDetailsGlobal = () => {
   const { eventId } = useParams();
   const { user } = useAuth();
 
-  /** Sends the visitor to /login, remembering this page so Login can send
-   * them back here (or to /register, if they choose to sign up instead)
-   * once they've authenticated. Mirrors the `state.from` pattern used by
+  /** Sends the visitor to the login/signup choice page, remembering this
+   * page so they land back here once they've authenticated, whichever way
+   * they choose to do so. Mirrors the `state.from` pattern used by
    * ProtectedRoute. */
-  const redirectToLogin = () => navigate("/login", { state: { from: location } });
+  const redirectToAuth = () => navigate("/onboarding-choice", { state: { from: location } });
 
   const handleGoBack = () => {
     if (window.history.length > 1) navigate(-1);
@@ -480,7 +480,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFavorite = async () => {
     if (!user) {
-      redirectToLogin();
+      redirectToAuth();
       return;
     }
     if (!eventId) return;
@@ -514,7 +514,7 @@ const EventDetailsGlobal = () => {
 
   const handleToggleFollow = async () => {
     if (!user) {
-      redirectToLogin();
+      redirectToAuth();
       return;
     }
     if (!eventData?.organizerId) return;

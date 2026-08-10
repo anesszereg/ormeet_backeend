@@ -95,7 +95,10 @@ const Login = () => {
         ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       if (needsOnboarding) {
-        navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', { replace: true });
+        navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', {
+          replace: true,
+          state: { from: (location.state as any)?.from },
+        });
       } else {
         redirectAfterLogin(user);
       }
@@ -179,15 +182,16 @@ const Login = () => {
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
 
       if (needsOnboarding) {
+        const onboardingState = { state: { from: (location.state as any)?.from } };
         // Redirect to onboarding based on role
         if (user?.role === 'organizer') {
           // Use setTimeout to ensure navigation happens after state updates
           setTimeout(() => {
-            navigate('/onboarding-brand-info', { replace: true });
+            navigate('/onboarding-brand-info', { replace: true, ...onboardingState });
           }, 100);
         } else {
           setTimeout(() => {
-            navigate('/onboarding-interests', { replace: true });
+            navigate('/onboarding-interests', { replace: true, ...onboardingState });
           }, 100);
         }
         return;

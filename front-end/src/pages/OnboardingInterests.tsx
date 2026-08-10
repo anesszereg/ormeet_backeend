@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
 import Logo from '../assets/Svgs/Logo.svg';
@@ -53,6 +53,11 @@ const eventCategories: EventCategory[] = [
 const OnboardingInterests = () => {
   const { t } = useTranslation('attendee');
   const navigate = useNavigate();
+  const location = useLocation();
+  // Forwarded from onboarding-choice/signup — the page to return to (e.g. an
+  // event the visitor was trying to buy tickets for or favorite) once
+  // onboarding completes, instead of always landing on the dashboard.
+  const from = (location.state as any)?.from;
   const { refreshUser, user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>('music');
   const [selectedSubtypes, setSelectedSubtypes] = useState<string[]>([]);
@@ -110,7 +115,10 @@ const OnboardingInterests = () => {
 
       // Check if user is organizer - if so, redirect to brand info page
       if (user?.role === 'organizer') {
-        navigate('/onboarding-brand-info', { replace: true });
+        navigate('/onboarding-brand-info', { replace: true, state: { from } });
+      } else if (from?.pathname) {
+        // Return to the page the visitor was trying to reach before signing up.
+        navigate(from.pathname, { replace: true });
       } else {
         // Redirect to attendee dashboard
         navigate('/dashboard-attendee', { replace: true });

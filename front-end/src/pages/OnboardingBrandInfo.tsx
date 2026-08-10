@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import authService from '../services/authService';
@@ -42,6 +42,10 @@ const eventTypeKeys: Record<string, string> = {
 const OnboardingBrandInfo = () => {
   const { t } = useTranslation('organizer');
   const navigate = useNavigate();
+  const location = useLocation();
+  // Forwarded from onboarding-choice/signup — the page to return to once
+  // onboarding completes, instead of always landing on the dashboard.
+  const from = (location.state as any)?.from;
   const { user, refreshUser } = useAuth();
   const [organisationName, setOrganisationName] = useState('');
   const [selectedEventTypes, setSelectedEventTypes] = useState<string[]>([]);
@@ -89,8 +93,13 @@ const OnboardingBrandInfo = () => {
       // Refresh user data in context
       await refreshUser();
 
-      // Redirect to organizer dashboard
-      navigate('/dashboard-organizer', { replace: true });
+      // Return to the page the visitor was trying to reach before signing
+      // up, if any; otherwise go to the organizer dashboard.
+      if (from?.pathname) {
+        navigate(from.pathname, { replace: true });
+      } else {
+        navigate('/dashboard-organizer', { replace: true });
+      }
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || err.message || t('onboarding.brandInfo.errorFallback');
       setError(errorMessage);
