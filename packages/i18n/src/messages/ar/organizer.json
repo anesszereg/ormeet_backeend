@@ -107,7 +107,8 @@
       "faqQuestionRequired": "السؤال مطلوب",
       "faqAnswerRequired": "الإجابة مطلوبة",
       "sessionDateRequired": "أضِف تاريخ الحصة الأولى على الأقل",
-      "invitedEmailsRequired": "أضِف بريدًا إلكترونيًا واحدًا على الأقل للحدث الخاص"
+      "invitedEmailsRequired": "أضِف بريدًا إلكترونيًا واحدًا على الأقل للحدث الخاص",
+      "sessionOrder": "يجب أن تبدأ الحصة {{number}} بعد انتهاء الحصة السابقة"
     },
     "publicationSection": "النشر والظهور",
     "faq": {

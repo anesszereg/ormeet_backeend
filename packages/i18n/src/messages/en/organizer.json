@@ -107,7 +107,8 @@
       "faqQuestionRequired": "Question is required",
       "faqAnswerRequired": "Answer is required",
       "sessionDateRequired": "Add at least the first session date",
-      "invitedEmailsRequired": "Add at least one guest email for a private event"
+      "invitedEmailsRequired": "Add at least one guest email for a private event",
+      "sessionOrder": "Session {{number}} must start after the previous one ends"
     },
     "publicationSection": "Publication & Visibility",
     "faq": {

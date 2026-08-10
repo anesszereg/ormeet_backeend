@@ -109,7 +109,8 @@
       "faqQuestionRequired": "La question est requise",
       "faqAnswerRequired": "La réponse est requise",
       "sessionDateRequired": "Ajoutez au moins la date de la première session",
-      "invitedEmailsRequired": "Ajoutez au moins un email invité pour un événement privé"
+      "invitedEmailsRequired": "Ajoutez au moins un email invité pour un événement privé",
+      "sessionOrder": "La session {{number}} doit commencer après la fin de la précédente"
     },
     "publicationSection": "Publication et visibilité",
     "faq": {

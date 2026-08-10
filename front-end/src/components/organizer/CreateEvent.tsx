@@ -54,6 +54,8 @@ interface FAQData {
 /** Nombre maximum de sessions vendables par événement. */
 const MAX_SESSIONS = 3;
 
+const localeMap: Record<string, string> = { en: 'en-US', fr: 'fr-FR', ar: 'ar-DZ' };
+
 interface EventFormData {
   title: string;
   category: string;
@@ -75,9 +77,10 @@ interface EventFormData {
   invitedEmails: string[];
   requiresApproval: boolean;
   // Inscription par session (OFF par défaut = comportement global inchangé).
-  // Chaque session = une date ; les heures (startTime/endTime) sont partagées.
+  // Chaque session est un intervalle [début, fin] — même format que dateRange,
+  // une seule journée s'exprimant par début = fin. Les heures sont partagées.
   perSession: boolean;
-  sessionDates: (Date | null)[];
+  sessionRanges: [Date | null, Date | null][];
 }
 
 
@@ -142,7 +145,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         invitedEmails: (initialData as any).invitedEmails ?? [],
         requiresApproval: (initialData as any).requiresApproval ?? false,
         perSession: (initialData as any).perSession ?? false,
-        sessionDates: (initialData as any).sessionDates ?? [null],
+        sessionRanges: (initialData as any).sessionRanges ?? [[null, null]],
       };
     }
     return {
@@ -172,7 +175,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       invitedEmails: [],
       requiresApproval: false,
       perSession: false,
-      sessionDates: [null],
+      sessionRanges: [[null, null]],
     };
   };
 
@@ -194,6 +197,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  // Index de la session dont le calendrier est ouvert (un seul à la fois).
+  const [openSessionPicker, setOpenSessionPicker] = useState<number | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isDragging, setIsDragging] = useState(false);
   const [openPriceTypeDropdown, setOpenPriceTypeDropdown] = useState<string | null>(null);
@@ -265,6 +270,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     setShowStartTimePicker(false);
     setShowEndTimePicker(false);
     setShowDatePicker(false);
+    setOpenSessionPicker(null);
   };
 
   // Initialize map location from initial data
@@ -340,60 +346,72 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     return d;
   };
 
-  const isPastDay = (day: number) =>
-    new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day) < startOfToday();
+  /** Lendemain d'une date, à minuit — borne minimale de la session suivante. */
+  const dayAfter = (d: Date) => {
+    const next = new Date(d);
+    next.setDate(next.getDate() + 1);
+    next.setHours(0, 0, 0, 0);
+    return next;
+  };
 
-  const handleDateSelect = (day: number) => {
+  /** Affichage d'un intervalle : un seul jour, une plage, ou une sélection en cours. */
+  const formatRange = (range: [Date | null, Date | null]) => {
+    const [from, to] = range;
+    if (!from) return '';
+    const fmt = (d: Date) => d.toLocaleDateString(localeMap[i18n.language] || 'en-US');
+    if (!to) return `${fmt(from)} — …`;
+    return from.getTime() === to.getTime() ? fmt(from) : `${fmt(from)} - ${fmt(to)}`;
+  };
+
+  const isBefore = (day: number, min: Date) =>
+    new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day) < min;
+
+  /** Sélection d'un jour dans un intervalle. Recliquer le même jour = journée unique. */
+  const selectDay = (
+    day: number,
+    value: [Date | null, Date | null],
+    onChange: (range: [Date | null, Date | null]) => void,
+    min: Date,
+    close: () => void,
+  ) => {
     const selected = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    if (isPastDay(day)) return;
+    if (selected < min) return;
 
-    if (!formData.dateRange[0] || (formData.dateRange[0] && formData.dateRange[1])) {
-      // Start new selection
-      handleDateRangeChange([selected, null]);
+    if (!value[0] || (value[0] && value[1])) {
+      onChange([selected, null]); // démarre une nouvelle sélection
     } else {
-      // Complete range selection
-      if (selected < formData.dateRange[0]) {
-        handleDateRangeChange([selected, formData.dateRange[0]]);
-      } else {
-        handleDateRangeChange([formData.dateRange[0], selected]);
-      }
-      setShowDatePicker(false);
+      onChange(selected < value[0] ? [selected, value[0]] : [value[0], selected]);
+      close();
     }
   };
 
-  const handleMonthSelect = () => {
-    const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-    const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-    // Sur le mois en cours, on démarre à aujourd'hui plutôt qu'au 1er (ORM-016).
-    const startOfMonth = firstOfMonth < startOfToday() ? startOfToday() : firstOfMonth;
-    if (endOfMonth < startOfToday()) return;
-    handleDateRangeChange([startOfMonth, endOfMonth]);
-    setShowDatePicker(false);
-  };
-
-  const isDateInRange = (day: number): boolean => {
-    if (!formData.dateRange[0]) return false;
+  const isInRange = (day: number, value: [Date | null, Date | null]): boolean => {
+    if (!value[0]) return false;
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    
-    if (!formData.dateRange[1]) {
-      return date.getTime() === formData.dateRange[0].getTime();
-    }
-    
-    return date >= formData.dateRange[0] && date <= formData.dateRange[1];
+    if (!value[1]) return date.getTime() === value[0].getTime();
+    return date >= value[0] && date <= value[1];
   };
 
-  const isDateRangeEdge = (day: number): boolean => {
-    if (!formData.dateRange[0]) return false;
+  const isRangeEdge = (day: number, value: [Date | null, Date | null]): boolean => {
+    if (!value[0]) return false;
     const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    
-    if (formData.dateRange[1]) {
-      return date.getTime() === formData.dateRange[0].getTime() || date.getTime() === formData.dateRange[1].getTime();
+    if (value[1]) {
+      return date.getTime() === value[0].getTime() || date.getTime() === value[1].getTime();
     }
-    
-    return date.getTime() === formData.dateRange[0].getTime();
+    return date.getTime() === value[0].getTime();
   };
 
-  const renderCalendar = () => {
+  /**
+   * Calendrier unique, partagé par « Date de l'événement » et par chaque session.
+   * `min` désactive directement les jours interdits (dates passées, ou dates
+   * antérieures à la fin de la session précédente).
+   */
+  const renderCalendar = (
+    value: [Date | null, Date | null],
+    onChange: (range: [Date | null, Date | null]) => void,
+    min: Date,
+    close: () => void,
+  ) => {
     const { daysInMonth, startingDayOfWeek } = getDaysInMonth(currentMonth);
     const days = [];
     const monthName = currentMonth.toLocaleString('en-US', { month: 'long', year: 'numeric' });
@@ -405,15 +423,15 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
     // Add cells for each day of the month
     for (let day = 1; day <= daysInMonth; day++) {
-      const inRange = isDateInRange(day);
-      const isEdge = isDateRangeEdge(day);
-      const isPast = isPastDay(day);
+      const inRange = isInRange(day, value);
+      const isEdge = isRangeEdge(day, value);
+      const isPast = isBefore(day, min);
 
       days.push(
         <button
           key={day}
           type="button"
-          onClick={() => handleDateSelect(day)}
+          onClick={() => selectDay(day, value, onChange, min, close)}
           disabled={isPast}
           aria-disabled={isPast}
           className={`h-8 flex items-center justify-center text-sm font-normal rounded-full transition-colors
@@ -434,17 +452,21 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         <div className="flex items-center justify-between mb-3">
           <button
             type="button"
-            onClick={handleMonthSelect}
+            onClick={() => {
+              const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+              const endOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+              if (endOfMonth < min) return;
+              onChange([firstOfMonth < min ? min : firstOfMonth, endOfMonth]);
+              close();
+            }}
             className="text-xs text-primary hover:text-primary-dark font-medium transition-colors"
           >
             {t('createEvent.calendar.selectMonth')}
           </button>
-          {(formData.dateRange[0] || formData.dateRange[1]) && (
+          {(value[0] || value[1]) && (
             <button
               type="button"
-              onClick={() => {
-                handleDateRangeChange([null, null]);
-              }}
+              onClick={() => onChange([null, null])}
               className="text-xs text-gray hover:text-black font-medium transition-colors"
             >
               {t('createEvent.calendar.clear')}
@@ -577,11 +599,23 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     if (!formData.eventType) newErrors.eventType = t('createEvent.validation.eventTypeRequired');
     if (formData.perSession) {
       // Mode session : au moins une date de session, aucune dans le passé.
-      const validSessions = formData.sessionDates.filter((d): d is Date => d != null);
-      if (validSessions.length === 0) {
+      const filled = formData.sessionRanges.filter((r) => r[0] != null);
+      if (filled.length === 0) {
         newErrors.dateRange = t('createEvent.validation.sessionDateRequired');
-      } else if (validSessions.some((d) => d < startOfToday())) {
+      } else if (filled.some((r) => (r[0] as Date) < startOfToday())) {
         newErrors.dateRange = t('createEvent.validation.datePast');
+      } else {
+        // Chaque session doit démarrer après la fin de la précédente. Le
+        // calendrier grise déjà ces dates ; ce contrôle couvre un brouillon
+        // rechargé ou une saisie devenue incohérente.
+        for (let i = 1; i < filled.length; i++) {
+          const prevEnd = (filled[i - 1][1] || filled[i - 1][0]) as Date;
+          const start = filled[i][0] as Date;
+          if (start <= prevEnd) {
+            newErrors.dateRange = t('createEvent.validation.sessionOrder', { number: i + 1 });
+            break;
+          }
+        }
       }
     } else if (!formData.dateRange[0] || !formData.dateRange[1]) {
       newErrors.dateRange = t('createEvent.validation.dateRequired');
@@ -679,24 +713,45 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   // --- Inscription par session -------------------------------------------
   const addSessionDate = () => {
     setFormData((prev) =>
-      prev.sessionDates.length >= MAX_SESSIONS
+      prev.sessionRanges.length >= MAX_SESSIONS
         ? prev
-        : { ...prev, sessionDates: [...prev.sessionDates, null] },
+        : { ...prev, sessionRanges: [...prev.sessionRanges, [null, null]] },
     );
   };
 
-  const updateSessionDate = (index: number, date: Date | null) => {
-    setFormData((prev) => ({
-      ...prev,
-      sessionDates: prev.sessionDates.map((d, i) => (i === index ? date : d)),
-    }));
+  /**
+   * Date minimale de la session `index` : lendemain de la fin de la précédente
+   * (une session ne peut pas démarrer avant la fin de celle d'avant), sinon
+   * aujourd'hui. C'est cette borne qui grise les jours interdits.
+   */
+  const minDateForSession = (index: number): Date => {
+    if (index === 0) return startOfToday();
+    const prev = formData.sessionRanges[index - 1];
+    const prevEnd = prev?.[1] || prev?.[0];
+    return prevEnd ? dayAfter(prevEnd) : startOfToday();
+  };
+
+  const updateSessionRange = (index: number, range: [Date | null, Date | null]) => {
+    setFormData((prev) => {
+      const next = prev.sessionRanges.map((r, i) => (i === index ? range : r));
+      // Les sessions suivantes qui deviennent antérieures sont réinitialisées,
+      // pour ne jamais laisser un enchaînement incohérent à l'écran.
+      const end = range[1] || range[0];
+      if (end) {
+        for (let i = index + 1; i < next.length; i++) {
+          const start = next[i][0];
+          if (start && start <= end) next[i] = [null, null];
+        }
+      }
+      return { ...prev, sessionRanges: next };
+    });
     if (errors.dateRange) setErrors((prev) => ({ ...prev, dateRange: '' }));
   };
 
   const removeSessionDate = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      sessionDates: prev.sessionDates.filter((_, i) => i !== index),
+      sessionRanges: prev.sessionRanges.filter((_, i) => i !== index),
     }));
   };
 
@@ -712,16 +767,17 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
     return { hours, minutes };
   };
 
-  /** Une session par date renseignée ; heures de début/fin partagées. */
+  /** Une session par intervalle renseigné ; heures de début/fin partagées.
+   *  Journée unique = début et fin sur le même jour. */
   const buildSessionsPayload = () => {
     const st = parseTimeToHM(formData.startTime);
     const et = parseTimeToHM(formData.endTime);
-    return formData.sessionDates
-      .filter((d): d is Date => d != null)
-      .map((d, i) => {
-        const start = new Date(d);
+    return formData.sessionRanges
+      .filter((r): r is [Date, Date | null] => r[0] != null)
+      .map((r, i) => {
+        const start = new Date(r[0]);
         start.setHours(st.hours, st.minutes, 0, 0);
-        const end = new Date(d);
+        const end = new Date(r[1] || r[0]);
         end.setHours(et.hours, et.minutes, 0, 0);
         return {
           id: `session-${i + 1}`,
@@ -749,12 +805,14 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
 
     // En mode session, les dates de l'événement encadrent les sessions
     // (première session → dernière) ; sinon on utilise la plage saisie.
-    const validSessionDates = formData.sessionDates.filter((d): d is Date => d != null);
-    const startDate = formData.perSession && validSessionDates.length > 0
-      ? new Date(Math.min(...validSessionDates.map((d) => d.getTime())))
+    const sessionBounds = formData.sessionRanges
+      .filter((r) => r[0] != null)
+      .flatMap((r) => [r[0] as Date, (r[1] || r[0]) as Date]);
+    const startDate = formData.perSession && sessionBounds.length > 0
+      ? new Date(Math.min(...sessionBounds.map((d) => d.getTime())))
       : formData.dateRange[0] || new Date();
-    const endDate = formData.perSession && validSessionDates.length > 0
-      ? new Date(Math.max(...validSessionDates.map((d) => d.getTime())))
+    const endDate = formData.perSession && sessionBounds.length > 0
+      ? new Date(Math.max(...sessionBounds.map((d) => d.getTime())))
       : formData.dateRange[1] || formData.dateRange[0] || new Date();
 
     const startTime = parseTime(formData.startTime);
@@ -1117,7 +1175,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 onChange={(e) => setFormData((prev) => ({
                   ...prev,
                   perSession: e.target.checked,
-                  sessionDates: e.target.checked && prev.sessionDates.length === 0 ? [null] : prev.sessionDates,
+                  sessionRanges: e.target.checked && prev.sessionRanges.length === 0 ? [[null, null]] : prev.sessionRanges,
                 }))}
                 className="sr-only peer"
               />
@@ -1128,29 +1186,52 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-start">
             {/* Left Column - Form Fields */}
             <div className="space-y-4 flex flex-col">
-              {/* Sessions : une date par session (mode par session) */}
+              {/* Sessions : même champ + même calendrier que « Date de l'événement ».
+                  Chaque session accepte une journée ou un intervalle ; les jours
+                  antérieurs à la fin de la session précédente sont désactivés. */}
               {formData.perSession && (
-                <div className="space-y-3">
-                  {formData.sessionDates.map((date, index) => (
-                    <div key={index}>
+                <div className="space-y-4" ref={datePickerRef}>
+                  {formData.sessionRanges.map((range, index) => (
+                    <div key={index} className="relative">
                       <label className="block text-sm font-medium text-black mb-2">
                         {t(`createEvent.sessions.date${index + 1}`)} <span className="text-[#FF3425]">*</span>
                       </label>
-                      <div className="flex items-center gap-2">
+                      <div className="relative">
                         <input
-                          type="date"
-                          value={date ? date.toISOString().slice(0, 10) : ''}
-                          min={new Date().toISOString().slice(0, 10)}
-                          onChange={(e) => updateSessionDate(index, e.target.value ? new Date(e.target.value) : null)}
-                          className={`flex-1 px-4 py-2.5 border rounded-lg text-sm focus:outline-none focus:border-primary transition-all ${
+                          type="text"
+                          readOnly
+                          value={formatRange(range)}
+                          placeholder={t('createEvent.form.eventDatePlaceholder')}
+                          onClick={() => {
+                            closeAllDropdowns();
+                            setOpenSessionPicker(openSessionPicker === index ? null : index);
+                            if (openSessionPicker !== index) {
+                              setCurrentMonth(range[0] || minDateForSession(index));
+                            }
+                          }}
+                          className={`w-full px-4 py-2.5 pe-14 border rounded-lg text-sm cursor-pointer focus:outline-none focus:border-primary  transition-all ${
                             errors.dateRange ? 'border-[#FF3425]' : 'border-light-gray'
-                          } ${date ? 'text-black' : 'text-[#9CA3AF]'}`}
+                          } ${!range[0] ? 'text-[#9CA3AF]' : 'text-black'}`}
                         />
-                        {formData.sessionDates.length > 1 && (
+                        <img
+                          src={CalendarIcon}
+                          alt="Calendar"
+                          className={`absolute top-1/2 -translate-y-1/2 w-[30px] h-[30px] cursor-pointer ${
+                            formData.sessionRanges.length > 1 ? 'end-10' : 'end-3'
+                          }`}
+                          onClick={() => {
+                            closeAllDropdowns();
+                            setOpenSessionPicker(openSessionPicker === index ? null : index);
+                            if (openSessionPicker !== index) {
+                              setCurrentMonth(range[0] || minDateForSession(index));
+                            }
+                          }}
+                        />
+                        {formData.sessionRanges.length > 1 && (
                           <button
                             type="button"
                             onClick={() => removeSessionDate(index)}
-                            className="text-red-500 hover:text-red-600 transition-colors shrink-0"
+                            className="absolute end-3 top-1/2 -translate-y-1/2 text-red-500 hover:text-red-600 transition-colors"
                             aria-label={t('createEvent.sessions.remove')}
                           >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1159,9 +1240,16 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                           </button>
                         )}
                       </div>
+                      {openSessionPicker === index &&
+                        renderCalendar(
+                          range,
+                          (r) => updateSessionRange(index, r),
+                          minDateForSession(index),
+                          () => setOpenSessionPicker(null),
+                        )}
                     </div>
                   ))}
-                  {formData.sessionDates.length < MAX_SESSIONS && (
+                  {formData.sessionRanges.length < MAX_SESSIONS && (
                     <button
                       type="button"
                       onClick={addSessionDate}
@@ -1186,11 +1274,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                   <input
                     type="text"
                     readOnly
-                    value={
-                      formData.dateRange[0] && formData.dateRange[1]
-                        ? `${formData.dateRange[0].toLocaleDateString('en-US')} - ${formData.dateRange[1].toLocaleDateString('en-US')}`
-                        : ''
-                    }
+                    value={formatRange(formData.dateRange)}
                     placeholder={t('createEvent.form.eventDatePlaceholder')}
                     onClick={() => {
                       closeAllDropdowns();
@@ -1200,7 +1284,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                       errors.dateRange ? 'border-[#FF3425]' : 'border-light-gray'
                     } ${!formData.dateRange[0] ? 'text-[#9CA3AF]' : 'text-black'}`}
                   />
-                  <img 
+                  <img
                     src={CalendarIcon}
                     alt="Calendar"
                     className="absolute end-3 top-1/2 -translate-y-1/2 w-[30px] h-[30px] cursor-pointer"
@@ -1210,7 +1294,12 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     }}
                   />
                 </div>
-                {showDatePicker && renderCalendar()}
+                {showDatePicker && renderCalendar(
+                  formData.dateRange,
+                  handleDateRangeChange,
+                  startOfToday(),
+                  () => setShowDatePicker(false),
+                )}
                 {errors.dateRange && (
                   <p className="mt-1 text-xs text-[#FF3425]">{errors.dateRange}</p>
                 )}
