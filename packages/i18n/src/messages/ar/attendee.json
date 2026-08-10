@@ -174,7 +174,21 @@
       "edit": "تعديل تقييمي",
       "save": "حفظ",
       "saving": "جارٍ الحفظ…",
-      "cancelEdit": "إلغاء"
+      "cancelEdit": "إلغاء",
+      "addTitle": "اترك تقييمك",
+      "addSubtitle": "شارك تجربتك في هذه الفعالية.",
+      "editTitle": "تعديل تقييمك",
+      "editSubtitle": "عدّل تقييمك أو تعليقك.",
+      "ratingLabel": "تقييمك",
+      "commentLabel": "تعليقك",
+      "commentPlaceholder": "ما رأيك في هذه الفعالية؟",
+      "publish": "نشر",
+      "rateStars": "امنح {{count}} نجمة",
+      "saveError": "تعذّر الحفظ. أعد المحاولة.",
+      "delete": "حذف",
+      "deleting": "جارٍ الحذف…",
+      "deleteTitle": "حذف هذا التقييم؟",
+      "deleteMessage": "هل تريد فعلاً حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء."
     },
     "faq": {
       "sectionTitle": "هل لديك",

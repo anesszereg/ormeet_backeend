@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import EventDetailsNavbar from "../components/EventDetailsNavbar";
 import ReviewsModal from "../components/ReviewsModal";
+import ReviewFormModal from "../components/ReviewFormModal";
 import eventService, { Event as ApiEvent } from "../services/eventService";
 import reviewService, { Review as ApiReview } from "../services/reviewService";
 import userPreferencesService from "../services/userPreferencesService";
@@ -174,31 +175,66 @@ const EventDetailsGlobal = () => {
   // API-driven state
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
-  // Édition d'un avis, réservée à son auteur.
-  const [editingReviewId, setEditingReviewId] = useState<string | number | null>(null);
-  const [editComment, setEditComment] = useState("");
-  const [isSavingReview, setIsSavingReview] = useState(false);
+  // Ajout / modification / suppression d'un avis (pop-ups).
+  const [isReviewFormOpen, setIsReviewFormOpen] = useState(false);
+  const [reviewBeingEdited, setReviewBeingEdited] = useState<ReviewItem | null>(null);
+  const [reviewPendingDelete, setReviewPendingDelete] = useState<ReviewItem | null>(null);
+  const [isDeletingReview, setIsDeletingReview] = useState(false);
 
-  const startEditReview = (review: ReviewItem) => {
-    setEditingReviewId(review.id);
-    setEditComment(review.comment);
+  const openAddReview = () => {
+    setReviewBeingEdited(null);
+    setIsReviewFormOpen(true);
   };
 
-  const saveEditedReview = async () => {
-    if (editingReviewId == null) return;
-    setIsSavingReview(true);
-    try {
-      await reviewService.update(String(editingReviewId), { comment: editComment.trim() });
+  const openEditReview = (review: ReviewItem) => {
+    setReviewBeingEdited(review);
+    setIsReviewFormOpen(true);
+  };
+
+  /** Création ou mise à jour, selon qu'un avis est en cours d'édition. */
+  const submitReview = async (rating: number, comment: string) => {
+    if (reviewBeingEdited) {
+      await reviewService.update(String(reviewBeingEdited.id), { rating, comment });
       setAllReviews((prev) =>
         prev.map((r) =>
-          r.id === editingReviewId ? { ...r, comment: editComment.trim() } : r,
+          r.id === reviewBeingEdited.id ? { ...r, rating, comment } : r,
         ),
       );
-      setEditingReviewId(null);
+    } else {
+      if (!eventId || !user?.id) return;
+      const created = await reviewService.create({ eventId, userId: user.id, rating, comment });
+      setAllReviews((prev) => [
+        {
+          id: created.id,
+          userId: user.id,
+          name: user.name || t("eventDetails.reviews.anonymous", "Anonymous"),
+          avatar:
+            (user as { avatarUrl?: string }).avatarUrl ||
+            `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name || "A")}`,
+          date: new Date().toLocaleDateString(localeMap[i18n.language] || "en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          rating,
+          comment,
+        },
+        ...prev,
+      ]);
+    }
+  };
+
+  const confirmDeleteReview = async () => {
+    if (!reviewPendingDelete) return;
+    setIsDeletingReview(true);
+    try {
+      await reviewService.delete(String(reviewPendingDelete.id));
+      setAllReviews((prev) => prev.filter((r) => r.id !== reviewPendingDelete.id));
+      setReviewPendingDelete(null);
     } catch {
-      // L'avis reste en édition : l'utilisateur peut réessayer sans ressaisir.
+      // La modale reste ouverte : l'utilisateur peut réessayer.
     } finally {
-      setIsSavingReview(false);
+      setIsDeletingReview(false);
     }
   };
   const [trendingEvents, setTrendingEvents] = useState<TrendingEventItem[]>([]);
@@ -1501,19 +1537,32 @@ const EventDetailsGlobal = () => {
                               <span className="text-xs text-[#757575]">
                                 {review.date}
                               </span>
-                              {/* Modification réservée à l'auteur de l'avis */}
-                              {user?.id && review.userId === user.id && editingReviewId !== review.id && (
-                                <button
-                                  type="button"
-                                  onClick={() => startEditReview(review)}
-                                  className="text-[#757575] hover:text-primary transition-colors"
-                                  aria-label={t("eventDetails.reviews.edit")}
-                                  title={t("eventDetails.reviews.edit")}
-                                >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                  </svg>
-                                </button>
+                              {/* Modifier / supprimer : réservé à l'auteur de l'avis */}
+                              {user?.id && review.userId === user.id && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => openEditReview(review)}
+                                    className="text-[#757575] hover:text-primary transition-colors"
+                                    aria-label={t("eventDetails.reviews.edit")}
+                                    title={t("eventDetails.reviews.edit")}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setReviewPendingDelete(review)}
+                                    className="text-[#757575] hover:text-red-500 transition-colors"
+                                    aria-label={t("eventDetails.reviews.delete")}
+                                    title={t("eventDetails.reviews.delete")}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                  </button>
+                                </>
                               )}
                             </div>
                           </div>
@@ -1535,39 +1584,9 @@ const EventDetailsGlobal = () => {
                               </svg>
                             ))}
                           </div>
-                          {editingReviewId === review.id ? (
-                            <div>
-                              <textarea
-                                value={editComment}
-                                onChange={(e) => setEditComment(e.target.value)}
-                                rows={3}
-                                className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black focus:outline-none focus:border-[#FF4000] transition-all resize-none"
-                              />
-                              <div className="flex items-center gap-2 mt-2">
-                                <button
-                                  type="button"
-                                  onClick={saveEditedReview}
-                                  disabled={isSavingReview || !editComment.trim()}
-                                  className="px-4 py-1.5 bg-[#FF4000] text-white text-xs font-semibold rounded-full hover:bg-[#E63900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {isSavingReview
-                                    ? t("eventDetails.reviews.saving")
-                                    : t("eventDetails.reviews.save")}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setEditingReviewId(null)}
-                                  className="px-4 py-1.5 bg-white border border-[#EEEEEE] text-[#4F4F4F] text-xs font-semibold rounded-full hover:bg-[#F8F8F8] transition-colors"
-                                >
-                                  {t("eventDetails.reviews.cancelEdit")}
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                              {review.comment}
-                            </p>
-                          )}
+                          <p className="text-sm text-[#4F4F4F] leading-relaxed">
+                            {review.comment}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -1596,7 +1615,7 @@ const EventDetailsGlobal = () => {
                   </button>
                   {user && (
                     <button
-                      onClick={() => navigate(`/event/${eventId}/review`)}
+                      onClick={openAddReview}
                       className="flex items-center gap-2 px-6 py-2.5 bg-[#FF4000] text-white text-sm font-semibold rounded-full hover:bg-[#E63900] transition-colors"
                     >
                       <svg
@@ -2178,6 +2197,55 @@ const EventDetailsGlobal = () => {
         onClose={() => setIsReviewsModalOpen(false)}
         reviews={allReviews}
       />
+
+      {/* Ajout / modification d'un avis — même pop-up */}
+      <ReviewFormModal
+        isOpen={isReviewFormOpen}
+        onClose={() => setIsReviewFormOpen(false)}
+        isEdit={!!reviewBeingEdited}
+        initialRating={reviewBeingEdited?.rating ?? 0}
+        initialComment={reviewBeingEdited?.comment ?? ""}
+        onSubmit={submitReview}
+      />
+
+      {/* Confirmation avant suppression définitive */}
+      {reviewPendingDelete && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+          onClick={() => setReviewPendingDelete(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold text-black mb-4">
+              {t("eventDetails.reviews.deleteTitle")}
+            </h2>
+            <p className="text-[#4F4F4F] text-base leading-relaxed mb-8">
+              {t("eventDetails.reviews.deleteMessage")}
+            </p>
+            <div className="flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setReviewPendingDelete(null)}
+                className="px-8 py-3 bg-white text-black font-semibold rounded-full border-2 border-[#EEEEEE] hover:bg-[#F8F8F8] transition-colors"
+              >
+                {t("eventDetails.reviews.cancelEdit")}
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteReview}
+                disabled={isDeletingReview}
+                className="px-8 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors disabled:opacity-50"
+              >
+                {isDeletingReview
+                  ? t("eventDetails.reviews.deleting")
+                  : t("eventDetails.reviews.delete")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -170,7 +170,21 @@
       "edit": "Modifier mon avis",
       "save": "Enregistrer",
       "saving": "Enregistrement…",
-      "cancelEdit": "Annuler"
+      "cancelEdit": "Annuler",
+      "addTitle": "Donnez votre avis",
+      "addSubtitle": "Partagez votre expérience de cet événement.",
+      "editTitle": "Modifier votre avis",
+      "editSubtitle": "Ajustez votre note ou votre commentaire.",
+      "ratingLabel": "Votre note",
+      "commentLabel": "Votre commentaire",
+      "commentPlaceholder": "Qu'avez-vous pensé de cet événement ?",
+      "publish": "Publier",
+      "rateStars": "Donner {{count}} étoile(s)",
+      "saveError": "Impossible d'enregistrer. Réessayez.",
+      "delete": "Supprimer",
+      "deleting": "Suppression…",
+      "deleteTitle": "Supprimer cet avis ?",
+      "deleteMessage": "Voulez-vous vraiment supprimer cet avis ? Cette action est irréversible."
     },
     "faq": {
       "sectionTitle": "Des",
