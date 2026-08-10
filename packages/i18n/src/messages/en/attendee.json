@@ -162,7 +162,11 @@
     },
     "reviews": {
       "noReviews": "No reviews yet. Be the first to review this event!",
-      "viewAll": "View all reviews"
+      "viewAll": "View all reviews",
+      "edit": "Edit my review",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancelEdit": "Cancel"
     },
     "faq": {
       "sectionTitle": "Got",
@@ -218,12 +222,17 @@
       "invalidEmail": "Please enter a valid email address."
     },
     "price": {
-      "from": "From"
+      "from": "From",
+      "free": "Free",
+      "freeAndPaid": "Free & paid"
     },
     "getTickets": "Get Tickets Now!",
     "error": {
       "notFound": "Event not found",
       "goBack": "Go Back"
+    },
+    "sessions": {
+      "badge": "{{count}}-session event"
     }
   },
   "ticketList": {
@@ -247,9 +256,15 @@
     },
     "error": {
       "goBack": "Go Back"
+    },
+    "sessions": {
+      "title": "Choose your sessions",
+      "subtitle": "Select at least one session. Each session booked counts as a separate ticket.",
+      "sessionLabel": "Session {{number}}",
+      "pickAtLeastOne": "Select at least one session to continue.",
+      "recap": "{{count}} session(s) selected."
     }
   },
-
   "purchaseConfirmation": {
     "processing": "Processing your order...",
     "error": {
@@ -268,7 +283,6 @@
     "fromPrice": "from",
     "loadMore": "Load More"
   },
-
   "profile": {
     "roleOrganizer": "Organizer",
     "roleAttendee": "Attendee",
@@ -287,7 +301,6 @@
     "notificationPreferences": "Notification Preferences",
     "photoAlt": "Profile"
   },
-
   "support": {
     "title": "Support Center",
     "subtitle": "Need help? We're here for you!",
@@ -319,13 +332,11 @@
     },
     "goBack": "Go Back"
   },
-
   "unauthorized": {
     "title": "Access Denied",
     "description": "You don't have permission to access this page. Please contact an administrator if you believe this is an error.",
     "goToDashboard": "Go to Dashboard"
   },
-
   "hostEvents": {
     "title": "Host Your Events with",
     "titleBrand": "Ormeet",
@@ -368,7 +379,6 @@
     "signIn": "Sign In",
     "alertMessage": "Failed to upgrade account. Please try again."
   },
-
   "myTickets": {
     "title": "My Tickets",
     "tabs": {
@@ -393,7 +403,6 @@
       "cancelled": "You don't have any cancelled events."
     }
   },
-
   "favoriteEvents": {
     "title": "Favourite Events",
     "removeFromFavorites": "Remove from favorites",
@@ -404,7 +413,6 @@
       "description": "Start adding events to your favorites to see them here!"
     }
   },
-
   "following": {
     "title": "Organisers you follow",
     "visitWebsite": "Visit Website →",
@@ -415,31 +423,25 @@
       "description": "Start following organizers to stay updated with their latest events!"
     }
   },
-
   "eventCard": {
     "fromPrice": "from"
   },
-
   "eventListCard": {
     "fromPrice": "from"
   },
-
   "eventMapCard": {
     "fromPrice": "from",
     "closeAria": "Close"
   },
-
   "locationMapModal": {
     "title": "Location",
     "closeMap": "Close map",
     "mapTitle": "Event location map"
   },
-
   "reviewsModal": {
     "title": "All Reviews",
     "reviewCount": "({{count}} reviews)"
   },
-
   "onboardingInterests": {
     "logoAlt": "Ormeet Logo",
     "welcomeTitle": "Welcome to Ormeet!",
@@ -461,7 +463,6 @@
       "holiday": "Holiday"
     }
   },
-
   "accountSettings": {
     "pageTitle": "Personal Info",
     "pageSubtitle": "Verify your personal info to enhance your experience.",
@@ -612,7 +613,6 @@
       }
     }
   },
-
   "eventDetailsComponent": {
     "goBack": "Go Back",
     "dateTime": "Date & Time",
@@ -643,7 +643,6 @@
       "cancel": "Keep Order"
     }
   },
-
   "notificationBell": {
     "ariaLabel": "Notifications",
     "panelTitle": "Notifications",

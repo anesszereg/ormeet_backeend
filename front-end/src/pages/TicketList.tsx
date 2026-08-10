@@ -72,6 +72,15 @@ const TicketList: React.FC = () => {
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; type: PromotionType; value: number } | null>(null);
   const [promoError, setPromoError] = useState<string | null>(null);
   const [promoLoading, setPromoLoading] = useState(false);
+  // Sessions vendables de l'événement, et celles cochées par le participant.
+  const [sessions, setSessions] = useState<Array<{ id: string; title: string; startAt: string; endAt: string }>>([]);
+  const [selectedSessions, setSelectedSessions] = useState<string[]>([]);
+
+  const toggleSession = (id: string) => {
+    setSelectedSessions(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id],
+    );
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -122,6 +131,15 @@ const TicketList: React.FC = () => {
           location: event.customLocation ? `${event.customLocation.city}, ${event.customLocation.country}` : (event.venue ? `${event.venue.city}, ${event.venue.country}` : ''),
           image: event.images?.[0] || EventImageFallback,
         });
+
+        // Événement à sessions : le participant devra en choisir au moins une.
+        const evSessions = (event.sessions || []).map((s: any, i: number) => ({
+          id: s.id || `session-${i + 1}`,
+          title: s.title || `Session ${i + 1}`,
+          startAt: s.startAt,
+          endAt: s.endAt,
+        }));
+        setSessions(evSessions);
       } catch (err: any) {
         console.error('Failed to fetch ticket data:', err);
         setError(err.response?.data?.message || 'Failed to load tickets. Please try again.');
@@ -224,6 +242,8 @@ const TicketList: React.FC = () => {
         eventId,
         eventInfo,
         orderItems,
+        // Sessions retenues : une par session cochée (événement à sessions).
+        sessions: sessions.filter(s => selectedSessions.includes(s.id)),
         subtotal: calculateSubtotal(),
         serviceCharge,
         discountCode: appliedPromo?.code,
@@ -277,6 +297,56 @@ const TicketList: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Ticket Selection */}
           <div className="lg:col-span-2">
+            {/* Choix des sessions — au moins une requise (événement à sessions) */}
+            {sessions.length > 1 && (
+              <div className="bg-white rounded-2xl p-6 border-2 border-[#EEEEEE] mb-4">
+                <h2 className="text-lg font-bold text-black mb-1">
+                  {t('ticketList.sessions.title')}
+                </h2>
+                <p className="text-sm text-[#4F4F4F] mb-4">
+                  {t('ticketList.sessions.subtitle')}
+                </p>
+                <div className="space-y-2">
+                  {sessions.map((s, index) => {
+                    const checked = selectedSessions.includes(s.id);
+                    const start = new Date(s.startAt);
+                    const end = new Date(s.endAt);
+                    const dateStr = start.toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                    const sameDay = start.toDateString() === end.toDateString();
+                    const rangeStr = sameDay
+                      ? dateStr
+                      : `${dateStr} → ${end.toLocaleDateString(localeMap[i18n.language] || 'en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}`;
+                    return (
+                      <label
+                        key={s.id}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                          checked ? 'border-[#FF4000] bg-[#FFF4F3]' : 'border-[#EEEEEE] hover:border-[#CCCCCC]'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleSession(s.id)}
+                          className="w-5 h-5 accent-[#FF4000] cursor-pointer"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-black">
+                            {t('ticketList.sessions.sessionLabel', { number: index + 1 })}
+                          </p>
+                          <p className="text-xs text-[#757575]">{rangeStr}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="mt-3 text-xs text-[#757575]">
+                  {selectedSessions.length === 0
+                    ? t('ticketList.sessions.pickAtLeastOne')
+                    : t('ticketList.sessions.recap', { count: selectedSessions.length })}
+                </p>
+              </div>
+            )}
+
             <div className="space-y-4">
               {tickets.map((ticket) => (
                 <div 
@@ -456,7 +526,7 @@ const TicketList: React.FC = () => {
               <button 
                 onClick={handleContinue}
                 className="hidden lg:block w-full py-3 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors text-base cursor-pointer"
-                disabled={getOrderSummaryItems().length === 0}
+                disabled={getOrderSummaryItems().length === 0 || (sessions.length > 1 && selectedSessions.length === 0)}
               >
                 {t('common:cta.continue')}
               </button>
@@ -474,7 +544,7 @@ const TicketList: React.FC = () => {
         </div>
         <button
           onClick={handleContinue}
-          disabled={getOrderSummaryItems().length === 0}
+          disabled={getOrderSummaryItems().length === 0 || (sessions.length > 1 && selectedSessions.length === 0)}
           className="shrink-0 px-8 h-12 bg-[#FF4000] text-white font-bold rounded-full hover:bg-[#E63900] transition-colors disabled:bg-[#EEEEEE] disabled:text-[#CCCCCC] disabled:cursor-not-allowed whitespace-nowrap"
         >
           {t('common:cta.continue')}

@@ -166,7 +166,11 @@
     },
     "reviews": {
       "noReviews": "Aucun avis pour le moment. Soyez le premier à donner votre avis !",
-      "viewAll": "Voir tous les avis"
+      "viewAll": "Voir tous les avis",
+      "edit": "Modifier mon avis",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "cancelEdit": "Annuler"
     },
     "faq": {
       "sectionTitle": "Des",
@@ -222,12 +226,17 @@
       "invalidEmail": "Veuillez saisir une adresse e-mail valide."
     },
     "price": {
-      "from": "À partir de"
+      "from": "À partir de",
+      "free": "Gratuit",
+      "freeAndPaid": "Gratuit et payant"
     },
     "getTickets": "Réserver maintenant !",
     "error": {
       "notFound": "Événement introuvable",
       "goBack": "Retour"
+    },
+    "sessions": {
+      "badge": "Événement en {{count}} sessions"
     }
   },
   "ticketList": {
@@ -251,9 +260,15 @@
     },
     "error": {
       "goBack": "Retour"
+    },
+    "sessions": {
+      "title": "Choisissez vos sessions",
+      "subtitle": "Sélectionnez au moins une session. Chaque session réservée compte comme un billet distinct.",
+      "sessionLabel": "Session {{number}}",
+      "pickAtLeastOne": "Sélectionnez au moins une session pour continuer.",
+      "recap": "{{count}} session(s) sélectionnée(s)."
     }
   },
-
   "purchaseConfirmation": {
     "processing": "Traitement de votre commande…",
     "error": {
@@ -272,7 +287,6 @@
     "fromPrice": "à partir de",
     "loadMore": "Voir plus"
   },
-
   "profile": {
     "roleOrganizer": "Organisateur",
     "roleAttendee": "Participant",
@@ -291,7 +305,6 @@
     "notificationPreferences": "Préférences de notification",
     "photoAlt": "Photo de profil"
   },
-
   "support": {
     "title": "Centre d'aide",
     "subtitle": "Besoin d'aide ? Nous sommes là pour vous !",
@@ -323,13 +336,11 @@
     },
     "goBack": "Retour"
   },
-
   "unauthorized": {
     "title": "Accès refusé",
     "description": "Vous n'avez pas l'autorisation d'accéder à cette page. Contactez un administrateur si vous pensez qu'il s'agit d'une erreur.",
     "goToDashboard": "Aller au tableau de bord"
   },
-
   "hostEvents": {
     "title": "Organisez vos événements avec",
     "titleBrand": "Ormeet",
@@ -372,7 +383,6 @@
     "signIn": "Se connecter",
     "alertMessage": "Échec de la mise à niveau du compte. Veuillez réessayer."
   },
-
   "myTickets": {
     "title": "Mes billets",
     "tabs": {
@@ -397,7 +407,6 @@
       "cancelled": "Vous n'avez aucun événement annulé."
     }
   },
-
   "favoriteEvents": {
     "title": "Mes favoris",
     "removeFromFavorites": "Retirer des favoris",
@@ -408,7 +417,6 @@
       "description": "Ajoutez des événements à vos favoris pour les retrouver ici !"
     }
   },
-
   "following": {
     "title": "Organisateurs suivis",
     "visitWebsite": "Visiter le site →",
@@ -419,26 +427,21 @@
       "description": "Suivez des organisateurs pour rester informé de leurs prochains événements !"
     }
   },
-
   "eventCard": {
     "fromPrice": "à partir de"
   },
-
   "eventListCard": {
     "fromPrice": "à partir de"
   },
-
   "eventMapCard": {
     "fromPrice": "à partir de",
     "closeAria": "Fermer"
   },
-
   "locationMapModal": {
     "title": "Lieu",
     "closeMap": "Fermer la carte",
     "mapTitle": "Carte du lieu de l'événement"
   },
-
   "reviewsModal": {
     "title": "Tous les avis",
     "reviewCount": "({{count}} avis)"
@@ -464,7 +467,6 @@
       "holiday": "Vacances"
     }
   },
-
   "accountSettings": {
     "pageTitle": "Informations personnelles",
     "pageSubtitle": "Vérifiez vos informations personnelles pour améliorer votre expérience.",
@@ -615,7 +617,6 @@
       }
     }
   },
-
   "eventDetailsComponent": {
     "goBack": "Retour",
     "dateTime": "Date et heure",
@@ -646,7 +647,6 @@
       "cancel": "Conserver la commande"
     }
   },
-
   "notificationBell": {
     "ariaLabel": "Notifications",
     "panelTitle": "Notifications",

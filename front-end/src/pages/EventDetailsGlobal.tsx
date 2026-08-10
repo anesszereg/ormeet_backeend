@@ -40,6 +40,10 @@ interface EventData {
   description: string;
   images: string[];
   price: string;
+  /** Faux pour « Gratuit » / « Gratuit et payant » : pas de « à partir de ». */
+  showPriceFrom: boolean;
+  /** Sessions vendables ; vide pour un événement classique. */
+  sessions: Array<{ id: string; title: string; startAt: string; endAt: string }>;
   rating: number;
   reviewCount: string;
   views: number;
@@ -70,8 +74,28 @@ interface EventData {
   guidelines?: ApiEvent["guidelines"];
 }
 
+/**
+ * Libellé de prix d'un événement, préfixe compris. Trois cas, pour ne pas
+ * confondre un événement entièrement gratuit avec un événement qui propose
+ * aussi des billets payants.
+ */
+const formatEventPriceLabel = (
+  ticketTypes: Array<{ price: number | string }> | undefined,
+  t: (key: string) => string,
+): string => {
+  if (!ticketTypes || ticketTypes.length === 0) return t("eventDetails.price.free");
+  const prices = ticketTypes.map((tt) => Number(tt.price));
+  const min = Math.min(...prices);
+  const max = Math.max(...prices);
+  if (max === 0) return t("eventDetails.price.free");
+  if (min === 0) return t("eventDetails.price.freeAndPaid");
+  return `${t("eventDetails.price.from")} ${formatCurrency(min)}`;
+};
+
 interface ReviewItem {
   id: number | string;
+  /** Auteur de l'avis : seul lui peut le modifier. */
+  userId: string;
   name: string;
   avatar: string;
   date: string;
@@ -150,6 +174,33 @@ const EventDetailsGlobal = () => {
   // API-driven state
   const [eventData, setEventData] = useState<EventData | null>(null);
   const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
+  // Édition d'un avis, réservée à son auteur.
+  const [editingReviewId, setEditingReviewId] = useState<string | number | null>(null);
+  const [editComment, setEditComment] = useState("");
+  const [isSavingReview, setIsSavingReview] = useState(false);
+
+  const startEditReview = (review: ReviewItem) => {
+    setEditingReviewId(review.id);
+    setEditComment(review.comment);
+  };
+
+  const saveEditedReview = async () => {
+    if (editingReviewId == null) return;
+    setIsSavingReview(true);
+    try {
+      await reviewService.update(String(editingReviewId), { comment: editComment.trim() });
+      setAllReviews((prev) =>
+        prev.map((r) =>
+          r.id === editingReviewId ? { ...r, comment: editComment.trim() } : r,
+        ),
+      );
+      setEditingReviewId(null);
+    } catch {
+      // L'avis reste en édition : l'utilisateur peut réessayer sans ressaisir.
+    } finally {
+      setIsSavingReview(false);
+    }
+  };
   const [trendingEvents, setTrendingEvents] = useState<TrendingEventItem[]>([]);
   const [moreFromOrganizerEvents, setMoreFromOrganizerEvents] = useState<
     OrganizerEventItem[]
@@ -190,6 +241,24 @@ const EventDetailsGlobal = () => {
             (min, tt) => Math.min(min, Number(tt.price)),
             Infinity,
           ) ?? 0;
+        const highestPrice =
+          event.ticketTypes?.reduce(
+            (max, tt) => Math.max(max, Number(tt.price)),
+            0,
+          ) ?? 0;
+        /**
+         * Trois cas distincts, pour ne pas confondre un événement entièrement
+         * gratuit avec un événement proposant aussi des billets payants :
+         *  - tout gratuit            → « Gratuit »
+         *  - gratuit ET payant       → « Gratuit et payant »
+         *  - payant                  → « à partir de <prix> »
+         */
+        const priceLabel =
+          lowestPrice === Infinity || highestPrice === 0
+            ? t("eventDetails.price.free")
+            : lowestPrice === 0
+              ? t("eventDetails.price.freeAndPaid")
+              : formatCurrency(lowestPrice);
         const venueAddress = event.customLocation
           ? `${event.customLocation.address}, ${event.customLocation.city}, ${event.customLocation.state} ${event.customLocation.zipCode}, ${event.customLocation.country}`
           : event.venue
@@ -251,10 +320,15 @@ const EventDetailsGlobal = () => {
             event.images && event.images.length > 0
               ? event.images
               : fallbackImages,
-          price:
-            lowestPrice === Infinity || lowestPrice === 0
-              ? "Free"
-              : formatCurrency(lowestPrice),
+          price: priceLabel,
+          // Le préfixe « à partir de » n'a de sens que pour un prix chiffré.
+          showPriceFrom: lowestPrice !== Infinity && lowestPrice > 0,
+          sessions: (event.sessions || []).map((s: any, i: number) => ({
+            id: s.id || `session-${i + 1}`,
+            title: s.title || `Session ${i + 1}`,
+            startAt: s.startAt,
+            endAt: s.endAt,
+          })),
           rating: avgRating.average || 0,
           reviewCount:
             avgRating.count > 1000
@@ -305,6 +379,7 @@ const EventDetailsGlobal = () => {
               localeMap[i18n.language] || "en-US",
               { year: "numeric", month: "long", day: "numeric" },
             ),
+            userId: r.userId || r.user?.id || "",
             rating: r.rating,
             comment: r.comment || "",
           }),
@@ -325,9 +400,8 @@ const EventDetailsGlobal = () => {
         ]
           .slice(0, 10)
           .map((e: ApiEvent, i: number) => {
-            const ePrice = e.ticketTypes?.[0]
-              ? formatCurrency(Number(e.ticketTypes[0].price))
-              : "Free";
+            // Même règle de wording que le prix principal (préfixe compris).
+            const ePrice = formatEventPriceLabel(e.ticketTypes, t);
             return {
               id: e.id,
               title: e.title,
@@ -350,9 +424,8 @@ const EventDetailsGlobal = () => {
                   title: e.title,
                   date: e.startAt,
                   venue: e.venue?.name || e.customLocation?.city || "TBA",
-                  price: e.ticketTypes?.[0]
-                    ? Number(e.ticketTypes[0].price).toFixed(2)
-                    : "0.00",
+                  // Même règle de wording que le prix principal.
+                  price: formatEventPriceLabel(e.ticketTypes, t),
                   image:
                     e.images?.[0] || fallbackImages[i % fallbackImages.length],
                 }))
@@ -412,6 +485,7 @@ const EventDetailsGlobal = () => {
             localeMap[i18n.language] || "en-US",
             { year: "numeric", month: "long", day: "numeric" },
           ),
+          userId: r.userId || r.user?.id || "",
           rating: r.rating,
           comment: r.comment || "",
         }),
@@ -736,6 +810,18 @@ const EventDetailsGlobal = () => {
               <h1 className="text-2xl md:text-3xl font-bold text-black mb-3">
                 {eventData.title}
               </h1>
+
+              {/* Événement à sessions : l'attendee doit le savoir avant de réserver */}
+              {eventData.sessions.length > 1 && (
+                <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full bg-primary-light text-primary">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span className="text-xs font-semibold">
+                    {t("eventDetails.sessions.badge", { count: eventData.sessions.length })}
+                  </span>
+                </div>
+              )}
 
               {/* Description */}
               <p className="text-sm md:text-base text-[#4F4F4F] leading-relaxed mb-4 max-w-full lg:max-w-[650px]">
@@ -1411,9 +1497,25 @@ const EventDetailsGlobal = () => {
                             <h4 className="text-sm font-semibold text-black">
                               {review.name}
                             </h4>
-                            <span className="text-xs text-[#757575]">
-                              {review.date}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-[#757575]">
+                                {review.date}
+                              </span>
+                              {/* Modification réservée à l'auteur de l'avis */}
+                              {user?.id && review.userId === user.id && editingReviewId !== review.id && (
+                                <button
+                                  type="button"
+                                  onClick={() => startEditReview(review)}
+                                  className="text-[#757575] hover:text-primary transition-colors"
+                                  aria-label={t("eventDetails.reviews.edit")}
+                                  title={t("eventDetails.reviews.edit")}
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                  </svg>
+                                </button>
+                              )}
+                            </div>
                           </div>
                           <div className="flex items-center gap-0.5 mb-2">
                             {[...Array(5)].map((_, i) => (
@@ -1433,9 +1535,39 @@ const EventDetailsGlobal = () => {
                               </svg>
                             ))}
                           </div>
-                          <p className="text-sm text-[#4F4F4F] leading-relaxed">
-                            {review.comment}
-                          </p>
+                          {editingReviewId === review.id ? (
+                            <div>
+                              <textarea
+                                value={editComment}
+                                onChange={(e) => setEditComment(e.target.value)}
+                                rows={3}
+                                className="w-full px-3 py-2 border border-[#EEEEEE] rounded-lg text-sm text-black focus:outline-none focus:border-[#FF4000] transition-all resize-none"
+                              />
+                              <div className="flex items-center gap-2 mt-2">
+                                <button
+                                  type="button"
+                                  onClick={saveEditedReview}
+                                  disabled={isSavingReview || !editComment.trim()}
+                                  className="px-4 py-1.5 bg-[#FF4000] text-white text-xs font-semibold rounded-full hover:bg-[#E63900] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {isSavingReview
+                                    ? t("eventDetails.reviews.saving")
+                                    : t("eventDetails.reviews.save")}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingReviewId(null)}
+                                  className="px-4 py-1.5 bg-white border border-[#EEEEEE] text-[#4F4F4F] text-xs font-semibold rounded-full hover:bg-[#F8F8F8] transition-colors"
+                                >
+                                  {t("eventDetails.reviews.cancelEdit")}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-[#4F4F4F] leading-relaxed">
+                              {review.comment}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -1717,7 +1849,7 @@ const EventDetailsGlobal = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-semibold text-black">
-                              {t("eventDetails.trending.fromPrice")}{" "}
+                              {/* Le préfixe est déjà inclus dans le libellé. */}
                               <bdi>{event.price}</bdi>
                             </span>
                           </div>
@@ -1734,9 +1866,11 @@ const EventDetailsGlobal = () => {
               {/* Price and Badge Row */}
               <div className="flex items-center gap-4">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-sm text-[#757575]">
-                    {t("eventDetails.price.from")}
-                  </span>
+                  {eventData.showPriceFrom && (
+                    <span className="text-sm text-[#757575]">
+                      {t("eventDetails.price.from")}
+                    </span>
+                  )}
                   <span className="text-2xl md:text-3xl font-bold text-black">
                     {eventData.price}
                   </span>
@@ -1887,7 +2021,8 @@ const EventDetailsGlobal = () => {
                       </h3>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-black">
-                          {t("eventDetails.trending.fromPrice")} {event.price}
+                          {/* Le préfixe est déjà inclus dans le libellé. */}
+                          {event.price}
                         </span>
                         {event.badge && (
                           <span
@@ -2020,9 +2155,11 @@ const EventDetailsGlobal = () => {
         style={{ boxShadow: "0 -2px 10px rgba(0,0,0,0.08)" }}
       >
         <div className="flex flex-col min-w-0">
-          <span className="text-xs text-[#757575] leading-tight">
-            {t("eventDetails.price.from")}
-          </span>
+          {eventData.showPriceFrom && (
+            <span className="text-xs text-[#757575] leading-tight">
+              {t("eventDetails.price.from")}
+            </span>
+          )}
           <span className="text-lg font-bold text-black leading-tight truncate">
             <bdi>{eventData.price}</bdi>
           </span>

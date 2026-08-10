@@ -75,7 +75,6 @@
     "freePrice": "مجاني",
     "defaultDate": "20 أبريل 2025"
   },
-
   "eventDetails": {
     "dateTime": {
       "sectionTitle": "التاريخ والوقت",
@@ -171,7 +170,11 @@
     },
     "reviews": {
       "noReviews": "لا توجد تقييمات بعد. كن أوّل من يقيّم هذه الفعالية!",
-      "viewAll": "عرض كل التقييمات"
+      "viewAll": "عرض كل التقييمات",
+      "edit": "تعديل تقييمي",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "cancelEdit": "إلغاء"
     },
     "faq": {
       "sectionTitle": "هل لديك",
@@ -227,15 +230,19 @@
       "invalidEmail": "يُرجى إدخال عنوان بريد إلكتروني صالح."
     },
     "price": {
-      "from": "ابتداءً من"
+      "from": "ابتداءً من",
+      "free": "مجاني",
+      "freeAndPaid": "مجاني ومدفوع"
     },
     "getTickets": "احجز الآن!",
     "error": {
       "notFound": "الفعالية غير موجودة",
       "goBack": "رجوع"
+    },
+    "sessions": {
+      "badge": "فعالية من {{count}} حصص"
     }
   },
-
   "ticketList": {
     "goBack": "رجوع",
     "orderSummary": {
@@ -257,9 +264,15 @@
     },
     "error": {
       "goBack": "رجوع"
+    },
+    "sessions": {
+      "title": "اختر حصصك",
+      "subtitle": "اختر حصة واحدة على الأقل. كل حصة محجوزة تُحتسب تذكرة مستقلة.",
+      "sessionLabel": "الحصة {{number}}",
+      "pickAtLeastOne": "اختر حصة واحدة على الأقل للمتابعة.",
+      "recap": "تم اختيار {{count}} حصة."
     }
   },
-
   "purchaseConfirmation": {
     "processing": "جاري معالجة طلبك…",
     "error": {
@@ -278,7 +291,6 @@
     "fromPrice": "ابتداءً من",
     "loadMore": "عرض المزيد"
   },
-
   "profile": {
     "roleOrganizer": "منظّم",
     "roleAttendee": "مشارك",
@@ -297,7 +309,6 @@
     "notificationPreferences": "تفضيلات الإشعارات",
     "photoAlt": "صورة الملف الشخصي"
   },
-
   "support": {
     "title": "مركز المساعدة",
     "subtitle": "تحتاج مساعدة؟ نحن هنا من أجلك!",
@@ -329,13 +340,11 @@
     },
     "goBack": "رجوع"
   },
-
   "unauthorized": {
     "title": "الوصول مرفوض",
     "description": "ليس لديك صلاحية الوصول إلى هذه الصفحة. تواصل مع المسؤول إذا كنت تعتقد أن هذا خطأ.",
     "goToDashboard": "إلى لوحة التحكم"
   },
-
   "hostEvents": {
     "title": "نظّم فعالياتك مع",
     "titleBrand": "Ormeet",
@@ -402,7 +411,6 @@
       "cancelled": "لا توجد لديك فعاليات ملغاة."
     }
   },
-
   "favoriteEvents": {
     "title": "الفعاليات المفضّلة",
     "removeFromFavorites": "إزالة من المفضّلة",
@@ -413,7 +421,6 @@
       "description": "أضف فعاليات إلى مفضّلتك لتجدها هنا!"
     }
   },
-
   "following": {
     "title": "المنظّمون الذين تتابعهم",
     "visitWebsite": "زيارة الموقع ←",
@@ -424,31 +431,25 @@
       "description": "تابع المنظّمين لتبقى على اطّلاع بآخر فعالياتهم!"
     }
   },
-
   "eventCard": {
     "fromPrice": "ابتداءً من"
   },
-
   "eventListCard": {
     "fromPrice": "ابتداءً من"
   },
-
   "eventMapCard": {
     "fromPrice": "ابتداءً من",
     "closeAria": "إغلاق"
   },
-
   "locationMapModal": {
     "title": "المكان",
     "closeMap": "إغلاق الخريطة",
     "mapTitle": "خريطة موقع الفعالية"
   },
-
   "reviewsModal": {
     "title": "كل التقييمات",
     "reviewCount": "({{count}} تقييم)"
   },
-
   "onboardingInterests": {
     "logoAlt": "شعار Ormeet",
     "welcomeTitle": "أهلًا بك في Ormeet!",
@@ -470,7 +471,6 @@
       "holiday": "عطل"
     }
   },
-
   "accountSettings": {
     "pageTitle": "المعلومات الشخصية",
     "pageSubtitle": "أكّد معلوماتك الشخصية لتحسين تجربتك.",
@@ -621,7 +621,6 @@
       }
     }
   },
-
   "eventDetailsComponent": {
     "goBack": "رجوع",
     "dateTime": "التاريخ والوقت",
@@ -652,7 +651,6 @@
       "cancel": "الاحتفاظ بالطلب"
     }
   },
-
   "notificationBell": {
     "ariaLabel": "الإشعارات",
     "panelTitle": "الإشعارات",
