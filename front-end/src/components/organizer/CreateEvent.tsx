@@ -2115,8 +2115,10 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                 <label className="block text-sm font-medium text-black mb-2">
                   {t('createEvent.visibility.invitedLabel')} <span className="text-[#FF3425]">*</span>
                 </label>
+                {/* Champ + bouton d'import sur la même ligne */}
+                <div className="flex items-start gap-3">
                 <div
-                  className={`flex flex-wrap items-center gap-2 w-full px-3 py-2 border rounded-lg focus-within:border-primary transition-all ${
+                  className={`flex-1 min-w-0 flex flex-wrap items-center gap-2 px-3 py-2 border rounded-lg focus-within:border-primary transition-all ${
                     errors.invitedEmails ? 'border-[#FF3425]' : 'border-light-gray'
                   }`}
                 >
@@ -2161,6 +2163,18 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     className="flex-1 min-w-[160px] text-sm text-black bg-transparent outline-none placeholder:text-[#9CA3AF] py-1"
                   />
                 </div>
+                {/* Import des participants d'événements précédents */}
+                <button
+                  type="button"
+                  onClick={() => setIsImportAttendeesOpen(true)}
+                  className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-light-gray text-black hover:border-primary hover:text-primary font-medium text-sm rounded-full transition-all cursor-pointer whitespace-nowrap"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {t('createEvent.visibility.importAttendees')}
+                </button>
+                </div>
                 {errors.invitedEmails ? (
                   <p className="mt-1 text-xs text-[#FF3425]">{errors.invitedEmails}</p>
                 ) : (
@@ -2168,18 +2182,6 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     {t('createEvent.visibility.invitedHint', { count: formData.invitedEmails.length })}
                   </p>
                 )}
-
-                {/* Import des participants d'événements précédents */}
-                <button
-                  type="button"
-                  onClick={() => setIsImportAttendeesOpen(true)}
-                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-white border border-light-gray text-black hover:border-primary hover:text-primary font-medium text-sm rounded-full transition-all cursor-pointer"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  {t('createEvent.visibility.importAttendees')}
-                </button>
               </div>
             )}
           </div>

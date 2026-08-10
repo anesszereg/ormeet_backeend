@@ -6,7 +6,12 @@ import {
   defaultLocale,
   messages,
   LOCALE_COOKIE_NAME,
+  purgeShadowingLocaleCookie,
 } from '@ormeet/i18n';
+
+// Avant toute détection : retirer un ancien cookie propre à l'hôte qui
+// masquerait le cookie partagé et figerait la langue sur une seule valeur.
+purgeShadowingLocaleCookie();
 
 const resources = Object.fromEntries(
   locales.map((loc) => [loc, messages[loc]])

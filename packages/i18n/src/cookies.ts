@@ -39,9 +39,38 @@ export function getLocaleCookie(): Locale | null {
   return isValidLocale(value) ? value : null;
 }
 
+/**
+ * Supprime un éventuel cookie de langue propre à l'hôte courant, qui masquerait
+ * le cookie partagé du domaine parent. À appeler une fois au démarrage : sans
+ * ça, un utilisateur ayant un ancien cookie host-only reste bloqué sur une
+ * langue tant qu'il ne vide pas son navigateur.
+ *
+ * Une suppression sans `domain` ne vise que le cookie host-only : le cookie
+ * partagé sur `.ormeet.com` n'est pas touché.
+ */
+export function purgeShadowingLocaleCookie(): void {
+  if (typeof document === 'undefined') return;
+  const domain = getCookieDomain();
+  if (!domain) return; // en local, le cookie host-only est le bon
+  const cookies = document.cookie.split('; ').filter((c) => c.startsWith(`${LOCALE_COOKIE_NAME}=`));
+  if (cookies.length > 1) {
+    document.cookie = `${LOCALE_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+  }
+}
+
 export function setLocaleCookie(locale: Locale): void {
   if (typeof document === 'undefined') return;
   const domain = getCookieDomain();
+
+  // Purge d'un éventuel cookie de même nom propre à l'hôte courant. Quand deux
+  // cookies portent le même nom, le navigateur renvoie le plus spécifique en
+  // premier : un ancien cookie host-only (écrit avant `caches: []`) masquait le
+  // cookie partagé sur le domaine parent et figeait la langue. Sans cette
+  // purge, seuls les utilisateurs vidant leurs cookies seraient débloqués.
+  if (domain) {
+    document.cookie = `${LOCALE_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+  }
+
   const domainPart = domain ? `; domain=${domain}` : '';
   document.cookie =
     `${LOCALE_COOKIE_NAME}=${locale}; ` +
