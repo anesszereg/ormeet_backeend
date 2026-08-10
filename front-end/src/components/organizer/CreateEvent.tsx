@@ -6,6 +6,7 @@ import authService from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 import CalendarIcon from '../../assets/Svgs/organiser/dashboard/calendrier.svg';
 import EventPreviewModal from './EventPreviewModal';
+import ImportAttendeesModal from './ImportAttendeesModal';
 import StaticTimePicker from './StaticTimePicker';
 
 interface InitialEventData {
@@ -185,6 +186,9 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const [errors, setErrors] = useState<Partial<Record<keyof EventFormData, string>>>({});
   const [ticketErrors, setTicketErrors] = useState<Record<string, Partial<Record<keyof TicketData, string>>>>({});
   const [emailInput, setEmailInput] = useState('');
+  const [isImportAttendeesOpen, setIsImportAttendeesOpen] = useState(false);
+  // Nombre de destinataires effectivement ajoutés, pour la confirmation.
+  const [importedCount, setImportedCount] = useState<number | null>(null);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
   // formData.category stocke la valeur envoyée au back (« Sports ») ; le champ
   // doit afficher le libellé traduit correspondant (« Sport & Football »).
@@ -2139,7 +2143,8 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ',') {
+                      // Espace, Entrée et virgule valident l'adresse en cours.
+                      if (e.key === 'Enter' || e.key === ',' || e.key === ' ') {
                         e.preventDefault();
                         addInvitedEmails(emailInput);
                         setEmailInput('');
@@ -2163,6 +2168,18 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
                     {t('createEvent.visibility.invitedHint', { count: formData.invitedEmails.length })}
                   </p>
                 )}
+
+                {/* Import des participants d'événements précédents */}
+                <button
+                  type="button"
+                  onClick={() => setIsImportAttendeesOpen(true)}
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-white border border-light-gray text-black hover:border-primary hover:text-primary font-medium text-sm rounded-full transition-all cursor-pointer"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {t('createEvent.visibility.importAttendees')}
+                </button>
               </div>
             )}
           </div>
@@ -2255,6 +2272,45 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         onClose={() => setIsPreviewModalOpen(false)}
         eventData={formData}
       />
+
+      <ImportAttendeesModal
+        isOpen={isImportAttendeesOpen}
+        onClose={() => setIsImportAttendeesOpen(false)}
+        alreadyInvited={formData.invitedEmails}
+        onImport={(emails) => {
+          // Compte réellement ajouté (hors doublons), pas le nombre de cases cochées.
+          const existing = new Set(formData.invitedEmails.map((e) => e.toLowerCase()));
+          const added = emails.map((e) => e.toLowerCase()).filter((e) => !existing.has(e));
+          addInvitedEmails(added.join(' '));
+          setImportedCount(added.length);
+        }}
+      />
+
+      {/* Confirmation d'envoi — nombre de destinataires dynamique */}
+      {importedCount !== null && (
+        <div className="fixed inset-0 bg-black/40 z-[70] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center">
+            <div className="w-14 h-14 rounded-full bg-primary-light flex items-center justify-center mx-auto mb-4">
+              <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-black mb-2">
+              {t('createEvent.visibility.inviteSentTitle')}
+            </h2>
+            <p className="text-[#4F4F4F] text-base leading-relaxed mb-8">
+              {t('createEvent.visibility.inviteSentMessage', { count: importedCount })}
+            </p>
+            <button
+              type="button"
+              onClick={() => setImportedCount(null)}
+              className="w-full px-8 py-3 bg-[#FF4000] text-white font-semibold rounded-full hover:bg-[#E63900] transition-colors"
+            >
+              {t('createEvent.visibility.inviteSentClose')}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

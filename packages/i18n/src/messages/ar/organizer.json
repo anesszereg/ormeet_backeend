@@ -153,7 +153,11 @@
       "invitedLabel": "بريد المدعوّين الإلكتروني",
       "invitedPlaceholder": "أدخل بريدًا إلكترونيًا ثم اضغط Enter…",
       "invitedHint": "{{count}} مدعوّ. سيتلقّون دعوة عبر البريد الإلكتروني.",
-      "removeEmail": "إزالة هذا البريد"
+      "removeEmail": "إزالة هذا البريد",
+      "importAttendees": "استيراد مشاركين",
+      "inviteSentTitle": "تم إرسال الدعوات",
+      "inviteSentMessage": "تم إرسال الدعوات بنجاح إلى {{count}} مشارك.",
+      "inviteSentClose": "تم"
     }
   },
   "dashboard": {
@@ -917,5 +921,21 @@
     "timesAvailable_one": "{{count}} توقيت متاح يوم {{date}}",
     "timesAvailable_other": "{{count}} توقيتات متاحة يوم {{date}}",
     "selectTimeSubtitle": "اختر التوقيت الذي يناسبك من الخيارات أدناه."
+  },
+  "importAttendees": {
+    "title": "استيراد مشاركين",
+    "subtitle": "اختر مشاركين من فعالياتك السابقة لدعوتهم.",
+    "allEvents": "كل الفعاليات",
+    "selectAll": "تحديد الكل",
+    "selectedCount": "{{count}} محدَّد",
+    "alreadyInvited": "مدعوّ مسبقًا",
+    "empty": "لا يوجد مشارك لهذا الفلتر.",
+    "error": "تعذّر تحميل المشاركين.",
+    "cancel": "إلغاء",
+    "invite": "دعوة",
+    "discardTitle": "إلغاء التحديد؟",
+    "discardMessage": "سيتم فقدان {{count}} مشارك محدَّد إذا أغلقت الآن.",
+    "discardKeep": "متابعة",
+    "discardConfirm": "إلغاء"
   }
 }

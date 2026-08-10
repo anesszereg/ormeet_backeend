@@ -153,7 +153,11 @@
       "invitedLabel": "Guest emails",
       "invitedPlaceholder": "Type an email and press Enter…",
       "invitedHint": "{{count}} guest(s). They will receive an email invitation.",
-      "removeEmail": "Remove this email"
+      "removeEmail": "Remove this email",
+      "importAttendees": "Import attendees",
+      "inviteSentTitle": "Invitations sent",
+      "inviteSentMessage": "Invitations successfully sent to {{count}} attendee(s).",
+      "inviteSentClose": "Done"
     }
   },
   "dashboard": {
@@ -917,5 +921,21 @@
     "timesAvailable_one": "{{count}} time available for {{date}}",
     "timesAvailable_other": "{{count}} times available for {{date}}",
     "selectTimeSubtitle": "Please select a suitable time for your event from the options below."
+  },
+  "importAttendees": {
+    "title": "Import attendees",
+    "subtitle": "Pick attendees from your previous events to invite them.",
+    "allEvents": "All events",
+    "selectAll": "Select all",
+    "selectedCount": "{{count}} selected",
+    "alreadyInvited": "Already invited",
+    "empty": "No attendee found for this filter.",
+    "error": "Could not load attendees.",
+    "cancel": "Cancel",
+    "invite": "Invite",
+    "discardTitle": "Discard selection?",
+    "discardMessage": "{{count}} selected attendee(s) will be lost if you close now.",
+    "discardKeep": "Keep editing",
+    "discardConfirm": "Discard"
   }
 }

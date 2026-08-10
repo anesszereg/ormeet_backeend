@@ -155,7 +155,11 @@
       "invitedLabel": "Emails des invités",
       "invitedPlaceholder": "Saisissez un email et Entrée…",
       "invitedHint": "{{count}} invité(s). Ils recevront une invitation par email.",
-      "removeEmail": "Retirer cet email"
+      "removeEmail": "Retirer cet email",
+      "importAttendees": "Importer des participants",
+      "inviteSentTitle": "Invitations envoyées",
+      "inviteSentMessage": "Invitations envoyées avec succès à {{count}} participant(s).",
+      "inviteSentClose": "Terminé"
     }
   },
   "dashboard": {
@@ -919,5 +923,21 @@
     "timesAvailable_one": "{{count}} créneau disponible le {{date}}",
     "timesAvailable_other": "{{count}} créneaux disponibles le {{date}}",
     "selectTimeSubtitle": "Choisissez un créneau qui vous convient parmi les options ci-dessous."
+  },
+  "importAttendees": {
+    "title": "Importer des participants",
+    "subtitle": "Sélectionnez des participants de vos événements précédents pour les inviter.",
+    "allEvents": "Tous les événements",
+    "selectAll": "Tout sélectionner",
+    "selectedCount": "{{count}} sélectionné(s)",
+    "alreadyInvited": "Déjà invité",
+    "empty": "Aucun participant trouvé pour ce filtre.",
+    "error": "Impossible de charger les participants.",
+    "cancel": "Annuler",
+    "invite": "Inviter",
+    "discardTitle": "Abandonner la sélection ?",
+    "discardMessage": "{{count}} participant(s) sélectionné(s) seront perdus si vous fermez maintenant.",
+    "discardKeep": "Continuer",
+    "discardConfirm": "Abandonner"
   }
 }
