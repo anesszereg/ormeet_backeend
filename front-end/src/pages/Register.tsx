@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAuthErrorMessage } from '../utils/authErrors';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,12 @@ import LoginImage from '../assets/imges/login.jpg';
 const Register = () => {
   const { t } = useTranslation('auth');
   const navigate = useNavigate();
+  const location = useLocation();
+  // Preserve the page the visitor was sent here from (e.g. via Login's
+  // "Create account" link) so we can forward it to /login after signup,
+  // letting them land back where they started once they've verified their
+  // email and logged in.
+  const from = (location.state as any)?.from;
   const [formData, setFormData] = useState({
     firstName: '',
     familyName: '',
@@ -157,7 +163,7 @@ const Register = () => {
                 {t('register.success.description', { email: formData.email })}
               </p>
               <button
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/login', { state: { from } })}
                 className="w-full px-6 py-3.5 bg-[#FF4000] text-white text-base font-semibold rounded-lg hover:bg-[#E63900] transition-all shadow-sm hover:shadow-md mt-2 cursor-pointer"
               >
                 {t('register.success.goToLogin')}
@@ -351,7 +357,7 @@ const Register = () => {
           {/* Login Link */}
           <div className="text-center">
             <p className="text-sm text-[#4F4F4F]">
-              {t('register.alreadyHaveAccount')} <a href="/login" className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('register.loginLink')}</a>
+              {t('register.alreadyHaveAccount')} <Link to="/login" state={{ from }} className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('register.loginLink')}</Link>
             </p>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getAuthErrorMessage } from '../utils/authErrors';
 import { useAuth } from '../context/AuthContext';
@@ -95,7 +95,10 @@ const Login = () => {
         ? (!user?.hostingEventTypes || user.hostingEventTypes.length === 0)
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
       if (needsOnboarding) {
-        navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', { replace: true });
+        navigate(user?.role === 'organizer' ? '/onboarding-brand-info' : '/onboarding-interests', {
+          replace: true,
+          state: { from: (location.state as any)?.from },
+        });
       } else {
         redirectAfterLogin(user);
       }
@@ -108,7 +111,6 @@ const Login = () => {
 
   const { login, loginWithCode } = useAuth();
   const location = useLocation();
-  const from = (location.state as any)?.from?.pathname || '/';
 
   // After a successful login, redirect back to the page the user came from
   // (passed via ProtectedRoute in location.state.from). If there is no return
@@ -180,15 +182,16 @@ const Login = () => {
         : (!user?.interestedEventCategories || user.interestedEventCategories.length === 0);
 
       if (needsOnboarding) {
+        const onboardingState = { state: { from: (location.state as any)?.from } };
         // Redirect to onboarding based on role
         if (user?.role === 'organizer') {
           // Use setTimeout to ensure navigation happens after state updates
           setTimeout(() => {
-            navigate('/onboarding-brand-info', { replace: true });
+            navigate('/onboarding-brand-info', { replace: true, ...onboardingState });
           }, 100);
         } else {
           setTimeout(() => {
-            navigate('/onboarding-interests', { replace: true });
+            navigate('/onboarding-interests', { replace: true, ...onboardingState });
           }, 100);
         }
         return;
@@ -533,7 +536,10 @@ const Login = () => {
           {/* Sign Up Link */}
           <div className="text-center">
             <p className="text-sm text-[#4F4F4F]">
-              {t('login.newUserPrompt')} <a href="/register" className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('login.createAccount')}</a>
+              {/* Forward the page we were sent here from, so if the visitor
+                  signs up instead of logging in, they still land back where
+                  they started once they've verified their email and logged in. */}
+              {t('login.newUserPrompt')} <Link to="/register" state={{ from: (location.state as any)?.from }} className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('login.createAccount')}</Link>
             </p>
           </div>
         </div>

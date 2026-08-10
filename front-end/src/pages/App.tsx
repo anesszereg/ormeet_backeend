@@ -116,7 +116,11 @@ const App = () => {
         <Route path="/browse-events" element={<SearchResult />} />
         <Route path="/search-results" element={<SearchResult />} />
         <Route path="/event/:eventId" element={<EventDetailsGlobal />} />
-        <Route path="/event/:eventId/tickets" element={<TicketList />} />
+        <Route path="/event/:eventId/tickets" element={
+          <ProtectedRoute>
+            <TicketList />
+          </ProtectedRoute>
+        } />
         <Route path="/event/:eventId/tickets/confirmation" element={
           <ProtectedRoute>
             <PurchaseConfirmation />
