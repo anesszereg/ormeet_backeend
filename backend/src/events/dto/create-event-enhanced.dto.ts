@@ -19,6 +19,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventStatus, EventDateType, RecurringPattern, LocationType, EventVisibility } from '../../entities';
 import { CreateEventTicketTypeDto } from './create-event-ticket-type.dto';
+import { EventGuidelinesDto } from './event-guidelines.dto';
 
 // Sub-DTOs for nested objects
 export class CustomLocationDto {
@@ -45,45 +46,6 @@ export class CustomLocationDto {
   @ApiProperty({ example: 'USA' })
   @IsString()
   country: string;
-}
-
-export class EventGuidelinesDto {
-  @ApiPropertyOptional({ example: '18+' })
-  @IsOptional()
-  @IsString()
-  ageRequirement?: string;
-
-  @ApiPropertyOptional({ example: 'Full refund up to 7 days before event' })
-  @IsOptional()
-  @IsString()
-  refundPolicy?: string;
-
-  @ApiPropertyOptional({ example: 'Wheelchair accessible, ASL interpreter available' })
-  @IsOptional()
-  @IsString()
-  accessibleInfo?: string;
-
-  @ApiPropertyOptional({ example: 'Doors open 30 minutes before start time' })
-  @IsOptional()
-  @IsString()
-  entryPolicy?: string;
-
-  @ApiPropertyOptional({ example: ['Weapons', 'Outside food', 'Professional cameras'] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  prohibitedItems?: string[];
-
-  @ApiPropertyOptional({ example: ['Small bags', 'Water bottles', 'Phones'] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  allowedItems?: string[];
-
-  @ApiPropertyOptional({ example: 'Free parking available in Lot A' })
-  @IsOptional()
-  @IsString()
-  parkingInfo?: string;
 }
 
 export class SpeakerDto {

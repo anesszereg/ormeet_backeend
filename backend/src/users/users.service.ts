@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User, UserRole, Organization } from '../entities';
+import { User, UserRole, Organization, EventCategory } from '../entities';
 import {
   UpdateProfileDto,
   UpdateEmailDto,
@@ -171,7 +171,7 @@ export class UsersService {
   async updateInterests(userId: string, dto: UpdateInterestsDto): Promise<User> {
     const user = await this.findById(userId);
 
-    user.interestedEventCategories = dto.interestedEventCategories as any;
+    user.interestedEventCategories = dto.interestedEventCategories as EventCategory[];
 
     await this.userRepository.save(user);
     return this.sanitizeUser(user);
@@ -180,24 +180,24 @@ export class UsersService {
   async updateHostingTypes(userId: string, dto: UpdateHostingTypesDto): Promise<User> {
     const user = await this.findById(userId);
 
-    user.hostingEventTypes = dto.hostingEventTypes as any;
+    user.hostingEventTypes = dto.hostingEventTypes as EventCategory[];
 
     await this.userRepository.save(user);
     return this.sanitizeUser(user);
   }
 
   private sanitizeUser(user: User): User {
-    const sanitized = { ...user };
+    const sanitized = { ...user } as Partial<User>;
     // Remove sensitive fields
-    delete (sanitized as any).passwordHash;
-    delete (sanitized as any).emailVerificationToken;
-    delete (sanitized as any).passwordResetToken;
-    delete (sanitized as any).passwordResetExpires;
+    delete sanitized.passwordHash;
+    delete sanitized.emailVerificationToken;
+    delete sanitized.passwordResetToken;
+    delete sanitized.passwordResetExpires;
     // Remove relations to prevent localStorage quota exceeded error
-    delete (sanitized as any).orders;
-    delete (sanitized as any).tickets;
-    delete (sanitized as any).reviews;
-    delete (sanitized as any).organization;
-    return sanitized;
+    delete sanitized.orders;
+    delete sanitized.tickets;
+    delete sanitized.reviews;
+    delete sanitized.organization;
+    return sanitized as User;
   }
 }

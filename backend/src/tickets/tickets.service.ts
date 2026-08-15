@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -11,6 +12,7 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class TicketsService {
+  private readonly logger = new Logger(TicketsService.name);
   constructor(
     @InjectRepository(Ticket)
     private readonly ticketRepository: Repository<Ticket>,
@@ -89,16 +91,16 @@ export class TicketsService {
   }
 
   async findByUser(userId: string): Promise<Ticket[]> {
-    console.log(`🔍 Fetching tickets for user: ${userId}`);
+    this.logger.log(`Fetching tickets for user: ${userId}`);
     const tickets = await this.ticketRepository.find({
       where: { ownerId: userId },
       relations: ['order', 'ticketType', 'event', 'event.venue'],
       order: { createdAt: 'DESC' },
     });
-    console.log(`✅ Found ${tickets.length} tickets for user ${userId}`);
+    this.logger.log(`Found ${tickets.length} tickets for user ${userId}`);
     if (tickets.length > 0) {
-      console.log('📋 Ticket IDs:', tickets.map(t => t.id));
-      console.log('📊 First ticket details:', {
+      this.logger.debug('Ticket IDs:', tickets.map(t => t.id));
+      this.logger.debug('First ticket details:', {
         id: tickets[0].id,
         code: tickets[0].code,
         status: tickets[0].status,

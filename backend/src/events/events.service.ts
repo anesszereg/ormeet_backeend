@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
@@ -19,6 +20,8 @@ import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class EventsService {
+  private readonly logger = new Logger(EventsService.name);
+
   constructor(
     @InjectRepository(Event)
     private readonly eventRepository: Repository<Event>,
@@ -31,12 +34,12 @@ export class EventsService {
 
   // Legacy method - kept for backward compatibility
   async create(createEventDto: CreateEventDto): Promise<Event> {
-    const { tickets: _tickets, ...eventData } = createEventDto as any;
+    const { tickets: _tickets, ...eventData } = createEventDto;
     const event = this.eventRepository.create({
       ...eventData,
       status: createEventDto.status || EventStatus.DRAFT,
       visibility: createEventDto.visibility || EventVisibility.PUBLIC,
-    } as any) as unknown as Event;
+    } as Event);
 
     return await this.eventRepository.save(event);
   }
@@ -94,7 +97,7 @@ export class EventsService {
   async update(id: string, updateEventDto: UpdateEventDto): Promise<Event> {
     const event = await this.findOne(id);
 
-    const { tickets, ...eventUpdates } = updateEventDto as any;
+    const { tickets, ...eventUpdates } = updateEventDto as Partial<UpdateEventDto>;
     Object.assign(event, eventUpdates);
 
     const savedEvent = await this.eventRepository.save(event);
@@ -289,6 +292,7 @@ export class EventsService {
     }
 
     // Send invitation emails for private events
+    const failedInvitations: string[] = [];
     if (
       savedEvent.visibility === EventVisibility.PRIVATE &&
       createEventDto.invitedEmails &&
@@ -311,8 +315,9 @@ export class EventsService {
             eventUrl,
           });
         } catch (error) {
-          // Log error but continue with other invitations
-          console.error(`Failed to send invitation to ${email}:`, error);
+          // Track failed invitations and continue with others
+          this.logger.warn(`Failed to send invitation to ${email}:`, error);
+          failedInvitations.push(email);
         }
       }
     }
@@ -322,6 +327,11 @@ export class EventsService {
       where: { id: savedEvent.id },
       relations: ["ticketTypes", "organizer", "venue"],
     });
+
+    // Add failed invitations to the response
+    if (failedInvitations.length > 0) {
+      (eventWithRelations as any).failedInvitations = failedInvitations;
+    }
 
     if (!eventWithRelations) {
       throw new NotFoundException("Event not found after creation");

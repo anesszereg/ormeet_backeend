@@ -245,9 +245,13 @@ export class OrdersService {
       }
     }
 
-    // Calculate fees (you can customize these based on your business logic)
-    const serviceFee = amountSubtotal * 0.05; // 5% service fee
-    const processingFee = (amountSubtotal - discountAmount) * 0.029 + 0.30; // Stripe-like fee
+    // Calculate fees (configurable via environment variables)
+    const serviceFeeRate = parseFloat(process.env.SERVICE_FEE_RATE || '0.05'); // 5% service fee
+    const processingFeeRate = parseFloat(process.env.PROCESSING_FEE_RATE || '0.029'); // 2.9% processing fee
+    const processingFeeFixed = parseFloat(process.env.PROCESSING_FEE_FIXED || '0.30'); // $0.30 fixed fee
+    
+    const serviceFee = amountSubtotal * serviceFeeRate;
+    const processingFee = (amountSubtotal - discountAmount) * processingFeeRate + processingFeeFixed;
 
     // Calculate final total
     const amountTotal = amountSubtotal - discountAmount + serviceFee + processingFee;

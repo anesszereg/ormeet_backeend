@@ -16,54 +16,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventStatus, EventVisibility } from '../../entities';
 import { CreateEventTicketTypeDto } from './create-event-ticket-type.dto';
-
-class EventGuidelinesDto {
-  @ApiPropertyOptional({ example: '18+' })
-  @IsOptional()
-  @IsString()
-  ageRequirement?: string;
-
-  @ApiPropertyOptional({ example: 'Refunds available up to 48 hours before event' })
-  @IsOptional()
-  @IsString()
-  refundPolicy?: string;
-
-  @ApiPropertyOptional({ example: 'Wheelchair accessible venue' })
-  @IsOptional()
-  @IsString()
-  accessibleInfo?: string;
-
-  @ApiPropertyOptional({ example: 'Doors open 30 minutes before start' })
-  @IsOptional()
-  @IsString()
-  entryPolicy?: string;
-
-  @ApiPropertyOptional({ example: ['Outside food', 'Weapons'] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  prohibitedItems?: string[];
-
-  @ApiPropertyOptional({ example: ['Small bags', 'Water bottles'] })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  allowedItems?: string[];
-
-  @ApiPropertyOptional({ example: 'Free parking available' })
-  @IsOptional()
-  @IsString()
-  parkingInfo?: string;
-
-  @ApiPropertyOptional({
-    example: [{ question: 'Can I get a refund?', answer: 'Yes, within 48 hours' }],
-  })
-  @Allow()
-  faqs?: Array<{
-    question: string;
-    answer: string;
-  }>;
-}
+import { EventGuidelinesDto } from './event-guidelines.dto';
 
 export class CreateEventDto {
   @ApiProperty({ example: 'Tech Conference 2025' })
