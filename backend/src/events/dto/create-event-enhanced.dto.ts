@@ -12,6 +12,7 @@ import {
   ValidateNested,
   IsNumber,
   Min,
+  Max,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -296,7 +297,7 @@ export class CreateEventEnhancedDto {
 
   // Sessions
   @ApiPropertyOptional({
-    description: 'Event sessions for per-session registration',
+    description: 'Event sessions for per-session registration (max 3 sessions)',
     example: [
       {
         title: 'Session 1',
@@ -309,6 +310,7 @@ export class CreateEventEnhancedDto {
   })
   @IsOptional()
   @IsArray()
+  @Max(3, { message: 'Maximum 3 sessions allowed per event' })
   sessions?: Array<{
     title: string;
     description: string;
