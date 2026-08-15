@@ -10,7 +10,6 @@ import ResetPassword from './ResetPassword';
 import VerifyEmail from './VerifyEmail';
 import OnboardingChoice from './OnboardingChoice';
 import OnboardingOrganizer from './OnboardingOrganizer';
-import OnboardingSignup from './OnboardingSignup';
 import EmailConfirmation from './EmailConfirmation';
 import OnboardingBrandInfo from './OnboardingBrandInfo';
 import OnboardingInterests from './OnboardingInterests';
@@ -69,11 +68,6 @@ const App = () => {
         <Route path="/onboarding-organizer" element={
           <PublicRoute>
             <OnboardingOrganizer />
-          </PublicRoute>
-        } />
-        <Route path="/onboarding-signup" element={
-          <PublicRoute>
-            <OnboardingSignup />
           </PublicRoute>
         } />
         <Route path="/email-confirmation" element={<EmailConfirmation />} />

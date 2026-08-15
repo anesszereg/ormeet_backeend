@@ -35,12 +35,10 @@ const OnboardingChoice = () => {
 
   const handleContinue = () => {
     if (!selectedType) return;
-    // Relu par /onboarding-signup pour déterminer le rôle à l'inscription.
+    // Store user type for registration to determine role
     localStorage.setItem('userType', selectedType);
-    // Le formulaire d'inscription gère lui-même le choix email / téléphone :
-    // les deux profils y vont directement, en 2 étapes comme l'indique la
-    // barre de progression.
-    navigate('/onboarding-signup', { state: { from } });
+    // Navigate to registration page
+    navigate('/register', { state: { from } });
   };
 
   return (

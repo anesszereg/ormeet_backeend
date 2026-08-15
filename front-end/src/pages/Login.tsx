@@ -538,8 +538,8 @@ const Login = () => {
             <p className="text-sm text-[#4F4F4F]">
               {/* Forward the page we were sent here from, so if the visitor
                   signs up instead of logging in, they still land back where
-                  they started once they've verified their email and logged in. */}
-              {t('login.newUserPrompt')} <Link to="/register" state={{ from: (location.state as any)?.from }} className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('login.createAccount')}</Link>
+                  they started once onboarding completes. */}
+              {t('login.newUserPrompt')} <Link to="/onboarding-choice" state={{ from: (location.state as any)?.from }} className="text-[#FF4000] font-semibold hover:opacity-80 transition-opacity">{t('login.createAccount')}</Link>
             </p>
           </div>
         </div>
