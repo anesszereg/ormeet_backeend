@@ -40,6 +40,7 @@ interface FullEventData {
   mapAddress: string;
   onlineLink: string;
   status: 'ongoing' | 'upcoming' | 'completed' | 'draft';
+  apiStatus: 'draft' | 'publish';
   sold: string;
   category: string;
   eventType: 'in-person' | 'online' | 'hybrid' | '';
@@ -116,7 +117,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           const now = new Date();
           const startDate = new Date(event.startAt);
           const endDate = new Date(event.endAt);
-          
+
           if (event.status === 'draft') {
             status = 'draft';
           } else if (event.status === 'cancelled' || event.status === 'completed') {
@@ -128,6 +129,9 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
           } else {
             status = 'completed';
           }
+
+          // Preserve the original API status for editing
+          const apiStatus: 'draft' | 'publish' = event.status === 'draft' ? 'draft' : 'publish';
 
           const customLocation = (event as any).customLocation;
           const ticketTypes = (event as any).ticketTypes || [];
@@ -148,6 +152,7 @@ const EventsTable = ({ onCreateEvent, onEditEvent, onDuplicateEvent }: EventsTab
             mapAddress: customLocation?.address || '',
             onlineLink: (event as any).onlineLink || '',
             status,
+            apiStatus,
             sold: (() => {
               const totalSold = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantitySold || 0), 0);
               const totalCapacity = ticketTypes.reduce((sum: number, t: any) => sum + (t.quantityTotal || 0), 0);

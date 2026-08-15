@@ -27,6 +27,7 @@ interface EventDataForEdit {
   visibility: 'public' | 'private';
   requiresApproval?: boolean;
   images?: string[];
+  status?: 'draft' | 'publish';
 }
 
 const DashboardOrganizer = () => {
@@ -91,7 +92,8 @@ const DashboardOrganizer = () => {
       faqs: event.faqs,
       visibility: event.visibility,
       requiresApproval: (event as any).requiresApproval,
-      images: event.images
+      images: event.images,
+      status: event.status
     });
     setShowCreateEvent(true);
   };
@@ -156,7 +158,7 @@ const DashboardOrganizer = () => {
             onBack={handleBackToEvents}
           />
         ) : (
-          <EventsTable 
+          <EventsTable
             onCreateEvent={handleCreateEvent}
             onEditEvent={(event) => handleEditEvent({
               id: event.id,
@@ -174,7 +176,8 @@ const DashboardOrganizer = () => {
               tickets: event.tickets,
               faqs: event.faqs,
               visibility: event.visibility,
-              images: event.images
+              images: event.images,
+              status: (event as any).apiStatus || event.status
             })}
             onDuplicateEvent={(event) => handleDuplicateEvent({
               title: event.name,

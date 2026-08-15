@@ -26,6 +26,7 @@ interface InitialEventData {
   faqs: FAQData[];
   visibility: 'public' | 'private';
   images?: string[];
+  status?: 'draft' | 'publish';
 }
 
 interface CreateEventProps {
@@ -141,7 +142,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
           quantity: ''
         }],
         faqs: initialData.faqs,
-        status: 'draft',
+        status: initialData.status || 'draft',
         visibility: initialData.visibility,
         invitedEmails: (initialData as any).invitedEmails ?? [],
         requiresApproval: (initialData as any).requiresApproval ?? false,
@@ -794,7 +795,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
       });
   };
 
-  const convertToApiFormat = (status: 'draft' | 'publish', imageUrls: string[] = []): CreateEventDto => {
+  const convertToApiFormat = (status: 'draft' | 'publish' = 'draft', imageUrls: string[] = []): CreateEventDto => {
     // Parse start and end times
     const parseTime = (timeStr: string): { hours: number; minutes: number } => {
       const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
@@ -908,7 +909,7 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
   const handleSaveDraft = async () => {
     setIsSubmitting(true);
     setSubmitError(null);
-    
+
     try {
       // Upload images first
       let imageUrls: string[] = [];
@@ -917,15 +918,17 @@ const CreateEvent = ({ onSaveDraft, onPublish, onSaveChanges, onBack, mode = 'cr
         imageUrls = await organizerService.uploadImages(filesToUpload);
       }
 
-      const eventData = convertToApiFormat('draft', imageUrls);
-      
+      // Preserve existing status when editing, otherwise use draft
+      const statusToSave = mode === 'edit' ? (formData.status || initialData?.status || 'draft') : 'draft';
+      const eventData = convertToApiFormat(statusToSave, imageUrls);
+
       if (mode === 'edit' && initialData?.id) {
         await organizerService.updateEvent(initialData.id, eventData);
       } else {
         await organizerService.createEvent(eventData);
       }
-      
-      setFormData(prev => ({ ...prev, status: 'draft' }));
+
+      setFormData(prev => ({ ...prev, status: statusToSave }));
       onSaveDraft?.();
     } catch (err: any) {
       console.error('Failed to save draft:', err);
