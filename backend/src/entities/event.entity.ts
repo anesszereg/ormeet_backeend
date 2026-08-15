@@ -190,6 +190,9 @@ export class Event {
   })
   visibility: EventVisibility;
 
+  @Column({ type: 'simple-array', nullable: true, name: 'invited_emails' })
+  invitedEmails: string[];
+
   // Event Guidelines
   @Column({ type: 'jsonb', nullable: true })
   guidelines: {

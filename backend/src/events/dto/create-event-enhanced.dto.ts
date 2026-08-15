@@ -13,6 +13,7 @@ import {
   IsNumber,
   Min,
   Max,
+  IsEmail,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -176,6 +177,16 @@ export class CreateEventEnhancedDto {
   @IsOptional()
   @IsBoolean()
   requiresApproval?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Email addresses invited to private event (only for visibility=private)',
+    example: ['guest1@example.com', 'guest2@example.com'],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @IsEmail({}, { each: true })
+  invitedEmails?: string[];
 
   // Media
   @ApiPropertyOptional({ example: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'] })

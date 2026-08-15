@@ -370,4 +370,61 @@ export class EmailService {
       throw error;
     }
   }
+
+  async sendPrivateEventInvitation(invitationData: {
+    email: string;
+    eventName: string;
+    eventDate: string;
+    eventLocation: string;
+    organizerName: string;
+    eventUrl: string;
+  }) {
+    try {
+      this.logger.log(`📧 Sending private event invitation to: ${invitationData.email}`);
+      const frontendUrl =
+        this.configService.get("FRONTEND_URL") || "http://localhost:5173";
+
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #FF4000;">You're Invited!</h1>
+          </div>
+          <p>Hello,</p>
+          <p>You have been invited to an exclusive private event:</p>
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h2 style="color: #333; margin-top: 0;">${invitationData.eventName}</h2>
+            <p><strong>Date:</strong> ${invitationData.eventDate}</p>
+            <p><strong>Location:</strong> ${invitationData.eventLocation}</p>
+            <p><strong>Organized by:</strong> ${invitationData.organizerName}</p>
+          </div>
+          <p>This is a private event and only invited guests can attend.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${invitationData.eventUrl}"
+               style="background-color: #FF4000; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+              View Event & Register
+            </a>
+          </div>
+          <p style="color: #666; font-size: 12px;">
+            If you can't click the button, copy and paste this link into your browser:<br>
+            ${invitationData.eventUrl}
+          </p>
+        </div>
+      `;
+
+      await this.sendEmail(
+        invitationData.email,
+        `You're Invited: ${invitationData.eventName}`,
+        html,
+      );
+      this.logger.log(
+        `✅ Private event invitation sent successfully to: ${invitationData.email}`,
+      );
+    } catch (error) {
+      this.logger.error(
+        `❌ Failed to send private event invitation to: ${invitationData.email}`,
+        (error as Error)?.stack,
+      );
+      throw error;
+    }
+  }
 }

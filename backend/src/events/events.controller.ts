@@ -283,4 +283,21 @@ export class EventsController {
     await this.eventReminderService.sendRemindersForEvent(event, 0);
     return { message: `Reminders sent for event: ${event.title}` };
   }
+
+  @Get('participants/emails')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ORGANIZER, UserRole.ADMIN)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get all participant emails from organizer events',
+    description: 'Retrieve unique email addresses of all participants who have ordered tickets for any of the organizer events',
+  })
+  @ApiResponse({ status: 200, description: 'List of participant emails', schema: { example: ['user1@example.com', 'user2@example.com'] } })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async getParticipantEmails(@CurrentUser() user: User) {
+    const organizerId = user.organizationId || user.id;
+    const emails = await this.eventsService.getParticipantEmailsFromAllEvents(organizerId);
+    return { emails };
+  }
 }

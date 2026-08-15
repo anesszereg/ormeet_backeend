@@ -12,8 +12,10 @@ import {
   LocationType,
   EventVisibility,
   TicketType,
+  Order,
 } from "../entities";
 import { CreateEventDto, UpdateEventDto, CreateEventEnhancedDto } from "./dto";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class EventsService {
@@ -22,6 +24,9 @@ export class EventsService {
     private readonly eventRepository: Repository<Event>,
     @InjectRepository(TicketType)
     private readonly ticketTypeRepository: Repository<TicketType>,
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+    private readonly emailService: EmailService,
   ) {}
 
   // Legacy method - kept for backward compatibility
@@ -245,6 +250,7 @@ export class EventsService {
       guidelines: createEventDto.guidelines,
       requiresApproval: createEventDto.requiresApproval,
       visibility: createEventDto.visibility || EventVisibility.PUBLIC,
+      invitedEmails: createEventDto.invitedEmails,
 
       // Participants
       speakers: createEventDto.speakers,
@@ -282,6 +288,35 @@ export class EventsService {
       await this.ticketTypeRepository.save(tickets);
     }
 
+    // Send invitation emails for private events
+    if (
+      savedEvent.visibility === EventVisibility.PRIVATE &&
+      createEventDto.invitedEmails &&
+      createEventDto.invitedEmails.length > 0
+    ) {
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const eventUrl = `${frontendUrl}/event/${savedEvent.id}`;
+
+      for (const email of createEventDto.invitedEmails) {
+        try {
+          await this.emailService.sendPrivateEventInvitation({
+            email,
+            eventName: savedEvent.title,
+            eventDate: new Date(savedEvent.startAt).toLocaleDateString(),
+            eventLocation:
+              savedEvent.locationType === LocationType.ONLINE
+                ? "Online Event"
+                : savedEvent.customLocation?.address || "TBA",
+            organizerName: savedEvent.organizer?.name || "Event Organizer",
+            eventUrl,
+          });
+        } catch (error) {
+          // Log error but continue with other invitations
+          console.error(`Failed to send invitation to ${email}:`, error);
+        }
+      }
+    }
+
     // Return event with tickets
     const eventWithRelations = await this.eventRepository.findOne({
       where: { id: savedEvent.id },
@@ -293,5 +328,35 @@ export class EventsService {
     }
 
     return eventWithRelations;
+  }
+
+  async getParticipantEmailsFromAllEvents(organizerId: string): Promise<string[]> {
+    // Get all events by this organizer
+    const events = await this.eventRepository.find({
+      where: { organizerId },
+      select: ["id"],
+    });
+
+    if (events.length === 0) {
+      return [];
+    }
+
+    const eventIds = events.map((e) => e.id);
+
+    // Get all orders for these events
+    const orders = await this.orderRepository.find({
+      where: { eventId: In(eventIds) },
+      relations: ["user"],
+    });
+
+    // Extract unique emails
+    const uniqueEmails = new Set<string>();
+    for (const order of orders) {
+      if (order.user?.email) {
+        uniqueEmails.add(order.user.email);
+      }
+    }
+
+    return Array.from(uniqueEmails);
   }
 }
