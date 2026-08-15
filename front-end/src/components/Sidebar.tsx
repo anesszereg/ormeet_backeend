@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MyTicketIcon from '../assets/Svgs/sidbar/Myticket.svg';
-import FavouriteIcon from '../assets/Svgs/sidbar/favourite.svg';
-import FollowingIcon from '../assets/Svgs/sidbar/following.svg';
-import SettingsIcon from '../assets/Svgs/sidbar/settings.svg';
-import RechercheIcon from '../assets/Svgs/sidbar/recherche.svg';
+import MyTicketIcon from '../assets/Svgs/sidebar/Myticket.svg';
+import FavouriteIcon from '../assets/Svgs/sidebar/favourite.svg';
+import FollowingIcon from '../assets/Svgs/sidebar/following.svg';
+import SettingsIcon from '../assets/Svgs/sidebar/settings.svg';
+import RechercheIcon from '../assets/Svgs/sidebar/recherche.svg';
 import { BsFillArrowLeftCircleFill } from "react-icons/bs";
 import { BsFillArrowRightCircleFill } from "react-icons/bs";
 

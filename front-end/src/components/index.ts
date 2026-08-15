@@ -6,5 +6,3 @@ export { default as Following } from './Following';
 export { default as Footer } from './Footer';
 export { default as EventDetailsNavbar } from './EventDetailsNavbar';
 export { default as ReviewsModal } from './ReviewsModal';
-export { default as DateTimeModal } from './DateTimeModal';
-export { default as LocationMapModal } from './LocationMapModal';
