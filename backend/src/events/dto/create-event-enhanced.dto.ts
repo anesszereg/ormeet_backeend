@@ -294,6 +294,29 @@ export class CreateEventEnhancedDto {
   @Type(() => SponsorDto)
   sponsors?: SponsorDto[];
 
+  // Sessions
+  @ApiPropertyOptional({
+    description: 'Event sessions for per-session registration',
+    example: [
+      {
+        title: 'Session 1',
+        description: 'First session',
+        startAt: '2025-06-15T09:00:00Z',
+        endAt: '2025-06-15T10:00:00Z',
+        speakers: [],
+      },
+    ],
+  })
+  @IsOptional()
+  @IsArray()
+  sessions?: Array<{
+    title: string;
+    description: string;
+    startAt: Date;
+    endAt: Date;
+    speakers: string[];
+  }>;
+
   // Tickets
   @ApiPropertyOptional({ 
     type: [CreateEventTicketTypeDto],

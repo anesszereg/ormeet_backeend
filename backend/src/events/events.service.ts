@@ -250,6 +250,9 @@ export class EventsService {
       speakers: createEventDto.speakers,
       performers: createEventDto.performers,
       sponsors: createEventDto.sponsors,
+
+      // Sessions
+      sessions: createEventDto.sessions,
     });
 
     const savedEvent = await this.eventRepository.save(event);
