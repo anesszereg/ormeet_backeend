@@ -63,10 +63,9 @@ const Register = () => {
     if (name === 'password') {
       setPasswordErrors(validatePassword(value));
     }
-    
+
     // Clear error when user starts typing
     if (error) {
-      console.log('Clearing error on input change');
       setError('');
     }
   };
@@ -76,10 +75,9 @@ const Register = () => {
       ...formData,
       phone: fullPhone,
     });
-    
+
     // Clear error when user starts typing
     if (error) {
-      console.log('Clearing error on phone change');
       setError('');
     }
   };

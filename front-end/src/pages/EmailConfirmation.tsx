@@ -75,7 +75,8 @@ const EmailConfirmation = () => {
         type: verificationType,
         purpose: 'email_verification',
       });
-      alert(t('emailConfirmation.codeSent'));
+      // TODO: Replace with proper toast notification system
+      // alert(t('emailConfirmation.codeSent'));
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Failed to resend code. Please try again.';
       setError(errorMessage);

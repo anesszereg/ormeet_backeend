@@ -31,7 +31,8 @@ const HostEvents = () => {
       navigate(needsOnboarding ? '/onboarding-brand-info' : '/dashboard-organizer');
     } catch (error: any) {
       console.error('❌ Failed to add organizer role:', error);
-      alert(error.response?.data?.message || t('hostEvents.alertMessage'));
+      // TODO: Replace with proper toast notification system
+      // alert(error.response?.data?.message || t('hostEvents.alertMessage'));
     } finally {
       setIsUpgrading(false);
     }

@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useApplyDirection } from '../i18n/useApplyDirection';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PublicRoute from '../components/PublicRoute';
@@ -107,7 +107,6 @@ const App = () => {
         <Route path="/oauth-callback" element={<OAuthCallback />} />
         
         {/* Public Routes - Accessible to everyone */}
-        <Route path="/browse-events" element={<SearchResult />} />
         <Route path="/search-results" element={<SearchResult />} />
         <Route path="/event/:eventId" element={<EventDetailsGlobal />} />
         <Route path="/event/:eventId/tickets" element={
@@ -141,6 +140,9 @@ const App = () => {
 
         {/* Privacy Policy - Public */}
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
+        {/* 404 Catch-all Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
